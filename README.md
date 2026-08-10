@@ -44,7 +44,7 @@ Cada carpeta de proyecto es independiente y contiene su propia documentación de
 - **Vivado** — síntesis, implementación y simulación de diseños en FPGA
 - **SystemVerilog** — descripción de hardware (RTL)
 - **GitHub** — control de versiones y trabajo colaborativo
-- Tarjeta de desarrollo FPGA (BASIC3-Artic7)
+- Tarjeta de desarrollo FPGA (BASys3-Artic7)
 - Componentes discretos (familia 74xx) para las partes implementadas en protoboard
 
 ## Metodología de trabajo
