@@ -1,1 +1,0 @@
-Acá va la documentación específica del proyecto.
