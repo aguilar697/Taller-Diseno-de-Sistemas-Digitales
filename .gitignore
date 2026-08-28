@@ -1,0 +1,39 @@
+# ==========================================================
+# Xilinx Vivado - archivos generados
+# ==========================================================
+
+**/.Xil/
+**/*.cache/
+**/*.gen/
+**/*.hw/
+**/*.ip_user_files/
+**/*.runs/
+**/*.sim/
+**/*.srcs/
+
+*.jou
+*.log
+*.str
+*.dcp
+*.bit
+*.ltx
+*.pb
+*.wdf
+
+# El proyecto .xpr de Vivado contiene rutas locales
+*.xpr
+
+# ==========================================================
+# Sistema operativo / editores
+# ==========================================================
+
+.DS_Store
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+
+*~
+*.swp
+*.tmp
