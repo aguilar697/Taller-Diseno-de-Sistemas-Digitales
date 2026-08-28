@@ -138,6 +138,14 @@ Todos estos bloques utilizan como referencia el reloj principal de 100 MHz.
 
 **Figura 2.** Diagrama de tercer nivel del subsistema FPGA.
 
+El diseño del subsistema FPGA se desarrolló además hasta un cuarto nivel de detalle. En este nivel se representa de forma más específica la relación entre los módulos internos, las señales de control, los registros principales y las interfaces externas utilizadas durante el funcionamiento del juego.
+
+En el diagrama se incluyen, entre otros, el acondicionamiento de los ocho botones, el generador de `tick_1ms`, el receptor UART, la FSM principal, el evaluador de golpes, el controlador de dificultad, el temporizador de turno, los contadores de puntaje, el temporizador de GAME OVER y el controlador de displays de siete segmentos.
+
+![Diagrama de cuarto nivel del subsistema FPGA](img/10_diagrama_nivel_4_fpga.png)
+
+**Figura 3.** Diagrama de cuarto nivel del subsistema FPGA.
+
 ### 4.3 Subsistema discreto
 
 El subsistema discreto se encarga de generar las posiciones utilizadas durante el juego.
@@ -154,7 +162,7 @@ El subsistema responde a la señal `mole_request` generada por la FPGA y posteri
 
 ![Diagrama de tercer nivel del subsistema discreto](img/03_diagrama_nivel_3_discreto.png)
 
-**Figura 3.** Diagrama de tercer nivel del subsistema de lógica discreta.
+**Figura 4.** Diagrama de tercer nivel del subsistema de lógica discreta.
 
 ---
 
@@ -170,7 +178,7 @@ Para el funcionamiento del juego, únicamente los tres bits menos significativos
 
 ![Simulación del receptor UART](img/04_simulacion_uart_rx.png)
 
-**Figura 4.** Verificación funcional del receptor UART mediante simulación.
+**Figura 5.** Verificación funcional del receptor UART mediante simulación.
 
 ### 5.2 Simulación de integración y respuesta UART temprana
 
@@ -200,7 +208,7 @@ La prueba verificó que:
 
 ![Simulación de respuesta UART temprana](img/05_simulacion_uart_temprana.png)
 
-**Figura 5.** Simulación específica de la recepción UART mientras `mole_request` continúa activo.
+**Figura 6.** Simulación específica de la recepción UART mientras `mole_request` continúa activo.
 
 ### 5.3 Medición experimental de la comunicación UART
 
@@ -232,7 +240,7 @@ En la medición también se verificó que la trama UART podía completarse antes
 
 ![Medición de UART en osciloscopio](img/06_osciloscopio_uart.png)
 
-**Figura 6.** Medición experimental de la comunicación UART entre el circuito discreto y la FPGA.
+**Figura 7.** Medición experimental de la comunicación UART entre el circuito discreto y la FPGA.
 
 ### 5.4 Síntesis e implementación FPGA
 
@@ -272,7 +280,7 @@ Asimismo, la verificación DRC posterior a la implementación no reportó violac
 
 ![Resultados de timing y DRC](img/07_timing_y_drc.png)
 
-**Figura 7.** Resultados posteriores a la implementación: análisis temporal y verificación DRC.
+**Figura 8.** Resultados posteriores a la implementación: análisis temporal y verificación DRC.
 
 ### 5.6 Verificación mediante linter
 
@@ -300,7 +308,7 @@ La herramienta indicó un nivel de confianza bajo en la estimación, por lo cual
 
 ![Estimación de potencia](img/08_reporte_potencia.png)
 
-**Figura 8.** Estimación de potencia del diseño implementado en la FPGA.
+**Figura 9.** Estimación de potencia del diseño implementado en la FPGA.
 
 ### 5.8 Implementación física
 
@@ -321,7 +329,7 @@ Durante las pruebas físicas se verificó la interacción entre el circuito disc
 
 ![Implementación física en Basys 3](img/09_implementacion_fisica_basys3.png)
 
-**Figura 9.** Implementación y verificación física del subsistema FPGA en la tarjeta Basys 3.
+**Figura 10.** Implementación y verificación física del subsistema FPGA en la tarjeta Basys 3.
 
 ---
 
