@@ -1,494 +1,412 @@
-# Informe técnico – Proyecto 1: Whack-a-Mole híbrido FPGA / lógica discreta /Sistema discreto
-## 1. Introducción
+# Diseño detallado del subsistema discreto
 
-En este proyecto se desarrolló una versión del juego Whack-a-Mole mediante una arquitectura híbrida compuesta por un subsistema de lógica discreta y un subsistema implementado en FPGA.
+## Proyecto 1 — Whack-a-Mole
 
-El circuito discreto se encarga de generar de forma pseudoaleatoria la posición activa del topo y transmitirla a la FPGA mediante comunicación serial UART. La FPGA se encarga del control general del juego, incluyendo la recepción de la posición, temporización de cada turno, procesamiento de botones, conteo de aciertos y fallos, control de dificultad, fin de partida y visualización de resultados.
+Este documento describe el diseño e implementación del **subsistema de lógica discreta** utilizado en el Proyecto 1 del curso **EL3313 Taller de Diseño Digital**.
 
-La comunicación entre ambos subsistemas se realiza utilizando referencias de tiempo independientes, por lo que fue necesario implementar mecanismos de sincronización y recepción serial confiables.
+El subsistema fue construido utilizando circuitos integrados de la familia 74xx y componentes discretos. Su función es generar la posición pseudoaleatoria del topo, mostrarla mediante LEDs y transmitirla hacia la FPGA mediante una comunicación serial asíncrona.
 
----
+La FPGA y el circuito discreto operan con referencias temporales independientes. La interacción entre ambos se realiza mediante dos señales principales:
 
-## 2. Objetivos
-
-### 2.1 Objetivo general
-
-Implementar un sistema digital híbrido capaz de ejecutar el funcionamiento del juego Whack-a-Mole mediante lógica discreta y una FPGA Basys 3.
-
-### 2.2 Objetivos específicos
-
-- Generar una posición pseudoaleatoria entre las posiciones disponibles del juego.
-- Transmitir la posición generada desde el circuito discreto hacia la FPGA mediante UART.
-- Implementar en FPGA la lógica de control de cada turno.
-- Detectar aciertos, fallos y expiración del tiempo disponible.
-- Implementar una dificultad progresiva reduciendo la ventana de tiempo después de cada acierto.
-- Registrar y mostrar los aciertos y fallos acumulados.
-- Finalizar la partida después de tres fallos consecutivos.
-- Verificar el comportamiento del diseño mediante simulaciones e implementación física.
+- `mole_request`: solicitud generada por la FPGA para producir una nueva posición.
+- `serial_data`: señal serial transmitida por el circuito discreto hacia la FPGA.
 
 ---
 
-## 3. Fundamentación teórica
-
-### 3.1 Diseño digital modular
-
-El diseño modular consiste en dividir un sistema complejo en bloques funcionales independientes que pueden diseñarse, verificarse e integrarse progresivamente.
-
-Esta metodología facilita la identificación de errores, la reutilización de módulos y la comprensión del funcionamiento general del sistema.
-
-En este proyecto se empleó una estructura jerárquica de diseño, desde la representación global del sistema hasta la descripción específica de los módulos implementados.
-
-### 3.2 FPGA
-
-Una FPGA (*Field Programmable Gate Array*) es un circuito integrado reconfigurable que permite implementar sistemas digitales utilizando recursos internos como LUTs, flip-flops, multiplexores, bloques de memoria y redes de interconexión programables.
-
-Para este proyecto se utilizó una tarjeta Basys 3 basada en una FPGA Xilinx Artix-7.
-
-La FPGA funciona con un reloj principal de 100 MHz y ejecuta toda la lógica de control del juego.
-
-### 3.3 Máquinas de estados finitos
-
-Una máquina de estados finitos o FSM (*Finite State Machine*) permite controlar sistemas cuyo comportamiento depende de su estado actual y de las entradas recibidas.
-
-En este proyecto la FSM coordina las principales etapas del juego:
-
-- reinicio;
-- solicitud de una nueva posición;
-- espera de respuesta UART;
-- turno activo;
-- evaluación del resultado;
-- revisión de fallos consecutivos;
-- estado de fin de partida.
-
-### 3.4 Comunicación UART
-
-UART es un protocolo de comunicación serial asíncrono en el cual transmisor y receptor no comparten una señal de reloj.
-
-La comunicación empleada en este proyecto utiliza formato 8N1:
-
-- 1 bit de inicio;
-- 8 bits de datos;
-- sin bit de paridad;
-- 1 bit de parada.
-
-La tasa nominal seleccionada fue de 9600 baud.
-
-Durante las mediciones realizadas al circuito discreto se obtuvo una tasa aproximada de 9616 baud, correspondiente a una diferencia de aproximadamente 0.17 % respecto al valor nominal.
-
-### 3.5 Sincronización de señales asíncronas
-
-La señal serial proveniente del circuito discreto pertenece a un dominio temporal independiente del reloj de la FPGA.
-
-Por esta razón, antes de ser procesada se utiliza un sincronizador de dos flip-flops.
-
-Esta estructura reduce la probabilidad de que un estado metaestable producido al muestrear una señal asíncrona se propague hacia la lógica interna del sistema.
-
-### 3.6 Clock Enable
-
-Todo el diseño FPGA utiliza únicamente el reloj principal de 100 MHz.
-
-Para implementar eventos de menor frecuencia se utiliza una señal de habilitación temporal de 1 ms generada mediante un contador.
-
-Esta señal no constituye un nuevo reloj, sino un *clock enable*, lo cual permite mantener el sistema dentro de un único dominio de reloj.
-
-### 3.7 Debounce de botones
-
-Los pulsadores mecánicos pueden producir varias transiciones durante una única pulsación debido al rebote de sus contactos.
-
-Para evitar que una pulsación sea interpretada como múltiples eventos, las entradas de los botones son sincronizadas, filtradas mediante *debounce* y posteriormente procesadas mediante detección de flanco.
-
-### 3.10 Registros de desplazamiento con realimentación lineal
-
-Un registro de desplazamiento simple, en el que cada biestable transfiere su contenido al
-siguiente en cada flanco de reloj, se vacía a ceros tras un número de ciclos igual a su longitud.
-Un LFSR evita esa degeneración realimentando la entrada de la primera etapa con una combinación
-lineal de las salidas de etapas seleccionadas utilizando una XOR.
-
-La elección de taps se describe mediante un polinomio de realimentación de grado n igual al
-número de etapas. Para *n* = 3 se escogió el siguiente polinomio: x³ + x² + 1.
-
-El estado excluido en una realimentación XOR es el 000: si las tres etapas valen 0, la
-XOR de cualquier subconjunto de ellas también vale 0, de modo que el registro se realimenta a sí
-mismo y queda atrapado de forma permanente. Esto obliga a inicializar el registro en un estado
-distinto de cero, condición que en este diseño se satisface mediante las entradas asíncronas de
-los biestables.
-
-Conviene notar que la secuencia es determinista y periódica: no se trata de aleatoriedad genuina
-sino de una permutación fija de los estados no nulos. La propiedad que la hace útil para el juego
-es que el orden de recorrido no resulta evidente para el jugador, y que cada posición aparece
-exactamente una vez por período.
-
-### 3.11 Decodificador de 3 a 8 líneas
-
-Un decodificador traduce una palabra binaria de n bits en la activación de exactamente una de
-2ⁿ líneas de salida. El 74LS138 implementa esta función para n = 3. Sus salidas son activas en bajo: la línea seleccionada se lleva a 0 lógico y las siete
-restantes permanecen en 1. Esta polaridad determina la forma de conectar los indicadores
-luminosos, según se detalla en la sección 3.4.
-
-### 3.12 Comunicación serial asíncrona UART
-
-UART transmite una palabra de datos bit a bit sobre una única línea, sin acompañarla de un reloj.
-La sincronización se logra mediante una trama de estructura acordada:
-
-| Campo | Nivel | Duración | Función |
-|---|---|---|---|
-| Reposo | 1 | indefinida | Estado de la línea sin transmisión |
-| Bit de inicio | 0 | 1 bit | Marca el comienzo de la trama |
-| Datos | variable | 8 bits | Carga útil, LSB primero |
-| Bit de parada | 1 | 1 bit | Cierra la trama y restaura el reposo |
-
-El receptor detecta el flanco de bajada del bit de inicio y, a partir de ese instante, muestrea la
-línea en el centro de cada intervalo de bit usando su propio reloj. Muestrear en el centro y
-no en los flancos maximiza el margen frente a diferencias de temporización entre ambos extremos.
-
-### 3.13 Metaestabilidad y sincronizadores de dos etapas
-
-Un biestable exige que su entrada permanezca estable durante una ventana alrededor del flanco de
-reloj, definida por sus tiempos de setup y hold. Cuando una señal proveniente de un dominio de
-reloj distinto viola esa ventana, la salida puede quedar transitoriamente en un nivel indefinido
-entre 0 y 1 antes de resolverse hacia un valor válido: el fenómeno de metaestabilidad.
-
-La técnica estándar es el sincronizador de dos etapas: dos biestables en cascada gobernados
-por el reloj de destino. El primero puede volverse metaestable, pero dispone de un ciclo completo
-para resolverse antes de que el segundo lo muestree, lo que reduce la probabilidad de propagar un
-valor indefinido en varios órdenes de magnitud.
-
-En este diseño la señal de solicitud proveniente de la FPGA es asíncrona respecto al reloj del
-protoboard, por lo que atraviesa un sincronizador de dos etapas antes de ser utilizada por
-cualquier otro bloque.
-
-
-
-### 3.14 Detección de flanco
-
-Un sincronizador de dos etapas ofrece de forma natural la misma señal en dos versiones retrasadas
-un ciclo entre sí. Comparándolas se identifica el instante exacto de una transición: si la versión
-menos retrasada ya vale 1 mientras la más retrasada aún vale 0, acaba de ocurrir un flanco de
-subida.
-
-La condición se implementa con una única compuerta, y su salida es un pulso de exactamente un
-ciclo de reloj de duración, con independencia de cuánto dure la señal original. Esta propiedad es
-la que garantiza que el LFSR avance una sola vez por solicitud, tal como exige la
-especificación, sin depender del comportamiento temporal de la FPGA.
-
-
-### 3.15 Registro de desplazamiento paralelo-a-serie
-
-El 74LS165 carga ocho bits en paralelo cuando su entrada SH/~LD está en nivel bajo, y los
-desplaza hacia la salida serie QH en cada flanco de reloj mientras dicha entrada permanece en
-alto. El desplazamiento ocurre de la etapa A hacia la H, de modo que el contenido de **H es el
-primero en aparecer** sobre la salida y el de A el último.
-
-Dos dispositivos se encadenan conectando la salida QH del primero a la entrada serie SER del
-segundo, formando un registro de 16 posiciones, de los cuales solo se utilzan 10 bits. 
-
-
-
-### 3.16 Tiempos de propagación, contaminación y ruta crítica
-
-Ninguna compuerta responde de forma instantánea. Ante un cambio en sus entradas, su salida
-permanece estable durante un intervalo y luego transita hacia el nuevo valor. Dos parámetros
-acotan ese comportamiento:
-
-- **Tiempo de contaminación** (*t<sub>cd</sub>*): intervalo mínimo durante el cual la salida
-  conserva con certeza su valor anterior tras un cambio en la entrada. Es una cota inferior.
-- **Tiempo de propagación** (*t<sub>pd</sub>*): intervalo máximo tras el cual la salida ha
-  adoptado con certeza su nuevo valor. Es una cota superior.
-
-Entre ambos instantes la salida se encuentra en transición y su valor no está definido. Muestrear
-una señal en ese intervalo produce resultados impredecibles, dependientes de las condiciones
-eléctricas particulares del montaje.
-
-La **ruta crítica** de un circuito combinacional es el camino de mayor retardo acumulado entre
-cualquier entrada y cualquier salida. En un sistema secuencial determina la frecuencia máxima de
-operación, puesto que el período de reloj debe satisfacer:
-
-$$T_{clk} \ge t_{pcq} + t_{pd,\text{crítica}} + t_{setup}$$
-
-donde *t<sub>pcq</sub>* es el retardo del biestable desde el flanco de reloj hasta su salida.
-
-En este subsistema estos parámetros importan por dos razones. La primera es que la frecuencia de
-operación es de apenas 9,6 kHz, con un período de 104 µs frente a retardos típicos de la serie LS
-del orden de 10 a 20 ns por compuerta. El margen es de más de tres órdenes de magnitud, por lo que
-la ruta crítica no impone ninguna restricción práctica al diseño.
-
-La segunda razón es más sutil y sí resulta determinante: cuando dos señales derivadas de un mismo
-origen recorren rutas con distinto número de compuertas, la diferencia entre sus tiempos de
-propagación establece un desfase relativo entre ellas. Ese desfase puede aprovecharse
-deliberadamente para separar en el tiempo dos eventos que de otro modo coincidirían, técnica que
-este diseño emplea según se analiza en la sección 5.4.
+## 1. Propósito del subsistema
+
+El subsistema discreto realiza cuatro funciones principales:
+
+1. Generar su propia referencia temporal para la comunicación serial.
+2. Detectar una nueva solicitud enviada por la FPGA.
+3. Generar una nueva posición pseudoaleatoria mediante un LFSR.
+4. Mostrar y transmitir la posición seleccionada.
+
+El funcionamiento general puede resumirse como:
+
+```text
+FPGA
+ │
+ │ mole_request
+ ▼
+┌─────────────────────────┐
+│ Procesamiento de        │
+│ solicitud               │
+└────────────┬────────────┘
+             │
+             ▼
+┌─────────────────────────┐
+│ LFSR de 3 bits          │
+│ Generación de posición  │
+└───────┬─────────┬───────┘
+        │         │
+        │         └─────────────────────┐
+        ▼                               ▼
+┌──────────────────┐          ┌───────────────────┐
+│ Decodificador    │          │ Transmisor UART  │
+│ 3 → 8            │          │ paralelo → serie │
+└────────┬─────────┘          └─────────┬─────────┘
+         │                              │
+         ▼                              ▼
+      8 LEDs                       serial_data
+                                        │
+                                        ▼
+                                      FPGA
+```
 
 ---
 
-## 4. Implementación del sistema
+## 2. Arquitectura modular
 
-### 4.1 Arquitectura general
+El diseño discreto fue dividido en siete bloques funcionales.
 
-El sistema se divide en dos subsistemas principales:
+| Módulo | Función principal |
+|---|---|
+| **M1** | Generación de la señal temporal mediante oscilador 555 |
+| **M2** | División de frecuencia para obtener el baud rate |
+| **M3** | Sincronización de `mole_request` y generación del pulso de avance |
+| **M4** | Generación del pulso de carga del transmisor |
+| **M5** | Generación pseudoaleatoria mediante LFSR de 3 bits |
+| **M6** | Decodificación 3 a 8 y visualización mediante LEDs |
+| **M7** | Formación y transmisión de la trama UART |
 
-- subsistema de lógica discreta;
-- subsistema FPGA.
+El diagrama completo de cuarto nivel puede consultarse en:
 
-El subsistema discreto genera la posición del topo, la muestra mediante LEDs y transmite la información hacia la FPGA.
+[**Diagrama de cuarto nivel del subsistema discreto**](../img/Diagrama_Nivel_4to_Sist_Discreto.pdf)
 
-La FPGA recibe dicha posición y ejecuta toda la lógica correspondiente al control de la partida.
+---
 
-![Arquitectura general del sistema](img/01_arquitectura_general.png)
+# 3. Generación de temporización
 
-**Figura 1.** Arquitectura general del sistema híbrido Whack-a-Mole.
+## 3.1 Oscilador astable con temporizador 555
 
-### 4.2 Subsistema FPGA
+El subsistema discreto no comparte el reloj de 100 MHz utilizado por la FPGA. Por esta razón se implementó una referencia temporal independiente mediante un temporizador **555 en configuración astable**.
 
-El subsistema FPGA se compone de los siguientes bloques funcionales:
+El objetivo del bloque M1 es generar una frecuencia cercana a:
 
-- acondicionamiento y sincronización de botones;
-- generador de base de tiempo;
-- receptor UART;
-- máquina de estados principal;
-- evaluador de golpes;
-- controlador de dificultad;
-- temporizador de turno;
-- contadores de aciertos y fallos;
-- temporizador de GAME OVER;
-- controlador de displays de siete segmentos.
+```text
+19.2 kHz
+```
 
-Todos estos bloques utilizan como referencia el reloj principal de 100 MHz.
+que posteriormente es dividida entre dos para obtener la frecuencia utilizada por el transmisor serial.
 
-![Diagrama de tercer nivel del subsistema FPGA](img/02_diagrama_nivel_3_fpga.png)
-
-**Figura 2.** Diagrama de tercer nivel del subsistema FPGA.
-
-El diseño del subsistema FPGA se desarrolló además hasta un cuarto nivel de detalle. En este nivel se representa de forma más específica la relación entre los módulos internos, las señales de control, los registros principales y las interfaces externas utilizadas durante el funcionamiento del juego.
-
-En el diagrama se incluyen, entre otros, el acondicionamiento de los ocho botones, el generador de `tick_1ms`, el receptor UART, la FSM principal, el evaluador de golpes, el controlador de dificultad, el temporizador de turno, los contadores de puntaje, el temporizador de GAME OVER y el controlador de displays de siete segmentos.
-
-![Diagrama de cuarto nivel del subsistema FPGA](img/10_diagrama_nivel_4_fpga.png)
-
-**Figura 3.** Diagrama de cuarto nivel del subsistema FPGA.
-
-#### 4.3 Subsistema discreto
-
-El subsistema discreto se encarga de generar las posiciones utilizadas durante el juego.
-
-Entre sus principales bloques se encuentran:
-
-- oscilador;
-- lógica de control de solicitud;
-- generador pseudoaleatorio;
-- decodificador para indicación mediante LEDs;
-- sistema de transmisión serial.
-
-El subsistema responde a la señal `mole_request` generada por la FPGA y posteriormente transmite la posición mediante `serial_data`.
-
-![Diagrama de tercer nivel del subsistema discreto](img/03_diagrama_nivel_3_discreto.png)
-
-**Figura 4.** Diagrama de tercer nivel del subsistema de lógica discreta.
-
-#### 4.3.1 — Oscilador
-
-Oscilador astable con 555 en configuración estándar.
+### Componentes utilizados
 
 | Componente | Valor | Función |
-|---|---|---|
-| R1 | 1 kΩ | Resistencia de carga |
-| R2 | Potenciómetro, ajustado a 3,11 kΩ | Resistencia de descarga y ajuste fino |
+|---|---:|---|
+| R1 | 1 kΩ | Resistencia de temporización |
+| R2 | Potenciómetro ajustado aproximadamente a 3.11 kΩ | Ajuste fino de frecuencia |
 | C | 10 nF | Capacitor de temporización |
-| Cf | 10 nF | Capacitor de desacople en la entrada CON |
-| RI | 100 Ω | Resistencia limitadora en la salida |
+| Cf | 10 nF | Desacople en la entrada de control |
+| RI | 100 Ω | Resistencia asociada a la salida |
 
-La frecuencia teórica del oscilador astable es de 19.2 kHz.
+La utilización de un potenciómetro permite realizar un ajuste fino de la frecuencia del oscilador durante la implementación física.
 
+![Oscilador astable con temporizador 555](./img/oscilador_555.png)
 
-El potenciómetro en la posición de R2 constituye una decisión de diseño deliberada: el cual permite ajustar la frecuencia del oscilador.
+**Figura 1.** Oscilador astable utilizado para generar la referencia temporal del subsistema discreto.
 
-**Justificación de la velocidad seleccionada.** La elección de 9600 baudios es debida a que es un estandar muy utilzado para este tipo de 
-comunicación.
+---
 
-![alt text](image.png)
+## 3.2 Divisor de frecuencia
 
-**Figura 5.** —Oscilador 
+La salida del oscilador se conecta a un divisor de frecuencia implementado mediante un biestable del **74LS175D**.
 
+El biestable se configura de forma que cambie de estado en cada flanco activo. Como consecuencia, la frecuencia de salida corresponde aproximadamente a la mitad de la frecuencia de entrada:
 
-#### 4.3.2  Divisor de frecuencia
+```text
+≈ 19.2 kHz
+     │
+     │ ÷ 2
+     ▼
+≈ 9.6 kHz
+```
 
-Divisor por 2 implementado con un biestable del 74LS175D, realimentando su salida complementada
-`~Q` hacia su propia entrada `D`. En esa configuración el biestable conmuta en cada flanco activo,
-de modo que su salida presenta exactamente la mitad de la frecuencia de entrada con un ciclo de
-trabajo del 50 % garantizado por construcción.
+Esta señal se utiliza como referencia temporal para la transmisión UART y para los bloques secuenciales que procesan `mole_request`.
 
-Esta última propiedad es relevante: aunque el 555 en configuración astable no produce un ciclo de
-trabajo simétrico, la división por 2 lo normaliza, entregando al resto del sistema un reloj con
-flancos regularmente espaciados.
+La división también permite obtener una señal con períodos de nivel alto y bajo más uniformes que los generados directamente por el oscilador astable.
 
-![alt text](image-2.png)
-**Figura 6.** -Divisor de frecuencia
+![Divisor de frecuencia](./img/divisor_frecuencia.png)
 
-#### 4.3.3 Mini-FSM (control de avance del LFSR)
+**Figura 2.** Divisor de frecuencia utilizado para obtener la referencia cercana a 9600 baud.
 
-Detector de flanco construido con los dos biestables de un 74LS74D en cascada, gobernados por el
-reloj de transmisión, y una compuerta AND del 74LS08D.
+---
+
+# 4. Procesamiento de `mole_request`
+
+La señal `mole_request` es generada por la FPGA, por lo que no está sincronizada con el reloj propio del circuito discreto.
+
+El subsistema debe garantizar que una solicitud sostenida durante varios ciclos produzca **una única actualización de posición**.
+
+Para conseguirlo se utilizan circuitos secuenciales de sincronización y detección de flanco.
+
+---
+
+## 4.1 Sincronización y generación del pulso de avance
+
+El bloque M3 utiliza dos biestables del **74LS74D** conectados en cascada y una compuerta AND del **74LS08D**.
+
+La señal atraviesa dos etapas secuenciales:
+
+```text
+mole_request
+     │
+     ▼
+┌─────────┐
+│   FF1   │─── 1Q ───┐
+└─────────┘           │
+                      ├── AND ──► pulso_avance
+┌─────────┐           │
+│   FF2   │─── ~2Q ───┘
+└─────────┘
+```
+
+La condición utilizada para detectar el flanco de subida es:
+
+```text
+pulso_avance = 1Q AND ~2Q
+```
+
+De esta manera, la salida se mantiene activa únicamente durante el intervalo en que la primera etapa ya detectó la solicitud pero la segunda todavía conserva el estado anterior.
+
+### Conexiones principales
 
 | Señal | Origen | Destino |
 |---|---|---|
-| `mole_request` | FPGA | 1D del 74LS74D |
-| Reloj de transmisión | M2 | 1CLK y 2CLK del 74LS74D |
-| 1Q | 74LS74D | 2D y entrada A de la AND |
-| ~2Q | 74LS74D | Entrada B de la AND |
-| Salida AND | 74LS08D | CLK de los biestables del LFSR |
+| `mole_request` | FPGA | Entrada D de la primera etapa |
+| Reloj de transmisión | M2 | CLK de ambas etapas |
+| `1Q` | Primera etapa | Segunda etapa y AND |
+| `~2Q` | Segunda etapa | AND |
+| `pulso_avance` | 74LS08D | Reloj del LFSR |
 
-**Tabla de verdad del detector:**
+### Tabla lógica
 
 | 1Q | 2Q | ~2Q | Salida AND | Condición |
-|---|---|---|---|---|
+|---:|---:|---:|---:|---|
 | 0 | 0 | 1 | 0 | Reposo |
 | 1 | 0 | 1 | **1** | Flanco de subida detectado |
 | 1 | 1 | 0 | 0 | Solicitud sostenida |
 | 0 | 1 | 0 | 0 | Flanco de bajada |
 
-La salida activa en alto es la polaridad correcta para excitar la entrada de reloj de los
-biestables del LFSR, que responden a flanco de subida.
+### Comportamiento temporal
 
-
-**Traza cronológica:**
-
-| Ciclo | mole_request | 1Q | 2Q | ~2Q | Salida AND | Efecto |
-|---|---|---|---|---|---|---|
+| Ciclo | `mole_request` | 1Q | 2Q | ~2Q | `pulso_avance` | Efecto |
+|---:|---:|---:|---:|---:|---:|---|
 | 0 | 0 | 0 | 0 | 1 | 0 | Reposo |
 | 1 | 1 | 0 | 0 | 1 | 0 | Solicitud aún no registrada |
-| 2 | 1 | 1 | 0 | 1 | 1 | Pulso: el LFSR avanza |
-| 3 | 1 | 1 | 1 | 0 | 0 | Segunda etapa alcanza a la primera |
-| 4 | 1 | 1 | 1 | 0 | 0 | Solicitud sostenida, sin efecto |
-| 5 | 0 | 1 | 1 | 0 | 0 | Inicio del descenso |
-| 6 | 0 | 0 | 1 | 0 | 0 | Sin pulso en el flanco de bajada |
-| 7 | 0 | 0 | 0 | 1 | 0 | Reposo, listo para la siguiente solicitud |
+| 2 | 1 | 1 | 0 | 1 | **1** | El LFSR avanza una posición |
+| 3 | 1 | 1 | 1 | 0 | 0 | La segunda etapa alcanza a la primera |
+| 4 | 1 | 1 | 1 | 0 | 0 | Solicitud sostenida sin nuevo avance |
+| 5 | 0 | 1 | 1 | 0 | 0 | Inicio del flanco de bajada |
+| 6 | 0 | 0 | 1 | 0 | 0 | Sin pulso |
+| 7 | 0 | 0 | 0 | 1 | 0 | Sistema listo para otra solicitud |
 
-![alt text](image-4.png)
-**Figura 7.** -Diagrama Mini-FSM
+La principal ventaja de esta estructura es que la duración de `mole_request` no determina cuántas veces avanza el LFSR. Una solicitud genera únicamente un pulso de avance.
 
-#### 4.3.4  Sincronizador (control de carga del transmisor)
+![Detector de flanco para avance del LFSR](./img/detector_flanco_lfsr.png)
 
-Detector de flanco de estructura idéntica al anterior, implementado con un segundo 74LS74D y
-una compuerta NAND del 74LS00D. La diferencia está en la compuerta de salida: la NAND produce
-un pulso activo en bajo, que es la polaridad requerida por la entrada `SH/~LD` de los
-74LS165D.
+**Figura 3.** Sincronización y detección de flanco utilizada para avanzar una única vez el LFSR.
 
-| Señal | Origen | Destino |
-|---|---|---|
-| `mole_request` | FPGA | 1D del 74LS74D (U22) |
-| Reloj de transmisión | M2 | 1CLK y 2CLK del 74LS74D |
-| 1Q | U22 | 2D y entrada de la NAND |
-| ~2Q | U22 | Entrada de la NAND |
-| Salida NAND | U4 | `SH/~LD` de ambos 74LS165D |
+---
 
-**Tabla de verdad del detector:**
+## 4.2 Generación del pulso de carga del transmisor
 
-| 1Q | ~2Q | Salida NAND | Condición | Efecto sobre el registro |
-|---|---|---|---|---|
-| 0 | 1 | 1 | Reposo | Desplaza |
-| 1 | 1 | **0** | Flanco de subida detectado | **Carga** |
-| 1 | 0 | 1 | Solicitud sostenida | Desplaza |
-| 0 | 0 | 1 | Flanco de bajada | Desplaza |
+El bloque M4 utiliza una estructura secuencial semejante, pero la salida se obtiene mediante una compuerta **NAND 74LS00D**.
 
-El comportamiento temporal es idéntico al del módulo M3 (sección 3.3), con la salida complementada
-por efecto de la NAND. El registro permanece en modo desplazamiento salvo durante el único ciclo
-en que se detecta el flanco, instante en que carga las entradas paralelas.
+La razón es que la entrada de carga de los registros `74LS165D`, denominada `SH/~LD`, es activa en nivel bajo.
 
-![alt text](image-5.png)
-**Figura 8.** -Diagrama del sincronizador
+Por tanto:
 
+```text
+Flanco de mole_request
+         │
+         ▼
+Detector de flanco
+         │
+         ▼
+Pulso activo en bajo
+         │
+         ▼
+SH/~LD de los 74LS165D
+```
 
-#### 4.3.5 Generador pseudoaleatorio
+### Tabla lógica
 
-LFSR de tres etapas implementado con dos 74LS74D y una compuerta XOR del 74LS86D,
-con taps en las etapas 2 y 3:
+| 1Q | ~2Q | Salida NAND | Condición | Registro |
+|---:|---:|---:|---|---|
+| 0 | 1 | 1 | Reposo | Desplazamiento |
+| 1 | 1 | **0** | Flanco detectado | **Carga paralela** |
+| 1 | 0 | 1 | Solicitud sostenida | Desplazamiento |
+| 0 | 0 | 1 | Flanco de bajada | Desplazamiento |
 
-$$D_1 = Q_2 \oplus Q_3 \qquad D_2 = Q_1 \qquad D_3 = Q_2$$
+Así, los registros permanecen normalmente en modo desplazamiento y solamente reciben un pulso de carga cuando se detecta una nueva solicitud.
 
-**Polinomio de realimentación:** x³ + x² + 1
+![Control de carga del transmisor UART](./img/control_carga_uart.png)
 
-**Tabla de verdad de la red de realimentación (74LS86D):**
+**Figura 4.** Circuito encargado de generar el pulso activo en bajo para cargar el transmisor.
 
-| Q2 | Q3 | D1 = Q2 ⊕ Q3 |
-|---|---|---|
+---
+
+# 5. Generador pseudoaleatorio
+
+## 5.1 LFSR de tres bits
+
+La posición del topo se genera mediante un **Linear Feedback Shift Register (LFSR)** de tres etapas.
+
+El circuito utiliza biestables del `74LS74D` y una compuerta XOR del `74LS86D`.
+
+La red de realimentación utilizada es:
+
+```text
+D1 = Q2 XOR Q3
+D2 = Q1
+D3 = Q2
+```
+
+El polinomio asociado al diseño es:
+
+\[
+x^3 + x^2 + 1
+\]
+
+Cada pulso generado por M3 hace avanzar el LFSR exactamente un estado.
+
+---
+
+## 5.2 Tabla de verdad de la realimentación
+
+La entrada de la primera etapa depende de la operación XOR entre `Q2` y `Q3`.
+
+| Q2 | Q3 | D1 = Q2 XOR Q3 |
+|---:|---:|---:|
 | 0 | 0 | 0 |
 | 0 | 1 | 1 |
 | 1 | 0 | 1 |
 | 1 | 1 | 0 |
 
-La primera fila explica el estado atrapado: con Q2 y Q3 en cero la realimentación entrega un cero,
-que al desplazarse mantiene el registro en 000 indefinidamente.
+---
 
-**Tabla de transición de estados:**
+## 5.3 Tabla de transición
 
-| Estado actual (Q1 Q2 Q3) | Q2 ⊕ Q3 | Estado siguiente |
-|---|---|---|
-| 0 0 1 | 1 | 1 0 0 |
-| 0 1 0 | 1 | 1 0 1 |
-| 0 1 1 | 0 | 0 0 1 |
-| 1 0 0 | 0 | 0 1 0 |
-| 1 0 1 | 1 | 1 1 0 |
-| 1 1 0 | 1 | 1 1 1 |
-| 1 1 1 | 0 | 0 1 1 |
-| 0 0 0 | 0 | 0 0 0 (estado atrapado) |
+| Estado actual Q1 Q2 Q3 | Q2 XOR Q3 | Estado siguiente |
+|---|---:|---|
+| `001` | 1 | `100` |
+| `010` | 1 | `101` |
+| `011` | 0 | `001` |
+| `100` | 0 | `010` |
+| `101` | 1 | `110` |
+| `110` | 1 | `111` |
+| `111` | 0 | `011` |
+| `000` | 0 | `000` |
 
-**Diagrama de estados.** Cada transición se produce ante un pulso del módulo M3, es decir, una
-solicitud de la FPGA. La etiqueta indica la posición del topo resultante:
+Partiendo de un estado no nulo, la secuencia periódica es:
 
-```mermaid
-stateDiagram-v2
-    direction LR
-    [*] --> S111: inicialización (~PR/~CLR)
-    S111: 111 → pos 7
-    S011: 011 → pos 3
-    S001: 001 → pos 1
-    S100: 100 → pos 4
-    S010: 010 → pos 2
-    S101: 101 → pos 5
-    S110: 110 → pos 6
-    S000: 000 (inalcanzable)
-
-    S111 --> S011
-    S011 --> S001
-    S001 --> S100
-    S100 --> S010
-    S010 --> S101
-    S101 --> S110
-    S110 --> S111
-    S000 --> S000: estado atrapado
+```text
+111
+ ↓
+011
+ ↓
+001
+ ↓
+100
+ ↓
+010
+ ↓
+101
+ ↓
+110
+ └────────► 111
 ```
 
+Por tanto, la secuencia posee un período de siete estados no nulos.
 
-La inicialización se realiza mediante las entradas asíncronas `~PR` y `~CLR` de los 74LS74D, que
-permiten forzar cualquier estado de arranque distinto de cero. El estado 000 no es alcanzable
-desde ningún estado válido, por lo que una vez inicializado el registro no puede caer en él.
+---
 
-![alt text](image-6.png)
-**Figura 9.** -Diagrama generador pseudo-aleatorio
+## 5.4 Estado `000`
 
-#### 4.3.6 Decodificación y despliegue
+El estado:
 
-Las tres salidas del LFSR alimentan las entradas de selección del 74LS138D (U11), con las entradas
-de habilitación fijadas permanentemente en su condición activa (G1 a VCC, G2A y G2B a GND).
+```text
+000
+```
 
-**Asignación de bits:**
+es un estado atrapado para esta red de realimentación.
 
-| Entrada 74LS138D | Señal LFSR | Peso |
-|---|---|---|
+Si todas las salidas son cero:
+
+```text
+Q2 XOR Q3 = 0
+```
+
+y el registro continúa cargando ceros indefinidamente.
+
+Por esta razón, el LFSR debe inicializarse en un estado distinto de cero.
+
+La inicialización se realiza mediante las entradas asíncronas de los biestables, permitiendo establecer un estado inicial válido.
+
+> **Observación de implementación:** con la realimentación utilizada, la secuencia generada recorre los siete estados no nulos del registro. El decodificador implementado admite las ocho combinaciones de tres bits, pero `000` no pertenece a la secuencia normal del LFSR.
+
+![Generador pseudoaleatorio LFSR](./img/generador_lfsr.png)
+
+**Figura 5.** Generador pseudoaleatorio de tres bits implementado con biestables y realimentación XOR.
+
+---
+
+# 6. Decodificación y visualización
+
+## 6.1 Decodificador 74LS138
+
+Las tres salidas del LFSR se conectan a un decodificador **74LS138D**, encargado de convertir la palabra de tres bits en una de ocho líneas de salida.
+
+Las entradas de habilitación se mantienen en su condición activa:
+
+```text
+G1      → nivel alto
+G2A     → nivel bajo
+G2B     → nivel bajo
+```
+
+La convención de bits utilizada es:
+
+| Entrada 74LS138D | Señal | Peso |
+|---|---|---:|
 | A | Q3 | 2⁰ |
 | B | Q2 | 2¹ |
 | C | Q1 | 2² |
 
-Los ocho LED con el ánodo a VCC a través de una resistencia limitadora de 300 Ω, y el cátodo directamente a la salida correspondiente del
-decodificador. Esta disposición aprovecha que las salidas del 74LS138D son activas en bajo, de
-modo que la línea seleccionada actúa como sumidero de corriente y enciende su LED, mientras las
-siete restantes permanecen en alto y mantienen sus LED apagados.
+Por tanto:
 
-La decisión elimina la necesidad de una etapa inversora completa con inversores.
+```text
+Q1 = bit más significativo
+Q3 = bit menos significativo
+```
 
-**Tabla de verdad del despliegue:**
+---
 
-| Q1 | Q2 | Q3 | Salida activa | LED encendido | Posición |
-|---|---|---|---|---|---|
+## 6.2 LEDs de posición
+
+Las salidas del `74LS138D` son activas en bajo.
+
+Cada LED se conecta de forma que la salida seleccionada funcione como sumidero de corriente:
+
+```text
+VCC
+ │
+resistencia 300 Ω
+ │
+LED
+ │
+salida Yx del 74LS138
+```
+
+Cuando una salida pasa a cero lógico, el LED correspondiente se enciende.
+
+Esta conexión permite utilizar directamente la polaridad activa en bajo del decodificador sin añadir una etapa completa de inversión.
+
+### Tabla de decodificación
+
+| Q1 | Q2 | Q3 | Salida activa | Indicador | Valor |
+|---:|---:|---:|---|---|---:|
 | 0 | 0 | 0 | Y0 | LED0 | 0 |
 | 0 | 0 | 1 | Y1 | LED1 | 1 |
 | 0 | 1 | 0 | Y2 | LED2 | 2 |
@@ -498,293 +416,287 @@ La decisión elimina la necesidad de una etapa inversora completa con inversores
 | 1 | 1 | 0 | Y6 | LED6 | 6 |
 | 1 | 1 | 1 | Y7 | LED7 | 7 |
 
+Durante la secuencia normal del LFSR se recorren los siete estados no nulos descritos anteriormente.
 
-La combinación 000 no se presenta durante la operación normal, por ser el estado excluido del
-LFSR. En consecuencia la salida Y0 nunca se activa y la posición 0 no aparece en el juego.
+![Decodificador 3 a 8 y LEDs](./img/decodificador_leds.png)
 
-**Figura 10.** ![alt text](image-7.png)
-### 3.7 — Emisor TX
+**Figura 6.** Decodificación de la posición generada y visualización mediante LEDs.
 
-Dos 74LS165D encadenados forman un registro de 16 posiciones, de las cuales se
-utilizan diez para la trama UART. La salida `QH` de U_1 alimenta la entrada `SER` de U_2, y la
-línea `serial_data` se toma de la salida `QH` de U_1.
+---
 
-**Estructura de la trama transmitida:**
+# 7. Transmisor UART
 
-| Índice en la trama | Contenido | Valor |
+## 7.1 Registros paralelo-a-serie
+
+La transmisión hacia la FPGA se implementa utilizando registros de desplazamiento **74LS165D**.
+
+Estos dispositivos permiten:
+
+1. cargar simultáneamente varios bits mediante sus entradas paralelas;
+2. cambiar al modo de desplazamiento;
+3. transmitir los bits secuencialmente mediante su salida serie.
+
+Debido a que una trama UART 8N1 contiene:
+
+```text
+1 bit START
+8 bits DATA
+1 bit STOP
+```
+
+se requieren diez posiciones de almacenamiento.
+
+Se utilizaron dos registros de ocho bits, proporcionando capacidad suficiente para formar y desplazar la trama completa.
+
+![Transmisor UART con registros de desplazamiento](./img/transmisor_uart.png)
+
+**Figura 7.** Implementación del transmisor serial mediante registros paralelo-a-serie.
+
+---
+
+## 7.2 Formato UART
+
+La comunicación utiliza formato:
+
+```text
+8N1
+```
+
+correspondiente a:
+
+| Campo | Cantidad |
+|---|---:|
+| Start bit | 1 |
+| Bits de datos | 8 |
+| Paridad | Ninguna |
+| Stop bit | 1 |
+
+La línea permanece normalmente en nivel alto.
+
+Una transmisión tiene conceptualmente la forma:
+
+```text
+REPOSO   START       DATOS D0...D7             STOP    REPOSO
+
+  1        0      D0 D1 D2 D3 D4 D5 D6 D7       1        1
+───────┐      ┌───────────────────────────────┐      ┌───────
+       └──────┘                               └──────┘
+```
+
+UART transmite el bit menos significativo primero.
+
+---
+
+## 7.3 Palabra de datos
+
+Solamente se requieren tres bits para representar la posición generada.
+
+Siguiendo la convención utilizada por el decodificador:
+
+```text
+Q1 = MSB
+Q2 = bit intermedio
+Q3 = LSB
+```
+
+por lo que la posición queda representada conceptualmente como:
+
+```text
+D2 D1 D0 = Q1 Q2 Q3
+```
+
+Los cinco bits superiores del byte se fijan en cero:
+
+```text
+D7 D6 D5 D4 D3 D2 D1 D0
+ 0  0  0  0  0 Q1 Q2 Q3
+```
+
+La FPGA utiliza únicamente:
+
+```text
+data[2:0]
+```
+
+para recuperar la posición transmitida.
+
+> La disposición física exacta de estos bits en las entradas paralelas de los `74LS165D` se encuentra representada en el esquemático de implementación y en el diagrama de cuarto nivel.
+
+---
+
+# 8. Secuencia completa de funcionamiento
+
+Ante una nueva solicitud, el subsistema sigue la siguiente secuencia:
+
+```text
+1. FPGA activa mole_request
+              │
+              ▼
+2. La solicitud se sincroniza con el reloj discreto
+              │
+              ▼
+3. Se detecta el flanco de subida
+              │
+       ┌──────┴──────┐
+       ▼             ▼
+4. Avance LFSR   Control de carga
+       │             │
+       ▼             ▼
+5. Nueva posición   Carga UART
+       │             │
+       ├──────┐      │
+       ▼      │      ▼
+6. 74LS138    │   74LS165
+       │      │      │
+       ▼      │      ▼
+7. LED activo │  desplazamiento
+              │      │
+              └──────┤
+                     ▼
+               serial_data
+                     │
+                     ▼
+                    FPGA
+```
+
+Este mecanismo permite que cada solicitud produzca una única nueva posición y una nueva transmisión serial.
+
+---
+
+# 9. Interfaces con la FPGA
+
+El subsistema discreto se comunica con la FPGA mediante dos señales principales.
+
+| Señal | Dirección respecto al circuito discreto | Función |
 |---|---|---|
-| 0 | Bit de inicio | 0 |
-| 1 | Bit 0 de datos | Q1 |
-| 2 | Bit 1 de datos | Q2 |
-| 3 | Bit 2 de datos | Q3 |
-| 4–8 | Bits 3–7 de datos (relleno) | 0 |
-| 9 | Bit de parada | 1 |
+| `mole_request` | Entrada | Solicita la generación y transmisión de una nueva posición |
+| `serial_data` | Salida | Transporta la trama UART hacia la FPGA |
 
-**Convención documentada.** El byte de datos tiene la forma `00000` `Q3 Q2 Q1`. Puesto que UART
-transmite el bit menos significativo primero y Q1 ocupa la primera posición de datos, el valor
-numérico del byte resulta:
+No existe una señal de reloj compartida entre ambos subsistemas.
 
-$$\text{byte} = 4\,Q_3 + 2\,Q_2 + Q_1$$
+La sincronización temporal se resuelve mediante:
 
-
-![alt text](image-8.png)`
-**Figura 11.** —Decodificador
-
-
+- sincronización de `mole_request` dentro del circuito discreto;
+- acuerdo previo de la velocidad UART;
+- receptor UART independiente dentro de la FPGA.
 
 ---
 
-## 5. Resultados
+# 10. Integrados y componentes principales
 
-### 5.1 Simulación del receptor UART
-
-El receptor UART fue verificado mediante simulación antes de realizar la integración completa del sistema.
-
-Las pruebas permitieron comprobar la recepción de diferentes valores enviados mediante una trama 8N1 y verificar que la señal `data_valid` se genera al recibir correctamente un byte.
-
-Para el funcionamiento del juego, únicamente los tres bits menos significativos del byte recibido, `data[2:0]`, son utilizados para representar la posición del topo.
-
-![Simulación del receptor UART](img/04_simulacion_uart_rx.png)
-
-**Figura 12.** Verificación funcional del receptor UART mediante simulación.
-
-### 5.2 Simulación de integración y respuesta UART temprana
-
-Durante las primeras pruebas físicas se detectó una condición de integración que no había sido reproducida inicialmente en el testbench.
-
-El circuito discreto era capaz de transmitir y finalizar la trama UART mientras la señal `mole_request` de la FPGA todavía permanecía activa.
-
-El receptor UART procesaba correctamente el byte; sin embargo, `data_valid` tiene una duración de solamente un ciclo del reloj de 100 MHz. Debido a esto, la indicación podía producirse mientras la FSM todavía permanecía en el estado `S_REQUEST`.
-
-Cuando posteriormente la FSM entraba en `S_WAIT_UART`, el pulso de `data_valid` ya había desaparecido.
-
-Para corregir esta condición se incorporaron las señales internas:
-
-- `uart_pending`;
-- `pending_position`.
-
-Si una respuesta se recibe durante `S_REQUEST`, la posición queda almacenada temporalmente. Al terminar el período de solicitud, la FSM utiliza dicha posición y continúa directamente hacia el turno activo.
-
-Se implementó posteriormente un testbench específico para reproducir esta condición.
-
-La prueba verificó que:
-
-- la trama UART finalizaba mientras `mole_request` continuaba activo;
-- la posición recibida era almacenada correctamente;
-- la FSM iniciaba posteriormente el turno;
-- los siguientes turnos podían ejecutarse con normalidad.
-
-![Simulación de respuesta UART temprana](img/05_simulacion_uart_temprana.png)
-
-**Figura 13.** Simulación específica de la recepción UART mientras `mole_request` continúa activo.
-
-### 5.3 Medición experimental de la comunicación UART
-
-La comunicación entre el circuito discreto y la FPGA también fue analizada mediante osciloscopio.
-
-Se observó una duración aproximada de:
-
-- 104 µs por bit;
-- aproximadamente 1.04 ms para una trama completa de 10 bits.
-
-A partir de la medición realizada se obtuvo una velocidad de transmisión aproximada de:
-
-\[
-Baud \approx 9616
-\]
-
-La diferencia respecto al valor nominal de 9600 baud es:
-
-\[
-Error =
-\frac{9616-9600}{9600}
-\times 100
-\approx 0.17\%
-\]
-
-La diferencia observada fue suficientemente pequeña para mantener una comunicación estable entre ambos subsistemas.
-
-En la medición también se verificó que la trama UART podía completarse antes de finalizar el pulso de `mole_request`, confirmando experimentalmente la condición temporal identificada durante la integración.
-
-![Medición de UART en osciloscopio](img/06_osciloscopio_uart.png)
-
-**Figura 14.** Medición experimental de la comunicación UART entre el circuito discreto y la FPGA.
-
-### 5.4 Síntesis e implementación FPGA
-
-El diseño completo fue sintetizado e implementado utilizando Vivado.
-
-Los resultados obtenidos mostraron una utilización reducida de los recursos disponibles en la FPGA.
-
-| Recurso | Utilización |
-|---|---:|
-| LUT | 208 |
-| Registros | 203 |
-| Slices | 88 |
-| IOB | 24 |
-| BUFGCTRL | 1 |
-
-La utilización de LUTs representa aproximadamente un 1 % de los recursos disponibles del dispositivo.
-
-Esto indica que la implementación del sistema requiere solamente una pequeña fracción de la capacidad lógica disponible en la FPGA utilizada.
-
-### 5.5 Análisis temporal y DRC
-
-Después de la implementación se realizó el análisis de temporización del diseño.
-
-Los resultados obtenidos fueron:
-
-| Parámetro | Resultado |
-|---|---:|
-| WNS | +4.421 ns |
-| TNS | 0 ns |
-| WHS | +0.129 ns |
-| THS | 0 ns |
-| WPWS | +4.500 ns |
-
-Los valores positivos de WNS y WHS indican que no se presentaron violaciones de *setup* ni de *hold* en las restricciones temporales utilizadas.
-
-Asimismo, la verificación DRC posterior a la implementación no reportó violaciones.
-
-![Resultados de timing y DRC](img/07_timing_y_drc.png)
-
-**Figura 15.** Resultados posteriores a la implementación: análisis temporal y verificación DRC.
-
-### 5.6 Verificación mediante linter
-
-También se utilizó el linter de Vivado para verificar posibles problemas estructurales del código RTL.
-
-No se identificaron problemas que impidieran la síntesis o implementación del sistema.
-
-Se presentó una advertencia asociada al uso de únicamente los tres bits menos significativos del byte recibido por UART.
-
-Este comportamiento es intencional, debido a que solamente `data[2:0]` se utiliza para codificar las posiciones disponibles del topo.
-
-### 5.7 Estimación de potencia
-
-Vivado realizó una estimación del consumo de potencia del diseño implementado.
-
-Los valores obtenidos fueron aproximadamente:
-
-| Componente | Potencia |
-|---|---:|
-| Potencia dinámica | 0.018 W |
-| Potencia estática | 0.072 W |
-| Potencia total | 0.089 W |
-
-La herramienta indicó un nivel de confianza bajo en la estimación, por lo cual estos resultados se utilizan principalmente como referencia del orden de magnitud del consumo esperado.
-
-![Estimación de potencia](img/08_reporte_potencia.png)
-
-**Figura 16.** Estimación de potencia del diseño implementado en la FPGA.
-
-### 5.8 Implementación física
-
-Después de completar la síntesis e implementación se generó el bitstream correspondiente y se programó la tarjeta Basys 3.
-
-Durante las pruebas físicas se verificó la interacción entre el circuito discreto y la FPGA, incluyendo:
-
-- generación de `mole_request`;
-- transmisión de la posición mediante UART;
-- recepción de la posición en la FPGA;
-- procesamiento de botones;
-- detección de aciertos y fallos;
-- actualización de los contadores;
-- generación de nuevas solicitudes;
-- funcionamiento del estado GAME OVER;
-- reinicio del juego;
-- visualización mediante displays de siete segmentos.
-
-![Implementación física en Basys 3](img/09_implementacion_fisica_basys3.png)
-
-**Figura 17.** Implementación y verificación física del subsistema FPGA en la tarjeta Basys 3.
+| Componente | Función |
+|---|---|
+| Temporizador 555 | Oscilador astable |
+| 74LS175D | División de frecuencia |
+| 74LS74D | Sincronización, detección de flanco y almacenamiento del LFSR |
+| 74LS08D | Generación del pulso activo en alto |
+| 74LS00D | Generación del pulso activo en bajo para carga |
+| 74LS86D | Realimentación XOR del LFSR |
+| 74LS138D | Decodificación de 3 a 8 |
+| 74LS165D | Registros paralelo-a-serie para UART |
+| LEDs | Indicación visual de posición |
+| Resistencias de 300 Ω | Limitación de corriente de LEDs |
 
 ---
 
-## 6. Análisis e interpretación de resultados
+# 11. Decisiones de diseño
 
-Los resultados obtenidos muestran la importancia de realizar la verificación del sistema en diferentes niveles.
+## 11.1 Referencia temporal independiente
 
-Inicialmente se verificaron individualmente los diferentes módulos implementados en FPGA. Esto permitió comprobar de forma aislada el funcionamiento del receptor UART, acondicionamiento de botones, temporizadores, contadores, control de dificultad, evaluación de golpes, visualización y FSM.
+El circuito discreto genera su propio reloj debido a que no comparte una referencia temporal con la FPGA.
 
-Posteriormente, las pruebas de integración permitieron evaluar la interacción entre los módulos.
-
-A pesar de que las simulaciones iniciales mostraban un funcionamiento correcto, durante la integración física apareció una condición temporal que no había sido considerada en el testbench original.
-
-El circuito discreto podía completar la transmisión UART antes de que finalizara la señal `mole_request`. Como consecuencia, `data_valid` se generaba mientras la FSM todavía se encontraba en `S_REQUEST`.
-
-Este problema permitió identificar una diferencia importante entre una simulación funcional y las condiciones temporales reales de integración.
-
-La solución implementada mediante `uart_pending` y `pending_position` permitió desacoplar temporalmente la recepción del byte UART de la transición de estado de la FSM. De esta forma se conserva la respuesta recibida aunque esta llegue antes de entrar en `S_WAIT_UART`.
-
-La medición experimental de aproximadamente 9616 baud también permitió comparar la implementación física del transmisor con los 9600 baud nominales configurados en la FPGA.
-
-La diferencia aproximada de 0.17 % no produjo errores de recepción, demostrando que ambos subsistemas podían comunicarse correctamente aun sin compartir una referencia de reloj.
-
-Por otra parte, el análisis temporal posterior a la implementación presentó márgenes positivos tanto para *setup* como para *hold*, indicando que el diseño cumple con las restricciones temporales establecidas para el reloj de 100 MHz.
-
-La utilización reducida de LUTs y registros muestra además que la implementación ocupa una pequeña fracción de los recursos disponibles en la FPGA Artix-7 utilizada.
-
-Finalmente, las pruebas físicas permitieron complementar la verificación realizada mediante simulación y comprobar el funcionamiento del sistema completo bajo las condiciones reales de interacción entre la FPGA, el circuito discreto y las entradas del usuario.
+El oscilador y divisor permiten obtener una frecuencia apropiada para la transmisión UART sin utilizar un dispositivo programable adicional.
 
 ---
 
-## 7. Problemas encontrados y correcciones
+## 11.2 Uso de clock independiente para UART
 
-### 7.1 Pérdida de respuesta UART durante `mole_request`
+La velocidad objetivo de aproximadamente **9600 baud** permite utilizar períodos suficientemente largos en comparación con los retardos propios de la lógica 74xx.
 
-Durante las pruebas físicas se observó que un primer turno podía completarse correctamente, pero posteriormente el sistema podía quedar esperando una nueva respuesta aun cuando el circuito discreto sí había realizado la transmisión.
+Un período de bit se encuentra alrededor de:
 
-Utilizando el osciloscopio se verificó que el problema no estaba relacionado con la ausencia de una trama UART.
+```text
+104 µs
+```
 
-La causa se encontraba en la relación temporal entre la transmisión y la FSM.
+mientras que los retardos internos de las compuertas son significativamente menores.
 
-La trama podía finalizar mientras `mole_request` permanecía activo y, por tanto, `data_valid` podía producirse antes de que la FSM llegara a `S_WAIT_UART`.
-
-La solución consistió en almacenar cualquier posición recibida durante `S_REQUEST`.
-
-Para ello se incorporaron:
-
-- `uart_pending`, utilizado para indicar que existe una respuesta almacenada;
-- `pending_position`, utilizado para conservar `data[2:0]`.
-
-Al terminar `S_REQUEST`, la FSM revisa si existe una respuesta pendiente y, de ser así, utiliza dicha posición e inicia el turno sin esperar una nueva transmisión.
-
-Posteriormente se diseñó una simulación específica para reproducir esta situación y se verificó que la corrección funcionaba correctamente.
-
-### 7.2 Correspondencia de los displays de siete segmentos
-
-Durante las pruebas también se identificó una diferencia entre la correspondencia lógica de las señales `seg[6:0]` y la asignación física de los segmentos de la tarjeta Basys 3.
-
-Esta condición provocaba que determinados valores no se visualizaran correctamente.
-
-Se revisó la asignación de pines del archivo de *constraints* y se corrigió la correspondencia de los segmentos para obtener la representación numérica esperada.
+Esto proporciona un margen amplio para que las señales se estabilicen antes del siguiente intervalo de transmisión.
 
 ---
 
-## 8. Conclusiones
+## 11.3 Detección de flanco de `mole_request`
 
-El proyecto permitió implementar un sistema digital híbrido en el cual lógica discreta y FPGA trabajan conjuntamente mediante una interfaz de comunicación serial.
+No se utiliza directamente el nivel lógico de `mole_request` para avanzar el LFSR.
 
-La metodología modular facilitó el desarrollo y la verificación de cada bloque antes de la integración completa del sistema.
+Si se utilizara de esta manera, una solicitud sostenida podría provocar múltiples cambios de posición.
 
-La comunicación UART permitió transferir correctamente la posición generada por el circuito discreto hacia la FPGA a pesar de que ambos subsistemas utilizan referencias temporales independientes.
+En su lugar se genera un pulso de un solo ciclo al detectar el flanco de subida.
 
-Las mediciones experimentales mostraron una velocidad aproximada de 9616 baud frente a los 9600 baud nominales, presentando una diferencia cercana al 0.17 % que no afectó el funcionamiento de la comunicación.
+Así se cumple:
 
-Las pruebas físicas fueron fundamentales para detectar una condición temporal relacionada con la llegada de `data_valid` durante `S_REQUEST`, la cual no había sido considerada inicialmente en la simulación de integración.
-
-La incorporación de almacenamiento temporal mediante `uart_pending` y `pending_position` permitió solucionar este comportamiento y mantener la duración definida para `mole_request`.
-
-Los resultados de implementación mostraron además una baja utilización de recursos de la FPGA y márgenes temporales positivos, confirmando que la arquitectura implementada puede operar correctamente con el reloj principal de 100 MHz.
-
-Finalmente, el proyecto permitió comprobar que la simulación, síntesis y análisis temporal son etapas fundamentales del diseño digital, pero deben complementarse con pruebas físicas para identificar condiciones que solamente aparecen durante la interacción real entre diferentes subsistemas.
+```text
+Una solicitud
+      ↓
+Un pulso
+      ↓
+Un avance del LFSR
+      ↓
+Una nueva posición
+```
 
 ---
 
-## 9. Referencias
+## 11.4 LFSR frente a contador binario
 
-- Instructivo del Proyecto 1: Whack-a-Mole, EL3313 Taller de Diseño Digital.
-- Material del curso EL3313 Taller de Diseño Digital.
-- Documentación de AMD/Xilinx Vivado.
-- Manual de referencia de la tarjeta Basys 3.
+El uso de un LFSR evita recorrer las posiciones en un orden binario evidente.
+
+Aunque la secuencia generada es determinista, su patrón es menos predecible para el usuario que un contador ascendente convencional.
+
+---
+
+## 11.5 Decodificación mediante 74LS138
+
+El `74LS138D` permite convertir directamente la palabra del LFSR en una única línea activa.
+
+Sus salidas activas en bajo se aprovechan para controlar los LEDs directamente como sumideros de corriente.
+
+---
+
+## 11.6 Transmisión mediante registros de desplazamiento
+
+El uso de registros `74LS165D` permite formar una trama serial sin recurrir a microcontroladores ni dispositivos programables adicionales.
+
+La carga paralela facilita preparar simultáneamente:
+
+- start bit;
+- bits de datos;
+- bits de relleno;
+- stop bit.
+
+Posteriormente, el reloj de transmisión desplaza la información hacia la FPGA.
+
+---
+
+# 12. Documentación relacionada
+
+Para consultar la arquitectura general del proyecto:
+
+[**Documentación general de diseño**](../README.md)
+
+Para consultar el diagrama detallado del circuito discreto:
+
+[**Diagrama de cuarto nivel del subsistema discreto**](../img/Diagrama_Nivel_4to_Sist_Discreto.pdf)
+
+Para consultar el informe técnico completo del proyecto:
+
+[**Informe técnico del Proyecto 1**](../../informe/README.md)
+
+---
+
+## Curso
+
+**EL3313 — Taller de Diseño Digital**  
+Escuela de Ingeniería Electrónica  
+Instituto Tecnológico de Costa Rica  
+**II Semestre 2026**
