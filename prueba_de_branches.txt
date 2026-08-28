@@ -1,1 +1,0 @@
-Esto es una prueba de branches para que los compañeros sepan como trabajar en branches.
