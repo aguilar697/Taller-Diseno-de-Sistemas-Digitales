@@ -1,0 +1,17 @@
+# Normalizar archivos de texto del repositorio
+* text=auto
+
+# Código y documentación
+*.sv  text eol=lf
+*.svh text eol=lf
+*.xdc text eol=lf
+*.md  text eol=lf
+*.tcl text eol=lf
+*.rpt text eol=lf
+
+# Archivos binarios
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
