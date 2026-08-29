@@ -70,9 +70,16 @@ El diseño discreto fue dividido en siete bloques funcionales.
 | **M6** | Decodificación 3 a 8 y visualización mediante LEDs |
 | **M7** | Formación y transmisión de la trama UART |
 
+La arquitectura funcional del subsistema discreto se muestra a continuación:
+
+![Arquitectura del subsistema discreto](./img/arquitectura_subsistema_discreto.png)
+
+**Figura 1.** Arquitectura funcional del subsistema discreto y su interfaz con la FPGA.
+
 El diagrama completo de cuarto nivel puede consultarse en:
 
-[**Diagrama de cuarto nivel del subsistema discreto**](../img/Diagrama_Nivel_4to_Sist_Discreto.pdf)
+[**Diagrama de cuarto nivel del subsistema discreto**](../img/diagrama_nivel_4_discreto.pdf)
+
 
 ---
 
@@ -101,10 +108,6 @@ que posteriormente es dividida entre dos para obtener la frecuencia utilizada po
 | RI | 100 Ω | Resistencia asociada a la salida |
 
 La utilización de un potenciómetro permite realizar un ajuste fino de la frecuencia del oscilador durante la implementación física.
-
-![Oscilador astable con temporizador 555](./img/oscilador_555.png)
-
-**Figura 1.** Oscilador astable utilizado para generar la referencia temporal del subsistema discreto.
 
 ---
 
@@ -203,7 +206,7 @@ De esta manera, la salida se mantiene activa únicamente durante el intervalo en
 
 La principal ventaja de esta estructura es que la duración de `mole_request` no determina cuántas veces avanza el LFSR. Una solicitud genera únicamente un pulso de avance.
 
-![Detector de flanco para avance del LFSR](./img/detector_flanco_lfsr.png)
+![Detector de flanco para avance del LFSR](./img/detector_de_flanco_lfsr.png)
 
 **Figura 3.** Sincronización y detección de flanco utilizada para avanzar una única vez el LFSR.
 
@@ -487,40 +490,35 @@ UART transmite el bit menos significativo primero.
 
 ---
 
-## 7.3 Palabra de datos
+### 7.3 Palabra de datos
 
-Solamente se requieren tres bits para representar la posición generada.
+Solamente se requieren tres bits para representar la posición generada por el LFSR.
 
-Siguiendo la convención utilizada por el decodificador:
+El transmisor incorpora las tres señales de posición dentro del campo de datos de la trama UART, mientras que los bits restantes se mantienen en valores definidos por el circuito de carga paralelo.
 
-```text
-Q1 = MSB
-Q2 = bit intermedio
-Q3 = LSB
-```
-
-por lo que la posición queda representada conceptualmente como:
+Conceptualmente, la información transmitida puede representarse como:
 
 ```text
-D2 D1 D0 = Q1 Q2 Q3
+START | D0 D1 D2 D3 D4 D5 D6 D7 | STOP
 ```
 
-Los cinco bits superiores del byte se fijan en cero:
+donde tres de los bits de datos contienen la posición generada por el LFSR.
 
-```text
-D7 D6 D5 D4 D3 D2 D1 D0
- 0  0  0  0  0 Q1 Q2 Q3
-```
+La disposición física de `Q1`, `Q2` y `Q3` en las entradas paralelas de los registros `74LS165D` se encuentra representada en el esquemático del transmisor y en el diagrama de cuarto nivel.
 
-La FPGA utiliza únicamente:
+Independientemente de la implementación física del transmisor, la interfaz utilizada por el subsistema FPGA entrega la posición recibida mediante:
 
 ```text
 data[2:0]
 ```
 
-para recuperar la posición transmitida.
+Estos tres bits son utilizados por la lógica del juego para determinar la posición activa.
 
-> La disposición física exacta de estos bits en las entradas paralelas de los `74LS165D` se encuentra representada en el esquemático de implementación y en el diagrama de cuarto nivel.
+Esta separación permite documentar de forma independiente:
+
+- la generación física de la trama en el circuito discreto;
+- la recepción del byte mediante UART;
+- el uso de la posición dentro de la FPGA.
 
 ---
 
@@ -686,7 +684,7 @@ Para consultar la arquitectura general del proyecto:
 
 Para consultar el diagrama detallado del circuito discreto:
 
-[**Diagrama de cuarto nivel del subsistema discreto**](../img/Diagrama_Nivel_4to_Sist_Discreto.pdf)
+[**Diagrama de cuarto nivel del subsistema discreto**](../img/diagrama_nivel_4_discreto.pdf)
 
 Para consultar el informe técnico completo del proyecto:
 

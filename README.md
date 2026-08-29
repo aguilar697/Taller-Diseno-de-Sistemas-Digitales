@@ -46,20 +46,26 @@ Taller-Diseno-de-Sistemas-Digitales/
 │
 ├── README.md
 ├── .gitignore
+├── .gitattributes
 │
 └── Proyecto1_Whack-a-mole/
     │
     ├── README.md
     │
     ├── docs/
+    │   │
     │   ├── diseno/
     │   │   ├── README.md
-    │   │   └── img/
+    │   │   ├── img/
+    │   │   └── subsistema_discreto/
+    │   │       ├── README.md
+    │   │       └── img/
     │   │
     │   └── informe/
     │       ├── README.md
     │       ├── img/
     │       └── resultados/
+    │           └── README.md
     │
     └── src/
         ├── design/
@@ -157,7 +163,9 @@ Para el Proyecto 1:
 
 - [Descripción y uso del proyecto](./Proyecto1_Whack-a-mole/README.md)
 - [Documentación de diseño](./Proyecto1_Whack-a-mole/docs/diseno/README.md)
+- [Diseño detallado del subsistema discreto](./Proyecto1_Whack-a-mole/docs/diseno/subsistema_discreto/README.md)
 - [Informe técnico](./Proyecto1_Whack-a-mole/docs/informe/README.md)
+- [Evidencias de simulación](./Proyecto1_Whack-a-mole/docs/informe/resultados/README.md)
 
 ---
 
