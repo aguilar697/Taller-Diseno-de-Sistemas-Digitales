@@ -2,97 +2,39 @@
 
 ## 1. Objetivo
 
-El objetivo del subsistema de comunicación es proporcionar un enlace bidireccional entre la FPGA y una aplicación ejecutada en la PC mediante comunicación UART a **115200 baud**.
+El subsistema de comunicación permite el intercambio de información entre la FPGA y una aplicación ejecutada en la computadora mediante una interfaz UART a 115200 baud. La FPGA mantiene toda la lógica del juego Ahorcado, mientras que la aplicación de PC funciona como terminal para ingresar letras y visualizar el estado de la partida.
 
-La FPGA mantiene toda la lógica de control del juego Ahorcado. La aplicación de PC funciona únicamente como terminal remota para ingresar letras y visualizar información recibida desde la FPGA.
-
-El subsistema de comunicación se encargará de:
-
-- integrar el núcleo UART TX/RX proporcionado por el profesor;
-- adaptar dicho núcleo a la interfaz estándar de periféricos de 32 bits definida para el proyecto;
-- almacenar los bytes transmitidos y recibidos;
-- proporcionar señales de control y estado mediante registros;
-- implementar posteriormente un controlador de protocolo para la comunicación PC-FPGA;
-- servir como interfaz entre la lógica del juego y la aplicación Python.
-
-Este subsistema **no debe implementar lógica propia del juego**, como selección de palabras, validación de aciertos, conteo de intentos, control de dificultad o determinación del resultado de la partida.
+La implementación se divide en tres bloques principales: la UART, el periférico de registros de 32 bits y el controlador de protocolo. Esta separación permite mantener independiente la comunicación serial de la lógica propia del juego y facilita la verificación de cada bloque de forma individual.
 
 ---
 
-## 2. Arquitectura del subsistema
+## 2. Arquitectura general
 
-La arquitectura propuesta se divide en tres niveles funcionales:
+El subsistema recibe y transmite información entre la aplicación Python y el controlador principal del juego. La UART se encarga de la transmisión física de bytes, el periférico adapta esta comunicación a la interfaz interna de 32 bits utilizada en el proyecto y el controlador de protocolo interpreta los datos recibidos y construye los mensajes enviados hacia la PC.
 
-1. Núcleo UART TX/RX proporcionado.
-2. Periférico UART de 32 bits.
-3. Controlador del protocolo de aplicación.
+![Diagrama de segundo nivel del subsistema UART](img/uart_nivel2.png)
 
-La aplicación Python se encuentra fuera de la FPGA y se comunica mediante las líneas seriales `rx` y `tx`.
+**Figura 1. Diagrama de segundo nivel del subsistema de comunicación UART y protocolo.**
 
-```text
-                      PC / Python
-                          │
-                          │ UART
-                          │ 115200 baud
-                          ▼
-              ┌──────────────────────┐
-              │ Núcleo UART TX/RX    │
-              │ proporcionado        │
-              │                      │
-              │ UART_tx.vhd          │
-              │ UART_rx.vhd          │
-              └──────────┬───────────┘
-                         │
-                         │ data_in[7:0]
-                         │ data_out[7:0]
-                         │ tx_start
-                         │ tx_rdy
-                         │ rx_data_rdy
-                         ▼
-              ┌──────────────────────┐
-              │   uart_peripheral    │
-              │                      │
-              │ CONTROL              │
-              │ DATA0 - TX           │
-              │ DATA1 - RX           │
-              │                      │
-              │ Interfaz de 32 bits  │
-              └──────────┬───────────┘
-                         │
-                         │ addr[1:0]
-                         │ write_enable
-                         │ wdata[31:0]
-                         │ rdata[31:0]
-                         ▼
-              ┌──────────────────────┐
-              │ protocol_controller  │
-              │                      │
-              │ Codificación y       │
-              │ decodificación de    │
-              │ mensajes             │
-              └──────────┬───────────┘
-                         │
-                         ▼
-                  game_controller
-```
+A un nivel más detallado, la UART se divide en los bloques de transmisión y recepción, mientras que el periférico contiene los registros DATA0, DATA1 y CONTROL. El controlador de protocolo se conecta a estos registros y se comunica con `game_controller` mediante información semántica del juego.
 
-![Arquitectura propuesta para el subsistema de comunicación UART y protocolo PC-FPGA](img/uart_protocolo_arquitectura.png)
+![Diagrama de tercer nivel del subsistema UART](img/uart_nivel3.png)
 
-**Figura 1. Arquitectura propuesta para el subsistema de comunicación UART y protocolo PC-FPGA.**
+**Figura 2. Diagrama de tercer nivel del subsistema UART y protocolo.**
 
-El núcleo UART maneja la transmisión física de bits. El periférico transforma eventos UART de corta duración en registros persistentes y el controlador de protocolo se encarga de traducir entre bytes UART y eventos semánticos del juego.
+El flujo funcional de recepción y transmisión se presenta en la Figura 3.
+
+![Flujo funcional TX y RX](img/uart_flujo_tx_rx.png)
+
+**Figura 3. Flujo funcional de transmisión y recepción del subsistema.**
 
 ---
 
-## 3. Núcleo UART proporcionado
+## 3. UART
 
-Los archivos suministrados por el profesor son:
+### 3.1 Código proporcionado
 
-Estos archivos se encuentran en:
-
-```text
-Proyecto2_Ahorcado/docs/src/Codigo administrado UART/
-```
+El profesor proporcionó como punto de partida los archivos:
 
 ```text
 UART.vhd
@@ -100,871 +42,210 @@ UART_tx.vhd
 UART_rx.vhd
 ```
 
-Estos archivos se encuentran almacenados sin modificaciones dentro del repositorio como código administrado/proporcionado.
-
-La interfaz observada en el módulo UART suministrado contiene las siguientes señales:
-
-| Señal | Ancho | Dirección respecto al UART | Tipo | Descripción |
-|---|---:|---|---|---|
-| `clk` | 1 | Entrada | Nivel | Reloj de operación |
-| `reset` | 1 | Entrada | Nivel | Reinicio del núcleo |
-| `tx_start` | 1 | Entrada | Pulso | Solicita transmitir un byte |
-| `tx_rdy` | 1 | Salida | Pulso | Indica finalización de una transmisión |
-| `rx_data_rdy` | 1 | Salida | Pulso | Indica que se recibió un nuevo byte |
-| `data_in[7:0]` | 8 | Entrada | Nivel | Byte que será transmitido |
-| `data_out[7:0]` | 8 | Salida | Nivel | Byte recibido |
-| `rx` | 1 | Entrada | Serial | Línea PC → FPGA |
-| `tx` | 1 | Salida | Serial | Línea FPGA → PC |
-
-### 3.1 Responsabilidad del núcleo
-
-El núcleo UART se encarga de:
-
-- generación del bit de inicio;
-- transmisión de los 8 bits de datos;
-- generación del bit de parada;
-- muestreo de la señal serial recibida;
-- reconstrucción del byte recibido;
-- generación de eventos de transmisión y recepción.
-
-Por lo tanto, no se requiere desarrollar nuevamente un receptor o transmisor UART en SystemVerilog.
-
----
-
-## 4. Periférico UART de 32 bits
-
-El módulo `uart_peripheral` será desarrollado por el equipo como un wrapper alrededor del núcleo UART proporcionado.
-
-Su objetivo es presentar una interfaz uniforme de registros al resto del sistema.
-
-### 4.1 Interfaz externa propuesta
-
-```systemverilog
-module uart_peripheral (
-    input  logic        clk_i,
-    input  logic        rst_i,
-
-    input  logic        write_enable_i,
-    input  logic [1:0]  addr_i,
-    input  logic [31:0] wdata_i,
-    output logic [31:0] rdata_o,
-
-    input  logic        rx_i,
-    output logic        tx_o
-);
-```
-
-| Señal | Ancho | Dirección | Tipo | Función |
-|---|---:|---|---|---|
-| `clk_i` | 1 | Entrada | Nivel | Reloj común del sistema |
-| `rst_i` | 1 | Entrada | Nivel | Reset global |
-| `write_enable_i` | 1 | Entrada | Nivel/pulso durante acceso | Habilita escritura |
-| `addr_i[1:0]` | 2 | Entrada | Nivel | Selección de registro |
-| `wdata_i[31:0]` | 32 | Entrada | Nivel | Dato de escritura |
-| `rdata_o[31:0]` | 32 | Salida | Nivel | Dato de lectura |
-| `rx_i` | 1 | Entrada | Serial asíncrona | PC → FPGA |
-| `tx_o` | 1 | Salida | Serial | FPGA → PC |
-
-El comportamiento exacto del reset debe mantenerse consistente con el contrato global establecido por el equipo.
-
----
-
-## 5. Mapa de registros
-
-El periférico UART requiere un registro de control y dos registros de datos.
-
-Se propone el siguiente mapa respetando que los registros DATA0 y DATA1 se direccionan como `00` y `01`.
-
-| `addr_i[1:0]` | Registro | Acceso | Función |
-|---|---|---|---|
-| `2'b00` | DATA0 | R/W | Dato para transmisión UART |
-| `2'b01` | DATA1 | Solo lectura | Último dato recibido; escrito internamente por hardware cuando ocurre `rx_data_rdy` |
-| `2'b10` | CONTROL | R/W | Control y estado UART |
-| `2'b11` | RESERVADO | — | Reservado para extensión |
-
----
-
-## 6. Registro DATA0 — Transmisión
-
-El registro DATA0 almacena el byte que posteriormente será transmitido por UART.
+La copia original se conserva sin modificaciones en:
 
 ```text
-31                                8 7               0
-+----------------------------------+-----------------+
-|            Reservado             |      DATO       |
-+----------------------------------+-----------------+
+Proyecto2_Ahorcado/src/design/uart/Codigo administrado UART/
 ```
 
-| Bits | Campo | Descripción |
-|---|---|---|
-| `[7:0]` | `DATO` | Byte a transmitir |
-| `[31:8]` | Reservado | Sin función |
-
-Una escritura válida en DATA0 almacena:
-
-```systemverilog
-tx_data_reg <= wdata_i[7:0];
-```
-
-Los bits `[31:8]` no participan en la transmisión.
-
-El contenido de DATA0 deberá permanecer estable mientras exista una transmisión activa.
-
----
-
-## 7. Registro DATA1 — Recepción
-
-DATA1 almacena el último byte recibido desde la PC. Es de solo lectura desde la interfaz de registros y se escribe internamente por hardware cuando ocurre `rx_data_rdy`.
+Para el desarrollo del proyecto se mantiene una segunda copia en:
 
 ```text
-31                                8 7               0
-+----------------------------------+-----------------+
-|            Reservado             |      DATO       |
-+----------------------------------+-----------------+
+Proyecto2_Ahorcado/src/design/uart/cod/
 ```
 
-| Bits | Campo | Descripción |
-|---|---|---|
-| `[7:0]` | `DATO` | Último byte recibido |
-| `[31:8]` | Reservado | Sin función |
+Los archivos de esta carpeta corresponden a la versión de trabajo y podrán modificarse para adaptarlos a las necesidades del sistema.
 
-Cuando el núcleo UART genera:
+Inicialmente, ambas copias son idénticas. Esta organización permite conservar el código original como referencia y, al mismo tiempo, realizar modificaciones sin perder la versión entregada por el profesor.
 
-```text
-rx_data_rdy = 1
-```
+### 3.2 Interfaz de la UART
 
-el periférico debe ejecutar conceptualmente:
+La interfaz del módulo UART está formada por las siguientes señales:
 
-```systemverilog
-rx_data_reg <= data_out;
-new_rx      <= 1'b1;
-```
+| Señal | Ancho | Dirección | Función |
+|---|---:|---|---|
+| `clk` | 1 | Entrada | Reloj del sistema |
+| `reset` | 1 | Entrada | Reset síncrono activo en alto |
+| `tx_start` | 1 | Entrada | Solicitud de transmisión |
+| `tx_rdy` | 1 | Salida | Indica que una transmisión finalizó |
+| `rx_data_rdy` | 1 | Salida | Indica que se recibió un nuevo byte |
+| `data_in` | 8 | Entrada | Byte a transmitir |
+| `data_out` | 8 | Salida | Byte recibido |
+| `rx` | 1 | Entrada | Línea serial de recepción |
+| `tx` | 1 | Salida | Línea serial de transmisión |
 
-De esta forma, un pulso de un solo ciclo generado por el núcleo se convierte en información persistente que puede ser consultada posteriormente por el controlador.
+El bloque `UART_tx` realiza la serialización del dato, mientras que `UART_rx` reconstruye los bytes recibidos desde la PC.
 
----
+### 3.3 Adaptación a 100 MHz
 
-## 8. Registro CONTROL
+La Basys 3 utiliza un reloj principal de 100 MHz y el proyecto requiere una comunicación UART a 115200 baud. Los valores originales de los módulos suministrados estaban configurados para una frecuencia cercana a 16 MHz, por lo que es necesario modificar la versión de trabajo.
 
-El registro CONTROL contiene los campos mínimos definidos por la especificación.
-
-```text
-31                              2 1        0
-+--------------------------------+----------+
-|            Reservado           | new_rx | send |
-+--------------------------------+----------+
-```
-
-| Bit | Campo | Tipo | Función |
-|---:|---|---|---|
-| 0 | `send` | Control/estado | Solicita y representa una transmisión activa |
-| 1 | `new_rx` | Estado | Indica que existe un nuevo byte recibido |
-| 31:2 | Reservado | — | Sin función |
-
-La lectura conceptual es:
-
-```systemverilog
-rdata_o = {30'b0, new_rx, send};
-```
-
-### 8.1 Campo `send`
-
-Cuando el controlador escribe un `1` en `CONTROL[0]`:
-
-1. se activa `send`;
-2. el periférico genera un pulso de un ciclo en `tx_start`;
-3. el núcleo UART comienza la transmisión;
-4. DATA0 permanece estable;
-5. cuando el núcleo genera `tx_rdy`, `send` vuelve automáticamente a cero.
-
-Mientras:
-
-```text
-send = 1
-```
-
-no se deberá iniciar una nueva transmisión.
-
-### 8.2 Campo `new_rx`
-
-Cuando ocurre:
-
-```text
-rx_data_rdy = 1
-```
-
-el periférico:
-
-1. captura `data_out`;
-2. almacena el byte en DATA1;
-3. activa `new_rx`.
-
-La especificación establece que el bloque que utiliza el periférico debe limpiar `new_rx` después de procesar el byte.
-
-Como la interfaz estándar no posee una señal `read_enable`, se propone provisionalmente utilizar un mecanismo **W1C (Write One to Clear)**:
-
-```text
-escribir CONTROL[1] = 1 → limpiar new_rx
-```
-
-Esta decisión permanece pendiente de aprobación del equipo.
-
-Si `rx_data_rdy` y la solicitud de limpieza de `new_rx` ocurren simultáneamente, debe priorizarse la nueva recepción para evitar perder la notificación.
-
----
-
-## 9. Secuencia de transmisión
-
-El flujo de una transmisión será:
-
-```text
-          send = 0
-             │
-             ▼
-     Escribir DATA0
-             │
-             ▼
- Escribir CONTROL.send=1
-             │
-             ▼
-          send = 1
-             │
-             ▼
-   tx_start = 1 por 1 ciclo
-             │
-             ▼
-      UART transmite byte
-             │
-             ▼
-       tx_rdy = 1
-             │
-             ▼
-          send = 0
-```
-
-Pasos:
-
-1. Consultar CONTROL.
-2. Verificar que `send=0`.
-3. Escribir el byte en DATA0.
-4. Escribir `1` en `CONTROL[0]`.
-5. Generar un único `tx_start`.
-6. Esperar `tx_rdy`.
-7. Limpiar automáticamente `send`.
-8. Permitir la transmisión del siguiente byte.
-
-Una escritura de `send=1` mientras ya existe una transmisión activa debe ser ignorada.
-
----
-
-## 10. Secuencia de recepción
-
-El flujo de recepción será:
-
-```text
-         PC transmite byte
-                 │
-                 ▼
-        UART recibe trama
-                 │
-                 ▼
-       rx_data_rdy = 1
-                 │
-                 ▼
-        DATA1 <= data_out
-                 │
-                 ▼
-          new_rx = 1
-                 │
-                 ▼
-  protocol_controller lee DATA1
-                 │
-                 ▼
-     reconocer recepción
-                 │
-                 ▼
-          new_rx = 0
-```
-
-Si llega un nuevo byte antes de que el anterior sea reconocido:
-
-- DATA1 podría ser sobrescrito;
-- `new_rx` permanecería activo.
-
-No se agregarán unilateralmente señales adicionales de `overrun` hasta que el equipo decida si son necesarias.
-
----
-
-## 11. Relación entre `uart_peripheral` y el núcleo UART
-
-La conexión conceptual será:
-
-| `uart_peripheral` | Núcleo UART | Descripción |
-|---|---|---|
-| `clk_i` | `clk` | Reloj |
-| `rst_i` | `reset` | Reset |
-| `tx_data_reg[7:0]` | `data_in[7:0]` | Byte TX |
-| pulso generado | `tx_start` | Inicio TX |
-| `tx_rdy` | entrada al periférico | Fin TX |
-| `data_out[7:0]` | entrada al periférico | Byte RX |
-| `rx_data_rdy` | entrada al periférico | Nuevo byte RX |
-| `rx_i` | `rx` | Línea serial PC→FPGA |
-| `tx` | `tx_o` | Línea serial FPGA→PC |
-
----
-
-## 12. Parametrización UART a 100 MHz
-
-El sistema completo utiliza un reloj único de:
-
-```text
-100 MHz
-```
-
-La comunicación UART requerida es:
-
-```text
-115200 baud
-```
-
-El transmisor proporcionado utiliza el parámetro `BAUD_CLK_TICKS`.
-
-Para 100 MHz:
+Para el transmisor:
 
 $$
 BAUD\_CLK\_TICKS =
 \frac{100000000}{115200}
-\approx 868.06
+\approx 868
 $$
 
-Se propone:
+Por lo tanto, se utilizará:
 
 ```text
 BAUD_CLK_TICKS = 868
 ```
 
-La frecuencia resultante aproximada es:
-
-$$
-\frac{100000000}{868}
-\approx 115207.37\ baud
-$$
-
-Para el receptor con sobremuestreo ×16:
+Para el receptor, que utiliza sobremuestreo por 16:
 
 $$
 BAUD\_X16\_CLK\_TICKS =
-\frac{100000000}{115200\times16}
-\approx54.25
+\frac{100000000}{115200 \times 16}
+\approx 54
 $$
 
-Se propone:
+Por lo tanto:
 
 ```text
 BAUD_X16_CLK_TICKS = 54
 ```
 
-Los módulos `UART_tx.vhd` y `UART_rx.vhd` permiten configurar estos parámetros, pero el archivo superior `UART.vhd` proporcionado no los expone externamente.
+Además del ajuste del baud rate, durante la revisión del código se identificaron algunos puntos que deberán verificarse en la versión de trabajo, principalmente el comportamiento de transmisiones consecutivas, el índice interno utilizado durante TX y la sincronización de la entrada RX.
 
-Por esta razón se propone:
-
-- conservar intactos los archivos suministrados por el profesor;
-- no generar un reloj derivado de 16 MHz;
-- crear posteriormente un wrapper específico que instancie directamente TX y RX con los parámetros adecuados para 100 MHz.
-
-La creación de este wrapper y los valores finales deben aprobarse con el equipo antes de su implementación.
+Estas modificaciones se realizarán únicamente sobre los archivos almacenados en la carpeta `cod`.
 
 ---
 
-## 13. Controlador de protocolo
+## 4. Periférico UART
 
-El bloque `protocol_controller` será responsable de traducir entre:
+El módulo `uart_peripheral` funcionará como interfaz entre la UART y el controlador de protocolo. Su propósito es convertir los eventos temporales generados por la UART en registros que puedan ser leídos o escritos mediante la interfaz estándar de 32 bits definida para el proyecto.
 
-```text
-bytes UART
-        ↕
-eventos semánticos del juego
+La interfaz propuesta es:
+
+```systemverilog
+module uart_peripheral (
+    input  logic        clk_i,
+    input  logic        rst_i,
+    input  logic        write_enable_i,
+    input  logic [1:0]  addr_i,
+    input  logic [31:0] wdata_i,
+    output logic [31:0] rdata_o,
+    input  logic        rx_i,
+    output logic        tx_o
+);
 ```
 
-Este bloque no deberá realizar funciones pertenecientes a la lógica del juego.
+### 4.1 Mapa de registros
 
-Por ejemplo, no debe:
+| Dirección | Registro | Acceso | Función |
+|---|---|---|---|
+| `2'b00` | DATA0 | R/W | Dato utilizado para transmisión |
+| `2'b01` | DATA1 | Lectura | Último dato recibido |
+| `2'b10` | CONTROL | R/W | Estado y control del periférico |
+| `2'b11` | Reservado | — | Sin función asignada |
 
-- decidir si una letra es correcta;
-- incrementar intentos;
-- seleccionar palabras;
-- determinar victoria o derrota;
-- cambiar directamente el estado principal del juego.
+El registro DATA0 almacena el byte que será transmitido. DATA1 contiene el último byte recibido por la UART y es actualizado internamente cuando se activa `rx_data_rdy`.
 
-Su responsabilidad será únicamente transportar y codificar información.
+El registro CONTROL utiliza al menos los siguientes campos:
+
+| Bit | Nombre | Función |
+|---:|---|---|
+| 0 | `send` | Indica o solicita una transmisión |
+| 1 | `new_rx` | Indica que existe un nuevo dato recibido |
+
+Cuando se escribe `send=1`, el periférico genera una solicitud de transmisión hacia la UART. El bit permanece activo mientras la transmisión está en curso y se limpia cuando se recibe `tx_rdy`.
+
+Por otro lado, `new_rx` se activa cuando la UART genera `rx_data_rdy`. Este bit permanecerá activo hasta que el controlador de protocolo reconozca el dato. Para esta operación se utilizará un mecanismo W1C, donde escribir un uno en `CONTROL[1]` limpia el flag.
 
 ---
 
-## 14. Comunicación PC → FPGA
+## 5. Controlador de protocolo
 
-La PC transmitirá una letra mediante un único byte ASCII.
+El bloque `protocol_controller` se encarga de interpretar los bytes recibidos y generar los mensajes enviados hacia la PC. Este bloque no implementa reglas propias del juego, sino que funciona únicamente como interfaz entre la comunicación UART y `game_controller`.
 
-Valores válidos:
+### 5.1 Comunicación PC → FPGA
 
-```text
-'A' ... 'Z'
-```
-
-equivalentes a:
+La aplicación Python enviará una letra mediante un byte ASCII. Los valores válidos corresponden al rango:
 
 ```text
-0x41 ... 0x5A
+A - Z
 ```
 
-Los caracteres inválidos deberán descartarse sin modificar el estado de la partida.
-
-La aplicación Python también validará la entrada antes de transmitirla.
-
-Ejemplo:
+equivalente a:
 
 ```text
-Usuario ingresa: A
-
-PC:
-'A' → ASCII 0x41
-
-UART:
-0x41
-
-FPGA:
-protocol_controller recibe 0x41
+0x41 - 0x5A
 ```
 
-La lógica del juego será responsable de determinar posteriormente si la letra es correcta, incorrecta o repetida.
+La aplicación realizará una primera validación antes de transmitir el carácter. Sin embargo, la FPGA también verificará que el byte recibido pertenezca a este rango. Cualquier valor inválido será descartado sin modificar el estado de la partida.
 
----
+Una vez validada la letra, `protocol_controller` la entregará a `game_controller` utilizando la interfaz definida por el equipo.
 
-## 15. Comunicación FPGA → PC
+### 5.2 Comunicación FPGA → PC
 
-La FPGA deberá notificar como mínimo:
+La FPGA deberá transmitir suficiente información para que la aplicación pueda mostrar el estado de la partida. Como mínimo, se deberán comunicar el inicio del juego, la dificultad seleccionada, la longitud de la palabra, el resultado de cada letra, el patrón actualizado, los intentos restantes y el resultado final.
 
-- inicio de partida;
-- dificultad seleccionada;
-- longitud de la palabra;
-- resultado de cada letra;
-- patrón actualizado;
-- intentos restantes;
-- resultado final;
-- causa de derrota cuando aplique.
+Se utilizará un protocolo textual basado en ASCII. Cada mensaje finalizará con un salto de línea para facilitar tanto la depuración con una terminal serial como el procesamiento desde Python.
 
-El formato definitivo deberá acordarse entre los integrantes antes de implementarse.
-
----
-
-## 16. Propuesta inicial de protocolo
-
-Para facilitar depuración, se propone inicialmente un protocolo textual ASCII.
-
-Cada mensaje podría finalizar con:
-
-```text
-\n
-```
-
-Ejemplos:
-
-### Inicio de partida
+Ejemplos del formato propuesto:
 
 ```text
 START,FACIL,7
-```
-
-Campos:
-
-```text
-START
-modo
-longitud
-```
-
-### Letra correcta
-
-```text
 HIT,_A__A__,6
-```
-
-Campos:
-
-```text
-HIT
-patrón visible
-intentos restantes
-```
-
-### Letra incorrecta
-
-```text
 MISS,_A__A__,5
-```
-
-### Letra repetida
-
-```text
 REPEAT,_A__A__,5
-```
-
-### Victoria
-
-```text
 WIN,PALABRA
-```
-
-### Derrota por intentos
-
-```text
 LOSE_ATTEMPTS,PALABRA
-```
-
-### Derrota por tiempo
-
-```text
 LOSE_TIME,PALABRA
 ```
 
-Ventajas de esta propuesta:
-
-- lectura sencilla desde una terminal serial;
-- depuración directa sin necesidad de la aplicación Python;
-- fácil implementación en Python;
-- formato comprensible durante pruebas.
-
-Este protocolo es **provisional** hasta que el equipo confirme la representación interna de palabras, estados y causas de derrota.
+El controlador de protocolo deberá transmitir estos mensajes byte por byte, esperando la finalización de cada transmisión antes de enviar el siguiente carácter.
 
 ---
 
-## 17. Aplicación Python
+## 6. Aplicación Python
 
-La aplicación de PC deberá:
+La aplicación de PC funcionará como terminal de usuario. Su responsabilidad será abrir el puerto serial, configurar la comunicación a 115200 baud, solicitar las letras al usuario y mostrar los mensajes enviados por la FPGA.
 
-1. abrir el puerto serial;
-2. configurar comunicación a 115200 baud;
-3. solicitar una letra al usuario;
-4. aceptar únicamente un carácter entre `A` y `Z`;
-5. convertir letras minúsculas a mayúsculas si se decide permitirlas;
-6. enviar el byte ASCII;
-7. esperar mensajes desde la FPGA;
-8. mostrar:
-   - patrón actual;
-   - intentos restantes;
-   - resultado de la letra;
-   - resultado de la partida;
-9. manejar entradas inválidas sin bloquear la ejecución.
+La aplicación no implementará reglas propias del juego. Toda decisión relacionada con aciertos, intentos, tiempo, selección de palabras o victoria y derrota permanecerá dentro de la FPGA.
 
-La aplicación no implementará reglas propias del juego.
+La aplicación deberá validar las entradas del usuario, enviar únicamente caracteres válidos y manejar de forma segura los mensajes recibidos desde la FPGA.
 
 ---
 
-## 18. Contrato de integración
+## 7. Integración con el controlador del juego
 
-Antes de implementar `protocol_controller`, deben definirse con el equipo las interfaces con `game_controller`.
+La interfaz entre `protocol_controller` y `game_controller` deberá mantenerse independiente del formato serial utilizado por la PC.
 
-No se modificarán unilateralmente señales pertenecientes a otros subsistemas.
+El controlador de protocolo entregará letras válidas al bloque de control del juego y recibirá de este la información necesaria para construir los mensajes de respuesta.
 
-Se deben confirmar específicamente:
+Antes de implementar esta interfaz se deben mantener consistentes las decisiones globales del equipo relacionadas con:
 
-### 18.1 Reset
+- codificación de `game_state`;
+- orden de caracteres en los buses de 96 bits;
+- representación de posiciones ocultas;
+- causa de derrota;
+- señal que indica que una letra terminó de evaluarse;
+- convención de reset.
 
-Definir:
-
-- nombre;
-- polaridad;
-- sincronía;
-- comportamiento sobre UART y protocolo.
-
-### 18.2 `game_state`
-
-Confirmar:
-
-- ancho;
-- codificación;
-- estados visibles para comunicación.
-
-### 18.3 Evaluación de una letra
-
-Definir una señal o handshake que indique:
-
-```text
-la letra recibida ya fue evaluada
-```
-
-El protocolo debe transmitir el resultado solamente cuando la información asociada sea coherente.
-
-### 18.4 Causa de derrota
-
-Debe acordarse una codificación para distinguir al menos:
-
-```text
-derrota por tiempo
-derrota por intentos
-```
-
-### 18.5 Bus de palabra
-
-Para buses:
-
-```text
-[95:0]
-```
-
-debe acordarse:
-
-- cuál extremo contiene el primer carácter;
-- cuántos caracteres son válidos;
-- qué contiene una posición no utilizada;
-- si el patrón oculto utiliza `_`;
-- codificación ASCII.
-
-Ejemplos posibles:
-
-```text
-word[7:0] = primer carácter
-```
-
-o:
-
-```text
-word[95:88] = primer carácter
-```
-
-La decisión deberá ser global para todos los subsistemas.
-
-### 18.6 Caracteres inválidos
-
-La aplicación Python validará antes de transmitir.
-
-Además, la FPGA debe ser capaz de descartar cualquier byte que no pertenezca al rango:
-
-```text
-0x41 ... 0x5A
-```
-
-sin afectar la partida.
+Estas decisiones corresponden al contrato de integración general del proyecto.
 
 ---
 
-## 19. Señales tipo pulso y nivel
+## 8. Estrategia de implementación y verificación
 
-### Pulsos
+La implementación se realizará de forma incremental. Primero se adaptará y verificará la versión de trabajo de la UART para operar correctamente con el reloj de 100 MHz. Posteriormente se desarrollará `uart_peripheral` y se comprobará su comportamiento mediante simulaciones autoverificables.
 
-Se espera que las siguientes señales correspondan a eventos de un ciclo:
+Una vez validado el periférico se implementará `protocol_controller`, seguido de la aplicación Python. Finalmente se integrarán todos los bloques en Vivado y se realizarán pruebas bidireccionales utilizando la Basys 3.
 
-```text
-tx_start
-tx_rdy
-rx_data_rdy
-```
+Entre las pruebas principales se incluirán:
 
-También podrán existir eventos de un ciclo entre protocolo y otros bloques, siempre que sean aprobados como parte del contrato global.
-
-### Niveles
-
-Las siguientes señales permanecen estables mientras representan un estado:
-
-```text
-send
-new_rx
-DATA0
-DATA1
-addr_i
-wdata_i durante escritura
-rdata_o
-rx_i
-tx_o
-```
+- transmisión de bytes conocidos;
+- recepción de bytes conocidos;
+- verificación de `tx_rdy` y `rx_data_rdy`;
+- transmisiones consecutivas;
+- escritura y lectura de DATA0 y DATA1;
+- comportamiento de `send` y `new_rx`;
+- validación de caracteres ASCII;
+- envío de mensajes completos del protocolo;
+- comunicación final PC-FPGA.
 
 ---
-
-## 20. Estrategia de implementación
-
-La implementación se realizará de forma incremental.
-
-### Etapa 1 - Núcleo UART
-
-- conservar archivos VHDL originales;
-- verificar sus interfaces;
-- validar parámetros necesarios para 100 MHz.
-
-### Etapa 2 - `uart_peripheral`
-
-Implementar:
-
-- DATA0;
-- DATA1;
-- CONTROL;
-- `send`;
-- `new_rx`;
-- generación de `tx_start`;
-- captura de `rx_data_rdy`.
-
-### Etapa 3 - Testbench del periférico
-
-Verificar automáticamente:
-
-- escritura y lectura de DATA0;
-- activación de `send`;
-- generación de un único `tx_start`;
-- limpieza de `send` mediante `tx_rdy`;
-- captura de DATA1;
-- activación de `new_rx`;
-- limpieza de `new_rx`.
-
-### Etapa 4 - Wrapper UART 100 MHz
-
-Después de aprobación del equipo:
-
-- instanciar TX;
-- instanciar RX;
-- aplicar parámetros correspondientes a 100 MHz y 115200 baud.
-
-### Etapa 5 - `protocol_controller`
-
-Implementar codificación y decodificación de mensajes una vez congelado el contrato con `game_controller`.
-
-### Etapa 6 - Aplicación Python
-
-Implementar terminal de usuario y comunicación serial.
-
-### Etapa 7 - Integración FPGA-PC
-
-Realizar pruebas bidireccionales sobre hardware.
-
----
-
-## 21. Estrategia de validación
-
-Se utilizarán testbenches autoverificables.
-
-Las pruebas mínimas del periférico serán:
-
-### Prueba 1 — Escritura de DATA0
-
-```text
-Escribir 0x41
-Esperado:
-DATA0 = 0x41
-```
-
-### Prueba 2 — Inicio TX
-
-```text
-CONTROL.send <- 1
-
-Esperado:
-send = 1
-tx_start = 1 durante un único ciclo
-```
-
-### Prueba 3 — Fin TX
-
-```text
-tx_rdy = 1
-
-Esperado:
-send = 0
-```
-
-### Prueba 4 — Recepción
-
-```text
-data_out = 0x42
-rx_data_rdy = 1
-
-Esperado:
-DATA1 = 0x42
-new_rx = 1
-```
-
-### Prueba 5 — Reconocimiento RX
-
-```text
-limpiar new_rx
-
-Esperado:
-new_rx = 0
-DATA1 conserva último dato recibido
-```
-
-Posteriormente se realizarán pruebas de transmisión y recepción mediante la aplicación Python y finalmente pruebas sobre la FPGA.
-
----
-
-## 22. Decisiones pendientes
-
-Antes de implementar completamente el subsistema deben acordarse:
-
-- [ ] Convención global de reset.
-- [ ] Wrapper para UART a 100 MHz.
-- [ ] `BAUD_CLK_TICKS = 868`.
-- [ ] `BAUD_X16_CLK_TICKS = 54`.
-- [ ] Mecanismo W1C para limpiar `new_rx`.
-- [ ] Formato definitivo del protocolo.
-- [ ] Codificación de `game_state`.
-- [ ] Codificación de causa de derrota.
-- [ ] Señal/handshake que indica final de evaluación de una letra.
-- [ ] Orden de caracteres en buses `[95:0]`.
-- [ ] Padding para caracteres no utilizados.
-- [ ] Representación definitiva del patrón oculto.
-- [ ] Política ante recepción de un nuevo byte mientras `new_rx=1`.
-
----
-
-## 23. Archivos previstos
-
-La estructura actual de la documentación y del código administrado, junto con la estructura prevista para los archivos por desarrollar, será:
-
-```text
-Proyecto2_Ahorcado/
-│
-├── docs/
-│   │
-│   ├── src/
-│   │   └── Codigo administrado UART/
-│   │       ├── UART.vhd
-│   │       ├── UART_tx.vhd
-│   │       └── UART_rx.vhd
-│   │
-│   └── diseño/
-│       ├── uart_protocolo.md
-│       └── img/
-│           └── uart_protocolo_arquitectura.png
-│
-├── src/
-│   │
-│   ├── design/
-│   │   ├── uart_peripheral.sv
-│   │   ├── uart_core_wrapper.vhd
-│   │   └── protocol_controller.sv
-│   │
-│   └── testbench/
-│       ├── uart_peripheral_tb.sv
-│       └── protocol_controller_tb.sv
-│
-└── app/
-    └── pc_uart/
-        ├── main.py
-        └── requirements.txt
-```
-
-Los nombres finales pueden ajustarse según la convención general definida por el equipo.
-
----
-
-## 24. Estado actual
-
-Actualmente:
-
-- el núcleo UART proporcionado ya se encuentra disponible en el repositorio;
-- la arquitectura conceptual del periférico está definida;
-- el mapa de registros está propuesto;
-- el funcionamiento de TX/RX se encuentra definido;
-- se identificó la necesidad de adaptar los parámetros UART para el reloj de 100 MHz;
-- el protocolo textual PC-FPGA permanece provisional;
-- las interfaces con `game_controller` permanecen pendientes de aprobación del equipo.
-
-No se debe comenzar la implementación de interfaces globales hasta resolver los puntos de integración pendientes.
