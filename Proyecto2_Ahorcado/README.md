@@ -81,10 +81,14 @@ para otra instalación. Comprueba la ROM, compila los cuatro módulos y ejecuta
 el testbench con resultados PASS/FAIL. Los archivos generados quedan en
 `Proyecto2_Ahorcado/build/word_engine/`.
 
-Para síntesis independiente, desde `Proyecto2_Ahorcado` con Vivado en PATH:
+Para síntesis independiente, desde la raíz del repositorio:
 
 ```text
-vivado -mode batch -source scripts/synth_word_engine.tcl
+python Proyecto2_Ahorcado/scripts/synth_word_engine.py
 ```
 
 [Resultados y límites de esta verificación](docs/informe/motor_verificacion.md).
+
+El script acepta `--vivado` con la ruta del ejecutable. Utiliza una copia
+temporal para aislar la síntesis de las rutas de OneDrive y guarda los reportes
+en `build/word_engine/`. El Tcl también puede ejecutarse directamente desde Vivado.

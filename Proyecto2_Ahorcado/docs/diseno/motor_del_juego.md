@@ -287,13 +287,17 @@ python Proyecto2_Ahorcado/scripts/generate_word_rom.py
 python Proyecto2_Ahorcado/scripts/test_word_engine.py
 ```
 
-Para sintetizar, desde `Proyecto2_Ahorcado`, usando Vivado en PATH:
+Para sintetizar desde la raíz del repositorio:
 
 ```text
-vivado -mode batch -source scripts/synth_word_engine.tcl
+python Proyecto2_Ahorcado/scripts/synth_word_engine.py
 ```
 
 Los resultados temporales se escriben en `build/word_engine/` y no se versionan.
+El script acepta `--vivado`, copia las fuentes a una carpeta temporal, utiliza
+un solo hilo y recupera reportes y hashes de las fuentes. Esto evita depender de
+la ruta larga con espacios y caracteres acentuados del repositorio. También se
+puede ejecutar el Tcl directamente desde Vivado en una ruta compatible.
 La síntesis es independiente del resto del sistema, en modo out-of-context para
 `xc7a35tcpg236-1`. No usa pines físicos ni demuestra funcionamiento del sistema
 completo. Véase [evidencia de verificación](../informe/motor_verificacion.md).
