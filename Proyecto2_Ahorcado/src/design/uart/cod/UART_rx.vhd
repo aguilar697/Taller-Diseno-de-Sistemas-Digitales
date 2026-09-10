@@ -9,7 +9,7 @@ entity UART_rx is
 
     generic(
         -- BAUD_X16_CLK_TICKS: integer := 65); -- (clk / baud_rate) / 16 => (10 000 000 / 9600) / 16 = 65.104
-        BAUD_X16_CLK_TICKS: integer := 9); -- (clk / baud_rate) / 16 => (16 000 000 / 115200) / 16 = 8.68
+        BAUD_X16_CLK_TICKS: integer := 54); -- (clk / baud_rate) / 16 => (100 000 000 / 115200) / 16 = 54.25
     port(
         clk            : in  std_logic;
         reset          : in  std_logic;
@@ -27,11 +27,27 @@ architecture Behavioral of UART_rx is
 
     signal baud_rate_x16_clk  : std_logic := '0';
     signal rx_stored_data     : std_logic_vector(7 downto 0) := (others => '0');
+    signal rx_data_meta       : std_logic := '1';
+    signal rx_data_sync       : std_logic := '1';
 
     signal rx_end             : std_logic := '0';
     signal edge_signal        : std_logic := '0';
 
 begin
+
+
+    rx_input_synchronizer: process(clk)
+    begin
+        if rising_edge(clk) then
+            if (reset = '1') then
+                rx_data_meta <= '1';
+                rx_data_sync <= '1';
+            else
+                rx_data_meta <= rx_data_in;
+                rx_data_sync <= rx_data_meta;
+            end if;
+        end if;
+    end process rx_input_synchronizer;
 
 
 -- The baud_rate_x16_clk_generator process generates an oversampled clock.
@@ -86,13 +102,13 @@ begin
                             bit_duration_count := 0;              -- reset counters
                             bit_count := 0;
 
-                            if (rx_data_in = '0') then             -- if the start bit received
+                            if (rx_data_sync = '0') then           -- if the start bit received
                                 rx_state <= START;                 -- transit to the START state
                             end if;
 
                         when START =>
                             rx_end <= '0';
-                            if (rx_data_in = '0') then             -- verify that the start bit is preset
+                            if (rx_data_sync = '0') then           -- verify that the start bit is preset
                                 if (bit_duration_count = 7) then   -- wait a half of the baud rate cycle
                                     rx_state <= DATA;              -- (it puts the capture point at the middle of duration of the receiving bit)
                                     bit_duration_count := 0;
@@ -106,7 +122,7 @@ begin
                         when DATA =>
 
                             if (bit_duration_count = 15) then                -- wait for "one" baud rate cycle (not strictly one, about one)
-                                rx_stored_data(bit_count) <= rx_data_in;     -- fill in the receiving register one received bit.
+                                rx_stored_data(bit_count) <= rx_data_sync;   -- fill in the receiving register one received bit.
                                 bit_duration_count := 0;
                                 if (bit_count = 7) then                      -- when all 8 bit received, go to the STOP state
                                     rx_state <= STOP;

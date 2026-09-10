@@ -9,7 +9,7 @@ entity UART_tx is
 
     generic(
         -- BAUD_CLK_TICKS: integer := 1041); -- clk/baud_rate (10 000 000 / 9600 = 1041,67)
-        BAUD_CLK_TICKS: integer := 139); -- clk/baud_rate (16 000 000 / 115200 = 138.89)
+        BAUD_CLK_TICKS: integer := 868); -- clk/baud_rate (100 000 000 / 115200 = 868.06)
     port(
         clk            : in  std_logic;
         reset          : in  std_logic;
@@ -34,7 +34,6 @@ architecture Behavioral of UART_tx is
     signal stored_data       : std_logic_vector(7 downto 0) := (others=>'0');
 
     signal start_detected    : std_logic := '0';
-    signal start_reset       : std_logic := '0';
     
     signal tx_end             : std_logic := '0';
     signal edge_signal        : std_logic := '0';
@@ -79,13 +78,17 @@ begin
     tx_start_detector: process(clk)
     begin
         if rising_edge(clk) then
-            if (reset ='1') or (start_reset = '1') then
+            if (reset = '1') then
                 start_detected <= '0';
-            else
-                if (tx_start = '1') and (start_detected = '0') then
-                    start_detected <= '1';
-                    stored_data <= tx_data_in;
-                end if;
+            elsif (tx_start = '1') and
+                  (tx_state = IDLE) and
+                  (start_detected = '0') then
+                start_detected <= '1';
+                stored_data    <= tx_data_in;
+            elsif (baud_rate_clk = '1') and
+                  (tx_state = IDLE) and
+                  (start_detected = '1') then
+                start_detected <= '0';
             end if;
         end if;
     end process tx_start_detector;
@@ -103,7 +106,9 @@ begin
             if (reset = '1') or (data_index_reset = '1') then
                 data_index <= 0;
             elsif (baud_rate_clk = '1') then
-                data_index <= data_index + 1;
+                if (data_index < 7) then
+                    data_index <= data_index + 1;
+                end if;
             end if;
         end if;
     end process data_index_counter;
@@ -118,7 +123,6 @@ begin
             if (reset = '1') then
                 tx_state <= IDLE;
                 data_index_reset <= '1';   -- keep data_index_counter on hold
-                start_reset <= '1';        -- keep tx_start_detector on hold
                 tx_data_out <= '1';        -- keep tx line set along the standard
                 tx_end      <= '0';
             else
@@ -128,7 +132,6 @@ begin
                         when IDLE =>
                             tx_end           <= '0';
                             data_index_reset <= '1';    -- keep data_index_counter on hold
-                            start_reset <= '0';         -- enable tx_start_detector to wait for starting impulses
                             tx_data_out <= '1';         -- keep tx line set along the standard
 
                             if (start_detected = '1') then
@@ -154,7 +157,6 @@ begin
                         when STOP =>
 
                             tx_data_out <= '1';     -- send '1' as a stop bit
-                            start_reset <= '1';     -- prepare tx_start_detector to be ready detecting the next impuls in IDLE
                             tx_end      <= '1';
                             tx_state <= IDLE;
 
