@@ -31,7 +31,7 @@ Los proyectos se desarrollan siguiendo una metodología de **diseño modular**, 
 | Proyecto | Descripción | Tecnologías principales | Estado |
 |---|---|---|---|
 | [Proyecto 1 — Whack-a-Mole](./Proyecto1_Whack-a-mole/) | Juego híbrido implementado mediante FPGA y lógica discreta, con comunicación serial UART entre ambos subsistemas. | Basys 3, SystemVerilog, UART, lógica 74xx | Finalizado |
-| Proyecto 2 - NA | --- | --- | --- |
+| [Proyecto 2 — Ahorcado](./Proyecto2_Ahorcado/) | Juego controlado por FPGA, terminal Python por UART e interfaz local LCD, displays y buzzer. | Basys 3, SystemVerilog, UART, Python, LCD | En desarrollo |
 
 Cada proyecto dispone de su propio `README.md`, donde se documentan su arquitectura, estructura interna, módulos implementados, procedimiento de uso y referencias hacia la documentación técnica.
 
