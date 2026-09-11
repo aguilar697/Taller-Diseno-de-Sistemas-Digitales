@@ -12,9 +12,10 @@ las respuestas de la FPGA.
 - [Planteamiento de diseño](docs/diseno/README.md).
 - [Diagrama de primer nivel](docs/diseno/nivel_1.md).
 - [Diagrama de segundo nivel](docs/diseno/nivel_2.md).
-- [Diseño del motor del juego](docs/diseno/nivel_3_motor_del_juego.md).
+- [Tercer nivel del motor del juego](docs/diseno/nivel_3_motor_del_juego.md).
+- [Cuarto nivel y FSM del motor](docs/diseno/nivel_4_motor_del_juego.md).
 - [Diseño de UART y protocolo](docs/diseño/uart_protocolo.md).
-- [Resultados del motor y pasos para probarlo en Vivado](docs/informe/motor_verificacion.md).
+- [Plantilla del informe y configuración de pruebas en Vivado](docs/informe/motor_verificacion.md).
 
 ## Responsabilidades
 
@@ -46,8 +47,9 @@ por el testbench. Los pasos completos están en el informe de verificación.
 
 El motor incluye selección por dificultad, ROM de 50 palabras, LFSR,
 validación, registro de letras utilizadas y actualización del patrón.
-Está verificado de forma aislada; la integración con los demás subsistemas,
-la simulación temporizada y las pruebas físicas siguen pendientes.
+El informe de entrega está en preparación, con resultados y capturas pendientes
+de incorporar. La integración con los demás subsistemas, la simulación
+temporizada y las pruebas físicas siguen pendientes.
 
 ## Trabajo colaborativo
 

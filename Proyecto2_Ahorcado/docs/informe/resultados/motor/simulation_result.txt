@@ -1,2 +1,0 @@
-PASS: word_engine_tb; 38612 checks, 128 games; 50 easy words and all eligible hard words covered
-Proyecto2_Ahorcado/src/testbench/word_engine/word_engine_tb.sv:200: $finish called at 118286000 (1ps)

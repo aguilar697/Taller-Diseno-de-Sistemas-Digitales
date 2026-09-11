@@ -50,6 +50,7 @@ debe seguir siendo atendida para no dejar bytes antiguos pendientes.
 
 ## Detalle por subsistema
 
-- [S2: motor, interfaces, algoritmo y plan de pruebas](nivel_3_motor_del_juego.md).
+- [S2: tercer nivel e interfaces del motor](nivel_3_motor_del_juego.md).
+- [S2: cuarto nivel y FSM del motor](nivel_4_motor_del_juego.md).
 - [S3: UART y protocolo](../diseño/uart_protocolo.md).
 - S1 y S4: documentación pendiente de integración.
