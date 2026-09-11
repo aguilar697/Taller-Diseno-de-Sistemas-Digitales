@@ -164,9 +164,21 @@ El subsistema responde a la señal `mole_request` generada por la FPGA y posteri
 
 **Figura 4.** Diagrama de tercer nivel del subsistema de lógica discreta.
 
+La implementación detallada del subsistema discreto, incluyendo la generación de temporización, detección de solicitud, LFSR, decodificación y transmisión UART, se encuentra documentada en:
+
+[**Diseño detallado del subsistema discreto**](../diseno/subsistema_discreto/README.md)
+
+Asimismo, puede consultarse el diagrama de implementación de cuarto nivel:
+
+[**Diagrama de cuarto nivel del subsistema discreto**](../diseno/img/diagrama_nivel_4_discreto.pdf)
+
 ---
 
 ## 5. Resultados
+
+Las evidencias complementarias de ejecución de los testbenches individuales se encuentran organizadas en:
+
+[**Resultados de verificación por simulación**](./resultados/README.md)
 
 ### 5.1 Simulación del receptor UART
 
@@ -197,9 +209,7 @@ Para corregir esta condición se incorporaron las señales internas:
 
 Si una respuesta se recibe durante `S_REQUEST`, la posición queda almacenada temporalmente. Al terminar el período de solicitud, la FSM utiliza dicha posición y continúa directamente hacia el turno activo.
 
-Se implementó posteriormente un testbench específico para reproducir esta condición.
-
-La prueba verificó que:
+La simulación específica verificó que:
 
 - la trama UART finalizaba mientras `mole_request` continuaba activo;
 - la posición recibida era almacenada correctamente;
