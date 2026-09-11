@@ -196,6 +196,29 @@ module word_engine_tb;
         @(negedge clk); reset = 1; new_game = 1; letter_valid = 1;
         @(posedge clk); #1;
         require(word_length == 0 && !word_ready && !letter_correct, "reset has highest priority");
+
+        // Letters during selection must be discarded, including the word-ready edge.
+        reset_system();
+        @(negedge clk); new_game = 1; difficulty = 1;
+        @(negedge clk); new_game = 0; letter_valid = 1; letter_ascii = "A";
+        waited = 0;
+        while (!word_ready && waited < 64) begin
+            @(posedge clk); #1; waited = waited + 1;
+            require(!letter_correct && !letter_repeated && !word_complete,
+                    "selection must not evaluate a letter");
+            require(dut.used_letters == 0, "selection must discard letters without recording them");
+        end
+        require(word_ready && waited > 1 && waited <= 63,
+                "selection test must cover rejected candidates and the ready edge");
+        require(word_length >= 6, "selection test must load a hard-mode word");
+        for (i = 0; i < 12; i = i + 1)
+            require(revealed_word[8*i +: 8] == ((i < word_length) ? 8'h5F : 8'h20),
+                    "letter during selection must not reveal any position");
+        @(negedge clk); letter_valid = 0;
+        @(posedge clk); #1;
+        require(dut.used_letters == 0 && !letter_correct && !letter_repeated,
+                "discarded selection letter must not be processed later");
+        games = games + 1;
         $display("PASS: word_engine_tb; %0d checks, %0d games; 50 easy words and all eligible hard words covered", checks, games);
         $finish;
     end
