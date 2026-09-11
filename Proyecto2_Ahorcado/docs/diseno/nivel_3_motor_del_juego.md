@@ -3,7 +3,7 @@
 **Responsable:** Kevin Aguilar. **Rama:** `kAguilar`.
 
 El motor selecciona y conserva la palabra secreta, evalúa letras y actualiza el
-patrón visible. Proporciona resultados al controlador de Kenneth; no modifica
+patrón visible. Proporciona resultados al controlador principal (S1); no modifica
 tiempo, intentos ni victorias y no controla directamente UART o LCD.
 
 El motor conserva los puertos acordados y el orden de bytes utilizado por UART.
@@ -274,21 +274,23 @@ la palabra seleccionada; **no constituye una interfaz de integración**.
 Los pasos para ejecutar las pruebas directamente en Vivado se encuentran en el
 [informe de verificación](../informe/motor_verificacion.md).
 
-## 9. Límites antes de integrar
+## 9. Condiciones de integración
 
-- Revisar con Kenneth la latencia, el pulso `word_ready` y el filtrado de letras
-  fuera de partida. El motor no recibe `game_state` ni una señal de derrota.
-- Resolver con Daniel cómo obtener la palabra completa al perder, conservando
-  una interfaz acordada. La implementación actual no la expone.
-- Coordinar el transporte de eventos UART: no debe perderse un resultado por
-  transmisión ocupada, especialmente al acertar la última letra.
-- Completar integración, simulación temporizada post-implementación y hardware.
-- Acordar tiempos de dificultad y políticas de simultaneidad en S1.
+- La interfaz con S1 requiere una latencia de evaluación definida, reconocimiento
+  de `word_ready` y filtrado de letras fuera de partida. El motor no recibe
+  `game_state` ni una señal de derrota.
+- La entrega de la palabra secreta completa al protocolo UART está pendiente de
+  definición. La interfaz actual del motor no expone ese dato.
+- El transporte de eventos UART debe conservar los resultados mientras la
+  transmisión esté ocupada, incluido el evento de la última letra correcta.
+- La integración completa, la simulación temporizada post-implementación y las
+  pruebas físicas constituyen etapas de validación pendientes.
+- Los tiempos por dificultad y la prioridad de eventos simultáneos pertenecen a S1.
 
 ## 10. Antecedentes y referencias del proyecto
 
 - Instructivo Proyecto 2 EL3313, secciones 3.1–3.4, 4 y rúbricas del Anexo A.
-- Contrato del equipo compartido por Kevin Aguilar el 10 de septiembre de 2026.
+- Contrato de interfaces del equipo, versión del 10 de septiembre de 2026.
 - [Diagrama preliminar de S2, dos páginas](diagrama_nivel_3_Motor_del_Juego.pdf).
 - [UART y protocolo existentes](../diseño/uart_protocolo.md).
 

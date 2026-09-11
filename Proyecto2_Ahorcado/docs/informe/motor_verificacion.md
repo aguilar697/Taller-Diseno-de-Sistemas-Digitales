@@ -82,28 +82,32 @@ línea para versionarlos; sus valores no se modificaron):
 - [Utilización posterior a síntesis](resultados/motor/utilization_synth.rpt).
 - [Análisis temporal posterior a síntesis](resultados/motor/timing_synth.rpt).
 
-## Ejecución manual en Vivado
+## Configuración de la simulación en Vivado
 
-1. Crear un proyecto RTL para Basys 3 (`xc7a35tcpg236-1`). Preferir una carpeta
-   local con ruta corta, fuera de OneDrive.
-2. Agregar los cuatro archivos de `src/design/word_engine/` como **Design Sources**:
-   `word_engine.sv`, `word_rom.sv`, `word_lfsr.sv` y `letter_evaluator.sv`.
-   Seleccionar `word_engine` como top de diseño.
-3. Agregar `word_engine_tb.sv` como **Simulation Source** y top de simulación.
-   No agregar el testbench a síntesis.
-4. Copiar `word_bank.txt` a la carpeta de trabajo de la simulación, normalmente
-   `<proyecto>.sim/sim_1/behav/xsim/`. Si el testbench indica que no encuentra
-   el archivo, copiarlo y reiniciar la simulación. Es una referencia de pruebas,
-   no una dependencia de la FPGA.
-5. Abrir **Run Behavioral Simulation**, agregar las señales y ejecutar **Run All**.
-   La prueba termina mediante `$finish`; un fallo produce `$fatal`.
-   Se espera PASS con 38 612 comprobaciones y 128 partidas.
-6. Capturar `new_game`, `word_ready`, `letter_valid`, `letter_ascii`,
-   `letter_correct`, `letter_repeated`, `revealed_word` y `word_complete`.
-   Mostrar inicio, coincidencias múltiples, repetición y última letra.
-7. Ejecutar **Run Synthesis** con `word_engine` como top. Los reportes guardados
-   corresponden a síntesis aislada out-of-context; al integrar el sistema los
-   recursos y tiempos pueden variar.
+La reproducción de las pruebas utiliza un proyecto RTL para Basys 3
+(`xc7a35tcpg236-1`) con la siguiente configuración:
+
+| Elemento | Configuración |
+|---|---|
+| Fuentes de diseño | `word_engine.sv`, `word_rom.sv`, `word_lfsr.sv` y `letter_evaluator.sv` |
+| Top de diseño | `word_engine` |
+| Fuente y top de simulación | `word_engine_tb.sv` / `word_engine_tb` |
+| Referencia del banco | `word_bank.txt` en el directorio de trabajo de simulación, normalmente `<proyecto>.sim/sim_1/behav/xsim/` |
+| Tipo de simulación | Behavioral Simulation |
+| Duración | Run All, hasta `$finish` o `$fatal` |
+| Resultado esperado | PASS con 38 612 comprobaciones y 128 partidas |
+
+El testbench pertenece exclusivamente al conjunto de fuentes de simulación.
+La ausencia del archivo de referencia produce un error explícito al inicio.
+Ese archivo no es necesario para la síntesis ni para el funcionamiento en FPGA.
+
+Las señales de observación son `new_game`, `word_ready`, `letter_valid`,
+`letter_ascii`, `letter_correct`, `letter_repeated`, `revealed_word` y
+`word_complete`. Los casos de interés incluyen inicio de partida, coincidencias
+múltiples, repetición de letras y revelado de la última posición pendiente.
+
+Los reportes existentes corresponden a síntesis aislada out-of-context con
+`word_engine` como top. Los recursos y tiempos pueden variar en el diseño integrado.
 
 Para analizar tiempos debe existir una restricción de reloj de 10 ns:
 
@@ -111,22 +115,21 @@ Para analizar tiempos debe existir una restricción de reloj de 10 ns:
 create_clock -name clk -period 10.000 [get_ports clk]
 ```
 
-Las capturas se agregarán a `docs/informe/resultados/motor/`, explicando las
-señales y el resultado observado. La simulación funcional registrada se ejecutó
-en Icarus; la simulación conductual en Vivado aún no se ha documentado.
-Los reportes de síntesis sí se obtuvieron en Vivado.
+Las evidencias se organizan en `docs/informe/resultados/motor/`, con la
+identificación de las señales y el resultado observado. La simulación funcional
+registrada se ejecutó en Icarus; la simulación conductual en Vivado aún no se ha
+documentado. Los reportes de síntesis sí se obtuvieron en Vivado.
 
-## Validación que falta para la entrega final
+## Alcance de validación pendiente
 
-1. Revisar con los otros integrantes la semántica de aceptación/evaluación y
-   resolver la entrega de la palabra final hacia UART.
-2. Integrar el motor con la FSM de partida y probar intentos, tiempo y eventos
-   simultáneos; verificar que una letra fuera de partida no se procese después.
-3. Ejecutar linter, implementación física y análisis temporal del top completo
-   con los constraints de la Basys 3.
-4. Presentar simulación **post-implementación temporizada** que incluya recepción
-   UART y validación de una letra, como solicita el instructivo.
-5. Probar en hardware ambas dificultades, LCD, displays, LED, buzzer y terminal.
+| Etapa | Criterio de verificación |
+|---|---|
+| Interfaces entre subsistemas | Semántica de aceptación/evaluación y entrega de palabra final a UART |
+| Integración con la FSM principal | Intentos, tiempo, eventos simultáneos y descarte de letras fuera de partida |
+| Implementación del sistema | Linter, implementación física y análisis temporal con los constraints de Basys 3 |
+| Simulación post-implementación temporizada | Recepción UART y validación de una letra |
+| Pruebas físicas | Ambas dificultades, LCD, displays, LED, buzzer y terminal |
 
-El informe final debe incorporar esas evidencias, discutir las diferencias con
-esta verificación aislada y registrar problemas de integración y sus soluciones.
+La validación final requiere estas evidencias y el análisis de las diferencias
+respecto a la verificación aislada, incluidos los problemas de integración y
+sus soluciones.

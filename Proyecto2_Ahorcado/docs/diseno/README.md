@@ -32,7 +32,7 @@ en Mermaid dentro del Markdown, sin depender de una imagen externa.
 | Índice de ROM | al menos 6 | Identifica una entrada del banco |
 | Intentos restantes | 3 | 0–6 |
 | Tiempo restante | 7 | Segundos; valores definitivos pendientes |
-| Victorias | 7 | Contador; definir comportamiento al alcanzar 99 |
+| Victorias | 7 | Contador; comportamiento al alcanzar 99 pendiente de definición |
 | Dificultad | 1 | 0=FACIL, 1=DIFICIL |
 
 ## Flujo de partida y responsabilidades
@@ -52,4 +52,4 @@ debe seguir siendo atendida para no dejar bytes antiguos pendientes.
 
 - [S2: motor, interfaces, algoritmo y plan de pruebas](nivel_3_motor_del_juego.md).
 - [S3: UART y protocolo](../diseño/uart_protocolo.md).
-- S1 y S4: incorporar los enlaces de diseño cuando sus documentos se integren.
+- S1 y S4: documentación pendiente de integración.

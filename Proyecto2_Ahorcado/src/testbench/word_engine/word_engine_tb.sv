@@ -117,7 +117,7 @@ module word_engine_tb;
         // Independent ASCII fixture, rather than decoding the RTL constants.
         fd = $fopen("word_bank.txt", "r");
         if (fd == 0) fd = $fopen("src/design/word_engine/word_bank.txt", "r");
-        require(fd != 0, "copy word_bank.txt into the simulation working directory");
+        require(fd != 0, "word_bank.txt not found in simulation working directory or project source path");
         for (i = 0; i < 50; i = i + 1) begin
             result = $fscanf(fd, "%s", reference_text);
             require(result == 1, "bank must contain 50 words");
