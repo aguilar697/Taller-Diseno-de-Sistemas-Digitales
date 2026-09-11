@@ -12,19 +12,19 @@ La implementación se divide en tres bloques principales: la UART, el periféric
 
 El subsistema recibe y transmite información entre la aplicación Python y el controlador principal del juego. La UART se encarga de la transmisión física de bytes, el periférico adapta esta comunicación a la interfaz interna de 32 bits utilizada en el proyecto y el controlador de protocolo interpreta los datos recibidos y construye los mensajes enviados hacia la PC.
 
-![Diagrama de segundo nivel del subsistema UART](img/uart_nivel2.png)
+![Diagrama de segundo nivel del subsistema UART](img/uart/uart_nivel2.png)
 
 **Figura 1. Diagrama de segundo nivel del subsistema de comunicación UART y protocolo.**
 
 A un nivel más detallado, la UART se divide en los bloques de transmisión y recepción, mientras que el periférico contiene los registros DATA0, DATA1 y CONTROL. El controlador de protocolo se conecta a estos registros y se comunica con `game_controller` mediante información semántica del juego.
 
-![Diagrama de tercer nivel del subsistema UART](img/uart_nivel3.png)
+![Diagrama de tercer nivel del subsistema UART](img/uart/uart_nivel3.png)
 
 **Figura 2. Diagrama de tercer nivel del subsistema UART y protocolo.**
 
 El flujo funcional de recepción y transmisión se presenta en la Figura 3.
 
-![Flujo funcional TX y RX](img/uart_flujo_tx_rx.png)
+![Flujo funcional TX y RX](img/uart/uart_flujo_tx_rx.png)
 
 **Figura 3. Flujo funcional de transmisión y recepción del subsistema.**
 

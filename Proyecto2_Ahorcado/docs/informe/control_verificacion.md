@@ -25,27 +25,27 @@ Módulos implementados:
 ### `countdown_timer`
 **PASS.** Se verificaron 60 s en FACIL, 45 s en DIFICIL, pausa por `enable=0`, decremento, llegada a cero y `expired`.
 
-![countdown_timer](img/03_countdown_timer_waveform.png)
+![countdown_timer](resultados/control/03_countdown_timer_waveform.png)
 
 ### `result_hold_timer`
 **PASS.** Se verificó la retención del resultado durante 3 s y la activación de `result_hold_done`.
 
-![result_hold_timer](img/04_result_hold_timer_waveform.png)
+![result_hold_timer](resultados/control/04_result_hold_timer_waveform.png)
 
 ### `game_datapath`
 **PASS.** Se verificaron dificultad, 6 intentos, protección contra underflow, captura de letra, `word_length`, `revealed_word` y victorias acumuladas con saturación en 99.
 
-![game_datapath](img/05_game_datapath_waveform.png)
+![game_datapath](resultados/control/05_game_datapath_waveform.png)
 
 ### `game_fsm`
 **PASS.** Se verificaron los estados `MODE_SELECT`, `REQUEST_WORD`, `WAIT_WORD`, `INIT_GAME`, `WAIT_LETTER`, `ISSUE_LETTER`, `CHECK_LETTER`, `RESULT_WIN`, `RESULT_LOSE_ATTEMPTS` y `RESULT_LOSE_TIME`, junto con las prioridades de victoria, derrota por intentos y derrota por tiempo.
 
-![game_fsm](img/06_game_fsm_waveform.png)
+![game_fsm](resultados/control/06_game_fsm_waveform.png)
 
 ### `game_control_top`
 **PASS.** Se verificó la integración completa de todos los módulos mediante tres escenarios: victoria, derrota por intentos y derrota por tiempo.
 
-![game_control_top](img/07_game_control_top_waveform.png)
+![game_control_top](resultados/control/07_game_control_top_waveform.png)
 
 ## 3. Elaboración RTL
 
@@ -66,7 +66,7 @@ La jerarquía elaborada contiene:
 - `u_result_hold_timer`
 - `u_game_fsm`
 
-![RTL elaborado](img/08_rtl_elaborated_schematic.png)
+![RTL elaborado](resultados/control/08_rtl_elaborated_schematic.png)
 
 ## 4. Síntesis
 
@@ -78,13 +78,13 @@ La síntesis se completó correctamente.
 | Slice Registers | 242 |
 | BUFGCTRL | 1 |
 
-![Utilización](img/09_synthesis_utilization.png)
+![Utilización](resultados/control/09_synthesis_utilization.png)
 
 ## 5. DRC
 
 El DRC del subsistema aislado reportó `NSTD-1`, `UCIO-1`, `CFGBVS-1` e `IOCNT-1`. Estos avisos aparecen porque `game_control_top` fue usado temporalmente como top físico aislado, por lo que Vivado interpreta buses internos entre subsistemas como pines externos. En el top global del proyecto esas señales serán nets internas.
 
-![DRC](img/10_drc_report.png)
+![DRC](resultados/control/10_drc_report.png)
 
 ## 6. Conclusión
 

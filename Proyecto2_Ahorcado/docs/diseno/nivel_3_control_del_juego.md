@@ -271,3 +271,13 @@ Por esa razón, el desarrollo asociado a este subsistema incluye:
 - integración final en Vivado.
 
 Los demás subsistemas se consideran interfaces externas al bloque de Control, aunque su comportamiento debe conocerse lo suficiente para definir correctamente las señales de comunicación.
+
+## Diagramas y documentos adjuntos
+
+- [Diagrama general del subsistema](img/control/Diagrama_Nivel_1_Control_Juego_Temporizacion.pdf).
+- [Diagrama de tercer nivel](img/control/Diagrama_Nivel_3_Control_Juego_Temporizacion.pdf).
+- [Explicación del diagrama general](img/control/Explicacion_Nivel_1_Control_Juego_Temporizacion.pdf).
+- [Explicación del tercer nivel](img/control/Explicacion_Nivel_3_Control_Juego_Temporizacion.pdf).
+- [Verificación del controlador](../informe/control_verificacion.md).
+
+[Índice de diseño](README.md)

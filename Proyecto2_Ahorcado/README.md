@@ -12,10 +12,11 @@ las respuestas de la FPGA.
 - [Planteamiento de diseño](docs/diseno/README.md).
 - [Diagrama de primer nivel](docs/diseno/nivel_1.md).
 - [Diagrama de segundo nivel](docs/diseno/nivel_2.md).
+- [Control del juego y temporización](docs/diseno/nivel_3_control_del_juego.md).
 - [Tercer nivel del motor del juego](docs/diseno/nivel_3_motor_del_juego.md).
 - [Cuarto nivel y FSM del motor](docs/diseno/nivel_4_motor_del_juego.md).
-- [Diseño de UART y protocolo](docs/diseño/uart_protocolo.md).
-- [Informe de verificación del motor](docs/informe/motor_verificacion.md).
+- [Diseño de UART y protocolo](docs/diseno/nivel_3_uart_protocolo.md).
+- [Informes y evidencias por subsistema](docs/informe/README.md).
 
 ## Responsabilidades
 
@@ -30,13 +31,29 @@ las respuestas de la FPGA.
 
 ```text
 docs/
-    diseno/       Diseño general y motor del juego
-    diseño/       Diseño de UART
-    informe/      Resultados y evidencias
+    diseno/       Diseño general y documentos por subsistema
+        img/      Diagramas de control, motor y UART
+    informe/      Informes de verificación por subsistema
+        resultados/
+            control/
+            motor/
 src/
     design/       Módulos de cada subsistema
     testbench/    Pruebas de los módulos
 ```
+
+## Estado del proyecto
+
+| Subsistema | Avance incorporado en main |
+|---|---|
+| S1: control | Diseño, módulos RTL, testbenches e informe de verificación; PR #17 |
+| S2: motor | Diseño de niveles 3 y 4, RTL, testbench, ondas y análisis de síntesis/tiempos aislados |
+| S3: UART | Diseño, núcleo VHDL proporcionado, periférico y protocolo SystemVerilog, testbenches |
+| S4: interfaz local | Avances en la rama `kCortes`; pendientes de integración en main |
+
+La integración funcional entre subsistemas y las pruebas del sistema completo
+siguen pendientes. La incorporación de ramas en Git conserva los avances de
+cada integrante, pero no sustituye esas pruebas.
 
 ## Motor del juego
 

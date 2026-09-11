@@ -166,8 +166,8 @@ Los pasos para ejecutar las pruebas directamente en Vivado se encuentran en el
 
 - Instructivo Proyecto 2 EL3313, secciones 3.1–3.4, 4 y rúbricas del Anexo A.
 - Contrato de interfaces del equipo, versión del 10 de septiembre de 2026.
-- [Diagrama preliminar de S2, dos páginas](diagrama_nivel_3_Motor_del_Juego.pdf).
-- [UART y protocolo existentes](../diseño/uart_protocolo.md).
+- [Diagrama preliminar de S2, dos páginas](img/motor/diagrama_nivel_3_Motor_del_Juego.pdf).
+- [UART y protocolo existentes](nivel_3_uart_protocolo.md).
 
 Los diagramas preliminares se conservan como antecedente; la versión editable
 de este documento describe el RTL actual y sus convenciones propuestas.
