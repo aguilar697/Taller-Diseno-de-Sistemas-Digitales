@@ -1,10 +1,10 @@
 # Informe de verificación — Motor del juego
 
-**Estado:** plantilla de entrega, pendiente de resultados y evidencias.
+**Estado:** simulación RTL conductual documentada; capturas, síntesis e integración pendientes de incorporar.
 **Subsistema:** S2. **Responsable:** Kevin Aguilar.
 
-Los campos «Pendiente» no representan resultados de ejecución. Las tablas
-separan los criterios esperados del diseño de las observaciones experimentales.
+Los resultados corresponden a la ejecución local en Vivado del 10 de septiembre
+de 2026. Los campos «Pendiente» identifican evidencias todavía no incorporadas.
 
 ## 1. Objetivo y alcance
 
@@ -14,13 +14,13 @@ identifica como motor aislado, integración con UART/controlador o sistema compl
 
 | Identificación de la ejecución | Valor |
 |---|---|
-| Fecha | Pendiente |
-| Commit de las fuentes verificadas | Pendiente |
-| Herramienta y versión | Pendiente |
-| Dispositivo | Pendiente; objetivo: xc7a35tcpg236-1 |
-| Top y alcance | Pendiente |
-| Etapa: RTL, post-síntesis o post-implementación | Pendiente |
-| Restricciones utilizadas | Pendiente |
+| Fecha | 10 de septiembre de 2026; inicio de simulación: 22:42:54 |
+| Commit de las fuentes verificadas | Referencia b8bb7cc; fuentes comparadas con la copia de Vivado |
+| Herramienta y versión | Vivado / XSim 2026.1 |
+| Dispositivo del proyecto | xc7a35tcpg236-1, Basys 3 |
+| Top y alcance | word_engine_tb; motor aislado |
+| Etapa: RTL, post-síntesis o post-implementación | Simulación conductual RTL |
+| Restricciones utilizadas | Reloj del testbench de 10 ns; resolución de 1 ps. No consta aplicación de XDC en el log |
 
 ## 2. Fundamento del diseño
 
@@ -31,7 +31,7 @@ consulta la máscara de letras utilizadas. El patrón siguiente permite detectar
 la última letra en la misma actualización. Las pruebas contrastan esa
 especificación con las señales observadas.
 
-## 3. Configuración prevista en Vivado
+## 3. Configuración de simulación en Vivado
 
 | Elemento | Configuración de referencia |
 |---|---|
@@ -60,27 +60,48 @@ ejecución. Los puertos sin restricciones limitan la validez del análisis tempo
 
 | ID | Caso | Criterio esperado | Resultado / evidencia |
 |---|---|---|---|
-| T01 | Reset y nueva partida | Limpieza y prioridad reset > new_game > letra | Pendiente |
-| T02 | ROM | 50 palabras distintas A–Z de longitud 4–12; índices externos inválidos | Pendiente |
-| T03 | LFSR | 63 estados no nulos y retorno a semilla | Pendiente |
-| T04 | Fácil | Todas las entradas alcanzables | Pendiente |
-| T05 | Difícil | Solo palabras de seis o más letras | Pendiente |
-| T06 | Patrón inicial | Guiones bajos válidos y espacios en relleno | Pendiente |
-| T07 | Letra correcta | Todas las coincidencias reveladas juntas | Pendiente |
-| T08 | Letra incorrecta | Patrón conservado; letra registrada como utilizada | Pendiente |
-| T09 | Repetida correcta/incorrecta | Sin nuevo acierto ni cambio de progreso | Pendiente |
-| T10 | ASCII inválido | Sin cambios en el progreso | Pendiente |
-| T11 | Última letra | Patrón completo y word_complete actualizados juntos | Pendiente |
-| T12 | Modo y selección | Modo capturado; letras ignoradas en IDLE/selección | Pendiente |
-| T13 | Solicitudes consecutivas | Resultados asociados al ciclo correcto | Pendiente |
+| T01 | Reset y nueva partida | Limpieza y prioridad reset > new_game > letra | PASS en testbench |
+| T02 | ROM | 50 palabras distintas A–Z de longitud 4–12; índices externos inválidos | PASS en testbench |
+| T03 | LFSR | 63 estados no nulos y retorno a semilla | PASS en testbench |
+| T04 | Fácil | Todas las entradas alcanzables | PASS en testbench |
+| T05 | Difícil | Solo palabras de seis o más letras | PASS en testbench |
+| T06 | Patrón inicial | Guiones bajos válidos y espacios en relleno | PASS en testbench |
+| T07 | Letra correcta | Todas las coincidencias reveladas juntas | PASS en testbench |
+| T08 | Letra incorrecta | Patrón conservado; letra registrada como utilizada | PASS en testbench |
+| T09 | Repetida correcta/incorrecta | Sin nuevo acierto ni cambio de progreso | PASS en testbench |
+| T10 | ASCII inválido | Sin cambios en el progreso | PASS en testbench |
+| T11 | Última letra | Patrón completo y word_complete actualizados juntos | PASS en testbench |
+| T12 | Modo y selección | Modo capturado; letras ignoradas en IDLE/selección | PASS: captura de modo y descarte en IDLE; descarte durante SELECT pendiente de caso específico |
+| T13 | Solicitudes consecutivas | Resultados asociados al ciclo correcto | PASS en testbench |
 
 | Indicador de ejecución | Resultado medido |
 |---|---|
-| Mensaje final del testbench | Pendiente |
-| Comprobaciones ejecutadas | Pendiente |
-| Partidas ejercitadas | Pendiente |
-| Tiempo simulado | Pendiente |
-| Errores y advertencias | Pendiente |
+| Mensaje final del testbench | PASS |
+| Comprobaciones ejecutadas | 38 612 |
+| Partidas ejercitadas | 128 |
+| Tiempo simulado | 118 286 ns (118.286 µs) |
+| Errores y advertencias | Incidencias de configuración descritas abajo; compilación, elaboración y simulación completadas con PASS |
+
+### Evidencia de la ejecución
+
+[Extracto del log de Vivado](resultados/motor/simulacion_vivado.txt).
+
+```text
+PASS: word_engine_tb; 38612 checks, 128 games; 50 easy words and all eligible hard words covered
+$finish called at time : 118286 ns
+```
+
+La ejecución inicial abarcó 1000 ns y posteriormente continuó con `run all`
+hasta `$finish`. Las fuentes copiadas al proyecto se compararon con las del
+repositorio: las diferencias son encabezados de Vivado, espacios y directivas
+`timescale` equivalentes. La lógica y el banco de palabras coinciden. El
+conteo expresa comprobaciones ejecutadas, no porcentaje de cobertura de código.
+
+Durante la configuración del proyecto aparece `Common 17-180: Spawn failed`
+y advertencias `filemgmt 56-199` de análisis durante refresco. El log no permite
+establecer su causa. La compilación y elaboración posteriores finalizaron y
+la simulación alcanzó PASS sin un fallo del testbench. Esto no constituye una
+comprobación de síntesis, timing físico ni funcionamiento en tarjeta.
 
 ### Capturas de formas de onda
 

@@ -456,8 +456,8 @@ de ausencia de latches. No se presenta una imagen conceptual como netlist real.
 
 ## 9. Validación y referencias
 
-El [informe de verificación](../informe/motor_verificacion.md) contiene la
-plantilla de resultados y casos de prueba. Las capturas y valores medidos se
+El [informe de verificación](../informe/motor_verificacion.md) documenta las
+pruebas y las evidencias pendientes. Las capturas y valores medidos se
 incorporan con identificación de herramienta, versión de fuentes y etapa.
 
 - Guía *Diseño Modular*, sección 3.5.4: desarrollo individual de los módulos.
