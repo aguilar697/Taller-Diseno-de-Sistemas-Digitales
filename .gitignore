@@ -37,6 +37,3 @@ desktop.ini
 *~
 *.swp
 *.tmp
-
-# Salidas reproducibles de pruebas y sintesis del Proyecto 2
-Proyecto2_Ahorcado/build/

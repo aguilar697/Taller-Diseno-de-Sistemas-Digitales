@@ -3,7 +3,7 @@
 Esta arquitectura expresa la división acordada por el equipo. Los diagramas
 Mermaid son editables y GitHub los presenta dentro de este documento. Las
 convenciones temporales todavía pendientes se identifican explícitamente en
-la [revisión de integración](revision_diagramas.md).
+el [diseño del motor](motor_del_juego.md).
 
 ## Objetivo y límites
 
@@ -101,4 +101,5 @@ debe seguir siendo atendida para no dejar bytes antiguos pendientes.
 
 La [imagen inicial de niveles 1 y 2](diagrama_nivel_1y2_Ahorcado.jpeg) se
 conserva como antecedente. Para interpretar las conexiones se utiliza la
-versión editable de este documento y su [revisión técnica](revision_diagramas.md).
+versión editable de este documento. Se corrigieron las direcciones RX/TX,
+el origen de tiempo e intentos en S1 y las señales de evaluación entre S1 y S2.

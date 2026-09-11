@@ -6,10 +6,8 @@ El motor selecciona y conserva la palabra secreta, evalúa letras y actualiza el
 patrón visible. Proporciona resultados al controlador de Kenneth; no modifica
 tiempo, intentos ni victorias y no controla directamente UART o LCD.
 
-Esta versión conserva los puertos del contrato del equipo. Kevin autorizó
-implementar la convención de bytes utilizada por UART y documentar la semántica
-temporal propuesta. La integración con los demás subsistemas todavía requiere
-revisión cruzada. En particular, **no se agregó una salida de palabra secreta**.
+El motor conserva los puertos acordados y el orden de bytes utilizado por UART.
+La entrega de la palabra secreta al finalizar sigue pendiente de acuerdo.
 
 ## 1. Requisitos y decisiones
 
@@ -118,10 +116,13 @@ combinacional de los registros mantiene explícita la propiedad del estado.
 
 ## 4. Nivel 4 — Organización de ROM y buses
 
-Fuente editable: [word_bank.txt](../../src/design/word_engine/word_bank.txt).
-El [generador](../../scripts/generate_word_rom.py) verifica cantidad, unicidad,
-alfabeto y longitudes, y genera un `case` constante sintetizable. La FPGA no abre
-archivos ni procesa strings durante la ejecución.
+La ROM se describe mediante un `case` constante en
+[word_rom.sv](../../src/design/word_engine/word_rom.sv). No requiere Python
+ni archivos externos para funcionar en FPGA.
+
+[word_bank.txt](../../src/design/word_engine/word_bank.txt) contiene las mismas
+50 palabras en texto y sirve como referencia del testbench. Al modificar una
+palabra, se deben actualizar la tabla RTL y esta referencia.
 
 Cada entrada contiene 96 bits de caracteres y 4 bits de longitud. El contenido
 lógico del banco ocupa 50 × 100 = **5000 bits**, sin contar decodificación. Esto
@@ -270,37 +271,8 @@ hexadecimal de ROM y un modelo de patrón/bitmap para contrastar resultados.
 El acceso jerárquico a `secret_word` en el testbench sirve solo para identificar
 la palabra seleccionada; **no constituye una interfaz de integración**.
 
-Desde la raíz del repositorio:
-
-```text
-python Proyecto2_Ahorcado/scripts/test_word_engine.py
-```
-
-Requiere Python 3 e Icarus Verilog (`iverilog` y `vvp`). El script busca las
-herramientas en PATH y, en Windows, también en `C:/iverilog/bin`; se puede indicar
-`--icarus-bin` con otra carpeta. No requiere paquetes Python adicionales.
-
-Para cambiar el banco, editar el `.txt`, regenerar y volver a probar:
-
-```text
-python Proyecto2_Ahorcado/scripts/generate_word_rom.py
-python Proyecto2_Ahorcado/scripts/test_word_engine.py
-```
-
-Para sintetizar desde la raíz del repositorio:
-
-```text
-python Proyecto2_Ahorcado/scripts/synth_word_engine.py
-```
-
-Los resultados temporales se escriben en `build/word_engine/` y no se versionan.
-El script acepta `--vivado`, copia las fuentes a una carpeta temporal, utiliza
-un solo hilo y recupera reportes y hashes de las fuentes. Esto evita depender de
-la ruta larga con espacios y caracteres acentuados del repositorio. También se
-puede ejecutar el Tcl directamente desde Vivado en una ruta compatible.
-La síntesis es independiente del resto del sistema, en modo out-of-context para
-`xc7a35tcpg236-1`. No usa pines físicos ni demuestra funcionamiento del sistema
-completo. Véase [evidencia de verificación](../informe/motor_verificacion.md).
+Los pasos para ejecutar las pruebas directamente en Vivado se encuentran en el
+[informe de verificación](../informe/motor_verificacion.md).
 
 ## 9. Límites antes de integrar
 
@@ -318,7 +290,6 @@ completo. Véase [evidencia de verificación](../informe/motor_verificacion.md).
 - Instructivo Proyecto 2 EL3313, secciones 3.1–3.4, 4 y rúbricas del Anexo A.
 - Contrato del equipo compartido por Kevin Aguilar el 10 de septiembre de 2026.
 - [Diagrama preliminar de S2, dos páginas](diagrama_nivel_3_Motor_del_Juego.pdf).
-- [Revisión de diagramas y acuerdos pendientes](revision_diagramas.md).
 - [UART y protocolo existentes](../diseño/uart_protocolo.md).
 
 Los diagramas preliminares se conservan como antecedente; la versión editable

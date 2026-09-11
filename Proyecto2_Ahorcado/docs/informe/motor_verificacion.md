@@ -16,7 +16,6 @@ Reloj del testbench: 10 ns. No se redujeron parámetros del motor para simular.
 Resultado:
 
 ```text
-PASS: 50 valid distinct words; RTL matches the bank
 PASS: word_engine_tb; 38612 checks, 128 games; 50 easy words and all eligible hard words covered
 ```
 
@@ -82,21 +81,40 @@ línea para versionarlos; sus valores no se modificaron):
 
 - [Utilización posterior a síntesis](resultados/motor/utilization_synth.rpt).
 - [Análisis temporal posterior a síntesis](resultados/motor/timing_synth.rpt).
-- [Hashes SHA-256 de fuentes verificadas](resultados/motor/source_sha256.txt).
 
-## Reproducción
+## Ejecución manual en Vivado
 
-Desde la raíz del repositorio:
+1. Crear un proyecto RTL para Basys 3 (`xc7a35tcpg236-1`). Preferir una carpeta
+   local con ruta corta, fuera de OneDrive.
+2. Agregar los cuatro archivos de `src/design/word_engine/` como **Design Sources**:
+   `word_engine.sv`, `word_rom.sv`, `word_lfsr.sv` y `letter_evaluator.sv`.
+   Seleccionar `word_engine` como top de diseño.
+3. Agregar `word_engine_tb.sv` como **Simulation Source** y top de simulación.
+   No agregar el testbench a síntesis.
+4. Copiar `word_bank.txt` a la carpeta de trabajo de la simulación, normalmente
+   `<proyecto>.sim/sim_1/behav/xsim/`. Si el testbench indica que no encuentra
+   el archivo, copiarlo y reiniciar la simulación. Es una referencia de pruebas,
+   no una dependencia de la FPGA.
+5. Abrir **Run Behavioral Simulation**, agregar las señales y ejecutar **Run All**.
+   La prueba termina mediante `$finish`; un fallo produce `$fatal`.
+   Se espera PASS con 38 612 comprobaciones y 128 partidas.
+6. Capturar `new_game`, `word_ready`, `letter_valid`, `letter_ascii`,
+   `letter_correct`, `letter_repeated`, `revealed_word` y `word_complete`.
+   Mostrar inicio, coincidencias múltiples, repetición y última letra.
+7. Ejecutar **Run Synthesis** con `word_engine` como top. Los reportes guardados
+   corresponden a síntesis aislada out-of-context; al integrar el sistema los
+   recursos y tiempos pueden variar.
 
-```text
-python Proyecto2_Ahorcado/scripts/test_word_engine.py
-python Proyecto2_Ahorcado/scripts/synth_word_engine.py
+Para analizar tiempos debe existir una restricción de reloj de 10 ns:
+
+```tcl
+create_clock -name clk -period 10.000 [get_ports clk]
 ```
 
-La síntesis inicial desde la ruta del repositorio encontró problemas de manejo
-de rutas y un cierre prematuro. El procedimiento reproducible usa una copia
-temporal de las mismas fuentes, con un hilo, y recupera los reportes. Esto
-permitió completar la síntesis; no se atribuye una causa única al cierre previo.
+Las capturas se agregarán a `docs/informe/resultados/motor/`, explicando las
+señales y el resultado observado. La simulación funcional registrada se ejecutó
+en Icarus; la simulación conductual en Vivado aún no se ha documentado.
+Los reportes de síntesis sí se obtuvieron en Vivado.
 
 ## Validación que falta para la entrega final
 

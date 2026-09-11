@@ -115,8 +115,9 @@ module word_engine_tb;
 
     initial begin
         // Independent ASCII fixture, rather than decoding the RTL constants.
-        fd = $fopen("src/design/word_engine/word_bank.txt", "r");
-        require(fd != 0, "run simulation with Proyecto2_Ahorcado as working directory");
+        fd = $fopen("word_bank.txt", "r");
+        if (fd == 0) fd = $fopen("src/design/word_engine/word_bank.txt", "r");
+        require(fd != 0, "copy word_bank.txt into the simulation working directory");
         for (i = 0; i < 50; i = i + 1) begin
             result = $fscanf(fd, "%s", reference_text);
             require(result == 1, "bank must contain 50 words");
