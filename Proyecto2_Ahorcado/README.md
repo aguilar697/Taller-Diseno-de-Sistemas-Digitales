@@ -15,7 +15,7 @@ las respuestas de la FPGA.
 - [Tercer nivel del motor del juego](docs/diseno/nivel_3_motor_del_juego.md).
 - [Cuarto nivel y FSM del motor](docs/diseno/nivel_4_motor_del_juego.md).
 - [Diseño de UART y protocolo](docs/diseño/uart_protocolo.md).
-- [Informe de simulación y validación pendiente](docs/informe/motor_verificacion.md).
+- [Informe de verificación del motor](docs/informe/motor_verificacion.md).
 
 ## Responsabilidades
 
@@ -47,9 +47,10 @@ por el testbench. Los pasos completos están en el informe de verificación.
 
 El motor incluye selección por dificultad, ROM de 50 palabras, LFSR,
 validación, registro de letras utilizadas y actualización del patrón.
-El informe incluye la simulación conductual del motor en Vivado. Las capturas
-y las evidencias de síntesis e implementación están pendientes de incorporar. La integración con los demás subsistemas, la simulación
-temporizada y las pruebas físicas siguen pendientes.
+El informe incluye simulación conductual, formas de onda y reportes de síntesis
+y temporización del motor aislado en Vivado. La integración con los demás
+subsistemas, el cierre temporal del sistema, la simulación temporizada y las
+pruebas físicas siguen pendientes.
 
 ## Trabajo colaborativo
 

@@ -449,10 +449,11 @@ externos que conectar entre ellos. Sus conexiones son las redes de datos y
 control del tercer nivel. Los pines de reloj, botones, UART y dispositivos
 locales pertenecen al top del sistema y a su archivo de constraints.
 
-Los esquemas anteriores detallan el diseño lógico previsto. Los esquemáticos
-RTL elaborados y de la netlist sintetizada de Vivado quedan pendientes de
-incorporación como evidencia de su implementación, junto con la comprobación
-de ausencia de latches. No se presenta una imagen conceptual como netlist real.
+Los esquemas anteriores detallan el diseño lógico. El
+[informe de verificación](../informe/motor_verificacion.md) incorpora una vista
+RTL elaborada por Vivado, un detalle de los registros del LFSR sintetizado y
+la comprobación de ausencia de latches en el motor. Las vistas de herramienta
+se distinguen de los diagramas lógicos de este documento.
 
 ## 9. Validación y referencias
 

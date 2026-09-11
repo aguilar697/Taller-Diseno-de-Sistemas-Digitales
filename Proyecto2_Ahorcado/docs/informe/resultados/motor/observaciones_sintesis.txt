@@ -1,0 +1,25 @@
+Vivado 2026.1; motor aislado; fuentes de diseño de 292ba93.
+Consulta de netlist después de síntesis:
+LATCHES 0
+REGISTERS 202
+
+Advertencias de la ejecución completada:
+WARNING: [Vivado 12-180] No cells matched 'get_cells -hier -filter {REF_NAME =~ LD*}'.
+WARNING: [DRC 23-814] Not all possible (connectivity based) DRCs may have been run because this design is seen as Out of Context.
+WARNING: [DRC 23-814] Not all possible (connectivity based) DRCs may have been run because this design is seen as Out of Context.
+WARNING: [Route 35-197] Clock port "clk" does not have an associated HD.CLK_SRC. Without this constraint, timing analysis may not be accurate and upstream checks cannot be done to ensure correct clock placement.
+WARNING: [Route 35-198] Port "letter_ascii[0]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_ascii[0]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "letter_ascii[1]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_ascii[1]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "letter_ascii[2]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_ascii[2]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "letter_ascii[5]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_ascii[5]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "letter_ascii[6]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_ascii[6]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "letter_ascii[7]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_ascii[7]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "letter_ascii[4]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_ascii[4]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "letter_ascii[3]" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_ascii[3]". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "reset" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "reset". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "new_game" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "new_game". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "difficulty" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "difficulty". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Route 35-198] Port "letter_valid" does not have an associated HD.PARTPIN_LOCS, which will prevent the partial routing of the signal "letter_valid". Without this partial route, timing analysis to/from this port will not be accurate, and no routing information for this port can be exported.
+WARNING: [Constraints 18-8777] Unable to split tiles. All required files are not available.
+WARNING: [Timing 38-242] The property HD.CLK_SRC of clock port "clk" is not set. In out-of-context mode, this prevents timing estimation for clock delay/skew
+WARNING: [DRC 23-814] Not all possible (connectivity based) DRCs may have been run because this design is seen as Out of Context.
