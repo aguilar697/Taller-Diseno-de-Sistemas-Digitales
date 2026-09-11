@@ -12,7 +12,7 @@ las respuestas de la FPGA.
 - [Planteamiento de diseño](docs/diseno/README.md).
 - [Diagrama de primer nivel](docs/diseno/nivel_1.md).
 - [Diagrama de segundo nivel](docs/diseno/nivel_2.md).
-- [Diseño del motor del juego](docs/diseno/motor_del_juego.md).
+- [Diseño del motor del juego](docs/diseno/nivel_3_motor_del_juego.md).
 - [Diseño de UART y protocolo](docs/diseño/uart_protocolo.md).
 - [Resultados del motor y pasos para probarlo en Vivado](docs/informe/motor_verificacion.md).
 

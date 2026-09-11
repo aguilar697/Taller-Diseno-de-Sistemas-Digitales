@@ -3,7 +3,7 @@
 Esta arquitectura expresa la división acordada por el equipo. Los diagramas
 Mermaid son editables y GitHub los presenta dentro de este documento. Las
 convenciones temporales todavía pendientes se identifican explícitamente en
-el [diseño del motor](motor_del_juego.md).
+el [diseño del motor](nivel_3_motor_del_juego.md).
 
 ## Objetivo y límites
 
@@ -50,6 +50,6 @@ debe seguir siendo atendida para no dejar bytes antiguos pendientes.
 
 ## Detalle por subsistema
 
-- [S2: motor, interfaces, algoritmo y plan de pruebas](motor_del_juego.md).
+- [S2: motor, interfaces, algoritmo y plan de pruebas](nivel_3_motor_del_juego.md).
 - [S3: UART y protocolo](../diseño/uart_protocolo.md).
 - S1 y S4: incorporar los enlaces de diseño cuando sus documentos se integren.

@@ -105,4 +105,4 @@ transmisión. Sigue pendiente acordar cómo proporcionar a UART la palabra secre
 completa al perder; el motor actual no dispone de una salida para ese dato.
 Estas conexiones describen la arquitectura propuesta, no una integración ya validada.
 
-[Primer nivel](nivel_1.md) · [Índice del diseño](README.md) · [Detalle del motor](motor_del_juego.md)
+[Primer nivel](nivel_1.md) · [Índice del diseño](README.md) · [Detalle del motor](nivel_3_motor_del_juego.md)
