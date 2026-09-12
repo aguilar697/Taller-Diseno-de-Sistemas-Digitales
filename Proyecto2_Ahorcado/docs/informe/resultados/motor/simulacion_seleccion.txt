@@ -1,0 +1,32 @@
+#-----------------------------------------------------------
+# xsim v2026.1 (64-bit)
+# SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+# IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+# SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+# Start of session at: Thu Sep 10 23:19:56 2026
+# Process ID         : 1924
+# Current directory  : <ejecucion_local>
+# Command line       : xsim.exe -log regression.log -mode tcl -source {xsim.dir/motor_regression/xsim_script.tcl}
+# Log file           : <ejecucion_local>/regression.log
+# Journal file       : <ejecucion_local>\xsim.jou
+# Running On         : Kevin
+# Platform           : Windows 11
+# Operating System   : 26200
+# Processor Detail   : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+# CPU Frequency      : 2304 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 16935 MB
+# Swap memory        : 11824 MB
+# Total Virtual      : 28760 MB
+# Available Virtual  : 3491 MB
+#-----------------------------------------------------------
+source xsim.dir/motor_regression/xsim_script.tcl
+# xsim {motor_regression} -autoloadwcfg -tclbatch {run.tcl}
+Time resolution is 1 ps
+source run.tcl
+## run all
+PASS: word_engine_tb; 38636 checks, 129 games; 50 easy words and all eligible hard words covered
+$finish called at time : 118356 ns : File "<ejecucion_local>/word_engine_tb.sv" Line 223
+## quit
+INFO: [Common 17-206] Exiting xsim at Thu Sep 10 23:19:58 2026...
