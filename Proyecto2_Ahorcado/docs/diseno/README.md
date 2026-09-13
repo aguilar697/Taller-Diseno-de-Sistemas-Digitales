@@ -55,12 +55,12 @@ debe seguir siendo atendida para no dejar bytes antiguos pendientes.
 - [S2: tercer nivel e interfaces del motor](nivel_3_motor_del_juego.md).
 - [S2: cuarto nivel y FSM del motor](nivel_4_motor_del_juego.md).
 - [S3: UART y protocolo](nivel_3_uart_protocolo.md).
-- S4: documentación pendiente de integrar desde su rama de trabajo.
+- [S4: interfaz local](nivel_3_interfaz_local.md).
 
 ## Organización de los documentos
 
 Los diagramas generales se guardan como `nivel_1.md` y `nivel_2.md`. El detalle
 por subsistema utiliza `nivel_3_<subsistema>.md` y, cuando corresponde,
 `nivel_4_<subsistema>.md`. Las imágenes y PDF se ubican en `img/control/`,
-`img/motor/` e `img/uart/`. Los resultados de pruebas se consultan en el
-[índice de informes](../informe/README.md).
+`img/motor/`, `img/uart/` e `img/interfaz_local/`. Los resultados de pruebas se
+consultan en el [índice de informes](../informe/README.md).
