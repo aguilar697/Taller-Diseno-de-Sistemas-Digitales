@@ -31,7 +31,7 @@ Los proyectos se desarrollan siguiendo una metodología de **diseño modular**, 
 | Proyecto | Descripción | Tecnologías principales | Estado |
 |---|---|---|---|
 | [Proyecto 1 — Whack-a-Mole](./Proyecto1_Whack-a-mole/) | Juego híbrido implementado mediante FPGA y lógica discreta, con comunicación serial UART entre ambos subsistemas. | Basys 3, SystemVerilog, UART, lógica 74xx | Finalizado |
-| Proyecto 2 - NA | --- | --- | --- |
+| [Proyecto 2 — Ahorcado](./Proyecto2_Ahorcado/) | Juego controlado por FPGA, terminal Python por UART e interfaz local LCD, displays y buzzer. | Basys 3, SystemVerilog, UART, Python, LCD | En desarrollo |
 
 Cada proyecto dispone de su propio `README.md`, donde se documentan su arquitectura, estructura interna, módulos implementados, procedimiento de uso y referencias hacia la documentación técnica.
 
@@ -43,34 +43,26 @@ La organización general utilizada para los proyectos es la siguiente:
 
 ```text
 Taller-Diseno-de-Sistemas-Digitales/
-│
 ├── README.md
-├── .gitignore
-├── .gitattributes
-│
-└── Proyecto1_Whack-a-mole/
-    │
+├── Proyecto1_Whack-a-mole/
+│   ├── README.md
+│   ├── docs/
+│   │   ├── diseno/
+│   │   └── informe/
+│   └── src/
+│       ├── design/
+│       ├── testbench/
+│       └── constraints/
+└── Proyecto2_Ahorcado/
     ├── README.md
-    │
     ├── docs/
-    │   │
     │   ├── diseno/
-    │   │   ├── README.md
-    │   │   ├── img/
-    │   │   └── subsistema_discreto/
-    │   │       ├── README.md
-    │   │       └── img/
-    │   │
+    │   │   └── img/
     │   └── informe/
-    │       ├── README.md
-    │       ├── img/
     │       └── resultados/
-    │           └── README.md
-    │
     └── src/
         ├── design/
-        ├── testbench/
-        └── constraints/
+        └── testbench/
 ```
 
 ---
@@ -87,7 +79,8 @@ Contiene el informe técnico final, resultados de simulación, mediciones, evide
 
 ### `src/design/`
 
-Contiene los módulos RTL sintetizables desarrollados en **SystemVerilog**.
+Contiene los módulos RTL sintetizables desarrollados en **SystemVerilog** y
+los núcleos **VHDL** proporcionados para el Proyecto 2.
 
 ### `src/testbench/`
 
@@ -168,6 +161,12 @@ Para el Proyecto 1:
 - [Evidencias de simulación](./Proyecto1_Whack-a-mole/docs/informe/resultados/README.md)
 
 ---
+
+Para el Proyecto 2:
+
+- [Descripción y estado del proyecto](./Proyecto2_Ahorcado/README.md)
+- [Planteamiento de diseño](./Proyecto2_Ahorcado/docs/diseno/README.md)
+- [Informes y evidencias](./Proyecto2_Ahorcado/docs/informe/README.md)
 
 ## Curso
 
