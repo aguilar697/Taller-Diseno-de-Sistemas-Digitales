@@ -6,7 +6,7 @@ module word_engine_tb;
     logic [7:0] letter_ascii = 0;
     wire word_ready, letter_correct, letter_repeated, word_complete;
     wire [3:0] word_length;
-    wire [95:0] revealed_word;
+    wire [95:0] revealed_word, secret_word;
     word_engine dut (.*);
 
     logic [5:0] rom_index = 0;

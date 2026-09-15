@@ -92,19 +92,19 @@ module sevenseg_driver #(
     unique case (digit_sel)
       2'd0: begin
         an_o          = 4'b1110;
-        active_nibble = time_tens;
+        active_nibble = time_units;
       end
       2'd1: begin
         an_o          = 4'b1101;
-        active_nibble = time_units;
+        active_nibble = time_tens;
       end
       2'd2: begin
         an_o          = 4'b1011;
-        active_nibble = wins_tens;
+        active_nibble = wins_units;
       end
       2'd3: begin
         an_o          = 4'b0111;
-        active_nibble = wins_units;
+        active_nibble = wins_tens;
       end
       default: begin
         an_o          = 4'b1111;

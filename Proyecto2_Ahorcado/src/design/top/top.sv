@@ -41,6 +41,7 @@ module top (
     localparam logic [2:0] EVENT_START         = 3'd0;
     localparam logic [2:0] EVENT_HIT           = 3'd1;
     localparam logic [2:0] EVENT_MISS          = 3'd2;
+    localparam logic [2:0] EVENT_REPEAT        = 3'd3;
     
     localparam logic [2:0] EVENT_WIN           = 3'd4;
     localparam logic [2:0] EVENT_LOSE_ATTEMPTS = 3'd5;
@@ -80,6 +81,7 @@ module top (
     logic        word_ready_s;
     logic [3:0]  word_length_from_engine_s;
     logic [95:0] revealed_word_from_engine_s;
+    logic [95:0] secret_word_s;
     logic        letter_correct_s;
     logic        letter_repeated_s;
     logic        word_complete_s;
@@ -235,6 +237,7 @@ module top (
         .word_ready     (word_ready_s),
         .word_length    (word_length_from_engine_s),
         .revealed_word  (revealed_word_from_engine_s),
+        .secret_word    (secret_word_s),
         .letter_correct (letter_correct_s),
         .letter_repeated(letter_repeated_s),
         .word_complete  (word_complete_s)
@@ -242,6 +245,7 @@ module top (
 
     logic [2:0] game_state_d1_s;
     logic       correct_pulse_d1_s;
+    logic       repeated_pulse_d1_s;
     logic       wrong_pulse_d1_s;
     logic       game_over_pulse_d1_s;
 
@@ -249,11 +253,13 @@ module top (
         if (rst_sync_top) begin
             game_state_d1_s      <= '0;
             correct_pulse_d1_s   <= 1'b0;
+            repeated_pulse_d1_s  <= 1'b0;
             wrong_pulse_d1_s     <= 1'b0;
             game_over_pulse_d1_s <= 1'b0;
         end else begin
             game_state_d1_s      <= game_state_s;
             correct_pulse_d1_s   <= correct_pulse_s;
+            repeated_pulse_d1_s  <= letter_repeated_s;
             wrong_pulse_d1_s     <= wrong_pulse_s;
             game_over_pulse_d1_s <= game_over_pulse_s;
         end
@@ -285,6 +291,9 @@ module top (
         end else if (correct_pulse_d1_s) begin
             new_event_pulse_s = 1'b1;
             new_event_type_s  = EVENT_HIT;
+        end else if (repeated_pulse_d1_s) begin
+            new_event_pulse_s = 1'b1;
+            new_event_type_s  = EVENT_REPEAT;
         end else if (wrong_pulse_d1_s) begin
             new_event_pulse_s = 1'b1;
             new_event_type_s  = EVENT_MISS;
@@ -296,16 +305,16 @@ module top (
         if (rst_sync_top) begin
             event_valid_s <= 1'b0;
             event_type_s  <= EVENT_START;
-        end else if (event_valid_s && event_ready_s) begin
-            event_valid_s <= 1'b0;
-        end else if (new_event_pulse_s && !event_valid_s) begin
+        end else if (new_event_pulse_s && (!event_valid_s || event_ready_s)) begin
             event_valid_s          <= 1'b1;
             event_type_s           <= new_event_type_s;
             event_difficulty_s     <= difficulty_s;
             event_word_length_s    <= word_length_s;
             event_attempts_left_s  <= attempts_left_s;
             event_revealed_word_s  <= revealed_word_s;
-            event_final_word_s     <= revealed_word_s;
+            event_final_word_s     <= secret_word_s;
+        end else if (event_valid_s && event_ready_s) begin
+            event_valid_s <= 1'b0;
         end
     end
 

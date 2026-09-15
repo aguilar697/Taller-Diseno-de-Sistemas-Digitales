@@ -1,4 +1,4 @@
-
+import io
 import os
 import string
 import threading
@@ -8,358 +8,463 @@ import serial
 import serial.tools.list_ports
 from PIL import Image
 
-# ==========================================
-# 0. CONFIGURACIÓN
-# ==========================================
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 CABEZA_PATH = os.path.join(BASE_DIR, "cabeza.png")
 
 BAUD_RATE = 115200
-ALPHABET = list(string.ascii_uppercase)
+READ_TIMEOUT = 0.1
+WRITE_TIMEOUT = 1.0
+ALPHABET = tuple(string.ascii_uppercase)
+MAX_ERRORS = 6
 
 
-# ==========================================
-# 1. IMAGEN DE LA CABEZA
-# ==========================================
-def prepare_head_image():
-    if os.path.exists(CABEZA_PATH):
-        try:
-            with Image.open(CABEZA_PATH) as img:
-                if img.size != (60, 60):
-                    img_resized = img.resize((60, 60), Image.Resampling.LANCZOS)
-                    img_resized.save(CABEZA_PATH)
-        except Exception as e:
-            print(f"Error al procesar la imagen: {e}")
+def load_head_image_data():
+    """Carga y redimensiona la cabeza en memoria sin modificar cabeza.png."""
+    if not os.path.exists(CABEZA_PATH):
+        return None
+
+    try:
+        with Image.open(CABEZA_PATH) as image:
+            resized = image.convert("RGBA").resize((60, 60), Image.Resampling.LANCZOS)
+            image_buffer = io.BytesIO()
+            resized.save(image_buffer, format="PNG")
+            return image_buffer.getvalue()
+    except (OSError, ValueError) as error:
+        print(f"Error al procesar la imagen: {error}")
+        return None
 
 
-prepare_head_image()
+HEAD_IMAGE_DATA = load_head_image_data()
 
 
-# ==========================================
-# 2. DIBUJO EN EL LIENZO (Visual)
-# ==========================================
 def draw_gallows(graph):
     graph.erase()
-    graph.draw_line((50, 40), (300, 40), color="black", width=4)     # Base
-    graph.draw_line((100, 40), (100, 400), color="black", width=4)   # Poste vertical
-    graph.draw_line((100, 400), (225, 400), color="black", width=4)  # Viga superior
-    graph.draw_line((225, 400), (225, 340), color="black", width=3)  # Cuerda
+    graph.draw_line((50, 40), (300, 40), color="black", width=4)
+    graph.draw_line((100, 40), (100, 400), color="black", width=4)
+    graph.draw_line((100, 400), (225, 400), color="black", width=4)
+    graph.draw_line((225, 400), (225, 340), color="black", width=3)
 
 
-HANGMAN_PICS = [
-    lambda g, c="black": g.draw_image(filename=CABEZA_PATH, location=(195, 340)),
-    lambda g, c="black": g.draw_line((225, 280), (225, 170), color=c, width=3),  # Torso
-    lambda g, c="black": g.draw_line((225, 250), (180, 200), color=c, width=3),  # Brazo izq
-    lambda g, c="black": g.draw_line((225, 250), (270, 200), color=c, width=3),  # Brazo der
-    lambda g, c="black": g.draw_line((225, 170), (180, 110), color=c, width=3),  # Pierna izq
-    lambda g, c="black": g.draw_line((225, 170), (270, 110), color=c, width=3),  # Pierna der
-]
+def draw_head(graph, _color="black"):
+    if HEAD_IMAGE_DATA is not None:
+        graph.draw_image(data=HEAD_IMAGE_DATA, location=(195, 340))
+    else:
+        graph.draw_circle((225, 310), 30, line_color="black", line_width=3)
 
-# Los 6 tramos del dibujo corresponden 1 a 1 con el máximo de 6 letras
-# incorrectas que exige el enunciado (sección 3.1). errors = tramos a dibujar.
-MAX_ERRORS = len(HANGMAN_PICS)
+
+HANGMAN_PICS = (
+    draw_head,
+    lambda graph, color="black": graph.draw_line(
+        (225, 280), (225, 170), color=color, width=3
+    ),
+    lambda graph, color="black": graph.draw_line(
+        (225, 250), (180, 200), color=color, width=3
+    ),
+    lambda graph, color="black": graph.draw_line(
+        (225, 250), (270, 200), color=color, width=3
+    ),
+    lambda graph, color="black": graph.draw_line(
+        (225, 170), (180, 110), color=color, width=3
+    ),
+    lambda graph, color="black": graph.draw_line(
+        (225, 170), (270, 110), color=color, width=3
+    ),
+)
 
 
 def update_hangman_visuals(graph, errors, game_over=False):
-    """Dibuja las partes del cuerpo según la cantidad de errores reportados por la FPGA."""
+    """Dibuja los errores a partir del valor de intentos recibido de la FPGA."""
     draw_gallows(graph)
     color = "red" if game_over else "black"
     errors = max(0, min(errors, len(HANGMAN_PICS)))
-    for i in range(errors):
-        HANGMAN_PICS[i](graph, color)
+    for picture in HANGMAN_PICS[:errors]:
+        picture(graph, color)
 
 
-def format_pattern(patron: str) -> str:
-    """'_A__A__' -> '_ A _ _ A _ _' para que se lea igual que el original."""
-    return " ".join(patron) if patron else ""
+def format_pattern(pattern):
+    return " ".join(pattern) if pattern else ""
 
 
-# ==========================================
-# 3. COMUNICACIÓN SERIAL (UART)
-# ==========================================
 def find_ports():
-    return [p.device for p in serial.tools.list_ports.comports()]
+    return [port.device for port in serial.tools.list_ports.comports()]
 
 
-def serial_reader(ser: serial.Serial, window: sg.Window, stop_event: threading.Event):
-    """
-    Corre en un hilo aparte. PySimpleGUI no es seguro para actualizar
-    widgets desde otro hilo, así que cada línea recibida se empuja al
-    loop de eventos principal con window.write_event_value(), y se
-    procesa allí como un evento más.
-    """
+def serial_reader(serial_port, window, stop_event):
+    """Recibe líneas LF en un hilo y las entrega al bucle gráfico principal."""
     while not stop_event.is_set():
         try:
-            raw = ser.readline()
+            raw_line = serial_port.readline()
         except (serial.SerialException, OSError):
-            window.write_event_value("-SERIAL-ERROR-", "Se perdió la conexión con la FPGA.")
+            if not stop_event.is_set():
+                try:
+                    window.write_event_value(
+                        "-SERIAL-ERROR-", "Se perdió la conexión con la FPGA."
+                    )
+                except Exception:
+                    pass
             return
-        if not raw:
-            continue  # timeout de lectura, seguir esperando
-        try:
-            line = raw.decode("ascii", errors="ignore").strip()
-        except Exception:
+
+        if not raw_line:
             continue
-        if line:
+
+        if raw_line.endswith(b"\n"):
+            raw_line = raw_line[:-1]
+
+        if not raw_line:
+            continue
+
+        line = raw_line.decode("ascii", errors="replace")
+        try:
             window.write_event_value("-SERIAL-LINE-", line)
-
-
-# ==========================================
-# 4. INTERFAZ GRÁFICA (Layout)
-# ==========================================
-canvas_element = sg.Graph(
-    canvas_size=(350, 450),
-    graph_bottom_left=(0, 0),
-    graph_top_right=(350, 450),
-    key="-CANVAS-",
-    background_color="white",
-    pad=(30, 10),
-)
-
-letter_grid = [
-    [
-        sg.Button(
-            letter,
-            key=f"-LETTER-{letter}-",
-            size=(5, 2),
-            font=("Helvetica", 12, "bold"),
-            disabled=True,  # se habilitan al recibir START de la FPGA
-        )
-        for letter in ALPHABET[i:i + 6]
-    ]
-    for i in range(0, len(ALPHABET), 6)
-]
-
-right_column = sg.Column(
-    letter_grid,
-    element_justification="center",
-    vertical_alignment="center",
-    pad=(30, 10),
-)
-
-word_display = sg.Text(
-    "Esperando partida...", font=("Helvetica", 30, "bold"), key="-WORD-", pad=(0, 20)
-)
-
-status_text = sg.Text(
-    "Sin conexión.", font=("Helvetica", 12), key="-STATUS-", text_color="gray", pad=(0, 5)
-)
-
-# Solo informativo: la dificultad la decide la FPGA (BTN_SEL/BTN_OK en la
-# tarjeta), no la PC. Se actualiza al llegar el mensaje START.
-difficulty_label = sg.Text("Modo: —", font=("Helvetica", 12, "bold"), key="-DIFFICULTY-")
-
-connection_row = [
-    sg.Text("Puerto:"),
-    sg.Combo(find_ports(), key="-PORT-", size=(15, 1), readonly=True),
-    sg.Button("Actualizar", key="-REFRESH-"),
-    sg.Button("Conectar", key="-CONNECT-"),
-    sg.Text("Desconectado", key="-CONN-STATUS-", text_color="red"),
-]
-
-action_buttons = [
-    sg.Button("Nuevo Juego", key="-NEW-", font=("Helvetica", 12), size=(14, 2), pad=(10, 0)),
-    sg.Button("Reiniciar", key="-RESTART-", font=("Helvetica", 12), size=(14, 2), pad=(10, 0)),
-    sg.Button("Salir", key="-QUIT-", font=("Helvetica", 12), size=(14, 2), pad=(10, 0)),
-]
-
-layout = [
-    [sg.VPush()],
-    [sg.Push(), sg.Column([connection_row]), sg.Push()],
-    [sg.Push(), difficulty_label, sg.Push()],
-    [sg.Push(), canvas_element, right_column, sg.Push()],
-    [sg.Push(), word_display, sg.Push()],
-    [sg.Push(), status_text, sg.Push()],
-    [sg.Push(), action_buttons[0], action_buttons[1], action_buttons[2], sg.Push()],
-    [sg.VPush()],
-]
-
-window = sg.Window("Juego del Ahorcado (Terminal Remota)", layout, resizable=True, finalize=True)
-window.maximize()
-
-for letter in ALPHABET:
-    window.bind(f"<Key-{letter.lower()}>", f"-LETTER-{letter}-")
-    window.bind(f"<Key-{letter.upper()}>", f"-LETTER-{letter}-")
-
-draw_gallows(window["-CANVAS-"])
-
-
-# ==========================================
-# 5. ESTADO DE LA APLICACIÓN
-# ==========================================
-ser: serial.Serial | None = None
-stop_event = threading.Event()
-reader_thread: threading.Thread | None = None
-game_in_progress = False
-
-
-def reset_local_view():
-    """Limpia SOLO la vista local. No envía nada a la FPGA (ver nota de protocolo arriba)."""
-    global game_in_progress
-    game_in_progress = False
-    draw_gallows(window["-CANVAS-"])
-    window["-WORD-"].update("Esperando partida...")
-    window["-DIFFICULTY-"].update("Modo: —")
-    for l in ALPHABET:
-        window[f"-LETTER-{l}-"].update(disabled=True)
-
-
-def set_status(msg: str, color: str = "gray"):
-    window["-STATUS-"].update(msg, text_color=color)
-
-
-def disconnect_serial():
-    global ser, reader_thread
-    stop_event.set()
-    if reader_thread is not None:
-        reader_thread.join(timeout=1)
-    if ser is not None:
-        try:
-            ser.close()
         except Exception:
-            pass
-    ser = None
+            return
+
+
+def build_window():
+    canvas = sg.Graph(
+        canvas_size=(350, 450),
+        graph_bottom_left=(0, 0),
+        graph_top_right=(350, 450),
+        key="-CANVAS-",
+        background_color="white",
+        pad=(30, 10),
+    )
+
+    letter_grid = [
+        [
+            sg.Button(
+                letter,
+                key=f"-LETTER-{letter}-",
+                size=(5, 2),
+                font=("Helvetica", 12, "bold"),
+                disabled=True,
+            )
+            for letter in ALPHABET[index:index + 6]
+        ]
+        for index in range(0, len(ALPHABET), 6)
+    ]
+
+    connection_row = [
+        sg.Text("Puerto:"),
+        sg.Combo(find_ports(), key="-PORT-", size=(15, 1), readonly=True),
+        sg.Button("Actualizar", key="-REFRESH-"),
+        sg.Button("Conectar", key="-CONNECT-"),
+        sg.Text("Desconectado", key="-CONN-STATUS-", text_color="red"),
+    ]
+
+    game_information = [
+        sg.Text("Modo: -", font=("Helvetica", 12, "bold"), key="-DIFFICULTY-"),
+        sg.Text("Longitud: -", font=("Helvetica", 12, "bold"), key="-LENGTH-"),
+        sg.Text(
+            "Intentos restantes: -",
+            font=("Helvetica", 12, "bold"),
+            key="-ATTEMPTS-",
+        ),
+    ]
+
+    layout = [
+        [sg.VPush()],
+        [sg.Push(), sg.Column([connection_row]), sg.Push()],
+        [sg.Push(), *game_information, sg.Push()],
+        [
+            sg.Push(),
+            canvas,
+            sg.Column(
+                letter_grid,
+                element_justification="center",
+                vertical_alignment="center",
+                pad=(30, 10),
+            ),
+            sg.Push(),
+        ],
+        [
+            sg.Push(),
+            sg.Text(
+                "Esperando partida...",
+                font=("Helvetica", 30, "bold"),
+                key="-WORD-",
+                pad=(0, 20),
+            ),
+            sg.Push(),
+        ],
+        [
+            sg.Push(),
+            sg.Text(
+                "Sin conexión.",
+                font=("Helvetica", 12),
+                key="-STATUS-",
+                text_color="gray",
+                pad=(0, 5),
+            ),
+            sg.Push(),
+        ],
+        [
+            sg.Push(),
+            sg.Button("Salir", key="-QUIT-", font=("Helvetica", 12), size=(14, 2)),
+            sg.Push(),
+        ],
+        [sg.VPush()],
+    ]
+
+    window = sg.Window(
+        "Juego del Ahorcado (Terminal Remota)",
+        layout,
+        resizable=True,
+        finalize=True,
+    )
+    window.maximize()
+
+    for letter in ALPHABET:
+        window.bind(f"<Key-{letter.lower()}>", f"-LETTER-{letter}-")
+        window.bind(f"<Key-{letter.upper()}>", f"-LETTER-{letter}-")
+
+    draw_gallows(window["-CANVAS-"])
+    return window
+
+
+def main():
+    window = build_window()
+
+    serial_port = None
+    stop_event = None
     reader_thread = None
-    window["-CONN-STATUS-"].update("Desconectado", text_color="red")
 
+    game_in_progress = False
+    awaiting_response = False
+    used_letters = set()
+    current_word_length = None
 
-# ==========================================
-# 6. MANEJO DE MENSAJES DE LA FPGA
-# ==========================================
-def handle_fpga_line(line: str):
-    """Traduce una línea del protocolo FPGA -> PC a actualizaciones de la GUI."""
-    global game_in_progress
+    def set_status(message, color="gray"):
+        window["-STATUS-"].update(message, text_color=color)
 
-    fields = line.split(",")
-    msg_type = fields[0]
+    def refresh_keyboard():
+        connected = serial_port is not None and serial_port.is_open
+        can_send = connected and game_in_progress and not awaiting_response
+        for letter in ALPHABET:
+            window[f"-LETTER-{letter}-"].update(
+                disabled=(not can_send or letter in used_letters)
+            )
 
-    if msg_type == "START" and len(fields) >= 3:
-        modo, longitud_str = fields[1], fields[2]
-        try:
-            longitud = int(longitud_str)
-        except ValueError:
-            set_status(f"Trama START mal formada: {line}", "orange")
+    def disconnect_serial(update_window=True):
+        nonlocal serial_port, stop_event, reader_thread, awaiting_response
+
+        if stop_event is not None:
+            stop_event.set()
+        if reader_thread is not None:
+            reader_thread.join(timeout=1.0)
+        if serial_port is not None:
+            try:
+                serial_port.close()
+            except (serial.SerialException, OSError):
+                pass
+
+        serial_port = None
+        stop_event = None
+        reader_thread = None
+        awaiting_response = False
+
+        if update_window:
+            window["-CONN-STATUS-"].update("Desconectado", text_color="red")
+            window["-CONNECT-"].update("Conectar")
+            refresh_keyboard()
+
+    def protocol_error():
+        set_status("Error de protocolo", "red")
+
+    def handle_fpga_line(line):
+        nonlocal game_in_progress, awaiting_response, current_word_length
+
+        fields = line.split(",")
+        message_type = fields[0] if fields else ""
+
+        if message_type == "START":
+            if len(fields) != 3 or fields[1] not in ("EASY", "HARD"):
+                protocol_error()
+                return
+            try:
+                word_length = int(fields[2])
+            except ValueError:
+                protocol_error()
+                return
+            if not 4 <= word_length <= 12:
+                protocol_error()
+                return
+
+            used_letters.clear()
+            awaiting_response = False
+            game_in_progress = True
+            current_word_length = word_length
+
+            window["-DIFFICULTY-"].update(f"Modo: {fields[1]}")
+            window["-LENGTH-"].update(f"Longitud: {word_length}")
+            window["-ATTEMPTS-"].update("Intentos restantes: -")
+            window["-WORD-"].update(format_pattern("_" * word_length))
+            update_hangman_visuals(window["-CANVAS-"], 0)
+            set_status("Partida iniciada. Elige una letra.", "green")
+            refresh_keyboard()
             return
-        game_in_progress = True
-        window["-DIFFICULTY-"].update(f"Modo: {modo}")
-        window["-WORD-"].update(format_pattern("_" * longitud))
-        update_hangman_visuals(window["-CANVAS-"], 0)
-        for l in ALPHABET:
-            window[f"-LETTER-{l}-"].update(disabled=False)
-        set_status("Partida iniciada. Elegí una letra.", "green")
 
-    elif msg_type in ("HIT", "MISS", "REPEAT") and len(fields) >= 3:
-        patron, intentos_str = fields[1], fields[2]
-        try:
-            intentos = int(intentos_str)
-        except ValueError:
-            set_status(f"Trama {msg_type} mal formada: {line}", "orange")
+        if message_type in ("HIT", "MISS", "REPEAT"):
+            if len(fields) != 3 or not game_in_progress:
+                protocol_error()
+                return
+
+            revealed_word = fields[1]
+            try:
+                attempts_left = int(fields[2])
+            except ValueError:
+                protocol_error()
+                return
+
+            valid_pattern = all(
+                character in string.ascii_uppercase or character == "_"
+                for character in revealed_word
+            )
+            if (
+                not 0 <= attempts_left <= MAX_ERRORS
+                or not valid_pattern
+                or len(revealed_word) != current_word_length
+            ):
+                protocol_error()
+                return
+
+            awaiting_response = False
+            window["-WORD-"].update(format_pattern(revealed_word))
+            window["-ATTEMPTS-"].update(f"Intentos restantes: {attempts_left}")
+            update_hangman_visuals(
+                window["-CANVAS-"], MAX_ERRORS - attempts_left
+            )
+
+            if message_type == "HIT":
+                set_status("¡Letra correcta!", "green")
+            elif message_type == "MISS":
+                set_status("Letra incorrecta", "red")
+            else:
+                set_status("Letra repetida", "orange")
+
+            refresh_keyboard()
             return
-        errors = MAX_ERRORS - intentos
-        window["-WORD-"].update(format_pattern(patron))
-        update_hangman_visuals(window["-CANVAS-"], errors)
-        if msg_type == "HIT":
-            set_status("¡Letra correcta!", "green")
-        elif msg_type == "MISS":
-            set_status(f"Letra incorrecta. Intentos restantes: {intentos}", "red")
-        else:  # REPEAT
-            set_status("Esa letra ya se había intentado (no penaliza).", "orange")
 
-    elif msg_type == "WIN" and len(fields) >= 2:
-        palabra = fields[1]
-        game_in_progress = False
-        window["-WORD-"].update(format_pattern(palabra))
-        set_status("¡GANASTE!", "green")
-        for l in ALPHABET:
-            window[f"-LETTER-{l}-"].update(disabled=True)
+        if message_type in ("WIN", "LOSE_ATTEMPTS", "LOSE_TIME"):
+            if len(fields) != 2 or not game_in_progress:
+                protocol_error()
+                return
 
-    elif msg_type == "LOSE_ATTEMPTS" and len(fields) >= 2:
-        palabra = fields[1]
-        game_in_progress = False
-        window["-WORD-"].update(format_pattern(palabra))
-        update_hangman_visuals(window["-CANVAS-"], MAX_ERRORS, game_over=True)
-        set_status("PERDISTE — se agotaron los intentos.", "red")
-        for l in ALPHABET:
-            window[f"-LETTER-{l}-"].update(disabled=True)
+            final_word = fields[1]
+            if (
+                len(final_word) != current_word_length
+                or not final_word
+                or not all(character in string.ascii_uppercase for character in final_word)
+            ):
+                protocol_error()
+                return
 
-    elif msg_type == "LOSE_TIME" and len(fields) >= 2:
-        palabra = fields[1]
-        game_in_progress = False
-        window["-WORD-"].update(format_pattern(palabra))
-        set_status("PERDISTE — se agotó el tiempo.", "red")
-        for l in ALPHABET:
-            window[f"-LETTER-{l}-"].update(disabled=True)
+            awaiting_response = False
+            game_in_progress = False
+            window["-WORD-"].update(format_pattern(final_word))
 
-    else:
-        # Trama desconocida: se reporta sin afectar la partida en curso,
-        # igual que el enunciado exige para bytes inválidos en el otro sentido.
-        set_status(f"Trama no reconocida: {line}", "orange")
+            if message_type == "WIN":
+                set_status("¡Ganaste!", "green")
+            elif message_type == "LOSE_ATTEMPTS":
+                update_hangman_visuals(
+                    window["-CANVAS-"], MAX_ERRORS, game_over=True
+                )
+                set_status("Perdiste: se agotaron los intentos", "red")
+            else:
+                set_status("Perdiste: se acabó el tiempo", "red")
 
+            refresh_keyboard()
+            return
 
-# ==========================================
-# 7. BUCLE PRINCIPAL DE EVENTOS
-# ==========================================
-while True:
-    event, values = window.read(timeout=100)
+        protocol_error()
 
-    if event == sg.WIN_CLOSED or event == "-QUIT-":
-        break
+    while True:
+        event, values = window.read(timeout=100)
 
-    elif event == "-REFRESH-":
-        window["-PORT-"].update(values=find_ports())
+        if event in (sg.WIN_CLOSED, "-QUIT-"):
+            break
 
-    elif event == "-CONNECT-":
-        if ser is not None:
+        if event == "-REFRESH-":
+            window["-PORT-"].update(values=find_ports())
+
+        elif event == "-CONNECT-":
+            if serial_port is not None:
+                disconnect_serial()
+                set_status("Desconectado manualmente.", "gray")
+                continue
+
+            port_name = values.get("-PORT-")
+            if not port_name:
+                set_status("Selecciona un puerto antes de conectar.", "orange")
+                continue
+
+            try:
+                serial_port = serial.Serial(
+                    port=port_name,
+                    baudrate=BAUD_RATE,
+                    bytesize=serial.EIGHTBITS,
+                    parity=serial.PARITY_NONE,
+                    stopbits=serial.STOPBITS_ONE,
+                    timeout=READ_TIMEOUT,
+                    write_timeout=WRITE_TIMEOUT,
+                )
+            except (serial.SerialException, OSError) as error:
+                set_status(f"No se pudo abrir {port_name}: {error}", "red")
+                serial_port = None
+                continue
+
+            stop_event = threading.Event()
+            reader_thread = threading.Thread(
+                target=serial_reader,
+                args=(serial_port, window, stop_event),
+                daemon=True,
+            )
+            reader_thread.start()
+            window["-CONN-STATUS-"].update(
+                f"Conectado a {port_name}", text_color="green"
+            )
+            window["-CONNECT-"].update("Desconectar")
+            set_status("Conectado. Esperando START desde la FPGA...", "gray")
+            refresh_keyboard()
+
+        elif isinstance(event, str) and event.startswith("-LETTER-"):
+            chosen_letter = event.split("-")[2]
+            connected = serial_port is not None and serial_port.is_open
+            if (
+                not connected
+                or not game_in_progress
+                or awaiting_response
+                or chosen_letter in used_letters
+            ):
+                continue
+
+            encoded_letter = chosen_letter.encode("ascii")
+            try:
+                bytes_written = serial_port.write(encoded_letter)
+            except (serial.SerialException, OSError) as error:
+                set_status(f"Error al enviar la letra: {error}", "red")
+                continue
+
+            if bytes_written != 1:
+                set_status("Error al enviar la letra: no se escribió un byte.", "red")
+                continue
+
+            used_letters.add(chosen_letter)
+            awaiting_response = True
+            refresh_keyboard()
+            set_status(f"TX -> {chosen_letter}. Esperando respuesta...", "gray")
+
+        elif event == "-SERIAL-LINE-":
+            handle_fpga_line(values[event])
+
+        elif event == "-SERIAL-ERROR-":
+            set_status(values[event], "red")
             disconnect_serial()
-            set_status("Desconectado manualmente.", "gray")
-            continue
-        port = values.get("-PORT-")
-        if not port:
-            set_status("Seleccioná un puerto antes de conectar.", "orange")
-            continue
-        try:
-            ser = serial.Serial(port, BAUD_RATE, timeout=0.1)
-        except serial.SerialException as e:
-            set_status(f"No se pudo abrir {port}: {e}", "red")
-            ser = None
-            continue
-        stop_event.clear()
-        reader_thread = threading.Thread(
-            target=serial_reader, args=(ser, window, stop_event), daemon=True
-        )
-        reader_thread.start()
-        window["-CONN-STATUS-"].update(f"Conectado a {port}", text_color="green")
-        set_status("Conectado. Esperando a que la FPGA inicie una partida...", "gray")
 
-    elif event in ("-NEW-", "-RESTART-"):
-        # No se envía nada por UART: el inicio real de partida lo controla
-        # BTN_OK en la tarjeta. Esto solo resincroniza la vista local.
-        reset_local_view()
-        set_status("Vista local reiniciada. Iniciá la partida desde la FPGA (BTN_OK).", "gray")
+    disconnect_serial(update_window=False)
+    window.close()
 
-    elif event.startswith("-LETTER-"):
-        chosen_letter = event.split("-")[2]
-        if window[f"-LETTER-{chosen_letter}-"].Disabled:
-            continue
-        if ser is None:
-            set_status("No hay conexión con la FPGA.", "red")
-            continue
-        if not game_in_progress:
-            set_status("No hay una partida activa; la letra sería ignorada por la FPGA.", "orange")
-            continue
-        try:
-            ser.write(chosen_letter.encode("ascii"))
-        except (serial.SerialException, OSError) as e:
-            set_status(f"Error al enviar la letra: {e}", "red")
-            continue
-        window[f"-LETTER-{chosen_letter}-"].update(disabled=True)
 
-    elif event == "-SERIAL-LINE-":
-        handle_fpga_line(values[event])
-
-    elif event == "-SERIAL-ERROR-":
-        set_status(values[event], "red")
-        disconnect_serial()
-
-window.close()
-disconnect_serial()
+if __name__ == "__main__":
+    main()

@@ -13,6 +13,7 @@ module word_engine (
     output logic        word_ready,
     output logic [3:0]  word_length,
     output logic [95:0] revealed_word,
+    output logic [95:0] secret_word,
     output logic        letter_correct,
     output logic        letter_repeated,
     output logic        word_complete
@@ -20,7 +21,6 @@ module word_engine (
     typedef enum logic [1:0] {IDLE, SELECT_WORD, ACTIVE} state_t;
     state_t state;
     logic selected_difficulty;
-    logic [95:0] secret_word;
     logic [25:0] used_letters;
     logic [5:0] random_state;
     logic [5:0] candidate_index;
