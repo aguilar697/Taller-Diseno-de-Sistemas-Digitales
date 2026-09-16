@@ -17,7 +17,7 @@ Módulos implementados:
 ## 2. Resultados de verificación
 
 ### `reset_sync`
-**PASS.** Se verificó aserción asíncrona y liberación sincronizada mediante dos flip-flops.
+El banco aplica estímulos de aserción asíncrona y liberación sincronizada mediante dos flip-flops. No contiene comprobaciones automáticas; su terminación no se contabiliza como un PASS de autochequeo.
 
 ### `button_conditioner`
 **PASS.** Se verificó sincronización, debounce y generación de un único pulso por pulsación válida. Resultado observado: `Pulsos detectados = 2`.
@@ -82,10 +82,10 @@ La síntesis se completó correctamente.
 
 ## 5. DRC
 
-El DRC del subsistema aislado reportó `NSTD-1`, `UCIO-1`, `CFGBVS-1` e `IOCNT-1`. Estos avisos aparecen porque `game_control_top` fue usado temporalmente como top físico aislado, por lo que Vivado interpreta buses internos entre subsistemas como pines externos. En el top global del proyecto esas señales serán nets internas.
+El DRC del subsistema aislado reportó `NSTD-1`, `UCIO-1`, `CFGBVS-1` e `IOCNT-1`. Estos avisos aparecen porque `game_control_top` fue usado temporalmente como top físico aislado, por lo que Vivado interpreta buses internos entre subsistemas como pines externos. En el top global esas señales son conexiones internas; su DRC se registra por separado en el informe general.
 
 ![DRC](resultados/control/10_drc_report.png)
 
 ## 6. Conclusión
 
-El Subsistema 1 quedó implementado en SystemVerilog, verificado mediante testbenches autoverificables, validado en integración, elaborado sin errores y sintetizado correctamente para la Artix-7 de Basys 3. La siguiente etapa corresponde a integrarlo con Word Engine, UART/Protocolo e Interfaz Local dentro del top global del Proyecto 2.
+El Subsistema 1 está implementado en SystemVerilog e integrado con motor, UART e interfaz local. Los bancos con autochequeo verifican los escenarios descritos; el banco de reset utiliza inspección de estímulos. Las capturas de recursos y DRC anteriores corresponden al subsistema aislado y se conservan como evidencia de esa etapa. Los resultados del `top` completo se presentan en el [informe general](README.md).

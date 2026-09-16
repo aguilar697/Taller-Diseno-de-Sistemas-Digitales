@@ -7,6 +7,10 @@ Este documento desarrolla individualmente los bloques del
 lógica del RTL: registros, multiplexores, comparadores y operaciones booleanas.
 No son capturas de simulación ni esquemáticos extraídos de una netlist.
 
+El registro `secret_word[95:0]` de B4 también se expone como salida del motor.
+`top` captura ese dato para UART en mensajes finales; su lógica de almacenamiento
+y evaluación permanece dentro de S2.
+
 ## 1. Correspondencia entre bloques y código
 
 | Bloque del tercer nivel | Implementación |

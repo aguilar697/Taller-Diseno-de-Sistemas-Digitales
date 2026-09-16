@@ -1,0 +1,19 @@
+Comprobaciones dirigidas de límites — 15 de septiembre de 2026
+Vivado/XSim 2026.1; fuentes RTL idénticas a 16d6f73.
+Pruebas adicionales temporales de auditoría; no son parte de la regresión de 17 bancos del repositorio.
+
+run_audit_uart_burst_tb.txt
+AUDIT_DROPPED_EVENT_TYPE=2
+AUDIT_DROPPED_EVENT_TYPE=2
+AUDIT_DROPPED_EVENT_TYPE=2
+AUDIT_DROPPED_EVENT_TYPE=5
+AUDIT_BURST sent=6 state=4 attempts=0 produced=7 consumed=3 dropped=4 final_consumed=0
+
+run_audit_edges_tb.txt
+AUDIT_GAME_OVER_DURING_TONE_RECEIVED=0
+AUDIT_LCD_RS_SETUP_NS=10.0
+
+UART: seis letras incorrectas distintas; tramas 8N1 consecutivas, 868 ciclos por bit, después de completar START. Se cuentan eventos producidos y aceptados en el handshake del transmisor.
+Buzzer: duraciones 20/30/40 ciclos y semiperíodos 2/3/4 ciclos; fin activado durante un tono de acierto.
+LCD: reloj de 100 MHz, inicialización completa, escritura ASCII A con RS=1; medida entre transición de RS y flanco ascendente de E.
+GUI: ejecución aislada de serial_reader con lecturas b"MISS,CA" y b"SA,5\n"; se entregaron dos eventos: "MISS,CA" y "SA,5". Se utilizó un puerto simulado; no es una medición del enlace físico.
