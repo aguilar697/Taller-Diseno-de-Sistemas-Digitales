@@ -1,0 +1,89 @@
+Regresión RTL — 15 de septiembre de 2026
+Vivado / XSim 2026.1; fuentes 70c6f68, idénticas en RTL y testbench a 16d6f73.
+Extractos literales de logs de simulación. No representan cobertura de código.
+
+=== button_conditioner_tb ===
+Time resolution is 1 ps
+PASS: button_conditioner
+$finish called at time : 518 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/button_conditioner_tb.sv" Line 147
+
+=== countdown_timer_tb ===
+Time resolution is 1 ps
+PASS: countdown_timer
+$finish called at time : 2206 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/countdown_timer_tb.sv" Line 239
+
+=== game_control_top_tb ===
+Time resolution is 1 ps
+PASS: game_control_top
+$finish called at time : 3286 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/game_control_top_tb.sv" Line 689
+
+=== game_datapath_tb ===
+Time resolution is 1 ps
+PASS: game_datapath
+$finish called at time : 2341 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/game_datapath_tb.sv" Line 467
+
+=== game_fsm_tb ===
+Time resolution is 1 ps
+PASS: game_fsm
+$finish called at time : 376 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/game_fsm_tb.sv" Line 698
+
+=== reset_sync_tb ===
+Time resolution is 1 ps
+$finish called at time : 75 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/reset_sync_tb.sv" Line 44
+Observación: este banco solo genera estímulos; no implementa autochequeo.
+
+=== result_hold_timer_tb ===
+Time resolution is 1 ps
+PASS: result_hold_timer
+$finish called at time : 336 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/result_hold_timer_tb.sv" Line 205
+
+=== tb_top ===
+Time resolution is 1 ps
+===== TESTBENCH PASO: 0 errores =====
+$finish called at time : 200452625 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/tb_top.sv" Line 558
+
+=== protocol_controller_tb ===
+Time resolution is 1 ps
+protocol_controller_tb: todas las pruebas finalizaron correctamente
+$finish called at time : 6783470 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/protocol_controller_tb.sv" Line 500
+
+=== protocol_rx_controller_tb ===
+Time resolution is 1 ps
+protocol_rx_controller_tb: todas las pruebas finalizaron correctamente
+$finish called at time : 286470 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/protocol_rx_controller_tb.sv" Line 317
+
+=== protocol_tx_controller_tb ===
+Time resolution is 1 ps
+protocol_tx_controller_tb: todas las pruebas finalizaron correctamente
+$finish called at time : 13762230 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/protocol_tx_controller_tb.sv" Line 332
+
+=== uart_peripheral_tb ===
+Time resolution is 1 ps
+uart_peripheral_tb: todas las pruebas finalizaron correctamente
+$finish called at time : 420851 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/uart_peripheral_tb.sv" Line 233
+
+=== uart_protocol_top_tb ===
+Time resolution is 1 ps
+uart_protocol_top_tb: todas las pruebas finalizaron correctamente
+$finish called at time : 3919070 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/uart_protocol_top_tb.sv" Line 373
+
+=== UART_rx_tb ===
+Time resolution is 1 ps
+Note: UART_rx_tb: todas las pruebas finalizaron correctamente
+
+=== UART_tb ===
+Time resolution is 1 ps
+Note: UART_tb: todas las pruebas finalizaron correctamente
+
+=== UART_tx_tb ===
+Time resolution is 1 ps
+Note: UART_tx_tb: todas las pruebas finalizaron correctamente
+
+=== word_engine_tb ===
+Time resolution is 1 ps
+PASS: word_engine_tb; 38636 checks, 129 games; 50 easy words and all eligible hard words covered
+$finish called at time : 118356 ns : File "C:/Users/kevin/AppData/Local/Temp/ahorcado_revision_20260915/sim/word_engine_tb.sv" Line 223
+
+Configuración de referencia: xvhdl --2008; xvlog -sv; xelab <top_tb> -s <snapshot> -mt off -debug typical; xsim <snapshot> -tclbatch run.tcl.
+run.tcl: run all; quit. word_bank.txt disponible en el directorio de simulación.
+El motor pasó con -debug typical. Una elaboración inicial sin esa opción falló en la primera comparación de ROM; no se atribuye esa diferencia a un fallo del RTL sin diagnóstico adicional.

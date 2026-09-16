@@ -1,283 +1,129 @@
-# Proyecto 2 — Ahorcado FPGA–PC por UART
+# Tercer nivel — Control del juego y temporización
+
+**Subsistema:** S1. **Responsable:** Kenneth Campos.
+
+## 1. Objetivo y arquitectura
+
+Coordinar la partida, acondicionar botones, seleccionar dificultad, administrar intentos y tiempo, registrar victorias y comunicar el estado a los subsistemas de presentación e integración.
+
+```mermaid
+flowchart LR
+    R["BTN_RST"] --> RS["reset_sync: aserción asíncrona y liberación sincronizada"]
+    B["BTN_SEL y BTN_OK"] --> BC["Dos button_conditioner: sincronización, debounce y pulso"]
+    BC --> F["game_fsm: control"]
+    U["S3: letra y validez"] --> F
+    U --> D["game_datapath: registros de partida"]
+    W["S2: palabra lista y evaluación"] --> F
+    W --> D
+    F -->|"carga, captura, decremento e incremento"| D
+    D -->|"intentos y dificultad"| F
+    F -->|"load y enable"| T["countdown_timer: 60 o 45 s"]
+    T -->|"expired"| F
+    F -->|"start"| H["result_hold_timer: 3 s"]
+    H -->|"done"| F
+    F --> OUT["S2: solicitudes; top y S4: estado y eventos"]
+    D --> DATA["Longitud, patrón, intentos, dificultad y victorias"]
+    RS -.-> F
+    RS -.-> D
+    RS -.-> T
+    RS -.-> H
+```
+
+Todos los bloques usan `clk_i` a 100 MHz. El reset sincronizado también alimenta los acondicionadores de botones; se omiten algunas conexiones comunes para facilitar la lectura. El antirrebote usa 2 000 000 ciclos, equivalentes a 20 ms, y genera un pulso por pulsación aceptada.
+
+## 2. Interfaz de game_control_top
+
+| Señal | Dirección | Bits | Función |
+|---|---|---:|---|
+| `clk_i` | Entrada | 1 | Reloj de 100 MHz |
+| `btn_sel_i`, `btn_ok_i`, `btn_rst_i` | Entrada | 1 c/u | Selección, confirmación y reset |
+| `rx_letter_valid_i`, `rx_letter_i` | Entrada | 1 / 8 | Letra recibida por S3 |
+| `word_ready_i`, `word_length_i`, `revealed_word_i` | Entrada | 1 / 4 / 96 | Palabra y patrón de S2 |
+| `letter_correct_i`, `letter_repeated_i`, `word_complete_i` | Entrada | 1 c/u | Resultado de evaluación |
+| `new_game_o`, `difficulty_o` | Salida | 1 c/u | Solicitud de palabra y dificultad |
+| `letter_valid_o`, `letter_ascii_o` | Salida | 1 / 8 | Letra registrada que se entrega a S2 |
+| `game_state_o` | Salida | 3 | Estado público del juego |
+| `word_length_o`, `revealed_word_o` | Salida | 4 / 96 | Copia registrada para presentación |
+| `attempts_left_o`, `time_remaining_o`, `wins_o` | Salida | 3 / 7 / 7 | Intentos, segundos y victorias |
+| `correct_pulse_o`, `wrong_pulse_o`, `game_over_pulse_o` | Salida | 1 c/u | Eventos de un ciclo |
+| `game_won_o` | Salida | 1 | Nivel activo durante resultado de victoria |
+
+S1 no compara caracteres: S2 es propietario de palabra secreta, patrón y letras usadas. Tampoco construye mensajes seriales. La disponibilidad UART se atiende en el adaptador de `top`, fuera de esta interfaz.
+
+## 3. FSM principal
+
+```mermaid
+stateDiagram-v2
+    [*] --> MODE_SELECT: reset
+    MODE_SELECT --> MODE_SELECT: BTN_SEL / alternar dificultad
+    MODE_SELECT --> REQUEST_WORD: BTN_OK
+    REQUEST_WORD --> WAIT_WORD: new_game
+    WAIT_WORD --> WAIT_WORD: word_ready = 0
+    WAIT_WORD --> INIT_GAME: word_ready / capturar palabra
+    INIT_GAME --> WAIT_LETTER: cargar intentos y temporizador
+    WAIT_LETTER --> RESULT_LOSE_TIME: expired
+    WAIT_LETTER --> ISSUE_LETTER: letra A-Z y no expired / capturar letra
+    ISSUE_LETTER --> CHECK_LETTER: letter_valid
+    CHECK_LETTER --> RESULT_WIN: word_complete / incrementar victorias
+    CHECK_LETTER --> RESULT_LOSE_ATTEMPTS: no complete y error nuevo y ultimo intento
+    CHECK_LETTER --> RESULT_LOSE_TIME: sin victoria ni ultimo error y expired
+    CHECK_LETTER --> WAIT_LETTER: sin final / actualizar patron e intentos
+    RESULT_WIN --> MODE_SELECT: result_hold_done
+    RESULT_LOSE_ATTEMPTS --> MODE_SELECT: result_hold_done
+    RESULT_LOSE_TIME --> MODE_SELECT: result_hold_done
+```
+
+El reset lleva a `MODE_SELECT` desde cualquier estado y borra los registros de partida, incluida la cuenta de victorias. En selección y resultado las letras no originan solicitudes al motor. En `WAIT_LETTER`, tiempo agotado tiene prioridad sobre una nueva entrada.
+
+### Prioridades de CHECK_LETTER
+
+| Prioridad | Condición | Acción |
+|---:|---|---|
+| 1 | `word_complete_i` | Victoria; incremento saturado de victorias y comienzo de retención |
+| 2 | Letra nueva incorrecta y un intento restante | Decremento a cero y derrota por intentos |
+| 3 | Tiempo agotado sin las condiciones anteriores | Derrota por tiempo; se conserva la actualización correspondiente a la letra ya aceptada |
+| 4 | Letra nueva correcta | Actualización del patrón y pulso de acierto |
+| 5 | Letra nueva incorrecta | Decremento de intentos y pulso de error |
+| 6 | Letra repetida | Sin penalización; regreso a espera |
+
+S2 registra su respuesta en el flanco que acepta `letter_valid`; S1 la evalúa en `CHECK_LETTER`. Esta secuencia permite comprobar la última letra junto con el patrón actualizado. Cada final activa `game_over_pulse` y `result_timer_start` una vez.
+
+### Estado público
+
+| Valor | Estado público | Estados internos |
+|---:|---|---|
+| 0 | MODE_SELECT | MODE_SELECT |
+| 1 | STARTING | REQUEST_WORD, WAIT_WORD, INIT_GAME |
+| 2 | ACTIVE | WAIT_LETTER, ISSUE_LETTER, CHECK_LETTER |
+| 3 | WIN | RESULT_WIN |
+| 4 | LOSE_ATTEMPTS | RESULT_LOSE_ATTEMPTS |
+| 5 | LOSE_TIME | RESULT_LOSE_TIME |
+
+## 4. Registros y temporización
 
-## Descripción general
+| Bloque | Operación |
+|---|---|
+| `game_datapath` | Registra dificultad, letra aceptada, longitud y patrón; carga 6 intentos, evita underflow y satura victorias en 99 |
+| `countdown_timer` | Cuenta 100 000 000 ciclos por segundo; carga 60/45 s y conserva la fracción de segundo cuando no está habilitado |
+| `result_hold_timer` | Cuenta 300 000 000 ciclos desde `start`; mantiene `done` hasta nuevo inicio/reset |
+| `button_conditioner` | Dos etapas de sincronización, filtro de estabilidad y pulso de un ciclo |
+| `reset_sync` | Aserción asíncrona y liberación tras dos flancos de reloj |
 
-Este proyecto implementa un juego de **Ahorcado** sobre una FPGA Basys 3, con comunicación hacia una computadora mediante UART. La idea principal es dividir el sistema en bloques bien definidos para que cada parte tenga una responsabilidad clara y pueda desarrollarse, probarse e integrarse de forma independiente.
+El temporizador principal permanece habilitado durante espera, emisión y evaluación de letras. Las letras repetidas no recargan el tiempo. La retención de 3 s empieza con la decisión de fin de partida; no recibe `screen_done` de la LCD. Su duración de estado y la duración de visualización son magnitudes distintas, tratadas en el [informe de S4](../informe/interfaz_local_verificacion.md).
 
-El diseño utiliza un único reloj de **100 MHz** y se implementa en **SystemVerilog** dentro de Vivado. La arquitectura general se organiza en cuatro subsistemas principales:
+## 5. Decisiones de diseño y verificación
 
-1. **Control del juego y temporización**
-2. **Word Engine**
-3. **UART y protocolo**
-4. **Interfaz local**
+La separación entre FSM y datapath permite verificar las reglas sin duplicar la lógica del motor. Los contadores utilizan habilitaciones sobre un reloj común; no se crean relojes lentos. La saturación impide desbordamientos visibles y los registros de letra/palabra mantienen estable la información entre subsistemas.
 
-Cada subsistema cumple una función específica y se comunica con los demás mediante señales previamente definidas.
+Los resultados de los bancos individuales y del conjunto de S1 se presentan en el [informe de control](../informe/control_verificacion.md). La validación con UART y motor se documenta en el [informe general](../informe/README.md).
 
----
+## 6. Antecedentes y referencias
 
-## 1. Control del juego y temporización
+- [Diagrama original de tercer nivel](img/control/Diagrama_Nivel_3_Control_Juego_Temporizacion.pdf).
+- [Explicación original del tercer nivel](img/control/Explicacion_Nivel_3_Control_Juego_Temporizacion.pdf).
+- [Interfaz original del subsistema](img/control/Diagrama_Nivel_1_Control_Juego_Temporizacion.pdf).
+- [Explicación original de la interfaz](img/control/Explicacion_Nivel_1_Control_Juego_Temporizacion.pdf).
 
-Este subsistema es el encargado de coordinar la partida completa. En términos simples, es el bloque que decide **qué debe pasar y en qué momento**.
+Los PDF se conservan como antecedentes del planteamiento. La FSM y las tablas anteriores describen el RTL integrado.
 
-Sus responsabilidades principales son:
-
-- permitir la selección entre modo **FÁCIL** y **DIFÍCIL**;
-- detectar la confirmación del modo seleccionado;
-- solicitar al Word Engine una nueva palabra;
-- iniciar la partida únicamente cuando la palabra ya está lista;
-- recibir letras desde UART durante una partida activa;
-- decidir cuándo una letra debe ser evaluada;
-- llevar el control de los intentos restantes;
-- administrar el tiempo disponible;
-- detectar victoria;
-- detectar derrota por intentos;
-- detectar derrota por tiempo;
-- mantener el resultado final visible durante al menos tres segundos;
-- regresar automáticamente al modo de selección;
-- llevar un contador acumulado de partidas ganadas.
-
-Internamente, este subsistema se divide en varios bloques funcionales.
-
-### Controlador principal
-
-El controlador principal contiene la lógica que organiza el flujo del juego. Su función es decidir cuál es la etapa actual de la partida y qué acciones deben ejecutarse.
-
-Por ejemplo, determina cuándo:
-
-- se está seleccionando la dificultad;
-- se debe pedir una nueva palabra;
-- se está esperando una letra;
-- una letra debe enviarse al Word Engine;
-- se debe revisar el resultado de una letra;
-- la partida terminó en victoria;
-- la partida terminó por falta de intentos;
-- la partida terminó por tiempo.
-
-Este bloque es el que más adelante se implementa mediante la **máquina de estados finitos principal**.
-
-### Datapath del juego
-
-El datapath almacena la información que cambia durante el juego.
-
-Entre los valores que conserva se encuentran:
-
-- dificultad seleccionada;
-- intentos restantes;
-- número de victorias acumuladas;
-- última letra recibida;
-- longitud de la palabra actual.
-
-El controlador no modifica directamente estos valores. En su lugar, genera órdenes para indicar cuándo deben cargarse, incrementarse, decrementarse o mantenerse.
-
-Esta separación permite que la lógica de control y los datos del juego no estén mezclados en un único bloque.
-
-### Temporización del juego
-
-La parte de temporización se encarga de manejar dos tiempos diferentes.
-
-El primero es el **temporizador regresivo de la partida**, que carga:
-
-- **60 segundos** en modo fácil;
-- **45 segundos** en modo difícil.
-
-El segundo es el temporizador utilizado para mantener visible el resultado final durante al menos **3 segundos**.
-
-Ambos trabajan con el reloj principal de 100 MHz y utilizan señales de habilitación, evitando crear relojes secundarios.
-
-### Acondicionamiento de entradas
-
-Los botones físicos de la Basys 3 no se utilizan directamente.
-
-Este bloque se encarga de:
-
-- sincronizar las entradas con el reloj;
-- eliminar el rebote mecánico de los botones;
-- generar pulsos limpios de un solo ciclo;
-- producir un reset sincronizado para los bloques internos.
-
-Las entradas físicas asociadas a este bloque son:
-
-- `BTN_SEL`
-- `BTN_OK`
-- `BTN_RST`
-
----
-
-## 2. Word Engine
-
-El Word Engine es el subsistema encargado de manejar la palabra del juego.
-
-Su responsabilidad no es controlar el flujo general de la partida, sino trabajar directamente con la palabra seleccionada.
-
-Entre sus tareas se encuentran:
-
-- seleccionar una nueva palabra;
-- tomar en cuenta la dificultad indicada por el controlador;
-- informar cuándo la palabra está lista;
-- entregar la longitud de la palabra;
-- evaluar cada letra recibida;
-- indicar si una letra es correcta;
-- indicar si una letra ya había sido utilizada;
-- actualizar la representación visible de la palabra;
-- indicar cuándo la palabra ha sido completada.
-
-### Señales recibidas desde Control
-
-El Word Engine recibe:
-
-- `new_game`
-- `difficulty`
-- `letter_valid`
-- `letter_ascii[7:0]`
-
-### Señales enviadas hacia Control
-
-El Word Engine entrega:
-
-- `word_ready`
-- `word_length[3:0]`
-- `revealed_word[95:0]`
-- `letter_correct`
-- `letter_repeated`
-- `word_complete`
-
-Una parte importante del diseño es que el Control **no compara letras ni modifica directamente la palabra**. Esa responsabilidad pertenece por completo al Word Engine.
-
----
-
-## 3. UART y protocolo
-
-Este subsistema se encarga de la comunicación entre la FPGA y la computadora.
-
-Por un lado, recibe los datos enviados desde el PC. Por otro, transmite información sobre el estado de la partida.
-
-Desde el punto de vista del controlador, las señales más importantes recibidas son:
-
-- `rx_letter_valid`
-- `rx_letter[7:0]`
-
-`rx_letter_valid` indica que se recibió una nueva letra válida desde la comunicación serial, mientras que `rx_letter[7:0]` contiene el valor ASCII recibido.
-
-Durante la partida, el subsistema de control utiliza estas señales para decidir cuándo una letra puede ser aceptada.
-
-En sentido contrario, el controlador entrega al subsistema UART información relacionada con:
-
-- estado actual del juego;
-- dificultad;
-- palabra revelada;
-- longitud de la palabra;
-- intentos restantes;
-- tiempo restante;
-- número de victorias;
-- eventos de acierto;
-- eventos de error;
-- fin de partida;
-- resultado de victoria o derrota.
-
-El subsistema UART utiliza esta información para construir y transmitir los mensajes correspondientes hacia la computadora.
-
-Es importante remarcar que el bloque de Control **no genera directamente las tramas UART**. Su función es entregar los datos y eventos necesarios para que el subsistema UART se encargue de la comunicación.
-
----
-
-## 4. Interfaz local
-
-La interfaz local es la parte del sistema encargada de mostrar información directamente en la Basys 3 y generar realimentación al usuario.
-
-Este subsistema recibe información desde el controlador y la utiliza para manejar los dispositivos disponibles.
-
-Entre los elementos de salida considerados se encuentran:
-
-- LCD;
-- displays de siete segmentos;
-- LED;
-- buzzer.
-
-La interfaz local puede utilizar información como:
-
-- estado actual del juego;
-- dificultad seleccionada;
-- palabra revelada;
-- intentos restantes;
-- tiempo restante;
-- contador de victorias;
-- eventos de letra correcta;
-- eventos de letra incorrecta;
-- resultado final.
-
-El controlador no genera directamente los patrones del LCD, los segmentos o los tonos del buzzer. Solamente entrega información de estado y eventos; la interfaz local decide cómo representarlos físicamente.
-
----
-
-## Relación entre los subsistemas
-
-La arquitectura busca que cada bloque tenga una responsabilidad bien definida.
-
-El flujo general puede entenderse así:
-
-1. El usuario selecciona la dificultad mediante los botones.
-2. El subsistema de Control confirma la selección y solicita una nueva palabra.
-3. El Word Engine prepara la palabra y avisa cuando está lista.
-4. El Control inicia los intentos y el temporizador.
-5. La computadora envía letras mediante UART.
-6. El Control acepta una letra y la envía al Word Engine.
-7. El Word Engine evalúa la letra y devuelve el resultado.
-8. El Control actualiza intentos, tiempo y estado de la partida.
-9. UART e Interfaz Local muestran el progreso al usuario.
-10. Si se completa la palabra, se registra una victoria.
-11. Si se terminan los intentos o el tiempo llega a cero, se registra una derrota.
-12. El resultado permanece visible durante al menos tres segundos.
-13. Finalmente, el sistema regresa automáticamente a la selección de dificultad.
-
----
-
-## Decisiones generales de diseño
-
-El proyecto se organiza siguiendo una estructura jerárquica y modular.
-
-Se utiliza:
-
-- un único reloj de **100 MHz**;
-- SystemVerilog sintetizable;
-- separación entre lógica de control y almacenamiento de datos;
-- temporizadores mediante **clock enable**;
-- señales sincronizadas;
-- módulos independientes;
-- testbenches para verificar cada bloque antes de la integración completa.
-
-La intención es que cada subsistema pueda desarrollarse y probarse de forma independiente, pero manteniendo interfaces claras para facilitar la integración final en Vivado.
-
----
-
-## Enfoque del Subsistema 1
-
-Dentro del trabajo asignado, el enfoque principal está en **Control del juego y temporización**.
-
-Por esa razón, el desarrollo asociado a este subsistema incluye:
-
-- definición de la FSM principal;
-- selección de dificultad;
-- manejo de botones;
-- control de tiempo;
-- control de intentos;
-- detección de victoria y derrota;
-- retención del resultado final;
-- contador acumulado de victorias;
-- coordinación con Word Engine;
-- coordinación con UART;
-- coordinación con la interfaz local;
-- implementación de módulos en SystemVerilog;
-- creación de testbenches;
-- integración final en Vivado.
-
-Los demás subsistemas se consideran interfaces externas al bloque de Control, aunque su comportamiento debe conocerse lo suficiente para definir correctamente las señales de comunicación.
-
-## Diagramas y documentos adjuntos
-
-- [Diagrama general del subsistema](img/control/Diagrama_Nivel_1_Control_Juego_Temporizacion.pdf).
-- [Diagrama de tercer nivel](img/control/Diagrama_Nivel_3_Control_Juego_Temporizacion.pdf).
-- [Explicación del diagrama general](img/control/Explicacion_Nivel_1_Control_Juego_Temporizacion.pdf).
-- [Explicación del tercer nivel](img/control/Explicacion_Nivel_3_Control_Juego_Temporizacion.pdf).
-- [Verificación del controlador](../informe/control_verificacion.md).
-
-[Índice de diseño](README.md)
+[Segundo nivel](nivel_2.md) · [Índice de diseño](README.md)

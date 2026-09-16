@@ -1,12 +1,14 @@
-# Subsistema de interfaz local (LCD, siete segmentos, LED y buzzer)
+# Tercer nivel — Interfaz local
+
+**Subsistema:** S4. **Responsable:** Kevin Cortés.
 
 ## 1. Objetivo
 
 El subsistema de interfaz local actúa exclusivamente como la capa de presentación física del juego en la FPGA Basys 3. Recibe el estado de la partida ya calculado por el resto del sistema y lo traduce en señales de control hacia el LCD, los displays de siete segmentos, el LED de estado y el buzzer, sin tomar ninguna decisión sobre las reglas del juego.
 
-![Diagrama de primer nivel del subsistema de interfaz local](img/interfaz_local/s4_nivel1.jpeg)
+![Interfaz externa del subsistema de interfaz local](img/interfaz_local/s4_nivel1.jpeg)
 
-**Figura 1. Diagrama de primer nivel del subsistema de interfaz local.**
+**Figura 1. Interfaz externa del subsistema de interfaz local.**
 
 ## 2. Interfaz externa
 
@@ -55,9 +57,9 @@ Internamente se agrupan en tres macro-estados visuales (`led_estado_o`: `00`=sel
 
 El subsistema se divide en 5 submódulos para aislar el control de cada periférico.
 
-![Diagrama de segundo nivel del subsistema de interfaz local](img/interfaz_local/s4_nivel2.jpeg)
+![Descomposición funcional del subsistema de interfaz local](img/interfaz_local/s4_nivel2.jpeg)
 
-**Figura 2. Diagrama de segundo nivel del subsistema de interfaz local.**
+**Figura 2. Descomposición funcional del subsistema de interfaz local.**
 
 ### 3.1 Administrador de pantallas (`screen_manager.sv`)
 
@@ -134,7 +136,7 @@ Valores estándar de inicialización del HD44780 en modo de 8 bits, usados por `
 
 ## 6. Bus de retorno hacia el control del juego
 
-A solicitud del profesor, la interfaz local expone también un bus de retorno hacia S1 (control del juego), para que la FSM principal pueda sincronizarse con la disponibilidad real de la pantalla y del buzzer:
+La interfaz local expone señales de disponibilidad para coordinar presentación y control:
 
 | Señal | Ancho | Tipo | Descripción y justificación |
 |---|:---:|---|---|
@@ -143,10 +145,90 @@ A solicitud del profesor, la interfaz local expone también un bus de retorno ha
 | `screen_done_o` | 1 | Pulso | Emitido al terminar de escribir una pantalla completa. Permitiría a S1 medir temporizaciones (por ejemplo, los 3 s mínimos de la pantalla de resultado) desde el momento correcto. |
 | `buzzer_busy_o` | 1 | Nivel | Indica que un tono sigue sonando. Evitaría que el juego avance antes de terminar la señal auditiva. |
 
-**Limitación conocida:** estas cuatro señales se generan correctamente en este subsistema, pero `game_control_top` (S1) todavía no tiene puertos de entrada para recibirlas, por lo que hoy quedan sin consumidor. Resolverlo requiere que S1 agregue esas 4 entradas y las use en su FSM (por ejemplo, esperar `lcd_ready` antes de salir de reset, o esperar `screen_done` + 3 s antes de salir de la pantalla de resultado). Mientras tanto, el juego funciona igual porque S1 usa sus propios temporizadores para el retraso de la pantalla de resultado.
+**Alcance de integración:** las cuatro señales se conectan a nets de `top`, pero S1 no las consume. El administrador de pantallas sí espera el estado interno del periférico antes de escribir. La FSM de juego conserva su temporización propia de 3 s; la duración de visualización completa debe comprobarse por separado. La prioridad sonora solo se aplica mientras el buzzer está inactivo. Estas condiciones se analizan en el [informe de interfaz local](../informe/interfaz_local_verificacion.md).
 
 ## 7. Aplicación de PC (Python)
 
-Como apoyo para las pruebas de este subsistema y del sistema integrado, se desarrolló `gui_terminal.py` (`src/design/local_interface/gui/`): una terminal remota con interfaz gráfica que envía letras por UART y decodifica en vivo los mensajes de protocolo (`START`, `HIT`, `MISS`, `WIN`, `LOSE_ATTEMPTS`, `LOSE_TIME`), dibujando el progreso del ahorcado. Esta aplicación se compartió con el responsable de S3 (comunicación UART), a quien corresponde formalmente la aplicación de PC según la tabla de responsabilidades del proyecto; se documenta aquí porque el desarrollo se originó durante las pruebas de integración de este subsistema.
+Como apoyo para las pruebas de este subsistema y del sistema integrado, se desarrolló `gui_terminal.py` (`src/design/local_interface/gui/`): una terminal remota con interfaz gráfica que envía letras por UART y decodifica en vivo los mensajes de protocolo (`START`, `HIT`, `MISS`, `REPEAT`, `WIN`, `LOSE_ATTEMPTS`, `LOSE_TIME`), dibujando el progreso del ahorcado. Esta aplicación se compartió con el responsable de S3 (comunicación UART), a quien corresponde formalmente la aplicación de PC según la tabla de responsabilidades del proyecto; se documenta aquí porque el desarrollo se originó durante las pruebas de integración de este subsistema.
+
+
+
+
+## 8. FSM del periférico LCD
+
+```mermaid
+stateDiagram-v2
+    [*] --> S_POWERON_WAIT: reset
+    S_POWERON_WAIT --> S_LATCH: contador de arranque completo / cargar primer comando
+    S_LATCH --> S_PULSE: E=1 e iniciar contador de pulso
+    S_PULSE --> S_EXEC_WAIT: ancho de pulso completo / E=0
+    S_EXEC_WAIT --> S_LATCH: inicializando y quedan comandos / siguiente comando
+    S_EXEC_WAIT --> S_IDLE: ultimo comando de inicializacion terminado
+    S_EXEC_WAIT --> S_DONE: operacion externa terminada
+    S_DONE --> S_IDLE: done durante un ciclo
+    S_IDLE --> S_LATCH: clear, home o start aceptado
+```
+
+El reset lleva a espera de arranque desde cualquier estado. La transición desde `S_EXEC_WAIT` solo ocurre al completar el contador de espera. `busy` es uno en todos los estados salvo `S_IDLE`; `done` es uno únicamente en `S_DONE`. Las solicitudes de operación recibidas mientras busy está activo no se encolan. La prioridad de aceptación es clear > home > start.
+
+`data_reg[7:0]` y `rs_cfg` conservan las escrituras MMIO. Al aceptar start, la salida RS toma el bit 1 de esa misma escritura de CONTROL; el administrador escribe juntos RS y start. Las escrituras de registros son posibles durante busy, pero no alteran el byte ya cargado en los registros de salida.
+
+Los bits reservados de CONTROL y DATOS se leen como cero y sus escrituras se ignoran. `addr_i=10/11` lee cero y no tiene función. Las direcciones 00/01 son índices de registro, equivalentes conceptualmente a offsets 0x00/0x04.
+
+### Temporizaciones nominales implementadas
+
+| Intervalo | Ciclos a 100 MHz | Valor nominal |
+|---|---:|---|
+| Espera inicial desde reset | 1 500 000 | 15 ms |
+| Contador de pulso E | 50 | 500 ns, más la transición de estado |
+| Ejecución normal | 4 000 | 40 µs |
+| Clear/home | 152 000 | 1.52 ms |
+| Primera espera de inicialización | 410 000 | 4.1 ms |
+
+Son valores del RTL, no una certificación de todos los mínimos eléctricos del controlador. La preparación RS→E y el arranque se contrastan con la hoja de datos en el informe de verificación.
+
+## 9. Administrador de pantallas
+
+El administrador captura una instantánea del estado, modo, patrón, longitud e intentos. Envía dirección de primera línea, 16 caracteres, dirección de segunda línea y otros 16 caracteres. Al terminar genera `screen_done` y atiende el siguiente cambio de entradas.
+
+```mermaid
+flowchart LR
+    R["Esperar LCD disponible"] --> I["Comparar entradas con instantánea"]
+    I -->|"cambio"| S["Capturar instantánea"]
+    S --> L1["Dirección y 16 caracteres de línea 1"]
+    L1 --> L2["Dirección y 16 caracteres de línea 2"]
+    L2 --> D["screen_done"]
+    D --> I
+```
+
+Cada byte utiliza WP_DATA → WP_CMD → WP_RISE → WP_FALL: escritura de DATOS, escritura de CONTROL, espera de busy alto y espera de busy bajo. Las lecturas de estado mantienen addr=00. El texto de resultado es GANASTE!/PERDISTE; su segunda línea conserva el patrón recibido de S1, que puede seguir parcialmente oculto en derrota. La palabra secreta completa se transmite por UART.
+
+## 10. Siete segmentos, LED y buzzer
+
+El barrido activa un dígito cada 25 000 ciclos (250 µs), dando un refresco de 1 kHz por cuadro de cuatro dígitos. Ánodos y segmentos son activos en bajo. Decenas y unidades se obtienen mediante restas acotadas, sin reloj derivado.
+
+| Dígito | Dato |
+|---|---|
+| an[0], derecho | Unidades de tiempo |
+| an[1] | Decenas de tiempo |
+| an[2] | Unidades de victorias |
+| an[3], izquierdo | Decenas de victorias |
+
+El LED usa dos bits para tres estados visuales. El buzzer alterna su salida con un contador de semiperíodo y limita la duración con otro contador.
+
+| Evento | Frecuencia nominal | Duración nominal |
+|---|---:|---:|
+| Acierto | 1000 Hz | 100 ms |
+| Error | 300 Hz | 200 ms |
+| Fin | 600 Hz | 400 ms |
+
+Los eventos solo se aceptan en reposo; la prioridad fin > error > acierto corresponde a eventos simultáneos en ese estado. No existe cola de tonos.
+
+## 11. Referencias
+
+- [Manual PmodCLP](https://digilent.com/reference/_media/pmod:pmod:pmodCLP_rm.pdf).
+- [Hoja HD44780U](https://www.sparkfun.com/datasheets/LCD/HD44780.pdf).
+- [RTL de interfaz local](../../src/design/local_interface/).
+- [Informe de interfaz local](../informe/interfaz_local_verificacion.md).
 
 [Segundo nivel](nivel_2.md) · [Índice del diseño](README.md)

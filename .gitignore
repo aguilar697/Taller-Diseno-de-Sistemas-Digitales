@@ -37,3 +37,8 @@ desktop.ini
 *~
 *.swp
 *.tmp
+
+# Entornos y caché de las terminales Python
+.venv/
+__pycache__/
+*.pyc

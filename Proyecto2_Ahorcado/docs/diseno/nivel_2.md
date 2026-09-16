@@ -2,107 +2,67 @@
 
 ## Objetivo
 
-Dividir el bloque FPGA del primer nivel en cuatro subsistemas, indicando su
-responsabilidad y la información que intercambian. Los registros, comparadores,
-contadores y demás bloques digitales internos se desarrollan en el tercer nivel.
-
-## Diagrama de subsistemas
+Descomponer el sistema FPGA en cuatro subsistemas y definir sus interconexiones. `top.sv` instancia los subsistemas, distribuye el reset y conserva un evento pendiente para UART. Este adaptador pertenece a la integración y no constituye un quinto subsistema funcional.
 
 ```mermaid
 flowchart TB
-    PC["PC · terminal Python de S3"] -->|"RX UART: letras"| U
-    U -->|"TX UART: respuestas"| PC
-    BTN["Botones de selección, confirmación y reinicio"] --> C
-    subgraph FPGA["FPGA Basys 3 · un reloj de 100 MHz"]
-        U["S3 · Comunicación UART y protocolo"]
-        C["S1 · Control del juego y temporización"]
-        M["S2 · Motor del juego"]
-        I["S4 · Interfaz local"]
-        U -->|"Letra recibida y validez"| C
-        C -->|"Eventos y datos de la partida"| U
-        U -->|"Disponibilidad para aceptar eventos"| C
-        C -->|"Nueva partida, dificultad y letra a evaluar"| M
-        M -->|"Palabra lista, patrón y resultado de evaluación"| C
-        C -->|"Estado, patrón, tiempo, intentos, victorias y avisos"| I
+    PC["PC: terminal Python"] -->|"RX: un byte A-Z"| U
+    U -->|"TX: mensajes ASCII"| PC
+    BTN["BTN_SEL y BTN_OK"] --> C
+    R["BTN_RST: reset sincronizado"] --> C
+    subgraph FPGA["Basys 3: reloj común de 100 MHz"]
+        C["S1: control y temporización"]
+        M["S2: motor del juego"]
+        U["S3: UART y protocolo"]
+        I["S4: interfaz local"]
+        A["Adaptación en top: registro de evento y datos"]
+        U -->|"letter y letter_valid"| C
+        C -->|"new_game, difficulty, letter_valid, letter_ascii"| M
+        M -->|"word_ready, longitud, patrón y resultados"| C
+        C -->|"estado y pulsos del juego"| A
+        M -->|"secret_word: 96 bits"| A
+        A -->|"event_valid, tipo y datos"| U
+        U -->|"event_ready"| A
+        C -->|"estado, patrón, tiempo, intentos, victorias y avisos"| I
     end
-    I --> LCD["LCD"]
+    I --> LCD["LCD 16x2"]
     I --> SEG["Siete segmentos"]
     I --> LED["LED"]
     I --> BZ["Buzzer"]
 ```
 
-La aplicación Python pertenece al trabajo de S3, pero se ejecuta fuera de la
-FPGA. El reloj común y la distribución interna de reset se omiten de las
-flechas para facilitar la lectura. El botón de reset llega al sistema por S1;
-el acondicionamiento y distribución de esa señal se detallan en su diseño.
+El reloj y el reset comunes a S2, S3 y S4 se omiten en las flechas para mantener legibilidad. S1 acondiciona los botones y dispone de su sincronizador de reset; `top` genera el reset distribuido a los demás subsistemas.
 
-## S1 — Control del juego y temporización
+## Responsabilidad de cada subsistema
 
-**Objetivo:** coordinar la partida y aplicar sus reglas temporales y de intentos.
+| Subsistema | Entradas principales | Salidas y función |
+|---|---|---|
+| S1: control | Botones, letras UART, resultados de S2 | Coordina partida, tiempo 60/45 s, 6 intentos, victorias hasta 99 y resultado |
+| S2: motor | Nueva partida, dificultad y letra a evaluar | Selecciona palabra, conserva letras usadas, revela coincidencias y detecta palabra completa |
+| S3: UART | RX físico, eventos y datos de integración | Entrega letras válidas y transmite mensajes de inicio, evaluación y final |
+| S4: presentación | Estado, patrón, longitud, contadores y pulsos | Controla LCD, displays, LED y buzzer; genera señales de disponibilidad |
 
-| Entradas | Salidas |
-|---|---|
-| Botones; letras de S3; palabra lista y resultados de S2; disponibilidad de S3 | Solicitudes a S2; eventos para S3; estado y datos para S4 |
-
-Selecciona el modo, solicita la palabra y administra tiempo, intentos y victorias.
-Decide cuándo evaluar letras y cuándo terminar la partida. Durante selección de
-modo y presentación del resultado, descarta las letras recibidas.
-
-## S2 — Motor del juego
-
-**Objetivo:** seleccionar la palabra y mantener su progreso de revelado.
-
-| Entradas | Salidas |
-|---|---|
-| Nueva partida, dificultad y letra con indicación de validez | Palabra lista, longitud, patrón, letra correcta/repetida y palabra completa |
-
-Conserva el banco y la palabra secreta, selecciona según dificultad e identifica
-las letras utilizadas. Revela todas las coincidencias de una letra nueva.
-No calcula tiempo, intentos ni victorias: esos datos pertenecen a S1.
-
-## S3 — Comunicación UART, protocolo y terminal
-
-**Objetivo:** intercambiar letras y estado de partida entre la FPGA y la PC.
-
-| Entradas | Salidas |
-|---|---|
-| Bytes desde PC; eventos y datos de S1 | Letras válidas hacia S1; disponibilidad para eventos; mensajes hacia PC |
-
-Interpreta bytes A–Z y forma mensajes de inicio, resultado de letra y fin de
-partida. La aplicación Python presenta la información recibida y valida las
-entradas del usuario. El protocolo no toma decisiones sobre las reglas del juego.
-
-## S4 — Interfaz local
-
-**Objetivo:** presentar el estado del juego mediante sus dispositivos locales.
-
-| Entradas | Salidas |
-|---|---|
-| Estado, dificultad, patrón, longitud, intentos, tiempo, victorias y eventos sonoros de S1 | Señales hacia LCD, siete segmentos, LED y buzzer |
-
-Organiza las pantallas del LCD, muestra los contadores y produce avisos visuales
-y sonoros. Recibe el patrón originado en S2 a través de S1 y no altera las reglas.
-
-## Información intercambiada
+## Contrato de interconexión
 
 | Conexión | Señales o datos |
 |---|---|
-| S3 → S1 | `rx_letter_valid`, `rx_letter[7:0]`; disponibilidad de eventos `event_ready` |
+| S3 → S1 | `rx_letter_valid`, `rx_letter[7:0]` |
 | S1 → S2 | `new_game`, `difficulty`, `letter_valid`, `letter_ascii[7:0]` |
 | S2 → S1 | `word_ready`, `word_length[3:0]`, `revealed_word[95:0]`, `letter_correct`, `letter_repeated`, `word_complete` |
-| S1 → S3 | Evento válido, tipo de evento, dificultad, longitud, patrón e intentos |
-| S1 → S4 | Estado, dificultad, patrón de 96 bits, longitud de 4 bits, intentos de 3 bits, tiempo y victorias de 7 bits; pulsos de acierto/error/fin y resultado |
+| S2 → adaptador → S3 | `secret_word[95:0]` capturada como `final_word` |
+| S1 → adaptador → S3 | Evento, dificultad, longitud, patrón e intentos; datos registrados junto con `event_valid` |
+| S3 → adaptador | `event_ready`: aceptación del evento; S1 no recibe esta señal |
+| S1 → S4 | Estado de 3 bits, dificultad, patrón 96, longitud 4, intentos 3, tiempo/victorias 7, pulsos y resultado |
+| S4 → top | `lcd_ready`, `lcd_busy`, `screen_done`, `buzzer_busy`; disponibles, sin consumidor de control en esta versión |
 
-## Funcionamiento conjunto y acuerdos pendientes
+El primer carácter ocupa `[7:0]`, los bytes fuera de longitud contienen espacios y las posiciones ocultas usan `_`. La palabra secreta permanece bajo propiedad de S2; UART solo utiliza su copia para los mensajes finales.
 
-S1 solicita una palabra a S2 y espera su confirmación. Luego inicia tiempo e
-intentos. S3 entrega las letras recibidas; S1 envía a S2 las que correspondan a
-una partida activa. S2 devuelve el resultado, S1 aplica las reglas y comunica
-el estado a S3 y S4. Al finalizar, S1 mantiene el resultado al menos 3 s.
+## Secuencia y límites de integración
 
-S1 debe respetar la disponibilidad de S3 para no perder eventos durante una
-transmisión. Sigue pendiente acordar cómo proporcionar a UART la palabra secreta
-completa al perder; el motor actual no dispone de una salida para ese dato.
-Estas conexiones describen la arquitectura propuesta, no una integración ya validada.
+S1 solicita una palabra, espera `word_ready`, carga tiempo e intentos y acepta letras durante la partida. S2 devuelve el resultado registrado al siguiente flanco de consumo de S1. Las letras repetidas no descuentan intentos y los aciertos revelan todas las posiciones correspondientes.
 
-[Primer nivel](nivel_1.md) · [Índice del diseño](README.md) · [Detalle del motor](nivel_3_motor_del_juego.md)
+El adaptador retrasa los pulsos para capturar los datos actualizados. Un evento final tiene prioridad sobre el evento de acierto/error del mismo ciclo. El registro admite reemplazo cuando el evento anterior se consume, pero no almacena eventos adicionales mientras está lleno. La operación de la terminal requiere esperar la respuesta a cada letra; el [informe integrado](../informe/README.md) delimita esta capacidad.
+
+La FSM mantiene el resultado durante 3 s y vuelve a selección. El temporizador no se sincroniza con `screen_done`; la duración visible completa en LCD se considera una comprobación experimental distinta.
+
+[Primer nivel](nivel_1.md) · [Índice de diseño](README.md)

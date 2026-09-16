@@ -6,8 +6,9 @@ El motor selecciona y conserva la palabra secreta, evalúa letras y actualiza el
 patrón visible. Proporciona resultados al controlador principal (S1); no modifica
 tiempo, intentos ni victorias y no controla directamente UART o LCD.
 
-El motor conserva los puertos acordados y el orden de bytes utilizado por UART.
-La entrega de la palabra secreta al finalizar sigue pendiente de acuerdo.
+El motor conserva el orden de bytes utilizado por UART. La integración expone
+`secret_word[95:0]` hacia `top`, que captura la palabra para los mensajes finales
+sin transferir la propiedad de sus registros fuera de S2.
 
 ## 1. Requisitos y decisiones
 
@@ -44,6 +45,7 @@ La entrega de la palabra secreta al finalizar sigue pendiente de acuerdo.
 | `word_ready` | 1 | Pulso de un ciclo al cargar e inicializar la palabra |
 | `word_length` | 4 | Longitud estable durante la partida; cero durante reset/selección |
 | `revealed_word` | 96 | Patrón registrado; cambia al iniciar partida o acertar una letra nueva |
+| `secret_word` | 96 | Palabra seleccionada; estable durante la partida; utilizada por integración para WIN/LOSE |
 | `letter_correct` | 1 | Resultado registrado: letra nueva con una o más coincidencias |
 | `letter_repeated` | 1 | Resultado registrado: letra A–Z ya utilizada |
 | `word_complete` | 1 | Nivel persistente al revelar todas las posiciones; se limpia con reset/new_game |
@@ -53,7 +55,7 @@ que otra evaluación produzca de nuevo ese resultado. Dos solicitudes en ciclos
 consecutivos pueden producir dos resultados consecutivos; S1 debe asociarlos
 por ciclo, no únicamente por detección de flanco de las salidas.
 
-### Contrato temporal propuesto para S1
+### Contrato temporal con S1
 
 | Flanco | Entrada / acción | Resultado |
 |---|---|---|
@@ -96,7 +98,7 @@ flowchart TB
     B3 -.->|"carga, evaluación y limpieza"| B6
     B6["B6 · Registros de resultado"] -.->|"word_complete"| B3
     B6 --> F["word_ready · letter_correct · letter_repeated · word_complete"]
-    B4 --> OUT["word_length: 4 · revealed_word: 96"]
+    B4 --> OUT["word_length: 4 · revealed_word: 96 · secret_word: 96"]
 ```
 
 Las flechas continuas representan datos o resultados; las discontinuas,
@@ -144,7 +146,8 @@ El [cuarto nivel](nivel_4_motor_del_juego.md) desarrolla sus circuitos y la FSM.
 La prueba usa el archivo ASCII como referencia independiente del empaquetado
 hexadecimal de ROM y un modelo de patrón/bitmap para contrastar resultados.
 El acceso jerárquico a `secret_word` en el testbench sirve solo para identificar
-la palabra seleccionada; **no constituye una interfaz de integración**.
+la palabra seleccionada. La integración utiliza el puerto explícito `secret_word`,
+sin depender de accesos jerárquicos al módulo.
 
 Los pasos para ejecutar las pruebas directamente en Vivado se encuentran en el
 [informe de verificación](../informe/motor_verificacion.md).
@@ -154,12 +157,13 @@ Los pasos para ejecutar las pruebas directamente en Vivado se encuentran en el
 - La interfaz con S1 requiere una latencia de evaluación definida, reconocimiento
   de `word_ready` y filtrado de letras fuera de partida. El motor no recibe
   `game_state` ni una señal de derrota.
-- La entrega de la palabra secreta completa al protocolo UART está pendiente de
-  definición. La interfaz actual del motor no expone ese dato.
+- La palabra secreta se entrega mediante `secret_word[95:0]`; `top` registra
+  este bus junto con los datos del evento final para UART.
 - El transporte de eventos UART debe conservar los resultados mientras la
   transmisión esté ocupada, incluido el evento de la última letra correcta.
-- La integración completa, la simulación temporizada post-implementación y las
-  pruebas físicas constituyen etapas de validación pendientes.
+- La integración RTL está comprobada en `tb_top`. La simulación temporizada
+  post-implementación y la evidencia física completa se distinguen en el
+  [informe general](../informe/README.md).
 - Los tiempos por dificultad y la prioridad de eventos simultáneos pertenecen a S1.
 
 ## 7. Referencias
@@ -170,4 +174,4 @@ Los pasos para ejecutar las pruebas directamente en Vivado se encuentran en el
 - [UART y protocolo existentes](nivel_3_uart_protocolo.md).
 
 Los diagramas preliminares se conservan como antecedente; la versión editable
-de este documento describe el RTL actual y sus convenciones propuestas.
+de este documento describe el RTL integrado y sus convenciones de interfaz.
