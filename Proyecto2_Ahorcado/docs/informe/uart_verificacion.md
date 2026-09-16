@@ -10,7 +10,7 @@ Verificar recepción y transmisión 8N1, acceso al periférico de 32 bits, valid
 
 Vivado/XSim 2026.1, reloj de 100 MHz y UART a 115200 baud. Los bancos VHDL verifican el núcleo; los SystemVerilog verifican periférico, protocolo e integración. Los resultados adjuntos corresponden a simulación conductual, no a simulación temporizada de una netlist.
 
-Las capturas originales de Puentes se conservan sin alterar sus resultados. Las del ensayo físico usan el top UART aislado; la síntesis y simulación del juego completo se identifican por separado. La [regresión del sistema](README.md) reproduce los bancos de UART sobre las fuentes integradas.
+Las pruebas comprenden el núcleo UART, el periférico de registros y el protocolo de aplicación. El ensayo físico utiliza el top UART aislado; la síntesis y simulación del juego completo se presentan en la [verificación integrada](README.md).
 
 ## 3. Verificación
 
@@ -91,7 +91,7 @@ La comunicación también se probó con la Basys 3 y el puente USB-UART integrad
 La aplicación de consola abrió el puerto a 115200 baud y permitió enviar letras
 sin agregar CR ni LF.
 
-[Captura original de la terminal UART](resultados/uart/hardware_terminal_uart_start.png)
+[Terminal UART](resultados/uart/hardware_terminal_uart_start.png)
 
 **Figura 7. Comunicación entre la terminal de PC y la Basys 3.**
 
@@ -101,7 +101,7 @@ confirmando ambos sentidos del enlace de prueba. En el juego completo, START
 se genera al iniciar la partida con BTN_OK; esta captura no acredita una
 partida completa.
 
-[Captura original de detección del puerto USB-UART](resultados/uart/hardware_deteccion_com6.png)
+[Detección del puerto USB-UART](resultados/uart/hardware_deteccion_com6.png)
 
 **Figura 8. Puerto USB-UART detectado durante la prueba.**
 
@@ -139,7 +139,11 @@ experimental del juego completo se registra por separado en el informe general.
 
 La recepción puede atenderse durante TX y los bancos comprueban los mensajes, LF y los caracteres válidos. Esto no equivale a una cola ilimitada de eventos del juego. El registro pendiente de `top` puede perder eventos ante ráfagas mientras TX está ocupado; la GUI aplica espera por respuesta y la consola requiere respetar ese ritmo.
 
-La GUI necesita una línea LF completa para interpretar mensajes; su lector actual no acumula fragmentos entre timeouts. La recuperación de sesión y la semántica RX_DATA/W1C se delimitan en el informe general. No se incorporan resultados de simulación temporizada ni una medición experimental de tasas de error del enlace.
+La GUI necesita una línea LF completa para interpretar mensajes; su lector actual no acumula fragmentos entre timeouts. La recuperación de sesión y la semántica RX_DATA/W1C se delimitan en el informe general.
+
+### Simulación post-implementación temporizada
+
+### **EN PROCESO**
 
 ## 7. Referencias
 

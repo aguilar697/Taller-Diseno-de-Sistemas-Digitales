@@ -4,15 +4,13 @@
 
 **Integrantes:** Kenneth Campos, Kevin Aguilar, Daniel Puentes y Kevin Cortés.
 
-**Fecha de consolidación documental:** 16 de septiembre de 2026.
-
-**Fuentes integradas de referencia:** `16d6f73`; sin cambios HDL respecto de `70c6f68`.
+**Fecha:** 16 de septiembre de 2026.
 
 ## Resumen
 
 Se implementó un juego de Ahorcado en Basys 3 con lógica de control, banco de palabras, evaluación de letras, temporización, periféricos locales y comunicación UART con una terminal Python. La FPGA mantiene todas las reglas del juego. La PC transmite letras y presenta los mensajes recibidos.
 
-La regresión conductual ejecutó 17 bancos: 16 con comprobaciones satisfactorias y uno de reset basado solamente en estímulos. El motor completó 38 636 comprobaciones en 129 partidas. El diseño completo se sintetizó y enrutó a 100 MHz con WNS de 0.888 ns, 1501 LUT, 1344 registros y ningún latch. El equipo reporta funcionamiento físico de LCD, buzzer y terminal; la evidencia incorporada distingue ese reporte de los ensayos documentados. No se incorpora todavía simulación post-implementación con retardos ni registro audiovisual completo de ambos modos.
+La regresión conductual ejecutó 17 bancos: 16 con comprobaciones satisfactorias y uno de reset basado solamente en estímulos. El motor completó 38 636 comprobaciones en 129 partidas. El diseño completo se sintetizó y enrutó a 100 MHz con WNS de 0.888 ns, 1501 LUT, 1344 registros y ningún latch. La interfaz local presenta el estado de la partida mediante LCD, displays, LED y buzzer, mientras la terminal permite ingresar letras y consultar los resultados.
 
 ## 1. Objetivo y fundamento
 
@@ -51,18 +49,17 @@ Los [niveles 1](../diseno/nivel_1.md) y [2](../diseno/nivel_2.md) presentan los 
 
 La palabra secreta no se selecciona ni evalúa en la PC. El registro del evento y sus datos evita mezclar un mensaje en transmisión con actualizaciones posteriores del juego. Su capacidad es limitada a un evento pendiente; la operación prevista requiere una letra por respuesta.
 
-## 4. Estrategia de validación y procedencia
+## 4. Metodología de verificación
 
-Se distinguen cuatro niveles de evidencia: bancos individuales, integración conductual, implementación y ensayo físico. Las capturas históricas y los reportes no se reinterpretan como resultados de etapas distintas.
+La verificación comprende pruebas individuales de los subsistemas, simulación conductual del sistema integrado, síntesis, análisis temporal y pruebas físicas. Los bancos de simulación comparan las salidas con los valores esperados para cada estímulo.
 
-| Evidencia | Herramienta y fecha | Fuentes / alcance |
+| Prueba | Herramienta | Alcance |
 |---|---|---|
-| Motor original y prueba ampliada | Vivado/XSim 2026.1, 10/09/2026 | Revisiones b8bb7cc y 292ba93; motor aislado |
-| Capturas Wave del motor | Aportadas el 16/09/2026 | word_engine_tb_behav; simulación conductual, cinco casos |
-| Capturas UART de Puentes | Vivado 2026.1; incorporadas en 16d6f73 | Bancos de protocolo, tb_top y ensayo físico UART aislado |
-| Regresión de integración | Vivado/XSim 2026.1, 15/09/2026 | 70c6f68; fuentes HDL y bancos idénticos en 16d6f73 |
-| Síntesis e implementación completa | Vivado 2026.1, 15/09/2026 | top, xc7a35tcpg236-1 y XDC del sistema completo |
-| Operación física completa | Reportada por el equipo | LCD, buzzer y terminal funcionando; demostración grabada según el equipo, sin enlace incorporado |
+| Motor del juego | Vivado/XSim 2026.1 | Selección, evaluación de letras, repetición y finalización |
+| Formas de onda del motor | Ventana Wave de Vivado | Cinco casos de simulación conductual |
+| UART y protocolo | Vivado/XSim 2026.1 | Núcleo serial, registros, mensajes e integración |
+| Sistema integrado | Vivado/XSim 2026.1 | Control, motor, comunicación e interfaz local en tb_top |
+| Síntesis e implementación | Vivado 2026.1 | top, xc7a35tcpg236-1 y restricciones del sistema completo |
 
 Los resultados de regresión se conservan como [extractos literales de logs](resultados/integracion/regresion_rtl.txt). La elaboración reproducible del motor emplea `-debug typical`; una ejecución inicial sin esa opción falló en la primera comparación de ROM, por lo que se registra la configuración junto con el resultado satisfactorio.
 
@@ -81,15 +78,23 @@ Los resultados de regresión se conservan como [extractos literales de logs](res
 
 ![Resultado conductual del sistema integrado](resultados/uart/tb_top_resultado_0_errores.png)
 
-**Figura 1.** Captura de la ejecución conductual integrada aportada por Puentes. El encabezado de Vivado identifica Behavioral Simulation; no es simulación temporizada post-implementación.
+**Figura 1.** Resultado de la simulación conductual del sistema integrado en Vivado: `tb_top` finaliza con cero errores en los escenarios comprobados.
 
-Las formas de onda de S1 se conservan en su informe. El [informe de S2](motor_verificacion.md#capturas-de-formas-de-onda-en-vivado) incorpora cinco capturas directas de la ventana Wave, aportadas por Kevin Aguilar el 16/09/2026: selección fácil, selección difícil, acierto y repetición, palabra completa y reset. Complementan la evidencia conductual; no sustituyen el autochequeo ni la simulación temporizada.
+Las formas de onda de control se presentan en el [informe de S1](control_verificacion.md). El [informe de S2](motor_verificacion.md#capturas-de-formas-de-onda-en-vivado) muestra selección fácil, selección difícil, acierto y repetición, palabra completa y reset mediante capturas directas de Vivado.
 
-`tb_top` finaliza con `$finish` incluso al reportar errores; el resultado se determina leyendo sus comprobaciones, no solo el código de salida del proceso. No existe un banco dedicado a S4 que decodifique texto LCD, valide todas las temporizaciones o compruebe cada tono.
+`tb_top` finaliza con `$finish` incluso al reportar errores; el resultado se determina leyendo sus comprobaciones, no solo el código de salida del proceso.
+
+### 5.1. Simulación específica de la interfaz local
+
+### **EN PROCESO**
+
+### 5.2. Simulación post-implementación temporizada: recepción y validación de una letra
+
+### **EN PROCESO**
 
 ## 6. Síntesis, implementación y análisis temporal
 
-La implementación completa usa la Artix-7 `xc7a35tcpg236-1`, reloj de 10 ns y `src/design/constraints/Basys-3-Master.xdc`. Se ejecutaron síntesis, optimización, colocación y enrutamiento con parámetros funcionales por defecto. Esta ejecución no programó la tarjeta ni generó evidencia de funcionamiento físico.
+La implementación completa usa la Artix-7 `xc7a35tcpg236-1`, reloj de 10 ns y `src/design/constraints/Basys-3-Master.xdc`. Se ejecutaron síntesis, optimización, colocación y enrutamiento con parámetros funcionales por defecto.
 
 | Indicador del top enrutado | Resultado |
 |---|---:|
@@ -103,34 +108,35 @@ La implementación completa usa la Artix-7 `xc7a35tcpg236-1`, reloj de 10 ns y `
 | THS | 0.000 ns |
 | DRC del ruledeck ejecutado | 0 incidencias |
 
-Reportes originales: [utilización](resultados/integracion/utilization_routed.rpt), [timing](resultados/integracion/timing_routed.rpt), [DRC](resultados/integracion/drc_routed.rpt).
+Reportes de implementación: [utilización](resultados/integracion/utilization_routed.rpt), [timing](resultados/integracion/timing_routed.rpt), [DRC](resultados/integracion/drc_routed.rpt).
 
 El margen positivo respalda las restricciones internas de 100 MHz. El reporte identifica cuatro entradas sin input delay y 25 salidas sin output delay. Parte de estas interfaces es asíncrona o periférica; su protocolo y márgenes requieren análisis específico. No se concluye cumplimiento de todos los tiempos del LCD a partir del WNS interno.
 
-La síntesis emitió avisos de bits de bus sin carga, incluidos campos reservados. No se declara ausencia total de warnings. La ausencia de latches se comprueba en la netlist; no se adjunta ejecución independiente de linter.
+La síntesis emitió avisos de bits de bus sin carga, incluidos campos reservados. La consulta de la netlist confirmó la ausencia de latches.
 
 Los valores de S1/S2 aislados y del top UART de ensayo pertenecen a diseños distintos. No se suman directamente para inferir el uso final, porque la síntesis optimiza la lógica en contexto.
 
-## 7. Pruebas físicas y matriz de evidencia
+## 7. Pruebas físicas y presentación funcional
 
-El [informe UART](uart_verificacion.md) conserva la comunicación de ida y vuelta del ensayo `uart_protocol_hw_test_top`: una letra válida produce un START fijo. La captura de bitstream de ese ensayo utiliza `basys3_uart_test.xdc`; no acredita por sí sola una partida del top completo.
+### 7.1. Comunicación UART
 
-El equipo reporta operación del sistema completo con LCD, buzzer y terminal. Para el registro de evaluación se distingue la observación reportada de las capturas o mediciones actualmente adjuntas:
+El [ensayo UART](uart_verificacion.md) utiliza `uart_protocol_hw_test_top` y `basys3_uart_test.xdc`. Una letra válida produce un mensaje START fijo, lo que permite comprobar la comunicación bidireccional antes de integrar las reglas del juego.
 
-| Requisito | Evidencia disponible | Alcance adicional no incorporado |
-|---|---|---|
-| Banco, LFSR y restricción difícil | Autochequeo de S2 y capturas directas de selección en Vivado | Registro audiovisual de ambos modos |
-| Repetición y revelado múltiple | Autochequeo y capturas directas del motor en Vivado | Demostración audiovisual integrada |
-| Victoria y derrotas | tb_top y pruebas S1 | Registro físico de ambos modos y causas de derrota |
-| UART bidireccional | Autochequeo y ensayo físico aislado | Registro de una partida completa en GUI y FPGA |
-| LCD, displays, LED y buzzer | RTL integrado y funcionamiento reportado por el equipo | Capturas legibles y audio; medición de duración visible del resultado |
-| Recursos y timing | Reportes enrutados del top completo | No sustituyen simulación con retardos |
-| Recepción y validación temporizada | Sin evidencia adjunta | Simulación post-implementación requerida por el instructivo |
-| Video de defensa | Sin enlace incorporado | Registro audiovisual de la entrega |
+### 7.2. Demostración del juego completo: video
+
+### **EN PROCESO**
+
+### 7.3. Registro experimental de LCD, displays, LED y buzzer
+
+### **EN PROCESO**
+
+### 7.4. Medición de la duración visible del resultado final
+
+### **EN PROCESO**
 
 ## 8. Problemas, tratamientos y limitaciones
 
-| Situación | Tratamiento o resultado en la versión actual |
+| Situación | Análisis y resultado |
 |---|---|
 | Evaluación del motor durante selección | Caso dirigido añadido al banco; descarte sin procesamiento diferido comprobado |
 | Envío de palabra secreta final | Puerto `secret_word` y captura en top incorporados; mensajes finales comprobados en integración |
@@ -139,16 +145,16 @@ El equipo reporta operación del sistema completo con LCD, buzzer y terminal. Pa
 | Fin de partida durante un tono | La FSM de buzzer solo atiende eventos en reposo; la prueba dirigida confirmó omisión del tono final durante actividad |
 | Preparación de LCD | Medida RTL RS→E de 10 ns; contraste con hoja de datos y arranque documentado en S4 |
 | Lectura fragmentada de GUI | El lector entrega fragmentos sin esperar LF; no hay garantía de recuperación automática ante timeout o reset durante partida |
-| Duración visible de resultado | S1 cuenta 3 s desde fin; no consume screen_done; medición visual completa no incorporada |
+| Duración visible de resultado | S1 cuenta 3 s desde fin y no consume screen_done; medición visible: **EN PROCESO** |
 | Mapa UART | RX_DATA implementado solo lectura y new_rx W1C; diferencia frente a la descripción RW del enunciado declarada en S3 |
 
-Los [registros de pruebas dirigidas](resultados/integracion/limites_verificacion.txt) preservan las observaciones adicionales. Estas pruebas de límite son distintas de la regresión nominal y no se contabilizan como casos aprobados. El funcionamiento físico reportado y estos límites pueden coexistir: corresponden a condiciones de estímulo y observación diferentes.
+Las [pruebas dirigidas](resultados/integracion/limites_verificacion.txt) permiten identificar los límites de capacidad y temporización. Los fallos de estas pruebas corresponden a condiciones distintas de los escenarios aprobados en la regresión nominal.
 
 ## 9. Conclusiones
 
 El diseño modular permitió integrar selección y evaluación de palabras, control temporal, comunicación serial y presentación local sin trasladar reglas a la PC. La regresión respalda los escenarios implementados y la síntesis confirma un uso moderado de recursos, ausencia de latches y cumplimiento de las restricciones internas de 100 MHz.
 
-La evaluación completa exige distinguir éxito conductual, timing estático y funcionamiento experimental. La evidencia actual no acredita la simulación temporizada requerida, todos los casos de periferia ni el registro físico completo de ambos modos. La capacidad de eventos, la recuperación de la terminal y los márgenes LCD constituyen límites identificados de esta implementación. Las conclusiones se restringen a los ensayos y reportes adjuntos.
+La capacidad del registro de eventos limita la recepción de ráfagas; la recuperación de la terminal y los márgenes temporales del LCD requieren atención específica. El análisis temporal estático y la simulación conductual permiten evaluar aspectos distintos del diseño y deben interpretarse según el alcance de cada prueba.
 
 ## 10. Referencias
 

@@ -4,7 +4,11 @@
 
 Juego implementado en una FPGA Basys 3, con terminal Python por UART a 115200 baud y presentación local mediante LCD 16×2, siete segmentos, LED y buzzer. La FPGA selecciona la palabra, evalúa letras, administra tiempo e intentos y determina el resultado; la PC presenta la información y transmite las entradas del jugador.
 
-El sistema está integrado. El equipo reporta funcionamiento físico de la LCD, buzzer y terminal; las evidencias incorporadas y el alcance de las pruebas se distinguen en el [informe técnico](docs/informe/README.md). La simulación temporizada post-implementación y las capturas físicas completas no están acreditadas en esta versión documental.
+El diseño integra control del juego, motor de palabras, comunicación UART e interfaz local. El [informe técnico](docs/informe/README.md) presenta la metodología, los resultados de verificación y el análisis de funcionamiento.
+
+## Video de presentación funcional
+
+### **EN PROCESO**
 
 ## Documentación
 

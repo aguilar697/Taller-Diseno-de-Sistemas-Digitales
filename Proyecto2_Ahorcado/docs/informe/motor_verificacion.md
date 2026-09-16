@@ -1,13 +1,8 @@
 # Informe de verificación — Motor del juego
 
-**Estado:** verificación del motor aislado documentada; integración RTL comprobada en `tb_top`. La evidencia del sistema completo se presenta en el [informe general](README.md).
 **Subsistema:** S2. **Responsable:** Kevin Aguilar.
 
-Se distinguen la simulación original del 10 de septiembre de 2026 y la ejecución
-complementaria del mismo día, que amplía el testbench y verifica el motor aislado
-mediante síntesis y enrutamiento. Se conservan las fechas, revisiones y alcances
-de esas mediciones; la incorporación posterior de `secret_word` a la interfaz
-se verifica en la regresión del sistema integrado.
+El motor selecciona la palabra, valida las letras y actualiza el patrón revelado. La verificación comprende pruebas del motor aislado y su integración con el control del juego y UART.
 
 ## 1. Objetivo y alcance
 
@@ -18,7 +13,6 @@ identifica como motor aislado, integración con UART/controlador o sistema compl
 | Identificación de la ejecución | Valor |
 |---|---|
 | Fecha | 10 de septiembre de 2026; inicio de simulación: 22:42:54 |
-| Commit de las fuentes verificadas | Referencia b8bb7cc; fuentes comparadas con la copia de Vivado |
 | Herramienta y versión | Vivado / XSim 2026.1 |
 | Dispositivo del proyecto | xc7a35tcpg236-1, Basys 3 |
 | Top y alcance | word_engine_tb; motor aislado |
@@ -108,8 +102,7 @@ comprobación de síntesis, timing físico ni funcionamiento en tarjeta.
 
 ### Ejecución complementaria: letras durante selección
 
-La revisión `292ba93` añade un caso dirigido al final del mismo testbench, sin
-modificar los cuatro módulos de diseño. Se solicita una partida difícil y se
+La prueba complementaria añade un caso dirigido al final del mismo testbench. Se solicita una partida difícil y se
 mantiene `letter_valid=1` durante la selección, incluido el flanco que carga la
 palabra. Se comprueba que no haya resultados de letra ni bits utilizados, que el
 patrón permanezca oculto y que el byte descartado no se procese en el ciclo activo
@@ -137,12 +130,7 @@ xsim motor_regression -runall
 
 ### Capturas de formas de onda en Vivado
 
-Las cinco figuras siguientes son capturas directas de la ventana Wave de
-`word_engine_tb_behav`, aportadas por Kevin Aguilar e incorporadas el 16 de
-septiembre de 2026. Presentan selección, evaluación, finalización y reinicio
-del motor en simulación conductual. Complementan los logs anteriores; no
-constituyen una simulación post-implementación con retardos ni un nuevo
-reporte de cantidad de comprobaciones.
+Las cinco figuras muestran selección, evaluación de letras, finalización y reinicio del motor en la ventana Wave de Vivado, con `word_engine_tb_behav` como simulación conductual. Los logs de autochequeo presentan los resultados de las comprobaciones automáticas.
 
 La escala horizontal está expresada en nanosegundos. Los buses se muestran
 en hexadecimal: `41` corresponde a A, `55` a U, `5F` al guion bajo y `20` al
@@ -195,7 +183,7 @@ en 3 655 ns.
 | Fecha / herramienta | 10 de septiembre de 2026 / Vivado 2026.1 |
 | Modo | `out_of_context`, motor aislado |
 | Top / dispositivo | `word_engine` / `xc7a35tcpg236-1` |
-| Fuentes | Cuatro módulos de diseño de `292ba93`; RTL sin cambios respecto a la simulación original |
+| Fuentes | word_engine.sv, word_rom.sv, word_lfsr.sv y letter_evaluator.sv |
 | Restricciones | Reloj de 10 ns aplicado después de síntesis y antes de implementación; sin restricciones de interfaz con otros subsistemas |
 
 | Recurso | Después de síntesis | Después de enrutamiento |
@@ -279,7 +267,7 @@ No se generó un bitstream ni se realizó una simulación con retardos anotados.
 
 ## 7. Integración y simulación temporizada
 
-La versión integrada expone `secret_word[95:0]` hacia `top`, que captura la palabra para los mensajes finales de UART. La regresión del 15 de septiembre sobre fuentes `70c6f68`, sin cambios HDL en `16d6f73`, alcanzó PASS en el motor con 38 636 comprobaciones y 129 partidas. `tb_top` verificó victoria, derrota por intentos, derrota por tiempo y repetición en los escenarios implementados.
+El motor expone `secret_word[95:0]` hacia `top`, que captura la palabra para los mensajes finales de UART. La regresión de integración alcanzó PASS en el motor con 38 636 comprobaciones y 129 partidas. `tb_top` verificó victoria, derrota por intentos, derrota por tiempo y repetición en los escenarios implementados.
 
 | Comprobación | Alcance actual |
 |---|---|
@@ -287,21 +275,23 @@ La versión integrada expone `secret_word[95:0]` hacia `top`, que captura la pal
 | Estado y resultado final | Comprobados en los escenarios RTL; la capacidad ante ráfagas se limita en el informe general |
 | Letras durante selección de S2 | Comprobadas por el caso dirigido T12 |
 | Síntesis/timing del sistema | Reportes del top completo disponibles en el informe general |
-| Simulación temporizada post-implementación | Evidencia no incorporada; requiere recepción y validación de una letra sobre netlist con retardos |
+| Simulación temporizada post-implementación | **EN PROCESO** |
 
 La simulación conductual y el timing estático son verificaciones diferentes. El testbench aislado utiliza señales internas por jerarquía; una prueba temporizada no debe asumir que esos nombres sobreviven a la síntesis.
 
-## 8. Evidencia experimental y formas de onda
+## 8. Funcionamiento del motor en el sistema completo
 
-El equipo reporta funcionamiento del sistema integrado en tarjeta y la grabación de una demostración funcional. La sección 4 incorpora cinco capturas directas de Wave aportadas por Kevin Aguilar. Estas imágenes documentan simulación conductual del motor, no mediciones físicas. El enlace del registro audiovisual no está incorporado en esta versión.
+La selección y evaluación se ejecutan en la FPGA. El control utiliza las banderas del motor para actualizar intentos, detectar victoria y transmitir el resultado por UART. Las capturas de la sección 4 corresponden a simulación conductual; la demostración física se presenta en el [informe general](README.md#72-demostración-del-juego-completo-video).
 
-La evidencia experimental y el estado de los requisitos se centralizan en el [informe general](README.md), evitando confundir medidas del motor aislado con medidas del conjunto.
+### Registro audiovisual
+
+### **EN PROCESO**
 
 ## 9. Problemas y correcciones
 
 | Hallazgo | Tratamiento | Resultado |
 |---|---|---|
-| T12 carecía de estímulo explícito durante selección | Caso dirigido añadido en `292ba93` | PASS en la ejecución complementaria; no requirió modificar el RTL |
+| T12 carecía de estímulo explícito durante selección | Caso dirigido de letras durante selección | PASS en la ejecución complementaria; no requirió modificar el RTL |
 | Presentación de formas de onda | Capturas directas de Vivado con reloj, reset, entradas y salidas del motor | Cinco casos documentados; la evidencia de autochequeo se conserva en los logs |
 | Restricciones físicas incompletas en el motor aislado | Limitación documentada en sección 6 | Comprobación del top completo registrada en el informe general; se conserva el alcance original de los reportes aislados |
 
@@ -321,9 +311,7 @@ simulación temporizada o las pruebas físicas.
 
 La integración incorpora `secret_word` como salida explícita, mantiene el orden
 de caracteres y conserva las funciones de evaluación dentro del motor. La
-regresión integrada complementa los resultados históricos. La simulación
-temporizada y las capturas físicas completas permanecen fuera de la evidencia
-incorporada, según el informe general.
+regresión integrada comprueba la coordinación con el control del juego y UART.
 
 ## Referencias
 

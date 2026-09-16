@@ -462,8 +462,8 @@ se distinguen de los diagramas lógicos de este documento.
 ## 9. Validación y referencias
 
 El [informe de verificación](../informe/motor_verificacion.md) documenta las
-pruebas y las evidencias pendientes. Las capturas y valores medidos se
-incorporan con identificación de herramienta, versión de fuentes y etapa.
+pruebas del motor, las formas de onda y los resultados de síntesis y
+análisis temporal.
 
 - Guía *Diseño Modular*, sección 3.5.4: desarrollo individual de los módulos.
 - Instructivo Proyecto 2 EL3313: reglas del juego, interfaces y verificación.
