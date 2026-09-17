@@ -19,10 +19,6 @@ module screen_manager #(
     output logic        screen_done_o
 );
 
-  // ------------------------------------------------------------------
-  // Codificacion externa real de game_state, definida por el Subsistema 1
-  // (game_fsm.sv). Contrato externo: NO modificar estos valores aqui.
-  // ------------------------------------------------------------------
   localparam logic [2:0] GS_MODE_SELECT   = 3'd0;
   localparam logic [2:0] GS_STARTING      = 3'd1;
   localparam logic [2:0] GS_ACTIVE        = 3'd2;
@@ -30,12 +26,6 @@ module screen_manager #(
   localparam logic [2:0] GS_LOSE_ATTEMPTS = 3'd4;
   localparam logic [2:0] GS_LOSE_TIME     = 3'd5;
 
-  // ------------------------------------------------------------------
-  // Categorias internas de pantalla (adaptacion propia del Subsistema 4).
-  // GS_STARTING se agrupa con GS_ACTIVE: ambos muestran la pantalla de
-  // partida (la palabra puede estar aun en blanco durante GS_STARTING,
-  // mientras el Word Engine entrega revealed_word_i).
-  // ------------------------------------------------------------------
   typedef enum logic [1:0] {
     CAT_SELECT,
     CAT_PLAYING,
@@ -223,17 +213,7 @@ module screen_manager #(
     endcase
   end
 
-  // ------------------------------------------------------------------
-  // Envio de un byte al periferico LCD en 4 fases explicitas:
-  //   WP_DATA -> escribe el registro DATOS (addr=01)
-  //   WP_CMD  -> escribe CONTROL/ESTADO con start+rs (addr=00)
-  //   WP_RISE -> espera a que busy suba a 1 (confirma que el periferico
-  //              realmente comenzo, evitando leer busy en el mismo ciclo
-  //              en que se dispara start, cuando aun no pudo reflejarse)
-  //   WP_FALL -> espera a que busy vuelva a 0 (transaccion terminada)
-  // Ambas fases de espera mantienen addr_o=00, de modo que la lectura de
-  // busy nunca queda enmascarada por una escritura pendiente a DATOS.
-  // ------------------------------------------------------------------
+  
   always_ff @(posedge clk_i) begin
     if (rst_i) begin
       state           <= S_WAIT_READY;

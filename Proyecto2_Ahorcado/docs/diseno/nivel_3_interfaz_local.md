@@ -1,12 +1,12 @@
 # Tercer nivel — Interfaz local
 
-**Subsistema:** S4. **Responsable:** Kevin Cortés.
+**Subsistema:** S4. **Responsable:** Kevin Cortés González.
 
 ## 1. Objetivo
 
 El subsistema de interfaz local actúa exclusivamente como la capa de presentación física del juego en la FPGA Basys 3. Recibe el estado de la partida ya calculado por el resto del sistema y lo traduce en señales de control hacia el LCD, los displays de siete segmentos, el LED de estado y el buzzer, sin tomar ninguna decisión sobre las reglas del juego.
 
-![Interfaz externa del subsistema de interfaz local](img/interfaz_local/s4_nivel1.jpeg)
+![Interfaz externa del subsistema de interfaz local](img/interfaz_local/Diagrama_subsistema4_nivel1.png)
 
 **Figura 1. Interfaz externa del subsistema de interfaz local.**
 
@@ -57,9 +57,13 @@ Internamente se agrupan en tres macro-estados visuales (`led_estado_o`: `00`=sel
 
 El subsistema se divide en 5 submódulos para aislar el control de cada periférico.
 
-![Descomposición funcional del subsistema de interfaz local](img/interfaz_local/s4_nivel2.jpeg)
+![Descomposición funcional del subsistema de interfaz local](img/interfaz_local/Diagrama_subsistema4_nivel2.png)
 
 **Figura 2. Descomposición funcional del subsistema de interfaz local.**
+
+![Interconexión detallada entre submódulos del subsistema de interfaz local](img/interfaz_local/Diagrama_subsistema4_nivel3.png)
+
+**Figura 3. Interconexión detallada entre submódulos del subsistema de interfaz local.**
 
 ### 3.1 Administrador de pantallas (`screen_manager.sv`)
 
@@ -147,14 +151,7 @@ La interfaz local expone señales de disponibilidad para coordinar presentación
 
 **Alcance de integración:** las cuatro señales se conectan a nets de `top`, pero S1 no las consume. El administrador de pantallas sí espera el estado interno del periférico antes de escribir. La FSM de juego conserva su temporización propia de 3 s; la duración de visualización completa debe comprobarse por separado. La prioridad sonora solo se aplica mientras el buzzer está inactivo. Estas condiciones se analizan en el [informe de interfaz local](../informe/interfaz_local_verificacion.md).
 
-## 7. Aplicación de PC (Python)
-
-Como apoyo para las pruebas de este subsistema y del sistema integrado, se desarrolló `gui_terminal.py` (`src/design/local_interface/gui/`): una terminal remota con interfaz gráfica que envía letras por UART y decodifica en vivo los mensajes de protocolo (`START`, `HIT`, `MISS`, `REPEAT`, `WIN`, `LOSE_ATTEMPTS`, `LOSE_TIME`), dibujando el progreso del ahorcado. Esta aplicación se compartió con el responsable de S3 (comunicación UART), a quien corresponde formalmente la aplicación de PC según la tabla de responsabilidades del proyecto; se documenta aquí porque el desarrollo se originó durante las pruebas de integración de este subsistema.
-
-
-
-
-## 8. FSM del periférico LCD
+## 7. FSM del periférico LCD
 
 ```mermaid
 stateDiagram-v2
@@ -187,23 +184,14 @@ Los bits reservados de CONTROL y DATOS se leen como cero y sus escrituras se ign
 
 Son valores del RTL, no una certificación de todos los mínimos eléctricos del controlador. La preparación RS→E y el arranque se contrastan con la hoja de datos en el informe de verificación.
 
-## 9. Administrador de pantallas
+## 8. Administrador de pantallas
 
 El administrador captura una instantánea del estado, modo, patrón, longitud e intentos. Envía dirección de primera línea, 16 caracteres, dirección de segunda línea y otros 16 caracteres. Al terminar genera `screen_done` y atiende el siguiente cambio de entradas.
 
-```mermaid
-flowchart LR
-    R["Esperar LCD disponible"] --> I["Comparar entradas con instantánea"]
-    I -->|"cambio"| S["Capturar instantánea"]
-    S --> L1["Dirección y 16 caracteres de línea 1"]
-    L1 --> L2["Dirección y 16 caracteres de línea 2"]
-    L2 --> D["screen_done"]
-    D --> I
-```
 
 Cada byte utiliza WP_DATA → WP_CMD → WP_RISE → WP_FALL: escritura de DATOS, escritura de CONTROL, espera de busy alto y espera de busy bajo. Las lecturas de estado mantienen addr=00. El texto de resultado es GANASTE!/PERDISTE; su segunda línea conserva el patrón recibido de S1, que puede seguir parcialmente oculto en derrota. La palabra secreta completa se transmite por UART.
 
-## 10. Siete segmentos, LED y buzzer
+## 9. Siete segmentos, LED y buzzer
 
 El barrido activa un dígito cada 25 000 ciclos (250 µs), dando un refresco de 1 kHz por cuadro de cuatro dígitos. Ánodos y segmentos son activos en bajo. Decenas y unidades se obtienen mediante restas acotadas, sin reloj derivado.
 
@@ -224,11 +212,3 @@ El LED usa dos bits para tres estados visuales. El buzzer alterna su salida con 
 
 Los eventos solo se aceptan en reposo; la prioridad fin > error > acierto corresponde a eventos simultáneos en ese estado. No existe cola de tonos.
 
-## 11. Referencias
-
-- [Manual PmodCLP](https://digilent.com/reference/_media/pmod:pmod:pmodCLP_rm.pdf).
-- [Hoja HD44780U](https://www.sparkfun.com/datasheets/LCD/HD44780.pdf).
-- [RTL de interfaz local](../../src/design/local_interface/).
-- [Informe de interfaz local](../informe/interfaz_local_verificacion.md).
-
-[Segundo nivel](nivel_2.md) · [Índice del diseño](README.md)

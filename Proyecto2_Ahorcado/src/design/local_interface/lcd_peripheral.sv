@@ -188,9 +188,7 @@ module lcd_peripheral (
             state      <= S_LATCH;
           end else if (start_w1p) begin
             db_reg     <= data_reg;
-            // Se usa wdata_i[1] directamente, no rs_cfg: rs y start llegan
-            // juntos en la misma escritura, y rs_cfg solo se actualizaria
-            // un ciclo despues (quedaria desfasado un caracter).
+            // wdata_i[1] directo, no rs_cfg: rs_cfg se actualiza un ciclo tarde.
             rs_out_reg <= wdata_i[1];
             long_exec  <= 1'b0;
             state      <= S_LATCH;
