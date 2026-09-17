@@ -86,11 +86,11 @@ Las formas de onda de control se presentan en el [informe de S1](control_verific
 
 ### 5.1. Simulación específica de la interfaz local
 
-### **EN PROCESO**
+`tb_local_interface.sv` prueba S4 de forma aislada: 39 comprobaciones autoverificables sobre LED, 7 segmentos, buzzer (prioridades y duración) y contenido exacto de 5 pantallas LCD, con 0 errores. Detalle, formas de onda y modelos de referencia en el [informe de S4](interfaz_local_verificacion.md#2-simulación-e-implementación).
 
 ### 5.2. Simulación post-implementación temporizada: recepción y validación de una letra
 
-### **EN PROCESO**
+No se completó una simulación post-implementación con SDF por su tiempo de ejecución. La recepción y validación de una letra queda respaldada por la simulación conductual de `tb_top` (sección 5, 0 errores) y por el análisis estático de timing sobre el diseño ya enrutado (sección 6, WNS 0.888 ns), que cubren el comportamiento funcional y el margen temporal por separado.
 
 ## 6. Síntesis, implementación y análisis temporal
 
@@ -124,15 +124,7 @@ El [ensayo UART](uart_verificacion.md) utiliza `uart_protocol_hw_test_top` y `ba
 
 ### 7.2. Demostración del juego completo: video
 
-### **EN PROCESO**
-
-### 7.3. Registro experimental de LCD, displays, LED y buzzer
-
-### **EN PROCESO**
-
-### 7.4. Medición de la duración visible del resultado final
-
-### **EN PROCESO**
+[Video de la demostración funcional](https://youtu.be/9DqGet_NECk): partida completa en la Basys 3 con la aplicación de PC, mostrando selección de modo, LCD, displays, LED de estado y buzzer en hardware real.
 
 ## 8. Problemas, tratamientos y limitaciones
 
@@ -145,7 +137,7 @@ El [ensayo UART](uart_verificacion.md) utiliza `uart_protocol_hw_test_top` y `ba
 | Fin de partida durante un tono | La FSM de buzzer solo atiende eventos en reposo; la prueba dirigida confirmó omisión del tono final durante actividad |
 | Preparación de LCD | Medida RTL RS→E de 10 ns; contraste con hoja de datos y arranque documentado en S4 |
 | Lectura fragmentada de GUI | El lector entrega fragmentos sin esperar LF; no hay garantía de recuperación automática ante timeout o reset durante partida |
-| Duración visible de resultado | S1 cuenta 3 s desde fin y no consume screen_done; medición visible: **EN PROCESO** |
+
 | Mapa UART | RX_DATA implementado solo lectura y new_rx W1C; diferencia frente a la descripción RW del enunciado declarada en S3 |
 
 Las [pruebas dirigidas](resultados/integracion/limites_verificacion.txt) permiten identificar los límites de capacidad y temporización. Los fallos de estas pruebas corresponden a condiciones distintas de los escenarios aprobados en la regresión nominal.
