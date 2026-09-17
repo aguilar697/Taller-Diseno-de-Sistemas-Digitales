@@ -37,8 +37,7 @@ module sevenseg_driver #(
     begin
       v = value;
       t = 4'd0;
-      // Límite estático: con v de 7 bits (max 127), 13 iteraciones bastan
-      // de sobra (floor(127/10) = 12) para dejar v < 10.
+      // v de 7 bits (max 127): 13 iteraciones bastan para dejar v < 10.
       for (i = 0; i < 13; i = i + 1) begin
         if (v >= 7'd10) begin
           v = v - 7'd10;
