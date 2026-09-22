@@ -12,3 +12,9 @@ El diseño utilizará un reloj principal de 100 MHz, VGA a 640 × 480 y 60 Hz, y
 - Persona 2: VGA, memoria de video y entradas J1.
 - Persona 3: bus, RAM, UART, outputs y aplicación PC.
 - Persona 4: software RISC-V y lógica de Batalla Naval.
+
+## Documentación de diseño
+
+- [Planteamiento del diseño](docs/diseno/README.md).
+- [Primer nivel: sistema y entorno](docs/diseno/nivel_1.md).
+- [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
