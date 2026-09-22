@@ -1,0 +1,95 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1760" height="1540" viewBox="0 0 1760 1540">
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="1760" height="1540" fill="white"/>
+<text x="880.0" y="42.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="27" fill="#0F172A">CPU · RUTA DE EJECUCIÓN Y DATOS</text>
+<text x="880.0" y="92.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#475569">Nivel 4 · Banco de registros, multiplexores, operaciones y registros intermedios</text>
+<rect x="60" y="140" width="430" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="275.0" y="158.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">IR: rs1 [19:15] · rs2 [24:20] · rd [11:7]</text>
+<polyline points="275,176 275,225" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="60" y="225" width="430" height="130" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="275.0" y="256.34" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">Banco x0–x31 · 32 bits</text>
+<text x="275.0" y="278.78" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">2 MUX de lectura asíncrona</text>
+<text x="275.0" y="301.21999999999997" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">Escritura: rf_we &amp; (rd != 0)</text>
+<text x="275.0" y="323.65999999999997" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">D = wb_data · x0 devuelve cero</text>
+<rect x="570" y="140" width="430" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="785.0" y="158.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">IR [31:0] · formato de inmediato</text>
+<polyline points="785,176 785,225" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="570" y="225" width="430" height="130" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="785.0" y="266.24" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Cableado I / S / B / U / J</text>
+<text x="785.0" y="290.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Extensión de signo</text>
+<text x="785.0" y="313.76" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">MUX según tipo de instrucción</text>
+<rect x="1170" y="140" width="430" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="1385.0" y="158.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">wb_data [31:0] · rd [4:0] · rf_we</text>
+<text x="1385.0" y="232.56" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">Retorno al puerto de escritura del banco.</text>
+<text x="1385.0" y="255.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">Las etiquetas de igual nombre representan</text>
+<text x="1385.0" y="277.44" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">la misma conexión; no hay registros implícitos.</text>
+<polyline points="180,355 180,445" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="260.0" y="397.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">rs1_data</text>
+<polyline points="385,355 385,445" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="465.0" y="397.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">rs2_data</text>
+<rect x="60" y="445" width="240" height="85" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="180.0" y="475.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">A = operand_a_q</text>
+<text x="180.0" y="499.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">EN = operands_en</text>
+<rect x="335" y="445" width="240" height="85" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="455.0" y="475.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">B = operand_b_q</text>
+<text x="455.0" y="499.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">EN = operands_en</text>
+<polyline points="785,355 785,445" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="655" y="445" width="260" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="785.0" y="463.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">immediate [31:0]</text>
+<rect x="1090" y="430" width="550" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="1365.0" y="448.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">PC = instruction_pc_q · L = link_q</text>
+<rect x="70" y="660" width="390" height="115" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="265.0" y="705.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">MUX A · alu_a_sel</text>
+<text x="265.0" y="729.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">0: A · 1: PC · 2: cero</text>
+<rect x="650" y="660" width="390" height="115" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="845.0" y="705.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">MUX B · alu_b_sel</text>
+<text x="845.0" y="729.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">0: B · 1: immediate</text>
+<polyline points="180,530 180,660" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="255.0" y="597.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">A [31:0]</text>
+<polyline points="455,530 455,590 735,590 735,660" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="590.0" y="565.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">B [31:0]</text>
+<polyline points="785,481 920,481 920,660" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="985.0" y="572.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">immediate</text>
+<rect x="1220" y="570" width="450" height="205" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1445.0" y="627.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">Comparador de bifurcaciones</text>
+<text x="1445.0" y="650.0600000000001" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">Fuentes: A y B (etiquetas)</text>
+<text x="1445.0" y="672.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">eq = (A == B)</text>
+<text x="1445.0" y="694.94" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">lt = ($signed(A) &lt; $signed(B))</text>
+<text x="1445.0" y="717.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">MUX funct3 → branch_taken</text>
+<rect x="70" y="895" width="970" height="175" rx="8" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+<text x="555.0" y="942.9" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#0F172A">ALU combinacional · operandos de 32 bits</text>
+<text x="555.0" y="969.3" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#0F172A">Suma/resta | AND / OR / XOR | comparación SLT / SLTU</text>
+<text x="555.0" y="995.6999999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#0F172A">Desplazador: SLL / SRL / SRA · cantidad = operando B[4:0]</text>
+<text x="555.0" y="1022.1" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" fill="#0F172A">MUX alu_op selecciona una de las diez operaciones</text>
+<polyline points="265,775 265,895" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="360.0" y="832.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">alu_a [31:0]</text>
+<polyline points="845,775 845,895" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="940.0" y="832.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">alu_b [31:0]</text>
+<polyline points="555,1070 555,1130" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="365" y="1130" width="380" height="85" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="555.0" y="1160.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">alu_result_q [31:0]</text>
+<text x="555.0" y="1184.3799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">EN = execute_en</text>
+<rect x="1190" y="875" width="480" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="1430.0" y="893.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">DataIn_i [31:0]</text>
+<polyline points="1430,911 1430,970" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1190" y="970" width="480" height="85" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="1430.0" y="1000.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">load_data_q [31:0]</text>
+<text x="1430.0" y="1024.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">EN = load_en</text>
+<rect x="1190" y="1190" width="480" height="145" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="1430.0" y="1226.86" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">MUX de retorno · result_select</text>
+<text x="1430.0" y="1250.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">0: alu_result_q</text>
+<text x="1430.0" y="1274.3799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">1: load_data_q</text>
+<text x="1430.0" y="1298.1399999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">2: link_q</text>
+<polyline points="1430,1055 1430,1190" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="745,1170 930,1170 930,1260 1190,1260" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="965.0" y="1137.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">alu_result_q [31:0]</text>
+<rect x="1380" y="1390" width="290" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="1525.0" y="1408.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">wb_data [31:0]</text>
+<polyline points="1525,1335 1525,1390" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="60" y="1320" width="1020" height="140" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="570.0" y="1352.38" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Interfaz de datos · selección combinacional</text>
+<text x="570.0" y="1377.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">DataAddress_o = acceso ? alu_result_q : 0</text>
+<text x="570.0" y="1402.5400000000002" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">DataOut_o = store_activo ? B : 0</text>
+<text x="570.0" y="1427.6200000000001" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">we_o = (estado == STORE) &amp; !rst_i &amp; !fault_q</text>
+<text x="880.0" y="1497.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">acceso: LOAD_REQ, LOAD_CAPTURE o STORE; rf_we solo en WRITEBACK válido. rst_i inhibe las escrituras.</text>
+</svg>
