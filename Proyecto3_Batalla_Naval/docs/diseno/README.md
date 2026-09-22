@@ -10,6 +10,10 @@ El diseño se organiza mediante descomposición modular: el primer nivel present
 
 Cada nivel presenta el diagrama correspondiente y desarrolla su objetivo, interfaces y funcionamiento.
 
+## Subsistemas
+
+- [Tercer nivel: procesador RISC-V y ROM](nivel_3_cpu.md).
+
 ## Organización
 
 La plataforma contiene CPU RISC-V, ROM, RAM, bus de datos y periféricos de video, comunicación y entrada/salida. Las reglas de Batalla Naval se implementan en ensamblador y se ejecutan en el CPU. La aplicación de PC funciona como terminal del Jugador 2.
