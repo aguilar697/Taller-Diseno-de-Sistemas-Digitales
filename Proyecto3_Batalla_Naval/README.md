@@ -18,3 +18,5 @@ El diseño utilizará un reloj principal de 100 MHz, VGA a 640 × 480 y 60 Hz, y
 - [Planteamiento del diseño](docs/diseno/README.md).
 - [Primer nivel: sistema y entorno](docs/diseno/nivel_1.md).
 - [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
+
+- [Tercer nivel: procesador RISC-V y ROM](docs/diseno/nivel_3_cpu.md).
