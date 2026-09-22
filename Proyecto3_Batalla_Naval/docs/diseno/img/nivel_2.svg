@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1230" viewBox="0 0 1600 1230">
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="1600" height="1230" fill="white"/>
+<text x="800.0" y="42.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#0F172A">BATALLA NAVAL · ARQUITECTURA INTERNA</text>
+<rect x="40" y="230" width="1520" height="760" rx="8" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="2"/>
+<text x="800.0" y="610.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A"></text>
+<text x="800.0" y="257.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#334155">FPGA BASYS 3</text>
+<rect x="70" y="100" width="350" height="80" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="245.0" y="127.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Programa en ensamblador</text>
+<text x="245.0" y="152.54" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Reglas de Batalla Naval</text>
+<polyline points="245,180 245,310" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<text x="365.0" y="205.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Inicialización de ROM</text>
+<rect x="70" y="310" width="350" height="110" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="245.0" y="352.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">ROM de instrucciones</text>
+<text x="245.0" y="377.53999999999996" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">8 KiB · 2048 palabras</text>
+<rect x="650" y="310" width="350" height="110" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="825.0" y="352.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">CPU RISC-V de 32 bits</text>
+<text x="825.0" y="377.53999999999996" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Multiciclo · sin pipeline</text>
+<polyline points="650,335 420,335" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="535.0" y="305.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">ProgAddress_o[31:0]</text>
+<polyline points="420,395 650,395" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="535.0" y="427.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">ProgIn_i[31:0]</text>
+<rect x="1180" y="310" width="330" height="110" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1345.0" y="352.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Relojes y reset</text>
+<text x="1345.0" y="377.53999999999996" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">PLL · sincronización</text>
+<rect x="1180" y="100" width="330" height="80" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1345.0" y="127.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Reloj de 100 MHz</text>
+<text x="1345.0" y="152.54" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Reset general</text>
+<polyline points="1345,180 1345,310" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1180,365 1000,365" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<text x="1090.0" y="330.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">clk_i / rst_i</text>
+<polyline points="755,420 755,545" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="585.0" y="476.28" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">DataAddress_o[31:0]</text>
+<text x="585.0" y="498.71999999999997" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">DataOut_o[31:0] · we_o</text>
+<polyline points="895,545 895,420" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1025.0" y="487.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">DataIn_i[31:0]</text>
+<rect x="85" y="545" width="1390" height="100" rx="8" fill="#E0F2FE" stroke="#0284C7" stroke-width="2"/>
+<text x="780.0" y="581.14" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0F172A">BUS DE DATOS</text>
+<text x="780.0" y="608.86" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" fill="#0F172A">Decodificación de direcciones · habilitación de escrituras · selección de lectura</text>
+<polyline points="210,645 210,780" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="287.5" y="697.6" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">Dirección / datos</text>
+<text x="287.5" y="717.4" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">y escritura</text>
+<rect x="85" y="780" width="250" height="130" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="210.0" y="832.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">RAM de datos</text>
+<text x="210.0" y="857.5400000000001" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">4 KiB · tableros y pila</text>
+<polyline points="495,645 495,780" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="572.5" y="697.6" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">Registros</text>
+<text x="572.5" y="717.4" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">de 32 bits</text>
+<rect x="370" y="780" width="250" height="130" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="495.0" y="832.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">UART</text>
+<text x="495.0" y="857.5400000000001" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Registros · RX / TX</text>
+<polyline points="780,645 780,780" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="857.5" y="697.6" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">Registros</text>
+<text x="857.5" y="717.4" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">de 32 bits</text>
+<rect x="655" y="780" width="250" height="130" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="780.0" y="819.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Entradas J1</text>
+<text x="780.0" y="845.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Sincronización</text>
+<text x="780.0" y="870.0799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">y antirrebote</text>
+<polyline points="1065,645 1065,780" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1142.5" y="697.6" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">Índice de tile</text>
+<text x="1142.5" y="717.4" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">Datos / escritura</text>
+<rect x="940" y="780" width="250" height="130" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="1065.0" y="819.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">VGA</text>
+<text x="1065.0" y="845.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Memoria dual-port</text>
+<text x="1065.0" y="870.0799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">y generación de video</text>
+<polyline points="1350,645 1350,780" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1427.5" y="697.6" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">Registros</text>
+<text x="1427.5" y="717.4" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">de 32 bits</text>
+<rect x="1225" y="780" width="250" height="130" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="1350.0" y="819.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Salidas</text>
+<text x="1350.0" y="845.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Displays · LED</text>
+<text x="1350.0" y="870.0799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">y buzzer</text>
+<polyline points="1510,400 1535,400 1535,945 1065,945 1065,910" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" stroke-dasharray="7 5"/>
+<text x="1205.0" y="962.6" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">Reloj de píxel</text>
+<text x="1205.0" y="982.4" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">y reset de video</text>
+<rect x="370" y="1040" width="250" height="85" rx="8" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+<text x="495.0" y="1070.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">PC · Jugador 2</text>
+<text x="495.0" y="1094.3799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">115200 baud · 8N1</text>
+<polyline points="495,910 495,1040" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="565.0" y="975.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">RX / TX</text>
+<rect x="655" y="1040" width="250" height="85" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="780.0" y="1060.06" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">Controles del J1</text>
+<text x="780.0" y="1082.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">Navegación · SEL · OK</text>
+<text x="780.0" y="1104.94" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">GAME_RST</text>
+<polyline points="780,1040 780,910" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="940" y="1040" width="250" height="85" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1065.0" y="1070.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Monitor VGA</text>
+<text x="1065.0" y="1094.3799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">640 × 480</text>
+<polyline points="1015,910 1015,1040" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1105.0" y="987.6" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">RGB / HSYNC</text>
+<text x="1105.0" y="1007.4" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">VSYNC</text>
+<rect x="1225" y="1040" width="250" height="85" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1350.0" y="1070.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Displays · LED</text>
+<text x="1350.0" y="1094.3799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Buzzer</text>
+<polyline points="1350,910 1350,1040" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="800.0" y="1168.78" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">Flechas dobles: solicitudes de acceso y retorno de lectura. Líneas discontinuas: inicialización o reloj/reset.</text>
+<text x="800.0" y="1191.22" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">Todos los bloques operan a 100 MHz, salvo el puerto de video y la generación de píxeles (~25 MHz).</text>
+</svg>

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="940" viewBox="0 0 1500 940">
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="1500" height="940" fill="white"/>
+<text x="750.0" y="45.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" fill="#0F172A">BATALLA NAVAL · SISTEMA Y ENTORNO</text>
+<text x="750.0" y="92.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#475569">Nivel 1 · Entradas y salidas del sistema digital</text>
+<rect x="535" y="230" width="400" height="440" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="735.0" y="358.92" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#0F172A">SISTEMA BATALLA NAVAL</text>
+<text x="735.0" y="389.28000000000003" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#0F172A"></text>
+<text x="735.0" y="419.64000000000004" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#0F172A">FPGA Basys 3</text>
+<text x="735.0" y="450.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#0F172A">Procesador RISC-V</text>
+<text x="735.0" y="480.36" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#0F172A"></text>
+<text x="735.0" y="510.72" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#0F172A">Ejecución de las reglas</text>
+<text x="735.0" y="541.08" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="23" fill="#0F172A">del juego en ensamblador</text>
+<rect x="40" y="160" width="260" height="85" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="170.0" y="202.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Reloj principal</text>
+<polyline points="300,202 475,202 475,250 535,250" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="415.0" y="170.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">100 MHz</text>
+<rect x="40" y="295" width="260" height="85" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="170.0" y="337.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Reset general</text>
+<polyline points="300,337 475,337 475,337 535,337" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="415.0" y="305.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">Reinicio de plataforma</text>
+<rect x="40" y="430" width="260" height="85" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="170.0" y="472.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Controles del Jugador 1</text>
+<polyline points="300,472 475,472 475,472 535,472" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="415.0" y="430.6" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">UP / DOWN / LEFT / RIGHT</text>
+<text x="415.0" y="450.40000000000003" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" fill="#475569">SEL / OK / GAME_RST</text>
+<rect x="40" y="640" width="260" height="100" rx="8" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+<text x="170.0" y="677.46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">PC · Jugador 2</text>
+<text x="170.0" y="702.5400000000001" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" fill="#0F172A">Terminal remota</text>
+<polyline points="300,665 400,665 400,590 535,590" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="420.0" y="565.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">RX · solicitudes</text>
+<polyline points="535,640 445,640 445,715 300,715" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="415.0" y="765.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">TX · respuestas</text>
+<rect x="1200" y="170" width="260" height="90" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1330.0" y="215.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Monitor VGA</text>
+<polyline points="935,270 1100,270 1100,215 1200,215" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1070.0" y="185.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">RGB · HSYNC · VSYNC</text>
+<rect x="1200" y="345" width="260" height="90" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1330.0" y="390.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Displays de 7 segmentos</text>
+<polyline points="935,390 1100,390 1100,390 1200,390" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1070.0" y="360.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Segmentos y dígitos</text>
+<rect x="1200" y="520" width="260" height="90" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1330.0" y="565.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">LED de estado</text>
+<polyline points="935,565 1100,565 1100,565 1200,565" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1070.0" y="535.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Fase de la partida</text>
+<rect x="1200" y="695" width="260" height="90" rx="8" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1330.0" y="740.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Buzzer</text>
+<polyline points="935,630 1100,630 1100,740 1200,740" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1015.0" y="684.44" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Señal de</text>
+<text x="1015.0" y="705.5600000000001" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">excitación</text>
+<text x="750.0" y="861.28" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">UART: 115200 baud · 8N1     |     VGA: 640 × 480 · 60 Hz nominal</text>
+<text x="750.0" y="883.72" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#475569">GAME_RST inicia otra partida y conserva las victorias; el reset general reinicia la plataforma.</text>
+</svg>
