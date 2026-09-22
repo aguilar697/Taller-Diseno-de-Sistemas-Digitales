@@ -6,7 +6,7 @@ El diseño se organiza mediante descomposición modular: el primer nivel present
 
 - [Primer nivel: sistema, entradas y salidas](nivel_1.md).
 - [Segundo nivel: procesador, memorias y periféricos](nivel_2.md).
-
+- [Subsistema 2: VGA y entradas del Jugador 1](subsistema_2_nivel_2.md).
 Cada nivel presenta el diagrama correspondiente y desarrolla su objetivo, interfaces y funcionamiento.
 
 ## Organización
@@ -16,3 +16,4 @@ La plataforma contiene CPU RISC-V, ROM, RAM, bus de datos y periféricos de vide
 Las fuentes se distribuyen por bloque en `src/design/`, las pruebas en `src/testbench/`, el programa ensamblador en `src/software_riscv/` y la aplicación remota en `src/software_pc/`.
 
 [Descripción del proyecto](../../README.md)
+
