@@ -1,4 +1,4 @@
-﻿# Tercer nivel — Procesador RISC-V y ROM
+# Tercer nivel — Procesador RISC-V y ROM
 
 ## Objetivo y alcance
 
@@ -142,4 +142,4 @@ Los testbenches deben comparar contra valores esperados independientes, acumular
 
 Posteriormente, la integración comprueba el enlace con la RAM y periféricos reales. El análisis temporal y la simulación posterior a implementación complementan la simulación funcional; sus resultados se documentarán en el informe con las evidencias obtenidas.
 
-[Segundo nivel: arquitectura del sistema](nivel_2.md) · [Índice del diseño](README.md)
+[Cuarto nivel: desarrollo del CPU y ROM](nivel_4_cpu.md) · [Segundo nivel: arquitectura del sistema](nivel_2.md) · [Índice del diseño](README.md)

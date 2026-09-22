@@ -12,6 +12,7 @@ Cada nivel presenta el diagrama correspondiente y desarrolla su objetivo, interf
 ## Subsistemas
 
 - [Tercer nivel: procesador RISC-V y ROM](nivel_3_cpu.md).
+- [Cuarto nivel: datapath, ROM y control del CPU](nivel_4_cpu.md).
 
 ## Organización
 
