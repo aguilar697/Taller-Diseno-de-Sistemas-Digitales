@@ -6,13 +6,14 @@ El diseño se organiza mediante descomposición modular: el primer nivel present
 
 - [Primer nivel: sistema, entradas y salidas](nivel_1.md).
 - [Segundo nivel: procesador, memorias y periféricos](nivel_2.md).
-- [Subsistema 2: VGA y entradas del Jugador 1](subsistema_2_nivel_2.md).
 
 Cada nivel presenta el diagrama correspondiente y desarrolla su objetivo, interfaces y funcionamiento.
 
 ## Subsistemas
 
 - [Tercer nivel: procesador RISC-V y ROM](nivel_3_cpu.md).
+- [Segundo nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_2.md).
+- [Tercer nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_3.md).
 
 ## Organización
 
