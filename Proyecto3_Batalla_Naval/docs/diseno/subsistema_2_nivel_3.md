@@ -1,360 +1,175 @@
 # Tercer nivel — Subsistema 2: VGA y entradas del Jugador 1
 
-## Responsable
-
-**Kenneth Campos — Subsistema 2: VGA + entradas del Jugador 1**
-
 ## Objetivo
 
-Descomponer el Subsistema 2 en bloques internos suficientemente definidos para implementar y verificar en SystemVerilog la generación VGA, la memoria de video, el renderizado basado en tiles y el periférico de entradas físicas del Jugador 1.
+Descomponer el Subsistema 2 en los bloques responsables de la generación de video VGA, la memoria de video, el reloj de píxel y el acondicionamiento de las entradas físicas del Jugador 1.
 
-Este nivel mantiene la separación arquitectónica del proyecto: el hardware del Subsistema 2 únicamente presenta información y captura entradas. Las reglas de Batalla Naval, incluyendo colocación, validación de disparos, turnos, impactos, hundimientos, victoria y reinicio de partida, permanecen en el programa ensamblador ejecutado por el procesador RISC-V.
+El subsistema funciona únicamente como interfaz gráfica y de entrada. Las reglas de Batalla Naval no se implementan en este hardware: la colocación de barcos, validación de disparos, detección de impactos, hundimientos, turnos y victoria se resuelven en el programa ensamblador ejecutado por el procesador RISC-V.
 
 ## Diagrama del subsistema
 
-![Diagrama de tercer nivel del Subsistema 2](img/vga_entradas/subsistema_2_nivel_3.svg)
+![Diagrama de Tercer nivel del Subsistema 2](img/vga_entradas/subsistema_2_nivel_3.svg)
 
-**Figura 1. Tercer nivel del Subsistema 2: VGA y entradas del Jugador 1.**
+**Figura 1. Tercer nivel del Subsistema 2: interfaz local del Jugador 1.**
 
-Las conexiones continuas representan rutas funcionales de datos y control. Las conexiones discontinuas representan distribución de reloj y reset entre los dominios de 100 MHz y 25 MHz.
+Las flechas continuas representan conexiones funcionales de datos y control. Las líneas discontinuas representan la distribución de reloj y reset. El puerto CPU de la memoria de video y el periférico de entradas operan en el dominio principal de 100 MHz, mientras que el controlador VGA, el puerto de lectura de video y el renderer trabajan en el dominio de píxel de 25 MHz.
 
-## Descomposición de tercer nivel
+## Función de los bloques
 
-| Bloque de segundo nivel | Bloques internos de tercer nivel |
+| Bloque | Función e intercambio principal |
 |---|---|
-| 2.1 Clock / PLL + Pixel Reset | PLL, sincronización del reset de píxel |
-| 2.2 VGA Timing Controller | contadores horizontal/vertical, decodificación de sincronismos y video activo |
-| 2.3 Video Memory Dual-Port | puerto CPU, BRAM de video, puerto VGA |
-| 2.4 Tile / Glyph Renderer | mapeo píxel→tile, decodificador de palabra, Glyph ROM, selección RGB |
-| 2.5 Player 1 Input Peripheral | sincronización de entradas, debouncing, empaquetado de estado, lectura MMIO |
-
----
-
-## 2.1 Clock / PLL + Pixel Reset
-
-### 2.1.1 PLL / Clocking Wizard
-
-Recibe el reloj principal de la Basys 3 y genera el reloj utilizado por el dominio VGA.
-
-**Entradas**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `clk_100_i` | 1 | reloj principal de 100 MHz |
-| `rst_i` | 1 | reset general del sistema |
-
-**Salidas**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `clk_pixel_25` | 1 | reloj de píxel de 25 MHz |
-| `locked` | 1 | indica que el PLL alcanzó una condición estable |
-
-La única fuente externa de reloj del sistema es `clk_100_i`. El reloj de 25 MHz se deriva internamente mediante PLL.
-
-### 2.1.2 Pixel Reset Synchronizer
-
-Genera el reset utilizado por los bloques que trabajan en el dominio `clk_pixel_25`.
-
-**Entradas**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `clk_pixel_25` | 1 | reloj del dominio de píxel |
-| `rst_i` | 1 | reset general |
-| `locked` | 1 | estado del PLL |
-
-**Salida**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `rst_pixel` | 1 | reset sincronizado para el dominio VGA |
-
-La liberación de `rst_pixel` se sincroniza con `clk_pixel_25`, evitando una desactivación asíncrona del reset dentro del dominio de video.
-
----
-
-## 2.2 VGA Timing Controller
-
-El controlador de temporización produce las coordenadas del píxel actual, la indicación de región visible y los sincronismos necesarios para una salida de **640 × 480 a 60 Hz**.
-
-### 2.2.1 Contadores horizontal y vertical
-
-Los contadores recorren la temporización completa del cuadro VGA.
-
-**Entradas**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `clk_pixel_25` | 1 | reloj de píxel |
-| `rst_pixel` | 1 | reset del dominio VGA |
-
-**Salidas**
-
-| Señal | Descripción |
-|---|---|
-| `pixel_x` | coordenada horizontal asociada al píxel actual |
-| `pixel_y` | coordenada vertical asociada al píxel actual |
-| `line_end` | indica fin del periodo horizontal |
-
-Las constantes de temporización horizontal y vertical se implementan como parámetros/localparams del módulo VGA.
-
-### 2.2.2 Sync / Active Decoder
-
-Decodifica los contadores para identificar la región visible y generar los sincronismos.
-
-**Entradas**
-
-| Señal | Descripción |
-|---|---|
-| contadores H/V | posición actual dentro del cuadro |
-
-**Salidas**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `active_video` | 1 | indica que el píxel pertenece al área visible |
-| `VGA_HSYNC` | 1 | sincronismo horizontal |
-| `VGA_VSYNC` | 1 | sincronismo vertical |
-| `pixel_x` | — | coordenada entregada al renderer |
-| `pixel_y` | — | coordenada entregada al renderer |
-
-`VGA_HSYNC` y `VGA_VSYNC` se conectan directamente a la interfaz física VGA; las coordenadas y `active_video` se entregan al renderer.
-
----
-
-## 2.3 Video Memory Dual-Port
-
-La memoria de video se implementa como una memoria de doble puerto de **512 palabras × 32 bits**.
-
-### Organización
-
-- Índices `0–299`: tiles visibles.
-- Índices `300–511`: región reservada.
-- Puerto A: CPU, dominio de 100 MHz.
-- Puerto B: VGA, dominio de 25 MHz.
-
-### 2.3.1 Puerto A — CPU
-
-Permite al procesador actualizar o consultar una posición de la memoria de video.
-
-**Entradas**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `clk_100_i` | 1 | reloj del sistema |
-| `rst_i` | 1 | reset del sistema |
-| `vga_write_enable_i` | 1 | habilitación de escritura |
-| `vga_addr_i` | 9 | índice local de memoria VGA |
-| `vga_wdata_i` | 32 | palabra a escribir |
-
-**Salida**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `vga_rdata_o` | 32 | palabra leída por el CPU |
-
-La lectura y escritura del puerto CPU son síncronas. Las escrituras dirigidas a índices `300–511` se ignoran y las lecturas de esa región retornan cero.
-
-### 2.3.2 Memoria BRAM
-
-La BRAM contiene el mapa de tiles empleado por la interfaz gráfica.
-
-El bus del sistema convierte la dirección absoluta del CPU en un índice local:
-
-```text
-tile_index = (DataAddress - VGA_BASE) >> 2
-```
-
-con:
-
-```text
-VGA_BASE = 0x00011000
-```
-
-La región VGA del mapa de memoria es:
-
-```text
-0x00011000 – 0x000117FF
-```
-
-### 2.3.3 Puerto B — VGA
-
-Proporciona al renderer la palabra correspondiente al tile visible en el píxel actual.
-
-**Entradas**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `clk_pixel_25` | 1 | reloj de píxel |
-| `tile_addr` | 9 | índice solicitado por el renderer |
-
-**Salida**
-
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `tile_word` | 32 | palabra del tile leído |
-
-La lectura es síncrona, por lo que el renderer debe alinear sus señales de control y coordenadas con la latencia de lectura de la memoria.
-
----
-
-## 2.4 Tile / Glyph Renderer
-
-El renderer transforma la posición del píxel y la palabra almacenada en memoria en el color enviado al monitor.
-
-### 2.4.1 Pixel → Tile Mapper
-
-La pantalla se divide en:
-
-```text
-20 columnas × 15 filas
-```
-
-con tiles de:
-
-```text
-32 × 32 píxeles
-```
-
-por lo que:
+| Clock / PLL + Pixel Reset | Recibir el reloj principal de 100 MHz, generar `clk_pixel_25` y acondicionar la liberación de `rst_pixel` |
+| VGA Timing Controller | Generar los contadores horizontal y vertical, `HSYNC`, `VSYNC`, `active_video`, `pixel_x` y `pixel_y` |
+| Video Memory Dual-Port | Permitir acceso de lectura/escritura desde el CPU a 100 MHz y lectura simultánea desde la lógica VGA a 25 MHz |
+| Tile / Glyph Renderer | Transformar coordenadas de píxel en índices de tile, interpretar la palabra de video y producir la salida RGB |
+| Player 1 Input Peripheral | Sincronizar y filtrar las entradas físicas del Jugador 1 y exponer su estado al CPU mediante MMIO |
+
+## Interfaces principales
+
+| Conexión | Señales | Convención |
+|---|---|---|
+| Sistema → Clock/PLL | `clk_100_i`, `rst_i` | Reloj principal y reset del sistema |
+| Clock/PLL → VGA Timing | `clk_pixel_25`, `rst_pixel` | Reloj y reset del dominio de píxel |
+| Clock/PLL → Video Memory | `clk_pixel_25` | Reloj del puerto de lectura VGA |
+| Clock/PLL → Renderer | `clk_pixel_25`, `rst_pixel` | Temporización del renderer |
+| VGA Timing → Renderer | `pixel_x`, `pixel_y`, `active_video` | Coordenadas y validez del píxel actual |
+| VGA Timing → Monitor | `VGA_HSYNC`, `VGA_VSYNC` | Sincronismos físicos VGA |
+| Renderer → Video Memory | `tile_addr[8:0]` | Índice local del tile solicitado |
+| Video Memory → Renderer | `tile_word[31:0]` | Palabra de video del tile leído |
+| Renderer → Monitor | `VGA_RGB` | Información de color |
+| Bus/MMIO → Video Memory | `vga_write_enable_i`, `vga_addr_i[8:0]`, `vga_wdata_i[31:0]` | Acceso del CPU a la memoria VGA |
+| Video Memory → Bus/CPU | `vga_rdata_o[31:0]` | Dato leído desde memoria VGA |
+| Bus/MMIO → Entradas J1 | `input_write_enable_i`, `input_addr_i[1:0]`, `input_wdata_i[31:0]` | Interfaz estándar del periférico |
+| Entradas físicas → Entradas J1 | `UP`, `DOWN`, `LEFT`, `RIGHT`, `SEL`, `OK`, `GAME_RST` | Controles físicos del Jugador 1 |
+| Entradas J1 → Bus/CPU | `input_rdata_o[31:0]` | Estado filtrado de los controles |
+
+## Organización del video
+
+La salida VGA utiliza una resolución activa de **640 × 480 píxeles a 60 Hz**. El reloj de píxel es de **25 MHz**, generado a partir del reloj principal de **100 MHz**.
+
+La pantalla se organiza en una cuadrícula de:
+
+- 20 columnas;
+- 15 filas;
+- tiles de 32 × 32 píxeles.
+
+Por tanto:
 
 ```text
 20 × 32 = 640
 15 × 32 = 480
 ```
 
-Para cada píxel visible:
+Cada tile se almacena en una palabra de 32 bits.
+
+La dirección absoluta utilizada por el CPU para acceder a un tile es:
 
 ```text
-columna = pixel_x >> 5
-fila    = pixel_y >> 5
-tile_index = fila*20 + columna
+VGA_BASE + 4*(fila*20 + columna)
 ```
 
-**Entradas**
+donde:
 
-| Señal | Descripción |
+```text
+VGA_BASE = 0x00011000
+```
+
+El rango reservado para VGA es:
+
+```text
+0x00011000 – 0x000117FF
+```
+
+El bus entrega al subsistema un índice local de 9 bits:
+
+```text
+tile_index = (DataAddress - VGA_BASE) >> 2
+```
+
+Los índices `0–299` corresponden a los 300 tiles visibles. Los índices `300–511` quedan reservados.
+
+## Distribución gráfica acordada
+
+| Región | Ubicación |
 |---|---|
-| `pixel_x` | coordenada horizontal |
-| `pixel_y` | coordenada vertical |
-| `active_video` | habilitación de región visible |
+| HUD / títulos | Filas 0–3 |
+| Tablero propio | Columnas 1–8, filas 4–11 |
+| Tablero rival | Columnas 11–18, filas 4–11 |
+| Mensajes | Filas 12–14 |
 
-**Salidas**
+La memoria VGA no decide qué información debe ocultarse o mostrarse. El programa RISC-V escribe únicamente la representación visual permitida para cada jugador.
 
-| Señal | Ancho | Descripción |
-|---|---:|---|
-| `tile_addr` | 9 | dirección del tile solicitado |
-| posición interna | — | posición del píxel dentro del tile |
+## Formato de palabra VGA
 
-### 2.4.2 Tile Word Decoder
+Cada tile utiliza una palabra de 32 bits:
 
-Interpreta la palabra de 32 bits almacenada en la memoria VGA.
-
-| Bits | Campo |
-|---|---|
-| `[2:0]` | `COLOR` |
-| `[3]` | `GLYPH_ENABLE` |
-| `[11:4]` | `ASCII/GLYPH` |
-| `[31:12]` | reservado, escrito como cero |
+| Bits | Campo | Función |
+|---:|---|---|
+| `[2:0]` | `COLOR` | Selección del color base |
+| `[3]` | `GLYPH_ENABLE` | Habilita la representación de un carácter o símbolo |
+| `[11:4]` | `GLYPH/ASCII` | Código del carácter |
+| `[31:12]` | Reservado | Reservado para ampliaciones; se mantiene en cero |
 
 Codificación de color acordada:
 
-| Código | Uso |
+| Código | Significado |
 |---:|---|
-| 0 | fondo |
-| 1 | agua |
-| 2 | barco propio |
-| 3 | impacto |
-| 4 | fallo |
-| 5 | cursor |
+| 0 | Fondo |
+| 1 | Agua |
+| 2 | Barco propio |
+| 3 | Impacto |
+| 4 | Fallo |
+| 5 | Cursor |
 | 6 | HUD / acento |
-| 7 | reservado |
+| 7 | Reservado |
 
-### 2.4.3 Glyph ROM
+El renderer debe soportar como mínimo espacio, `A–Z`, `0–9`, guion, dos puntos y punto. Los códigos no implementados se representan como espacio.
 
-Genera el bit gráfico correspondiente al carácter seleccionado cuando `GLYPH_ENABLE = 1`.
+## Memoria de video y dominios de reloj
 
-El conjunto mínimo soportado es:
+La memoria VGA es de doble puerto.
 
-- espacio;
-- `A–Z`;
-- `0–9`;
-- guion;
-- dos puntos;
-- punto.
+### Puerto A — CPU
 
-Un código no soportado se representa como espacio.
+- reloj: `clk_100_i`;
+- lectura y escritura;
+- dirección local de 9 bits;
+- palabra de 32 bits.
 
-### 2.4.4 RGB Mux / Pipeline
+### Puerto B — VGA
 
-Selecciona entre el color base del tile y el píxel del glyph, respetando `active_video`.
+- reloj: `clk_pixel_25`;
+- lectura síncrona;
+- solo lectura;
+- entrega `tile_word[31:0]` al renderer.
 
-**Entradas principales**
+De esta manera, el CPU puede actualizar la memoria de video sin detener la generación continua de la imagen VGA.
 
-- `active_video`;
-- `COLOR`;
-- `GLYPH_ENABLE`;
-- bit de la Glyph ROM;
-- posición interna dentro del tile.
+La lectura síncrona del puerto de video introduce latencia. La alineación entre coordenadas, dato leído y señales de sincronismo se resolverá en el detalle de cuarto nivel y en la implementación.
 
-**Salida**
+## Periférico de entradas del Jugador 1
 
-| Señal | Descripción |
+El periférico de entradas se encuentra en:
+
+```text
+0x00010120
+```
+
+Las entradas físicas asignadas son:
+
+| Entrada física | Función lógica |
 |---|---|
-| `VGA_RGB` | información RGB entregada al monitor |
+| Botón UP | `UP` |
+| Botón DOWN | `DOWN` |
+| Botón LEFT | `LEFT` |
+| Botón RIGHT | `RIGHT` |
+| Botón central | `GAME_RST` |
+| `SW0` | `SEL` |
+| `SW1` | `OK` |
 
-Durante la región no visible, la salida RGB se fuerza al nivel de fondo definido por la implementación.
+Todas las entradas deben pasar por sincronización y debouncing antes de llegar al registro visible por software.
 
----
-
-## 2.5 Player 1 Input Peripheral
-
-Este periférico captura los controles físicos del Jugador 1 y entrega al CPU únicamente señales sincronizadas y filtradas.
-
-Entradas físicas:
-
-```text
-UP
-DOWN
-LEFT
-RIGHT
-SEL
-OK
-GAME_RST
-```
-
-### 2.5.1 Synchronizers ×7
-
-Cada señal física atraviesa un sincronizador para ingresar de forma segura al dominio de `clk_100_i`.
-
-**Entradas**
-
-- siete controles físicos;
-- `clk_100_i`;
-- `rst_i`.
-
-**Salida**
-
-```text
-sync_levels[6:0]
-```
-
-### 2.5.2 Debouncers ×7
-
-Cada entrada sincronizada se filtra de forma independiente para eliminar rebotes mecánicos.
-
-**Salida**
-
-```text
-clean_levels[6:0]
-```
-
-Las señales filtradas son niveles activos en alto. El hardware no implementa auto-repeat.
-
-### 2.5.3 Status Packer
-
-Empaqueta los siete controles en el registro de estado:
+El registro de estado utiliza:
 
 | Bit | Entrada |
 |---:|---|
@@ -365,133 +180,69 @@ Empaqueta los siete controles en el registro de estado:
 | 4 | `SEL` |
 | 5 | `OK` |
 | 6 | `GAME_RST` |
-| 31:7 | cero |
+| `[31:7]` | `0` |
 
-`GAME_RST` no corresponde al reset físico del FPGA. Es una entrada que el software interpreta como solicitud de reinicio de partida.
+Las escrituras MMIO al periférico de entradas se ignoran. Las lecturas entregan el estado filtrado actual.
 
-### 2.5.4 MMIO Read Interface
-
-El registro de entradas está mapeado en:
-
-```text
-0x00010120
-```
-
-**Interfaz**
-
-| Señal | Ancho | Dirección |
-|---|---:|---|
-| `input_write_enable_i` | 1 | Bus → periférico |
-| `input_addr_i` | 2 | Bus → periférico |
-| `input_wdata_i` | 32 | Bus → periférico |
-| `input_rdata_o` | 32 | periférico → Bus/CPU |
-
-Las escrituras se ignoran. El CPU consulta el registro de estado y el programa ensamblador detecta los cambios o flancos necesarios para la interacción del juego.
-
----
+`GAME_RST` no es el reset general del hardware. Es únicamente una entrada de usuario que el software interpreta como solicitud de reinicio de partida.
 
 ## Dominios de reloj
 
-| Dominio | Bloques |
-|---|---|
-| 100 MHz | puerto CPU de VRAM, sincronizadores, debouncers, empaquetado y MMIO de entradas |
-| 25 MHz | VGA Timing Controller, puerto VGA de VRAM, Tile/Glyph Renderer |
+| Dominio | Frecuencia | Bloques |
+|---|---:|---|
+| Sistema | 100 MHz | Puerto CPU de Video Memory, Player 1 Input Peripheral |
+| VGA | 25 MHz | VGA Timing Controller, puerto VGA de Video Memory, Tile / Glyph Renderer |
 
-No se utiliza el reloj de píxel como reloj de entrada externo. Se deriva internamente del reloj principal de 100 MHz.
+La memoria dual-port constituye la frontera principal entre ambos dominios.
 
----
+El reset general `rst_i` pertenece al dominio de 100 MHz. Para el dominio VGA se utiliza `rst_pixel`, cuya liberación se sincroniza con `clk_pixel_25`.
 
 ## Límites de responsabilidad
 
-El Subsistema 2:
+El Subsistema 2 no implementa:
 
-**Sí realiza**
-
-- generación de reloj de píxel;
-- temporización VGA;
-- almacenamiento y lectura del mapa de tiles;
-- conversión de tiles/glyphs a RGB;
-- sincronización y debounce de entradas;
-- exposición MMIO de controles.
-
-**No realiza**
-
-- colocación o validación de barcos;
+- validación de colocación de barcos;
 - control de turnos;
-- validación de disparos;
-- detección de impacto, hundimiento o victoria;
-- reglas de reinicio de partida;
-- lógica del Jugador 2.
+- determinación de impacto o fallo;
+- detección de barco hundido;
+- detección de victoria;
+- lógica de ocultamiento del tablero rival;
+- contadores de victorias;
+- reglas de reinicio de partida.
 
-Todas esas decisiones corresponden al programa RISC-V.
+Estas decisiones corresponden al programa de Batalla Naval ejecutado por el procesador RISC-V.
 
----
+El Subsistema 2 únicamente:
 
-## Verificación prevista
+1. genera la imagen VGA solicitada por el software;
+2. almacena la representación gráfica en memoria de video;
+3. genera los sincronismos físicos del monitor;
+4. acondiciona y entrega al CPU las entradas del Jugador 1.
 
-Los bloques se verificarán mediante testbenches autoverificables.
-
-### VGA Timing Controller
-
-Se comprobará:
-
-- periodicidad de los contadores;
-- generación de `HSYNC` y `VSYNC`;
-- delimitación de `active_video`;
-- reinicio correcto.
-
-### Video Memory Dual-Port
-
-Se comprobará:
-
-- escritura y lectura del puerto CPU;
-- lectura del puerto VGA;
-- índices visibles;
-- comportamiento de `300–511`;
-- operación con ambos relojes.
-
-### Tile / Glyph Renderer
-
-Se comprobará:
-
-- cálculo de `tile_addr`;
-- decodificación de `tile_word`;
-- colores;
-- habilitación de glyph;
-- blanking fuera de `active_video`;
-- alineamiento de la latencia de memoria.
-
-### Player 1 Input Peripheral
-
-Se comprobará:
-
-- sincronización de las siete entradas;
-- eliminación de rebotes;
-- empaquetado correcto de bits;
-- lectura MMIO;
-- escrituras ignoradas.
-
----
-
-## Archivos RTL previstos
+## Ubicación prevista en el repositorio
 
 ```text
-src/design/vga/
-├── pixel_clock.sv
-├── pixel_reset_sync.sv
-├── vga_timing.sv
-├── video_memory.sv
-├── tile_renderer.sv
-└── glyph_rom.sv
-
-src/design/inputs/
-├── input_sync.sv
-├── debounce.sv
-└── player1_inputs.sv
+Proyecto3_Batalla_Naval/
+├── docs/
+│   └── diseno/
+│       ├── subsistema_2_nivel_3.md
+│       └── img/
+│           └── vga_entradas/
+│               └── subsistema_2_nivel_3.svg
+└── src/
+    ├── design/
+    │   ├── vga/
+    │   └── inputs/
+    └── testbench/
 ```
 
-La división exacta de archivos puede ajustarse durante la implementación siempre que se preserve la interfaz y responsabilidad descritas en este documento.
+## Referencias de integración
 
-## Relación con el issue
+- El mapa de memoria global reserva `0x00011000–0x000117FF` para VGA.
+- El registro de entradas J1 se ubica en `0x00010120`.
+- El bus entrega al VGA un índice local de 9 bits.
+- El reloj principal es de 100 MHz.
+- El reloj de píxel es de 25 MHz.
+- La lógica del juego se mantiene exclusivamente en software RISC-V.
 
-Esta documentación corresponde al trabajo definido en el **issue #25 — Proyecto 3: Subsistema 2, VGA + entradas**. El issue debe permanecer abierto hasta completar la implementación RTL y los testbenches autoverificables.
+[Segundo nivel global: arquitectura e interconexiones](nivel_2.md) · [Índice del diseño](README.md)
