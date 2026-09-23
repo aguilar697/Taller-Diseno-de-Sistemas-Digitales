@@ -13,6 +13,8 @@ Cada nivel presenta el diagrama correspondiente y desarrolla su objetivo, interf
 
 - [Tercer nivel: procesador RISC-V y ROM](nivel_3_cpu.md).
 - [Cuarto nivel: datapath, ROM y control del CPU](nivel_4_cpu.md).
+- [Tercer nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_3.md).
+- [Cuarto nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_4.md).
 
 ## Organización
 
