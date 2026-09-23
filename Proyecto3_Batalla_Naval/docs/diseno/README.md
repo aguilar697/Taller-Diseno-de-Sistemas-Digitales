@@ -12,8 +12,9 @@ Cada nivel presenta el diagrama correspondiente y desarrolla su objetivo, interf
 ## Subsistemas
 
 - [Tercer nivel: procesador RISC-V y ROM](nivel_3_cpu.md).
-- [Segundo nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_2.md).
+- [Cuarto nivel: datapath, ROM y control del CPU](nivel_4_cpu.md).
 - [Tercer nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_3.md).
+- [Cuarto nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_4.md).
 
 ## Organización
 
@@ -22,4 +23,3 @@ La plataforma contiene CPU RISC-V, ROM, RAM, bus de datos y periféricos de vide
 Las fuentes se distribuyen por bloque en `src/design/`, las pruebas en `src/testbench/`, el programa ensamblador en `src/software_riscv/` y la aplicación remota en `src/software_pc/`.
 
 [Descripción del proyecto](../../README.md)
-

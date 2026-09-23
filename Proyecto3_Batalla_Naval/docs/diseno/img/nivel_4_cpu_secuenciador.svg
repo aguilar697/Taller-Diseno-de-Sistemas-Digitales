@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1160" viewBox="0 0 1600 1160">
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="1600" height="1160" fill="white"/>
+<text x="800.0" y="42.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="27" fill="#0F172A">CPU · BÚSQUEDA Y SECUENCIAMIENTO</text>
+<text x="800.0" y="92.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#475569">Nivel 4 · Registros, sumadores, selección de PC y lectura síncrona de ROM</text>
+<rect x="70" y="190" width="240" height="100" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="190.0" y="216.24" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">pc_q [31:0]</text>
+<text x="190.0" y="240.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">D = next_pc_q</text>
+<text x="190.0" y="263.76" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">EN = pc_en</text>
+<rect x="70" y="125" width="240" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="190.0" y="143.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">next_pc_q [31:0]</text>
+<polyline points="190,161 190,190" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="310,240 510,240" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="410.0" y="207.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">ProgAddress_o</text>
+<rect x="510" y="185" width="370" height="110" rx="8" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+<text x="695.0" y="216.24" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">ROM · 2048 × 32</text>
+<text x="695.0" y="240.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">índice = pc_q[12:2]</text>
+<text x="695.0" y="263.76" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">salida registrada en clk_i</text>
+<polyline points="880,240 1100,240" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="990.0" y="207.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">ProgIn_i [31:0]</text>
+<rect x="1100" y="190" width="360" height="100" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="1280.0" y="228.12" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">ir_q [31:0]</text>
+<text x="1280.0" y="251.88" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">EN = ir_en</text>
+<rect x="1140" y="345" width="280" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="1280.0" y="363.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">IR: opcode / rs1 / rs2 / rd</text>
+<polyline points="1280,290 1280,345" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="70" y="395" width="340" height="100" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="240.0" y="433.12" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">instruction_pc_q [31:0]</text>
+<text x="240.0" y="456.88" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">D = pc_q · EN = ir_en</text>
+<polyline points="190,290 190,395" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="295.0" y="342.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">pc_q [31:0]</text>
+<rect x="510" y="350" width="370" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="695.0" y="368.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">Control: FETCH_REQ → FETCH_CAPTURE</text>
+<rect x="510" y="410" width="370" height="85" rx="8" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="695.0" y="430.06" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">Dirección válida</text>
+<text x="695.0" y="452.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">pc_q[31:13] = 0</text>
+<text x="695.0" y="474.94" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" fill="#0F172A">pc_q[1:0] = 00</text>
+<text x="695.0" y="524.44" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Comprobación antes de aceptar la instrucción.</text>
+<text x="695.0" y="545.5600000000001" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Una dirección inválida conduce a FAULT.</text>
+<rect x="80" y="610" width="300" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="230.0" y="628.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">instruction_pc_q [31:0]</text>
+<polyline points="230,646 230,700" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="80" y="700" width="300" height="80" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="230.0" y="728.12" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Sumador de 32 bits</text>
+<text x="230.0" y="751.88" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">instruction_pc_q + 4</text>
+<polyline points="230,780 230,855" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="80" y="855" width="300" height="100" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="230.0" y="881.24" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">link_q [31:0]</text>
+<text x="230.0" y="905.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">D = PC + 4</text>
+<text x="230.0" y="928.76" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">EN = execute_en</text>
+<rect x="510" y="610" width="330" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="675.0" y="628.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">PC [31:0] · immediate [31:0]</text>
+<polyline points="675,646 675,700" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="510" y="700" width="330" height="80" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="675.0" y="728.12" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Destino B / J</text>
+<text x="675.0" y="751.88" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Sumador de 32 bits</text>
+<rect x="1070" y="610" width="390" height="36" rx="8" fill="#FFF7ED" stroke="#EA580C" stroke-width="2"/>
+<text x="1265.0" y="628.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#0F172A">alu_result_comb = A + immediate</text>
+<polyline points="1265,646 1265,700" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="1070" y="700" width="390" height="80" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="1265.0" y="728.12" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">Destino JALR</text>
+<text x="1265.0" y="751.88" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">alu_result_comb &amp; 0xFFFFFFFE</text>
+<rect x="520" y="880" width="440" height="115" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="740.0" y="913.74" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">MUX · próxima dirección</text>
+<text x="740.0" y="937.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">0: PC + 4</text>
+<text x="740.0" y="961.26" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">1: destino B / J · 2: destino JALR</text>
+<polyline points="380,740 440,740 440,910 520,910" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="480.0" y="847.5" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" fill="#475569">PC + 4</text>
+<polyline points="675,780 675,880" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<polyline points="1265,780 1265,935 960,935" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="1155.0" y="880.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Destino JALR</text>
+<rect x="1090" y="1000" width="370" height="95" rx="8" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="1275.0" y="1035.62" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">next_pc_q [31:0]</text>
+<text x="1275.0" y="1059.3799999999999" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="#0F172A">EN = execute_en</text>
+<polyline points="960,970 1030,970 1030,1045 1090,1045" fill="none" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+<text x="745.0" y="1033.88" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Selección: JALR → 2; JAL o branch_taken → 1;</text>
+<text x="745.0" y="1055.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">resto → 0. Validar destino antes de efectos.</text>
+<text x="745.0" y="1076.1200000000001" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">COMMIT habilita pc_q.</text>
+<text x="800.0" y="1125.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" fill="#475569">Reset: registros a cero. La ROM no se borra. link_q alimenta el retorno de JAL/JALR en la lámina de ejecución.</text>
+</svg>
