@@ -4,7 +4,7 @@
 
 El subsistema ejecuta el programa de Batalla Naval mediante un procesador de 32 bits y una ROM de instrucciones independiente del bus de datos. Su responsabilidad comprende búsqueda, decodificación y ejecución de instrucciones, cálculo de direcciones y operaciones de lectura y escritura. La RAM, el decoder y los periféricos pertenecen a la plataforma externa al CPU; las reglas del juego pertenecen al programa ensamblador.
 
-El diseño plantea una arquitectura multiciclo sin pipeline, con reloj de 100 MHz y reset síncrono activo alto. Se conserva la interfaz del segundo nivel. Este documento especifica el diseño previsto; no presenta resultados de implementación ni de simulación.
+El diseño utiliza una arquitectura multiciclo sin pipeline, con reloj de 100 MHz y reset síncrono activo alto. Se conserva la interfaz del segundo nivel. Este documento describe la arquitectura del subsistema; los resultados de simulación y análisis temporal se documentan por separado en el informe.
 
 ## Diagrama funcional
 
@@ -29,11 +29,11 @@ El secuenciador proporciona también el PC de la instrucción y PC + 4 a la ruta
 
 No se añaden señales de espera ni de confirmación. La plataforma debe cumplir la latencia fija acordada. Fuera de un acceso de datos, el núcleo presenta dirección cero y `we_o=0`; por tanto, la plataforma no debe atribuir efectos secundarios a esas lecturas. Durante reset se inhiben las escrituras externas.
 
-## Bloques y estructura modular prevista
+## Bloques y estructura modular
 
-| Módulo previsto | Función |
+| Módulo | Función |
 |---|---|
-| cpu.sv | Integración del núcleo y conservación de la interfaz externa |
+| cpu.sv | Integración del núcleo, registro de controles en DECODE y conservación de la interfaz externa |
 | cpu_control.sv | FSM multiciclo y habilitaciones de actualización |
 | cpu_datapath.sv | PC, IR, operandos registrados, resultado, dato leído y multiplexores |
 | instruction_decoder.sv | Identificación de instrucciones y rechazo de codificaciones no soportadas |
@@ -42,7 +42,7 @@ No se añaden señales de espera ni de confirmación. La plataforma debe cumplir
 | alu.sv | Operaciones aritméticas, lógicas, desplazamientos y comparaciones |
 | program_rom.sv | Almacenamiento y lectura síncrona de 2048 instrucciones |
 
-Los módulos del núcleo se ubican en `src/design/cpu/`; la ROM, en `src/design/memory/`. Los nombres describen la estructura prevista y no implican que los archivos ya estén implementados. El secuenciador y el retorno del diagrama son funciones del datapath, no necesariamente archivos separados.
+Los módulos del núcleo se ubican en `src/design/cpu/`; la ROM, en `src/design/memory/`. La [implementación del núcleo](../../src/design/cpu/README.md) conserva esta estructura. El secuenciador y el retorno del diagrama son funciones del datapath, no necesariamente archivos separados.
 
 ## Estado interno y señales principales
 
@@ -90,7 +90,7 @@ Cada estado ocupa un ciclo. Las acciones registradas ocurren al flanco que termi
 |---|---|---|
 | FETCH_REQ | Presentar y validar la dirección de ROM; iniciar la lectura síncrona | FETCH_CAPTURE, o FAULT por dirección inválida |
 | FETCH_CAPTURE | Capturar ProgIn_i en IR y conservar el PC de la instrucción | DECODE |
-| DECODE | Decodificar y capturar los operandos fuente | EXECUTE, o FAULT por instrucción no soportada |
+| DECODE | Decodificar y capturar los operandos fuente y los controles | EXECUTE, o FAULT por instrucción no soportada |
 | EXECUTE | Calcular resultado, dirección efectiva o destino; determinar la condición de salto | LOAD_REQ para lw; STORE para sw; COMMIT para bifurcación; WRITEBACK para ALU, LUI, AUIPC y saltos; FAULT por acceso inválido |
 | LOAD_REQ | Presentar dirección efectiva con we_o=0; iniciar lectura | LOAD_CAPTURE |
 | LOAD_CAPTURE | Capturar DataIn_i en load_data_q | WRITEBACK |
@@ -113,7 +113,7 @@ El CPU verifica alineación de `lw/sw`, pero no duplica el mapa de periféricos.
 
 La ROM comprende `0x00000000–0x00001FFF`: 8192 bytes, equivalentes a 2048 instrucciones de 32 bits. El índice es `ProgAddress_o[12:2]`, después de comprobar que la dirección completa pertenece al rango y está alineada. El último inicio válido de instrucción es `0x00001FFC`.
 
-Se prevé inicialización sintetizable desde `program.hex`, con una palabra hexadecimal de ocho dígitos por línea. Cada línea representa una instrucción completa; una conversión desde bytes del ejecutable debe respetar su orden little-endian. Las posiciones libres contienen `00000013` (NOP). El programa no modifica esta memoria durante la ejecución.
+El parámetro `INIT_FILE` selecciona el archivo de inicialización sintetizable, previsto como `program.hex` para el juego, con una palabra hexadecimal de ocho dígitos por línea. Su valor predeterminado vacío conserva toda la ROM inicializada con NOP. Cada línea representa una instrucción completa; una conversión desde bytes del ejecutable debe respetar su orden little-endian. Las posiciones libres contienen `00000013` (NOP). El programa no modifica esta memoria durante la ejecución.
 
 La interfaz de datos no permite leer constantes desde ROM. El ensamblador construye constantes mediante instrucciones e inicializa los datos requeridos en RAM. El contenido final debe caber en las 2048 palabras y utilizar exclusivamente instrucciones soportadas; las pseudoinstrucciones se verifican después de su expansión. La frecuencia objetivo de 100 MHz deberá comprobarse mediante implementación y análisis temporal.
 
