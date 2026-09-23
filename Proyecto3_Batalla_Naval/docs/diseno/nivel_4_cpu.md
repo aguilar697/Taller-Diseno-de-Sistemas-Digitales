@@ -1,8 +1,8 @@
-﻿# Cuarto nivel — Procesador RISC-V y ROM
+# Cuarto nivel — Procesador RISC-V y ROM
 
 ## Objetivo
 
-El cuarto nivel desarrolla los bloques funcionales del [tercer nivel](nivel_3_cpu.md) mediante registros, multiplexores, operaciones combinacionales y una máquina de estados. Se mantiene la arquitectura multiciclo, la interfaz externa y el contrato de lectura síncrona. El contenido corresponde al planteamiento de diseño; la validación funcional y temporal se realizará sobre la implementación RTL.
+El cuarto nivel desarrolla los bloques funcionales del [tercer nivel](nivel_3_cpu.md) mediante registros, multiplexores, operaciones combinacionales y una máquina de estados. Se mantiene la arquitectura multiciclo, la interfaz externa y el contrato de lectura síncrona. El contenido corresponde al planteamiento de diseño; la [verificación funcional del RTL](../informe/cpu_verificacion.md) se documenta por separado y el cierre temporal del sistema corresponde a la integración.
 
 Las tres láminas representan partes del mismo circuito. Todos los datos y direcciones tienen 32 bits salvo indicación explícita. Las etiquetas de igual nombre representan conexiones compartidas entre láminas. Los registros cambian en el flanco ascendente cuando su habilitación está activa; en caso contrario conservan su valor. `rst_i` es síncrono, activo alto y prioritario.
 
@@ -26,7 +26,7 @@ La dirección de búsqueda debe tener `pc_q[31:13]=0` y `pc_q[1:0]=00`. Se compr
 
 ### Organización de la ROM
 
-La ROM contiene 2048 palabras y un puerto de lectura síncrono. La inicialización desde `program.hex` se conserva durante reset. Las posiciones libres contienen `0x00000013`. Una dirección inválida produce una salida segura definida, también `0x00000013`, pero el CPU entra en FAULT y no la acepta como instrucción válida. El reset no exige borrar el arreglo, lo que evita una estructura de reinicio incompatible con la memoria inferida.
+La ROM contiene 2048 palabras y un puerto de lectura síncrono. El parámetro `INIT_FILE` selecciona la imagen de instrucciones (`program.hex` en la integración del juego); si está vacío, toda la ROM contiene NOP. La inicialización se conserva durante reset. Las posiciones libres contienen `0x00000013`. Una dirección inválida produce una salida segura definida, también `0x00000013`, pero el CPU entra en FAULT y no la acepta como instrucción válida. El reset no exige borrar el arreglo, lo que evita una estructura de reinicio incompatible con la memoria inferida.
 
 ## 2. Ruta de ejecución y acceso de datos
 
@@ -37,6 +37,12 @@ La ROM contiene 2048 palabras y un puerto de lectura síncrono. La inicializaci�
 El banco contiene 31 registros modificables y una salida constante para x0. Dos multiplexores seleccionan las lecturas de rs1 y rs2; un decoder de escritura habilita exclusivamente `rd` cuando `rf_we=1` y `rd!=0`. El dato de escritura es `wb_data`. Durante reset los registros modificables se ponen a cero.
 
 Al finalizar DECODE válido se capturan ambas lecturas en `operand_a_q` y `operand_b_q`, denominados A y B en las láminas. El valor B original se conserva para `sw`, aunque el segundo operando de la ALU sea un inmediato. No se requiere forwarding: cada instrucción termina antes de que la siguiente lea el banco.
+
+### Control registrado
+
+Al finalizar DECODE válido, `cpu.sv` captura `kind`, `imm_format`, `alu_op`, `alu_a_sel`, `alu_b_sel` y `result_sel` junto con los operandos del datapath. Las salidas combinacionales del decoder se identifican con el sufijo `_d`; `legal` se evalúa directamente durante DECODE. Los controles registrados permanecen estables hasta la siguiente decodificación válida y se ponen a cero durante reset.
+
+Este registro evita concatenar la decodificación completa con la ALU y la validación de destino durante EXECUTE. Conserva los ciclos definidos y no permite ejecutar dos instrucciones simultáneamente: la arquitectura continúa siendo multiciclo sin pipeline.
 
 ### Selección de operandos y retorno
 
@@ -109,7 +115,7 @@ La FSM se implementa con un registro `state_q`, lógica combinacional de próxim
 |---|---|---|
 | FETCH_REQ | Ninguna de los registros de CPU | ROM registra la lectura de programa |
 | FETCH_CAPTURE | ir_en | Captura IR e instruction_pc_q |
-| DECODE válido | operands_en | Captura A y B |
+| DECODE válido | operands_en | Captura A, B y controles decodificados |
 | EXECUTE válido | execute_en | Captura alu_result_q, next_pc_q y link_q |
 | LOAD_REQ | Ninguna | El destino registra la lectura de datos |
 | LOAD_CAPTURE | load_en | Captura load_data_q |
