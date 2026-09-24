@@ -1,4 +1,4 @@
-# Tercer nivel — Subsistema 2: VGA y entradas del Jugador 1
+# Tercer nivel — VGA y entradas del Jugador 1
 
 ## Objetivo
 
@@ -8,7 +8,7 @@ El subsistema funciona únicamente como interfaz gráfica y de entrada. Las regl
 
 ## Diagrama del subsistema
 
-![Diagrama de Tercer nivel del Subsistema 2](img/vga_entradas/subsistema_2_nivel_3.svg)
+![Diagrama de Tercer nivel del Subsistema 2](img/vga_entradas/nivel_3_vga_entradas.svg)
 
 **Figura 1. Tercer nivel del Subsistema 2: interfaz local del Jugador 1.**
 
@@ -225,10 +225,10 @@ El Subsistema 2 únicamente:
 Proyecto3_Batalla_Naval/
 ├── docs/
 │   └── diseno/
-│       ├── subsistema_2_nivel_3.md
+│       ├── nivel_3_vga_entradas.md
 │       └── img/
 │           └── vga_entradas/
-│               └── subsistema_2_nivel_3.svg
+│               └── nivel_3_vga_entradas.svg
 └── src/
     ├── design/
     │   ├── vga/
@@ -245,4 +245,4 @@ Proyecto3_Batalla_Naval/
 - El reloj de píxel es de 25 MHz.
 - La lógica del juego se mantiene exclusivamente en software RISC-V.
 
-[Segundo nivel global: arquitectura e interconexiones](nivel_2.md) · [Índice del diseño](README.md)
+[Cuarto nivel: desarrollo de VGA y entradas](nivel_4_vga_entradas.md) · [Segundo nivel: arquitectura e interconexiones](nivel_2.md) · [Índice del diseño](README.md)
