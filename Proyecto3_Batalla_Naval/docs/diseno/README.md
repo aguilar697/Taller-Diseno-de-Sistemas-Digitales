@@ -1,25 +1,27 @@
 # Planteamiento de diseño — Batalla Naval
 
-El diseño se organiza mediante descomposición modular: el primer nivel presenta el sistema y su entorno; el segundo identifica los bloques principales y sus interconexiones. El detalle de datapath, FSM, registros y circuitos corresponde a los niveles posteriores.
+El diseño se organiza mediante descomposición modular: el primer nivel presenta el sistema y su entorno; el segundo identifica los bloques principales y sus interconexiones. El tercer nivel descompone cada subsistema en funciones, y el cuarto desarrolla sus circuitos o procedimientos internos.
 
 ## Diagramas generales
 
 - [Primer nivel: sistema, entradas y salidas](nivel_1.md).
-- [Segundo nivel: procesador, memorias y periféricos](nivel_2.md).
+- [Segundo nivel: arquitectura e interconexiones](nivel_2.md).
 
-Cada nivel presenta el diagrama correspondiente y desarrolla su objetivo, interfaces y funcionamiento.
+## Diseño por subsistema
 
-## Subsistemas
+| Subsistema | Responsable | Tercer nivel | Cuarto nivel |
+|---|---|---|---|
+| 1. CPU RISC-V y ROM | Kevin Aguilar | [Arquitectura del núcleo](nivel_3_cpu.md) | [Datapath, ROM y control](nivel_4_cpu.md) |
+| 2. VGA y entradas J1 | Kenneth Campos | [Bloques e interfaces](nivel_3_vga_entradas.md) | [Video, memoria y entradas](nivel_4_vga_entradas.md) |
+| 3. Plataforma de datos, UART y PC | Daniel Puentes | [Bus, memorias y periféricos](nivel_3_uart.md) | [Bus, RAM, UART y salidas](nivel_4_uart.md) |
+| 4. Lógica del juego en ensamblador | Kevin Cortés | [Organización del software](nivel_3_logica_juego.md) | **EN PROCESO** |
 
-- [Tercer nivel: procesador RISC-V y ROM](nivel_3_cpu.md).
-- [Cuarto nivel: datapath, ROM y control del CPU](nivel_4_cpu.md).
-- [Tercer nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_3.md).
-- [Cuarto nivel: VGA y entradas del Jugador 1](subsistema_2_nivel_4.md).
+## Organización documental
 
-## Organización
+Los niveles generales se nombran `nivel_1.md` y `nivel_2.md`. Los documentos de subsistema utilizan `nivel_3_<subsistema>.md` y `nivel_4_<subsistema>.md`. Las imágenes se almacenan en `img/`, con nombres que identifican el nivel, el subsistema y, cuando corresponde, la vista representada.
 
-La plataforma contiene CPU RISC-V, ROM, RAM, bus de datos y periféricos de video, comunicación y entrada/salida. Las reglas de Batalla Naval se implementan en ensamblador y se ejecutan en el CPU. La aplicación de PC funciona como terminal del Jugador 2.
+Las fuentes se distribuyen por bloque en `src/design/`, las pruebas en `src/testbench/`, el programa ensamblador en `src/software_riscv/` y la aplicación remota en `src/software_pc/`. Las reglas de Batalla Naval se ejecutan en el CPU; los periféricos y la terminal de PC representan el estado comunicado por el programa.
 
-Las fuentes se distribuyen por bloque en `src/design/`, las pruebas en `src/testbench/`, el programa ensamblador en `src/software_riscv/` y la aplicación remota en `src/software_pc/`.
+Los resultados y sus evidencias se documentan en el [informe técnico](../informe/README.md).
 
 [Descripción del proyecto](../../README.md)

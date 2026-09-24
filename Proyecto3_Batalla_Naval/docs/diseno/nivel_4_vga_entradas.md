@@ -1,8 +1,4 @@
-# Cuarto nivel — Subsistema 2: VGA y entradas del Jugador 1
-
-## Responsable
-
-**Kenneth Campos — Subsistema 2: VGA + entradas del Jugador 1**
+# Cuarto nivel — VGA y entradas del Jugador 1
 
 ## Objetivo
 
@@ -12,7 +8,7 @@ Este nivel mantiene la separación arquitectónica del proyecto: el hardware del
 
 ## Diagrama del subsistema
 
-![Diagrama de cuarto nivel del Subsistema 2](img/vga_entradas/subsistema_2_nivel_4.svg)
+![Diagrama de cuarto nivel del Subsistema 2](img/vga_entradas/nivel_4_vga_entradas.svg)
 
 **Figura 1. Cuarto nivel del Subsistema 2: VGA y entradas del Jugador 1.**
 
@@ -498,6 +494,6 @@ La división exacta de archivos puede ajustarse durante la implementación siemp
 
 ## Relación con el issue
 
-Esta documentación corresponde al trabajo definido en el **issue #25 — Proyecto 3: Subsistema 2, VGA + entradas**. El issue debe permanecer abierto hasta completar la implementación RTL y los testbenches autoverificables.
+El seguimiento de este subsistema se registra en el [issue #25: VGA y entradas](https://github.com/aguilar697/Taller-Diseno-de-Sistemas-Digitales/issues/25), cuyo alcance comprende el diseño, la implementación RTL y los testbenches autoverificables.
 
-[Descripción del subsistema y plan de pruebas](subsistema_2_nivel_3.md) · [Índice del diseño](README.md)
+[Descripción del subsistema y plan de pruebas](nivel_3_vga_entradas.md) · [Índice del diseño](README.md)

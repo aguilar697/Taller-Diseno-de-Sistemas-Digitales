@@ -1,14 +1,14 @@
 # Tercer nivel — Lógica del juego (software RISC-V)
 
-**Responsable:** Persona 4.
-
 ## 1. Objetivo
 
 Implementar en software, mediante un programa en ensamblador RISC-V, toda la lógica de reglas de Batalla Naval: colocación de flotas, alternancia de turnos, validación de disparos, detección de barcos hundidos y condición de victoria, coordinando al Jugador 1 (físico, FPGA/VGA/botones) y al Jugador 2 (remoto, aplicación de PC vía UART). Ningún periférico ni la aplicación de PC contienen lógica de reglas: el hardware solo opera a bajo nivel (temporización VGA, debounce, tramas UART) y la PC solo transmite/despliega.
 
-## 2. Nivel 1 — Bloque único
+## 2. Vista de contexto del subsistema
 
-![Diagrama de bloque único de la lógica del juego](img/logica_juego/nivel_1_logica_del_juego.png)
+Las figuras presentan el contexto y la descomposición funcional del software dentro del tercer nivel del proyecto. La numeración interna de las imágenes corresponde a esas dos vistas; los niveles generales del sistema se documentan en [primer nivel](nivel_1.md) y [segundo nivel](nivel_2.md).
+
+![Diagrama de bloque único de la lógica del juego](img/logica_juego/nivel_3_logica_juego_contexto.png)
 
 **Figura 1.** El programa de ensamblador como bloque único, con sus entradas y salidas mapeadas en memoria.
 
@@ -36,11 +36,11 @@ Implementar en software, mediante un programa en ensamblador RISC-V, toda la ló
 
 `r_board_RAM`/`w_board_RAM` y `r_state_RAM`/`w_state_RAM` separan, solo conceptualmente, la lectura/escritura de tableros y de variables de control; en la RAM real es una única memoria de datos.
 
-## 3. Nivel 2 — Descomposición funcional
+## 3. Descomposición funcional
 
 El programa se organiza en 6 bloques de lógica y 2 regiones de RAM compartida.
 
-![Diagrama de sub-bloques de la lógica del juego](img/logica_juego/nivel_2_logica_del_juego.png)
+![Diagrama de sub-bloques de la lógica del juego](img/logica_juego/nivel_3_logica_juego_bloques.png)
 
 **Figura 2.** Descomposición funcional en 6 bloques y las dos memorias compartidas (`ram_board`, `ram_state`).
 
@@ -198,5 +198,7 @@ Secuencia: al iniciar/reiniciar se envía `PLACEMENT_START`; al completar ambas 
 | Formato de metadata de barcos (`0x2220–0x22DF`) | 8 words/barco: `placed, row, column, orientation, length, hit_count, sunk, reserved` |
 | Detección de "casilla ya disparada" | La validación de disparo revisa el estado de la casilla antes de aplicar el turno; un disparo repetido no lo consume y se responde `ERROR/REPEATED_SHOT` (PC) o se ignora en silencio (J1) |
 
-Detalle de implementación (registros, pila, subrutinas concretas) queda para el Nivel 3/4 de cada bloque.
+El cuarto nivel desarrollará las subrutinas, las convenciones de registros y el uso detallado de la pila.
+
+[Segundo nivel: arquitectura del sistema](nivel_2.md) · [Índice del diseño](README.md)
 

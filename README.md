@@ -32,6 +32,7 @@ Los proyectos se desarrollan siguiendo una metodología de **diseño modular**, 
 |---|---|---|---|
 | [Proyecto 1 — Whack-a-Mole](./Proyecto1_Whack-a-mole/) | Juego híbrido implementado mediante FPGA y lógica discreta, con comunicación serial UART entre ambos subsistemas. | Basys 3, SystemVerilog, UART, lógica 74xx | Finalizado |
 | [Proyecto 2 — Ahorcado](./Proyecto2_Ahorcado/) | Juego controlado por FPGA, terminal Python por UART e interfaz local LCD, displays y buzzer. | Basys 3, SystemVerilog, UART, Python, LCD | Integrado; alcance de verificación documentado |
+| [Proyecto 3 — Batalla Naval](./Proyecto3_Batalla_Naval/) | Juego de dos jugadores controlado por un procesador RISC-V en FPGA, con interfaz VGA y terminal PC por UART. | Basys 3, SystemVerilog, RISC-V, VGA, UART, Python | En desarrollo |
 
 Cada proyecto dispone de su propio `README.md`, donde se documentan su arquitectura, estructura interna, módulos implementados, procedimiento de uso y referencias hacia la documentación técnica.
 
@@ -45,15 +46,8 @@ La organización general utilizada para los proyectos es la siguiente:
 Taller-Diseno-de-Sistemas-Digitales/
 ├── README.md
 ├── Proyecto1_Whack-a-mole/
-│   ├── README.md
-│   ├── docs/
-│   │   ├── diseno/
-│   │   └── informe/
-│   └── src/
-│       ├── design/
-│       ├── testbench/
-│       └── constraints/
-└── Proyecto2_Ahorcado/
+├── Proyecto2_Ahorcado/
+└── Proyecto3_Batalla_Naval/
     ├── README.md
     ├── docs/
     │   ├── diseno/
@@ -62,7 +56,10 @@ Taller-Diseno-de-Sistemas-Digitales/
     │       └── resultados/
     └── src/
         ├── design/
-        └── testbench/
+        ├── testbench/
+        ├── constraints/
+        ├── software_riscv/
+        └── software_pc/
 ```
 
 ---
@@ -167,6 +164,12 @@ Para el Proyecto 2:
 - [Descripción y estado del proyecto](./Proyecto2_Ahorcado/README.md)
 - [Planteamiento de diseño](./Proyecto2_Ahorcado/docs/diseno/README.md)
 - [Informes y evidencias](./Proyecto2_Ahorcado/docs/informe/README.md)
+
+Para el Proyecto 3:
+
+- [Descripción y organización del proyecto](./Proyecto3_Batalla_Naval/README.md)
+- [Planteamiento de diseño](./Proyecto3_Batalla_Naval/docs/diseno/README.md)
+- [Informe técnico y verificación](./Proyecto3_Batalla_Naval/docs/informe/README.md)
 
 ## Curso
 
