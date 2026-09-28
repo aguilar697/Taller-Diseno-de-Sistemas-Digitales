@@ -1,0 +1,5 @@
+Time resolution is 1 ps
+PASS register_file_tb: 256 lecturas y prioridad de reset
+$finish called at time : 832 ns : File "C:/Users/kevin/Desktop/taller_diseno_digital/proyecto3/projecto_3_CPU/projecto_3_CPU.srcs/sim_1/imports/cpu/register_file_tb.sv" Line 35
+The current simulation has finished. Please use 'restart' to begin a new simulation.
+$finish called at time : 832 ns : File "C:/Users/kevin/Desktop/taller_diseno_digital/proyecto3/projecto_3_CPU/projecto_3_CPU.srcs/sim_1/imports/cpu/register_file_tb.sv" Line 35
