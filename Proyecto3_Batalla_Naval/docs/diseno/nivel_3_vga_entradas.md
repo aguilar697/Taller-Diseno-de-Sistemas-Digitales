@@ -19,7 +19,7 @@ Las flechas continuas representan conexiones funcionales de datos y control. Las
 | Bloque | Función e intercambio principal |
 |---|---|
 | Clock / PLL + Pixel Reset | Recibir el reloj principal de 100 MHz, generar `clk_pixel_25` y acondicionar la liberación de `rst_pixel` |
-| VGA Timing Controller | Generar los contadores horizontal y vertical, `HSYNC`, `VSYNC`, `active_video`, `pixel_x` y `pixel_y` |
+| VGA Timing Controller | Generar los contadores horizontal y vertical, los sincronismos internos `hsync_raw` y `vsync_raw`, `active_video`, `pixel_x` y `pixel_y` |
 | Video Memory Dual-Port | Permitir acceso de lectura/escritura desde el CPU a 100 MHz y lectura simultánea desde la lógica VGA a 25 MHz |
 | Tile / Glyph Renderer | Transformar coordenadas de píxel en índices de tile, interpretar la palabra de video y producir la salida RGB |
 | Player 1 Input Peripheral | Sincronizar y filtrar las entradas físicas del Jugador 1 y exponer su estado al CPU mediante MMIO |
@@ -33,7 +33,8 @@ Las flechas continuas representan conexiones funcionales de datos y control. Las
 | Clock/PLL → Video Memory | `clk_pixel_25` | Reloj del puerto de lectura VGA |
 | Clock/PLL → Renderer | `clk_pixel_25`, `rst_pixel` | Temporización del renderer |
 | VGA Timing → Renderer | `pixel_x`, `pixel_y`, `active_video` | Coordenadas y validez del píxel actual |
-| VGA Timing → Monitor | `VGA_HSYNC`, `VGA_VSYNC` | Sincronismos físicos VGA |
+| VGA Timing → Integración | `hsync_raw`, `vsync_raw` | Sincronismos generados en el dominio de píxel |
+| Integración → Monitor | `VGA_HSYNC`, `VGA_VSYNC` | Sincronismos registrados un ciclo de píxel para mantenerlos alineados con RGB |
 | Renderer → Video Memory | `tile_addr[8:0]` | Índice local del tile solicitado |
 | Video Memory → Renderer | `tile_word[31:0]` | Palabra de video del tile leído |
 | Renderer → Monitor | `VGA_RGB` | Información de color |
@@ -145,7 +146,9 @@ La memoria VGA es de doble puerto.
 
 De esta manera, el CPU puede actualizar la memoria de video sin detener la generación continua de la imagen VGA.
 
-La lectura síncrona del puerto de video introduce latencia. La alineación entre coordenadas, dato leído y señales de sincronismo se resolverá en el detalle de cuarto nivel y en la implementación.
+La lectura síncrona del puerto de video introduce una latencia de un ciclo de reloj de píxel. Para mantener la correspondencia entre las coordenadas, la palabra leída de VRAM y la salida RGB, el renderer registra las señales necesarias durante ese ciclo.
+
+En la integración final, los sincronismos generados por `vga_timing` también se registran durante un ciclo de `clk_pixel_25` antes de llegar a los pines físicos como `VGA_HSYNC` y `VGA_VSYNC`. De esta manera, los sincronismos permanecen alineados temporalmente con la salida RGB producida por el pipeline de video.
 
 ## Periférico de entradas del Jugador 1
 
@@ -191,7 +194,7 @@ Las escrituras MMIO al periférico de entradas se ignoran. Las lecturas entregan
 | Dominio | Frecuencia | Bloques |
 |---|---:|---|
 | Sistema | 100 MHz | Puerto CPU de Video Memory, Player 1 Input Peripheral |
-| VGA | 25 MHz | VGA Timing Controller, puerto VGA de Video Memory, Tile / Glyph Renderer |
+| VGA | 25 MHz | VGA Timing Controller, puerto VGA de Video Memory, Tile / Glyph Renderer y registros de alineación de sincronismos |
 
 La memoria dual-port constituye la frontera principal entre ambos dominios.
 
@@ -216,7 +219,7 @@ El Subsistema 2 únicamente:
 
 1. genera la imagen VGA solicitada por el software;
 2. almacena la representación gráfica en memoria de video;
-3. genera los sincronismos físicos del monitor;
+3. genera y alinea los sincronismos físicos del monitor con la salida RGB;
 4. acondiciona y entrega al CPU las entradas del Jugador 1.
 
 ## Ubicación prevista en el repositorio
@@ -243,6 +246,8 @@ Proyecto3_Batalla_Naval/
 - El bus entrega al VGA un índice local de 9 bits.
 - El reloj principal es de 100 MHz.
 - El reloj de píxel es de 25 MHz.
+- La lectura síncrona de VRAM introduce una latencia de un ciclo de píxel.
+- `HSYNC` y `VSYNC` se registran un ciclo de píxel en la integración para mantener su alineación con RGB.
 - La lógica del juego se mantiene exclusivamente en software RISC-V.
 
 [Cuarto nivel: desarrollo de VGA y entradas](nivel_4_vga_entradas.md) · [Segundo nivel: arquitectura e interconexiones](nivel_2.md) · [Índice del diseño](README.md)
