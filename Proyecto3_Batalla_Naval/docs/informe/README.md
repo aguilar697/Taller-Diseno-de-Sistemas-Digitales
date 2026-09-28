@@ -5,7 +5,7 @@
 | Subsistema | Informe y evidencias |
 |---|---|
 | 1. Procesador RISC-V y ROM | [Verificación del CPU y la ROM](cpu_verificacion.md) |
-| 2. VGA y entradas J1 | **EN PROCESO** |
+| 2. VGA y entradas J1 | [Verificación del VGA y entradas del Jugador 1](vga_entradas_verificacion.md) |
 | 3. Plataforma de datos, UART y PC | **EN PROCESO** |
 | 4. Programa ensamblador | **EN PROCESO** |
 

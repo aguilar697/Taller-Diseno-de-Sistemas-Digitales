@@ -19,9 +19,9 @@ Las conexiones continuas representan rutas funcionales de datos y control. Las c
 | Bloque de tercer nivel | Bloques internos de cuarto nivel |
 |---|---|
 | 2.1 Clock / PLL + Pixel Reset | PLL, sincronización del reset de píxel |
-| 2.2 VGA Timing Controller | contadores horizontal/vertical, decodificación de sincronismos y video activo |
+| 2.2 VGA Timing Controller | contadores horizontal/vertical, decodificación de sincronismos internos, video activo y alineación de sincronismos físicos |
 | 2.3 Video Memory Dual-Port | puerto CPU, BRAM de video, puerto VGA |
-| 2.4 Tile / Glyph Renderer | mapeo píxel→tile, decodificador de palabra, Glyph ROM, selección RGB |
+| 2.4 Tile / Glyph Renderer | mapeo píxel→tile, decodificador de palabra, Glyph ROM, selección RGB y pipeline |
 | 2.5 Player 1 Input Peripheral | sincronización de entradas, debouncing, empaquetado de estado, lectura MMIO |
 
 ---
@@ -97,7 +97,7 @@ Las constantes de temporización horizontal y vertical se implementan como pará
 
 ### 2.2.2 Sync / Active Decoder
 
-Decodifica los contadores para identificar la región visible y generar los sincronismos.
+Decodifica los contadores para identificar la región visible y generar los sincronismos internos.
 
 **Entradas**
 
@@ -110,12 +110,34 @@ Decodifica los contadores para identificar la región visible y generar los sinc
 | Señal | Ancho | Descripción |
 |---|---:|---|
 | `active_video` | 1 | indica que el píxel pertenece al área visible |
-| `VGA_HSYNC` | 1 | sincronismo horizontal |
-| `VGA_VSYNC` | 1 | sincronismo vertical |
+| `hsync_raw` | 1 | sincronismo horizontal interno |
+| `vsync_raw` | 1 | sincronismo vertical interno |
 | `pixel_x` | — | coordenada entregada al renderer |
 | `pixel_y` | — | coordenada entregada al renderer |
 
-`VGA_HSYNC` y `VGA_VSYNC` se conectan directamente a la interfaz física VGA; las coordenadas y `active_video` se entregan al renderer.
+Las coordenadas y `active_video` se entregan al renderer. Los sincronismos `hsync_raw` y `vsync_raw` no se conectan directamente a la interfaz física VGA, porque la lectura síncrona de la memoria de video y el pipeline de renderizado introducen una latencia de un ciclo de reloj de píxel.
+
+### 2.2.3 Alineación de sincronismos de salida
+
+En el nivel de integración, `hsync_raw` y `vsync_raw` se registran durante un ciclo de `clk_pixel_25` antes de entregarse a los pines físicos.
+
+**Entradas**
+
+| Señal | Ancho | Descripción |
+|---|---:|---|
+| `clk_pixel_25` | 1 | reloj del dominio VGA |
+| `rst_pixel` | 1 | reset del dominio VGA |
+| `hsync_raw` | 1 | sincronismo horizontal generado por `vga_timing` |
+| `vsync_raw` | 1 | sincronismo vertical generado por `vga_timing` |
+
+**Salidas**
+
+| Señal | Ancho | Descripción |
+|---|---:|---|
+| `VGA_HSYNC` | 1 | sincronismo horizontal físico alineado |
+| `VGA_VSYNC` | 1 | sincronismo vertical físico alineado |
+
+Este registro de un ciclo compensa la latencia del camino VRAM→renderer. De esta forma, `VGA_HSYNC`, `VGA_VSYNC` y `VGA_RGB` corresponden temporalmente al mismo píxel.
 
 ---
 
@@ -193,7 +215,7 @@ Proporciona al renderer la palabra correspondiente al tile visible en el píxel 
 |---|---:|---|
 | `tile_word` | 32 | palabra del tile leído |
 
-La lectura es síncrona, por lo que el renderer debe alinear sus señales de control y coordenadas con la latencia de lectura de la memoria. El detalle de esta alineación se conserva dentro de la implementación del pipeline del renderer.
+La lectura es síncrona e introduce una latencia de un ciclo de reloj de píxel. Por esta razón, el renderer alinea sus señales de control y coordenadas con el dato leído de memoria. La misma compensación temporal se aplica en el nivel de integración a los sincronismos físicos VGA.
 
 ---
 
@@ -289,6 +311,8 @@ Un código no soportado se representa como espacio.
 Selecciona entre el color base del tile y el píxel del glyph, respetando `active_video`.
 
 La lógica de pipeline conserva la correspondencia entre las coordenadas de video, la palabra leída de la memoria VGA y las señales de control necesarias para compensar la lectura síncrona del puerto de video.
+
+La misma compensación temporal se aplica en el nivel de integración a `HSYNC` y `VSYNC`: ambos se retrasan un ciclo de reloj de píxel para mantenerse alineados con la salida RGB producida por el renderer.
 
 **Entradas principales**
 
@@ -395,7 +419,7 @@ Las escrituras se ignoran. El CPU consulta el registro de estado y el programa e
 | Dominio | Bloques |
 |---|---|
 | 100 MHz | puerto CPU de VRAM, sincronizadores, debouncers, empaquetado y MMIO de entradas |
-| 25 MHz | VGA Timing Controller, puerto VGA de VRAM, Tile/Glyph Renderer |
+| 25 MHz | VGA Timing Controller, puerto VGA de VRAM, Tile/Glyph Renderer y registros de alineación de `HSYNC`/`VSYNC` |
 
 No se utiliza el reloj de píxel como reloj de entrada externo. Se deriva internamente del reloj principal de 100 MHz.
 
@@ -409,6 +433,7 @@ El Subsistema 2:
 
 - generación de reloj de píxel;
 - temporización VGA;
+- alineación temporal de `HSYNC` y `VSYNC` con RGB;
 - almacenamiento y lectura del mapa de tiles;
 - conversión de tiles/glyphs a RGB;
 - sincronización y debounce de entradas;
@@ -436,9 +461,11 @@ Los bloques se verificarán mediante testbenches autoverificables.
 Se comprobará:
 
 - periodicidad de los contadores;
-- generación de `HSYNC` y `VSYNC`;
+- generación de `hsync_raw` y `vsync_raw`;
 - delimitación de `active_video`;
-- reinicio correcto.
+- reinicio correcto;
+- registro de `HSYNC` y `VSYNC` durante un ciclo de píxel en la integración;
+- alineación de los sincronismos físicos con la salida RGB del pipeline.
 
 ### Video Memory Dual-Port
 
