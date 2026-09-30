@@ -14,6 +14,14 @@ El contorno agrupa el CPU y la ROM como responsabilidad del subsistema; la ROM s
 
 El secuenciador proporciona también el PC de la instrucción y PC + 4 a la ruta de ejecución y retorno. El operando rs2 se conserva para las escrituras, independientemente del operando inmediato seleccionado para la ALU. Los cruces de líneas sin punto no representan uniones.
 
+## Elección del procesador
+
+El proyecto establece el uso de un procesador RISC-V. Se adoptó una implementación de 32 bits, acorde con las instrucciones, los datos y las interfaces de memoria definidas para el sistema. El programa ensamblador ejecuta las reglas del juego y utiliza `lw` y `sw` para acceder tanto a la RAM como a los periféricos mapeados en memoria. El núcleo implementa el subconjunto de instrucciones necesario para el proyecto, con la codificación estándar de esas instrucciones; no pretende cubrir toda la arquitectura RV32I.
+
+La organización multiciclo responde a la lectura síncrona de la ROM y de los destinos de datos: una dirección se presenta antes de un flanco, la memoria entrega su respuesta después de ese flanco y el CPU la captura en el siguiente. Separar búsqueda, decodificación, ejecución y acceso a memoria permite cumplir ese contrato y reutilizar la ruta de datos. En un diseño de un solo ciclo habría que completar la instrucción en un único período, lo que no corresponde a esta latencia de lectura y concentraría más lógica en la misma ruta temporal.
+
+No se utiliza pipeline porque la ejecución simultánea de varias instrucciones exigiría resolver dependencias entre registros, cambios de flujo por saltos y el orden de los accesos a periféricos. Para este juego se prioriza una implementación verificable y una escritura externa por cada instrucción `sw`; aumentar el rendimiento mediante pipeline no es un requisito de la interfaz. El reloj de 100 MHz es un objetivo de diseño cuyo cumplimiento debe comprobarse mediante análisis temporal, no una prestación demostrada por esta elección arquitectónica.
+
 ## Interfaz externa del CPU
 
 | Señal | Dirección | Ancho | Función |
@@ -119,7 +127,6 @@ La interfaz de datos no permite leer constantes desde ROM. El ensamblador constr
 
 ## Justificación de las decisiones
 
-- La organización multiciclo separa el acceso síncrono a memoria de la captura de datos y reduce la lógica que debe completarse en una sola etapa.
 - La separación de ROM y bus de datos conserva las interfaces del sistema y distingue instrucciones de RAM y periféricos.
 - Los operandos y resultados registrados evitan que una escritura en rd altere fuentes todavía necesarias, incluso cuando rd coincide con rs1 en JALR.
 - Las habilitaciones explícitas permiten comprobar que cada instrucción produce una sola actualización arquitectónica y cada STORE una sola escritura externa.

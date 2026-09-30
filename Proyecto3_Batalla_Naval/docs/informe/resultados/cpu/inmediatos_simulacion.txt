@@ -1,0 +1,5 @@
+Time resolution is 1 ps
+PASS immediate_generator_tb: 14298 comprobaciones
+$finish called at time : 14298 ns : File "C:/Users/kevin/Desktop/taller_diseno_digital/proyecto3/projecto_3_CPU/projecto_3_CPU.srcs/sim_1/imports/cpu/immediate_generator_tb.sv" Line 31
+The current simulation has finished. Please use 'restart' to begin a new simulation.
+$finish called at time : 14298 ns : File "C:/Users/kevin/Desktop/taller_diseno_digital/proyecto3/projecto_3_CPU/projecto_3_CPU.srcs/sim_1/imports/cpu/immediate_generator_tb.sv" Line 31
