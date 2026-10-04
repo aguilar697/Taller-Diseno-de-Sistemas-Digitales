@@ -21,7 +21,7 @@ create_clock -add -name sys_clk_pin \
 ## ============================================================
 ## SWITCHES
 ##
-## SW0  -> SEL
+## SW0  -> GAME_RST
 ## SW1  -> OK
 ## SW15 -> Reset general
 ##
@@ -149,7 +149,7 @@ set_property IOSTANDARD LVCMOS33 [get_ports {led[15]}]
 ## BTND -> DOWN
 ## BTNL -> LEFT
 ## BTNR -> RIGHT
-## BTNC -> GAME_RST
+## BTNC -> SEL
 ## ============================================================
 
 set_property PACKAGE_PIN U18 [get_ports btnC]
@@ -170,10 +170,17 @@ set_property IOSTANDARD LVCMOS33 [get_ports btnD]
 
 ## ============================================================
 ## VGA CONNECTOR
-## RGB 12 bits: 4 R + 4 G + 4 B
+##
+## RGB de 12 bits:
+## 4 bits rojo
+## 4 bits verde
+## 4 bits azul
 ## ============================================================
 
+
+## ------------------------------------------------------------
 ## RED
+## ------------------------------------------------------------
 
 set_property PACKAGE_PIN G19 [get_ports {vgaRed[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {vgaRed[0]}]
@@ -188,7 +195,9 @@ set_property PACKAGE_PIN N19 [get_ports {vgaRed[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {vgaRed[3]}]
 
 
+## ------------------------------------------------------------
 ## BLUE
+## ------------------------------------------------------------
 
 set_property PACKAGE_PIN N18 [get_ports {vgaBlue[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {vgaBlue[0]}]
@@ -203,7 +212,9 @@ set_property PACKAGE_PIN J18 [get_ports {vgaBlue[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {vgaBlue[3]}]
 
 
+## ------------------------------------------------------------
 ## GREEN
+## ------------------------------------------------------------
 
 set_property PACKAGE_PIN J17 [get_ports {vgaGreen[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {vgaGreen[0]}]
@@ -218,7 +229,9 @@ set_property PACKAGE_PIN D17 [get_ports {vgaGreen[3]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {vgaGreen[3]}]
 
 
+## ------------------------------------------------------------
 ## VGA SYNC
+## ------------------------------------------------------------
 
 set_property PACKAGE_PIN P19 [get_ports Hsync]
 set_property IOSTANDARD LVCMOS33 [get_ports Hsync]
@@ -230,7 +243,8 @@ set_property IOSTANDARD LVCMOS33 [get_ports Vsync]
 ## ============================================================
 ## PERIFERICOS NO UTILIZADOS EN ESTA PRUEBA
 ##
-## Permanecen deshabilitados.
+## Permanecen deshabilitados para evitar restricciones sobre
+## puertos que no existen en subsystem2_basys3_test_top.
 ## ============================================================
 
 
