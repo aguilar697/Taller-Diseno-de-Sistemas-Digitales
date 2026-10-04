@@ -1,0 +1,3 @@
+Time resolution is 1 ps
+PASS program_rom_tb: 9 comprobaciones
+$finish called at time : 96 ns : File "C:/Users/kevin/Desktop/taller_diseno_digital/proyecto3/projecto_3_CPU/projecto_3_CPU.srcs/sim_1/imports/memory/program_rom_tb.sv" Line 21

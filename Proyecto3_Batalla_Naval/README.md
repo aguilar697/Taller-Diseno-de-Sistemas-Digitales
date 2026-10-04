@@ -33,6 +33,18 @@ Toda la lógica del juego corresponde al programa ensamblador RISC-V. La platafo
 - [Testbenches y ejecución en Vivado](src/testbench/cpu/README.md).
 - [Informe de verificación del CPU y la ROM](docs/informe/cpu_verificacion.md).
 
+## Estado de verificación
+
+| Alcance | Estado documentado |
+|---|---|
+| CPU y ROM | Simulación funcional unitaria e integrada con resultados PASS; síntesis y análisis temporal pendientes |
+| VGA y entradas J1 | Simulaciones e implementación del subsistema documentadas; prueba física parcial, sin validación de imagen en monitor VGA |
+| Plataforma de datos, UART y aplicación PC | Diseño de interfaces documentado; implementación y verificación pendientes de incorporar |
+| Programa RISC-V | Diseño de tercer nivel documentado; cuarto nivel, programa y pruebas pendientes de incorporar |
+| Juego completo | Integración, implementación y validación conjunta pendientes |
+
+Las pruebas de CPU y del subsistema VGA tienen alcances independientes y todavía no acreditan el funcionamiento del juego completo. El [índice del informe](docs/informe/README.md) reúne los resultados disponibles y los pendientes para completar la entrega.
+
 ## Estructura
 
 | Carpeta | Contenido |

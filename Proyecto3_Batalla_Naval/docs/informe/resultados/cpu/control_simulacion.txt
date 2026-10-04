@@ -1,0 +1,3 @@
+Time resolution is 1 ps
+PASS cpu_control_tb: 75 comprobaciones
+$finish called at time : 1211 ns : File "C:/Users/kevin/Desktop/taller_diseno_digital/proyecto3/projecto_3_CPU/projecto_3_CPU.srcs/sim_1/imports/cpu/cpu_control_tb.sv" Line 50

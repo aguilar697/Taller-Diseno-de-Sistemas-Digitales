@@ -44,9 +44,9 @@ Recibe el reloj principal de la Basys 3 y genera el reloj utilizado por el domin
 | Señal | Ancho | Descripción |
 |---|---:|---|
 | `clk_pixel_25` | 1 | reloj de píxel de 25 MHz |
-| `locked` | 1 | indica que el PLL alcanzó una condición estable |
+| `locked` | 1 | indica que el generador de reloj alcanzó una condición estable |
 
-La única fuente externa de reloj del sistema es `clk_100_i`. El reloj de 25 MHz se deriva internamente mediante PLL.
+La única fuente externa de reloj del sistema es `clk_100_i`. La denominación PLL del diagrama identifica funcionalmente el generador de reloj; la implementación actual de `pixel_clock` utiliza Clocking Wizard con la primitiva MMCM, según la configuración conservada en `src/design/vga/ip/pixel_clock_wiz.xci`.
 
 ### 2.1.2 Pixel Reset Synchronizer
 
@@ -173,6 +173,8 @@ Permite al procesador actualizar o consultar una posición de la memoria de vide
 | `vga_rdata_o` | 32 | palabra leída por el CPU |
 
 La lectura y escritura del puerto CPU son síncronas. Las escrituras dirigidas a índices `300–511` se ignoran y las lecturas de esa región retornan cero.
+
+El reset pone a cero el registro `vga_rdata_o` e inhibe escrituras, pero no borra el arreglo de memoria. El software del juego deberá inicializar las posiciones visibles; el top físico de prueba realiza esa inicialización con un patrón propio. Una lectura de una posición aún no inicializada no debe interpretarse como contenido válido del tablero.
 
 ### 2.3.2 Memoria BRAM
 
@@ -410,7 +412,7 @@ El registro de entradas está mapeado en:
 | `input_wdata_i` | 32 | Bus → periférico |
 | `input_rdata_o` | 32 | periférico → Bus/CPU |
 
-Las escrituras se ignoran. El CPU consulta el registro de estado y el programa ensamblador detecta los cambios o flancos necesarios para la interacción del juego.
+Las escrituras se ignoran. La salida `input_rdata_o` es combinacional y vale cero para índices locales distintos de `00`. El bus debe registrar o adaptar esta respuesta para respetar la latencia acordada con el CPU. El programa ensamblador detecta los cambios o flancos necesarios para la interacción del juego.
 
 ---
 
@@ -452,9 +454,9 @@ Todas esas decisiones corresponden al programa RISC-V.
 
 ---
 
-## Verificación prevista
+## Plan de verificación
 
-Los bloques se verificarán mediante testbenches autoverificables.
+Los bloques se verifican mediante testbenches autoverificables. Los criterios siguientes definen la cobertura del diseño; los resultados y sus límites se documentan en el [informe del subsistema](../informe/vga_entradas_verificacion.md).
 
 ### VGA Timing Controller
 
@@ -500,7 +502,7 @@ Se comprobará:
 
 ---
 
-## Archivos RTL previstos
+## Archivos RTL
 
 ```text
 src/design/vga/
@@ -509,7 +511,10 @@ src/design/vga/
 ├── vga_timing.sv
 ├── video_memory.sv
 ├── tile_renderer.sv
-└── glyph_rom.sv
+├── glyph_rom.sv
+├── subsystem2_vga_inputs.sv
+└── ip/
+    └── pixel_clock_wiz.xci
 
 src/design/inputs/
 ├── input_sync.sv
@@ -517,7 +522,7 @@ src/design/inputs/
 └── player1_inputs.sv
 ```
 
-La división exacta de archivos puede ajustarse durante la implementación siempre que se preserve la interfaz y responsabilidad descritas en este documento.
+La prueba física utiliza [subsystem2_basys3_test_top.sv](../../src/design/top/subsystem2_basys3_test_top.sv) y [subsystem2_basys3_test.xdc](../../src/constraints/subsystem2_basys3_test.xdc). Ese top valida únicamente el subsistema VGA/entradas y no sustituye al módulo superior del juego completo.
 
 ## Relación con el issue
 

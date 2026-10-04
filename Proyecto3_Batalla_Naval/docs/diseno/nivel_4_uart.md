@@ -23,7 +23,7 @@ El decoder compara la dirección absoluta con el mapa de memoria y produce una s
 | Selección | Dirección o intervalo | Dirección local prevista |
 |---|---|---|
 | `ram_sel` | `0x00002000-0x00002FFF` | Índice de palabra derivado de la dirección |
-| `uart_sel` | `0x00010040-0x00010048` | `addr[1:0]` para CONTROL, TX y RX |
+| `uart_sel` | `0x00010040`, `0x00010044`, `0x00010048` | Índice local de dos bits: 0 para CONTROL, 1 para TX y 2 para RX |
 | `input_sel` | `0x00010120` | Registro de entradas |
 | `display_sel` | `0x00010130` | Registro del display |
 | `led_sel` | `0x00010138` | Registro del LED |
@@ -31,6 +31,8 @@ El decoder compara la dirección absoluta con el mapa de memoria y produce una s
 | `vga_sel` | `0x00011000-0x000117FF` | Índice local de tile |
 
 La comparación se realiza antes de recortar bits de dirección. Esto impide que una dirección fuera del rango seleccione accidentalmente un bloque por compartir sus bits menos significativos.
+
+Para UART, el índice local se calcula como `(DataAddress_o - 0x00010040) >> 2`, después de validar la dirección completa y su alineación. Los bits `DataAddress_o[1:0]` de la dirección en bytes solo indican alineación; no distinguen los tres registros, ya que valen cero en todos los accesos válidos.
 
 ### Habilitaciones de escritura
 
@@ -68,7 +70,7 @@ El periférico UART presenta tres registros MMIO y dos bloques seriales. `UART T
 | `0x00010044` | `TX_DATA` | Byte que se transmite hacia la PC |
 | `0x00010048` | `RX_DATA` | Byte recibido desde la PC |
 
-Los bytes útiles ocupan los ocho bits menos significativos del registro de 32 bits. Los bits restantes se reservan o se leen como cero. El contrato final de `CONTROL/STATUS` debe definir de forma explícita los bits de inicio, ocupado, dato nuevo y reconocimiento antes de implementar el software.
+Los bytes útiles de `TX_DATA` y `RX_DATA` ocupan los ocho bits menos significativos del registro de 32 bits; los restantes se leen como cero. El [contrato UART del programa](nivel_3_logica_juego.md) define los bits de `CONTROL/STATUS`: bit 0 para solicitar TX o consultar ocupado, bit 1 para consultar disponibilidad RX o consumir el byte, y bit 2 para consultar o reconocer overflow. Las lecturas conservan el estado; los reconocimientos se realizan escribiendo uno en el bit correspondiente.
 
 ### Transmisión
 
@@ -76,7 +78,7 @@ El programa consulta que TX pueda aceptar un dato, escribe el byte en `TX_DATA` 
 
 ### Recepción
 
-`UART RX` sincroniza la entrada `uart_rx_i`, detecta el bit de inicio y muestrea los ocho bits de datos. Cuando termina una trama válida, almacena el byte en `RX_DATA` y activa el indicador de dato nuevo. El programa lee el registro y reconoce el evento mediante el mecanismo definido en `CONTROL/STATUS`.
+`UART RX` sincroniza la entrada `uart_rx_i`, detecta el bit de inicio y muestrea los ocho bits de datos. El contrato acordado requiere una FIFO RX de al menos 16 bytes: `RX_DATA` presenta el próximo byte disponible y el programa lo consume mediante una escritura en `CONTROL/STATUS`. Si la FIFO está llena, el byte entrante se descarta y se activa overflow. Este comportamiento debe comprobarse con el RTL del periférico antes de integrar el programa.
 
 La aplicación Python se conecta al puente USB-UART de la Basys 3. Las señales `uart_rx_i` y `uart_tx_o` se nombran desde la FPGA. La terminal procesa mensajes del juego, pero la validación final de cada acción pertenece al programa RISC-V.
 

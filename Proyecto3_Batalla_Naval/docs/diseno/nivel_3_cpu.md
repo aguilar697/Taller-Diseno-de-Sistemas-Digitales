@@ -132,6 +132,14 @@ La interfaz de datos no permite leer constantes desde ROM. El ensamblador constr
 - Las habilitaciones explícitas permiten comprobar que cada instrucción produce una sola actualización arquitectónica y cada STORE una sola escritura externa.
 - Las reglas de Batalla Naval no aparecen en el control del CPU: el mismo núcleo puede ejecutar programas de prueba independientes del juego.
 
+## Estrategia de implementación
+
+La implementación se organiza de lo particular a lo integrado. Primero se fijan el subconjunto de instrucciones, las interfaces de 32 bits, el mapa de ROM y la latencia de lectura síncrona. Después se construyen y verifican por separado la ALU, el generador de inmediatos, el banco de registros, el decodificador, el control multiciclo y la ruta de datos. La ROM se prueba con una imagen pequeña de contenido conocido antes de conectar el procesador completo.
+
+El CPU y la ROM se integran con un modelo síncrono de memoria de datos que reproduce el contrato de lectura y escritura acordado con la plataforma. Un testbench autoverificable compara el PC, los registros y los accesos externos con un modelo de referencia al completar cada instrucción. Esta fase valida el núcleo de forma independiente del programa final y de los periféricos; sus resultados se presentan en el [informe de verificación](../informe/cpu_verificacion.md).
+
+La etapa de integración del proyecto conecta el núcleo con el bus, la RAM y los periféricos reales, y ejecuta la imagen ensamblada del juego desde ROM. Sobre el sistema integrado se deben repetir las comprobaciones de reset, accesos mapeados y funcionamiento del programa. Por último, la síntesis, la implementación y los reportes de temporización determinan si se cumple el objetivo de 100 MHz. Estas etapas no se consideran demostradas por la simulación funcional aislada del CPU.
+
 ## Plan de verificación
 
 | Prueba autoverificable | Comprobaciones |
