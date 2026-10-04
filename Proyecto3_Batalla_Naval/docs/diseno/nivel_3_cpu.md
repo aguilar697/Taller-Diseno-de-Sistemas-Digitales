@@ -14,6 +14,14 @@ El contorno agrupa el CPU y la ROM como responsabilidad del subsistema; la ROM s
 
 El secuenciador proporciona también el PC de la instrucción y PC + 4 a la ruta de ejecución y retorno. El operando rs2 se conserva para las escrituras, independientemente del operando inmediato seleccionado para la ALU. Los cruces de líneas sin punto no representan uniones.
 
+## Elección del procesador
+
+El proyecto establece el uso de un procesador RISC-V. Se adoptó una implementación de 32 bits, acorde con las instrucciones, los datos y las interfaces de memoria definidas para el sistema. El programa ensamblador ejecuta las reglas del juego y utiliza `lw` y `sw` para acceder tanto a la RAM como a los periféricos mapeados en memoria. El núcleo implementa el subconjunto de instrucciones necesario para el proyecto, con la codificación estándar de esas instrucciones; no pretende cubrir toda la arquitectura RV32I.
+
+La organización multiciclo responde a la lectura síncrona de la ROM y de los destinos de datos: una dirección se presenta antes de un flanco, la memoria entrega su respuesta después de ese flanco y el CPU la captura en el siguiente. Separar búsqueda, decodificación, ejecución y acceso a memoria permite cumplir ese contrato y reutilizar la ruta de datos. En un diseño de un solo ciclo habría que completar la instrucción en un único período, lo que no corresponde a esta latencia de lectura y concentraría más lógica en la misma ruta temporal.
+
+No se utiliza pipeline porque la ejecución simultánea de varias instrucciones exigiría resolver dependencias entre registros, cambios de flujo por saltos y el orden de los accesos a periféricos. Para este juego se prioriza una implementación verificable y una escritura externa por cada instrucción `sw`; aumentar el rendimiento mediante pipeline no es un requisito de la interfaz. El reloj de 100 MHz es un objetivo de diseño cuyo cumplimiento debe comprobarse mediante análisis temporal, no una prestación demostrada por esta elección arquitectónica.
+
 ## Interfaz externa del CPU
 
 | Señal | Dirección | Ancho | Función |
@@ -119,11 +127,18 @@ La interfaz de datos no permite leer constantes desde ROM. El ensamblador constr
 
 ## Justificación de las decisiones
 
-- La organización multiciclo separa el acceso síncrono a memoria de la captura de datos y reduce la lógica que debe completarse en una sola etapa.
 - La separación de ROM y bus de datos conserva las interfaces del sistema y distingue instrucciones de RAM y periféricos.
 - Los operandos y resultados registrados evitan que una escritura en rd altere fuentes todavía necesarias, incluso cuando rd coincide con rs1 en JALR.
 - Las habilitaciones explícitas permiten comprobar que cada instrucción produce una sola actualización arquitectónica y cada STORE una sola escritura externa.
 - Las reglas de Batalla Naval no aparecen en el control del CPU: el mismo núcleo puede ejecutar programas de prueba independientes del juego.
+
+## Estrategia de implementación
+
+La implementación se organiza de lo particular a lo integrado. Primero se fijan el subconjunto de instrucciones, las interfaces de 32 bits, el mapa de ROM y la latencia de lectura síncrona. Después se construyen y verifican por separado la ALU, el generador de inmediatos, el banco de registros, el decodificador, el control multiciclo y la ruta de datos. La ROM se prueba con una imagen pequeña de contenido conocido antes de conectar el procesador completo.
+
+El CPU y la ROM se integran con un modelo síncrono de memoria de datos que reproduce el contrato de lectura y escritura acordado con la plataforma. Un testbench autoverificable compara el PC, los registros y los accesos externos con un modelo de referencia al completar cada instrucción. Esta fase valida el núcleo de forma independiente del programa final y de los periféricos; sus resultados se presentan en el [informe de verificación](../informe/cpu_verificacion.md).
+
+La etapa de integración del proyecto conecta el núcleo con el bus, la RAM y los periféricos reales, y ejecuta la imagen ensamblada del juego desde ROM. Sobre el sistema integrado se deben repetir las comprobaciones de reset, accesos mapeados y funcionamiento del programa. Por último, la síntesis, la implementación y los reportes de temporización determinan si se cumple el objetivo de 100 MHz. Estas etapas no se consideran demostradas por la simulación funcional aislada del CPU.
 
 ## Plan de verificación
 
