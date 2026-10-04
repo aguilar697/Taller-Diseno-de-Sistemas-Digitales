@@ -16,11 +16,8 @@ La estrategia de verificación se dividió en pruebas unitarias autoverificables
 El Subsistema 2 utiliza dos dominios de reloj:
 
 | Dominio | Frecuencia | Elementos principales |
-
 |---|---:|---|
-
 | Sistema | 100 MHz | puerto CPU de VRAM, sincronizadores, debouncers y MMIO de entradas |
-
 | Píxel | 25 MHz | temporización VGA, puerto VGA de VRAM y renderer |
 
 El reloj de 25 MHz se deriva del reloj de 100 MHz mediante Clocking Wizard/MMCM. La memoria de video es dual-port: el CPU puede escribir y leer a 100 MHz mientras el renderer realiza lecturas a 25 MHz.
@@ -30,37 +27,23 @@ La pantalla visible se divide en 20 columnas × 15 filas de tiles de 32×32 píx
 La palabra de cada tile utiliza:
 
 | Bits | Campo |
-
 |---:|---|
-
 | `[2:0]` | color base |
-
 | `[3]` | `GLYPH_ENABLE` |
-
 | `[11:4]` | ASCII/glyph |
-
 | `[31:12]` | reservado, cero |
 
 El periférico de entradas entrega el registro:
 
 | Bit | Entrada |
-
 |---:|---|
-
 | 0 | UP |
-
 | 1 | DOWN |
-
 | 2 | LEFT |
-
 | 3 | RIGHT |
-
 | 4 | SEL |
-
 | 5 | OK |
-
 | 6 | GAME_RST |
-
 | 31:7 | cero |
 
 Cada entrada física atraviesa primero un sincronizador de dos flip-flops y después un filtro de debounce.
@@ -76,27 +59,16 @@ Como prueba final de aceptación se añadió `tb_subsystem2_peripheral.sv`. Esta
 
 ### Resumen de ejecuciones
 | Testbench | Bloque | Tiempo final observado | Resultado |
-
 |---|---|---:|---|
-
 | `tb_input_sync.sv` | sincronización de entrada | 56 ns | PASS |
-
 | `tb_debounce.sv` | debounce | 156 ns | PASS |
-
 | `tb_player1_inputs.sv` | periférico completo de entradas | 936 ns | PASS |
-
 | `tb_pixel_clock.sv` | 100 MHz → 25 MHz / MMCM | 1540 ns | PASS |
-
 | `tb_pixel_reset_sync.sv` | reset de dominio de píxel | 229 ns | PASS |
-
 | `tb_vga_timing.sv` | temporización 640×480 | 16.800061 ms | PASS |
-
 | `tb_video_memory.sv` | VRAM dual-port | 461 ns | PASS |
-
 | `tb_glyph_rom.sv` | ROM de glyphs | 2635 ns | PASS |
-
 | `tb_tile_renderer.sv` | renderer tile/glyph | 1061 ns | PASS |
-
 | `tb_subsystem2_vga_inputs.sv` | integración completa S2 | 159.496 µs | PASS |
 | `tb_subsystem2_peripheral.sv` | aceptación black-box del periférico completo | 15.745366 ms | PASS — 27/27 |
 
@@ -589,14 +561,10 @@ Para la validación física se utilizó `subsystem2_basys3_test_top.sv` como top
 
 ### Recursos después de implementación
 | Recurso | Uso observado |
-
 |---|---:|
-
 | LUT | 175 |
-
 | FF | 211 |
-
-| BRAM | 0.5 RAMB18 |
+| BRAM | 1 RAMB18E1 = 0.5 Block RAM Tile |
 
 La utilización reducida es coherente con un periférico de video basado en tiles y una memoria visible de 300 palabras de 32 bits.
 
@@ -604,22 +572,26 @@ La utilización reducida es coherente con un periférico de video basado en tile
 El diseño implementado reportó:
 
 | Métrica | Resultado |
-
 |---|---:|
-
-| WNS | 4.543 ns |
-
+| WNS | 4.612 ns |
 | TNS | 0.000 ns |
-
 | WHS | 0.122 ns |
-
 | THS | 0.000 ns |
-
 | Setup failing endpoints | 0 |
-
 | Hold failing endpoints | 0 |
 
 Vivado indicó que todas las restricciones temporales especificadas fueron satisfechas.
+
+### Evidencia original de implementación
+
+Como respaldo directo de los resultados anteriores se conservaron en el repositorio los reportes originales generados por Vivado:
+
+- `resultados/vga_entradas/14_subsystem2_utilization_impl.rpt`: reporte de utilización con el diseño completamente colocado (`Fully Placed`);
+- `resultados/vga_entradas/15_subsystem2_timing_summary_impl.rpt`: resumen temporal del diseño enrutado (`Routed`).
+
+El reporte de utilización confirma **175 LUT**, **211 registros**, **1 RAMB18E1** y **0 RAMB36**, equivalentes a **0.5 Block RAM Tile**. Por esta razón, la expresión correcta no es “0.5 RAMB18”, sino **1 RAMB18E1 = 0.5 Block RAM Tile**.
+
+El reporte de timing confirma `WNS = 4.612 ns`, `TNS = 0.000 ns`, `WHS = 0.122 ns` y `THS = 0.000 ns`, con cero endpoints fallando en setup y hold. También confirma los relojes de 100 MHz del sistema y 25 MHz del dominio de píxel.
 
 ### Clocking Wizard
 Durante la preparación de la prueba física se detectaron advertencias críticas de metodología asociadas a una redefinición del reloj primario. El Clocking Wizard se ajustó para utilizar `Source = No buffer`, manteniendo la restricción `create_clock` únicamente sobre el puerto superior de 100 MHz. Después del cambio, las advertencias críticas `TIMING-4` y `TIMING-27` desaparecieron.
@@ -650,25 +622,15 @@ El top realiza dos tareas de observación:
 La asignación utilizada es:
 
 | Control | Indicador |
-
 |---|---|
-
 | BTNU / UP | LED0 |
-
 | BTND / DOWN | LED1 |
-
 | BTNL / LEFT | LED2 |
-
 | BTNR / RIGHT | LED3 |
-
 | BTNC / SEL | LED4 |
-
 | SW1 / OK | LED5 |
-
 | SW0 / GAME_RST | LED6 |
-
 | inicialización VRAM terminada | LED15 |
-
 | SW15 | reset general, activo en alto |
 
 En hardware se utilizó `INPUT_DEBOUNCE_CYCLES = 1_000_000`, equivalente a aproximadamente 10 ms con un reloj de 100 MHz.
@@ -699,27 +661,16 @@ La prueba física confirma las entradas, el reset general y la secuencia de inic
 
 ## 10. Matriz de verificación
 | Bloque | Unit TB | Integración | Waveform | FPGA física |
-
 |---|:---:|:---:|:---:|:---:|
-
 | `input_sync` | ✅ | ✅ | ✅ | ✅ dentro del periférico |
-
 | `debounce` | ✅ | ✅ | ✅ | ✅ dentro del periférico |
-
 | `player1_inputs` | ✅ | ✅ | ✅ | ✅ |
-
 | `pixel_clock` | ✅ | ✅ | ✅ | ✅ implementado |
-
 | `pixel_reset_sync` | ✅ | ✅ | ✅ | ✅ dentro del sistema |
-
 | `vga_timing` | ✅ | ✅ | ✅ | no monitorizado |
-
 | `video_memory` | ✅ | ✅ | ✅ | inicialización observada |
-
 | `glyph_rom` | ✅ | ✅ | ✅ | no monitorizado |
-
 | `tile_renderer` | ✅ | ✅ | ✅ | no monitorizado |
-
 | `subsystem2_vga_inputs` | — | ✅ 27/27 en aceptación black-box | ✅ Fig. 12–13 | entradas/reset ✅; VGA visual pendiente |
 
 ---
@@ -752,3 +703,6 @@ La prueba física confirma el funcionamiento del acondicionamiento de entradas, 
 
 - `src/testbench/integration/tb_subsystem2_vga_inputs.sv`
 - `src/testbench/integration/tb_subsystem2_peripheral.sv`
+
+- `docs/informe/resultados/vga_entradas/14_subsystem2_utilization_impl.rpt`
+- `docs/informe/resultados/vga_entradas/15_subsystem2_timing_summary_impl.rpt`

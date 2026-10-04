@@ -1,0 +1,33 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Sun Oct  4 16:29:37 2026
+| Host         : Kenneth running 64-bit major release  (build 9200)
+| Command      : report_utilization -hierarchical -hierarchical_depth 4 -file C:/Taller-Diseno-de-Sistemas-Digitales/Proyecto3_Batalla_Naval/docs/informe/resultados/vga_entradas/14_subsystem2_utilization_impl.rpt
+| Design       : subsystem2_basys3_test_top
+| Device       : xc7a35tcpg236-1
+| Speed File   : -1
+| Design State : Routed
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++--------------------------------+-----------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|            Instance            |         Module        | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++--------------------------------+-----------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| subsystem2_basys3_test_top     |                 (top) |        175 |        175 |       0 |    0 | 211 |      0 |      1 |          0 |
+|   (subsystem2_basys3_test_top) |                 (top) |         16 |         16 |       0 |    0 |  19 |      0 |      0 |          0 |
+|   u_subsystem2                 | subsystem2_vga_inputs |        159 |        159 |       0 |    0 | 192 |      0 |      1 |          0 |
+|     u_video_memory             |          video_memory |         64 |         64 |       0 |    0 |   0 |      0 |      1 |          0 |
+|     u_player1_inputs           |        player1_inputs |         56 |         56 |       0 |    0 | 161 |      0 |      0 |          0 |
++--------------------------------+-----------------------+------------+------------+---------+------+-----+--------+--------+------------+
+* Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
+
+
