@@ -455,9 +455,9 @@ La asignación utilizada es:
 | BTND / DOWN | LED1 |
 | BTNL / LEFT | LED2 |
 | BTNR / RIGHT | LED3 |
-| SW0 / SEL | LED4 |
+| BTNC / SEL | LED4 |
 | SW1 / OK | LED5 |
-| BTNC / GAME_RST | LED6 |
+| SW0 / GAME_RST | LED6 |
 | inicialización VRAM terminada | LED15 |
 | SW15 | reset general, activo en alto |
 
@@ -469,8 +469,9 @@ La prueba confirmó:
 
 - con `SW15=0`, el sistema sale de reset y `LED15` se enciende después de inicializar VRAM;
 - cada botón direccional activa el LED correspondiente;
-- `SW0` y `SW1` se observan como SEL y OK;
-- BTNC se observa como GAME_RST;
+- `BTNC` se observa como SEL;
+- `SW1` se observa como OK;
+- `SW0` se observa como GAME_RST;
 - al colocar `SW15=1`, `LED15` y los indicadores de entrada se apagan por reset;
 - al liberar SW15, el sistema reinicia y vuelve a completar la inicialización.
 
