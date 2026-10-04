@@ -46,7 +46,7 @@ Las flechas continuas representan conexiones funcionales de datos y control. Las
 
 ## Organización del video
 
-La salida VGA utiliza una resolución activa de **640 × 480 píxeles a 60 Hz**. El reloj de píxel es de **25 MHz**, generado a partir del reloj principal de **100 MHz**.
+La salida VGA utiliza una resolución activa de **640 × 480 píxeles, con refresco nominal de 60 Hz**. El reloj de píxel es de **25 MHz**, generado a partir del reloj principal de **100 MHz**. Con los totales de 800 píxeles por línea y 525 líneas por cuadro de `vga_timing`, el refresco calculado es `25 000 000 / (800 × 525) ≈ 59,52 Hz`, equivalente a un cuadro cada 16,8 ms.
 
 La pantalla se organiza en una cuadrícula de:
 
@@ -185,7 +185,7 @@ El registro de estado utiliza:
 | 6 | `GAME_RST` |
 | `[31:7]` | `0` |
 
-Las escrituras MMIO al periférico de entradas se ignoran. Las lecturas entregan el estado filtrado actual.
+Las escrituras MMIO al periférico de entradas se ignoran. Las lecturas entregan el estado filtrado actual. En el RTL de `player1_inputs`, esta salida es combinacional; el bus debe adaptar esa respuesta al contrato de lectura síncrona del CPU. La VRAM ya dispone de salida registrada y no requiere agregar otro ciclo de lectura.
 
 `GAME_RST` no es el reset general del hardware. Es únicamente una entrada de usuario que el software interpreta como solicitud de reinicio de partida.
 

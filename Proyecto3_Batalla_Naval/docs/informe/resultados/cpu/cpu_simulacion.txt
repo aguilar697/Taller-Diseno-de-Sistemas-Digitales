@@ -1,0 +1,3 @@
+Time resolution is 1 ps
+PASS cpu_tb: 567 instrucciones, 11 programas, 29 operaciones y reset en 10 estados
+$finish called at time : 38276 ns : File "C:/Users/kevin/Desktop/taller_diseno_digital/proyecto3/projecto_3_CPU/projecto_3_CPU.srcs/sim_1/imports/cpu/cpu_tb.sv" Line 197

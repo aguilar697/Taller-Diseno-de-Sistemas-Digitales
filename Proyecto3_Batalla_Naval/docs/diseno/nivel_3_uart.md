@@ -52,7 +52,7 @@ El procesador controla todos estos bloques mediante instrucciones de carga y alm
 | RAM | `0x00002000-0x00002FFF` | Memoria de datos de 32 bits |
 | UART CONTROL/STATUS | `0x00010040` | Control y estado de la comunicación |
 | UART TX_DATA | `0x00010044` | Byte que se desea transmitir |
-| UART RX_DATA | `0x00010048` | Último byte recibido |
+| UART RX_DATA | `0x00010048` | Próximo byte disponible en la FIFO RX |
 | Entradas J1 | `0x00010120` | Controles locales del Jugador 1 |
 | Display de siete segmentos | `0x00010130` | Victorias acumuladas |
 | LED de estado | `0x00010138` | Fase de la partida |
@@ -67,7 +67,7 @@ La UART convierte los accesos MMIO del procesador en bytes seriales 8N1 a 115200
 
 La aplicación Python corresponde a la interfaz del Jugador 2. Envía las solicitudes de colocación y disparo, y recibe las respuestas generadas por el programa RISC-V. La aplicación presenta la información al usuario, pero no decide si una jugada es válida ni mantiene una copia independiente de las reglas.
 
-La comunicación debe evitar que un dato nuevo sobrescriba otro que todavía no ha sido atendido. El contrato exacto de bits de control, reconocimiento y disponibilidad se desarrolla en el cuarto nivel antes de implementar el periférico.
+La comunicación debe evitar que un dato nuevo sobrescriba otro que todavía no ha sido atendido. Los bits de control, reconocimiento, disponibilidad y overflow están definidos en el [contrato UART del programa](nivel_3_logica_juego.md) y se aplican al [diseño del periférico](nivel_4_uart.md#3-periférico-uart). La implementación deberá conservar ese contrato y verificarlo antes de la integración.
 
 ## Salidas locales
 

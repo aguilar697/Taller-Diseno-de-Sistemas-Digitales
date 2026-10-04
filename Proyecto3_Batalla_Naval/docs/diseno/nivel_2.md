@@ -10,7 +10,7 @@ Descomponer el sistema FPGA en procesador, memorias, interconexión y periféric
 
 Las flechas continuas representan conexiones funcionales; las flechas dobles agrupan las solicitudes de acceso y las respuestas de lectura. La flecha desde el programa hasta ROM representa el proceso de preparación del contenido, no un puerto de carga durante la partida. Las flechas discontinuas de reloj/reset resumen su distribución: ROM, bus, RAM, UART, entradas, salidas y el puerto CPU de VGA también trabajan en el dominio de 100 MHz.
 
-El programa no constituye un periférico ni una FSM adicional en RTL. Su ejecución en CPU produce las operaciones de lectura y escritura que controlan la partida. `top.sv` conecta los bloques y no incorpora reglas del juego.
+El programa no constituye un periférico ni una FSM adicional en RTL. Su ejecución en CPU produce las operaciones de lectura y escritura que controlan la partida. El módulo superior previsto para la integración, `top.sv`, conectará los bloques sin incorporar reglas del juego; todavía no forma parte de las fuentes del sistema completo.
 
 ## Función de los bloques
 
@@ -64,7 +64,7 @@ La ROM no se selecciona desde el bus de datos. La ejecución comienza en cero. E
 
 La pantalla contiene 20 columnas y 15 filas de tiles de 32 × 32 píxeles. Cada tile ocupa una palabra de 32 bits, por lo que los 300 tiles utilizan 1200 bytes. Su dirección es `VGA_BASE + 4*(fila*20 + columna)`; los índices 300–511 del rango reservado no corresponden a tiles visibles.
 
-El puerto CPU de la memoria de video funciona a 100 MHz. El segundo puerto alimenta la generación de píxeles en el dominio derivado por PLL, con frecuencia nominal aproximada de 25 MHz. La lógica de video alinea los datos leídos con las coordenadas y sincronismos. El diseño detallado establece el tratamiento de accesos simultáneos y la liberación del reset en cada dominio.
+El puerto CPU de la memoria de video funciona a 100 MHz. El segundo puerto alimenta la generación de píxeles a 25 MHz, derivados mediante Clocking Wizard con la primitiva MMCM seleccionada en la implementación actual. La lógica de video alinea los datos leídos con las coordenadas y sincronismos. El diseño detallado establece el tratamiento de accesos simultáneos y la liberación del reset en cada dominio.
 
 ## Ejecución del juego e integración
 

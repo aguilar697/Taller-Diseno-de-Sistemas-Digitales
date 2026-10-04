@@ -11,7 +11,7 @@ La prueba del núcleo incluye la ROM de programa y un modelo síncrono de RAM y 
 | Dato | Registro |
 |---|---|
 | Versión de Vivado | 2026.1 (Vivado Simulator / XSim) |
-| Fecha de ejecución | 28 de septiembre de 2026 |
+| Fechas de ejecución | 28 de septiembre y 4 de octubre de 2026 |
 | Dispositivo del proyecto | xc7a35tcpg236-1 |
 
 ## Resultados funcionales
@@ -22,17 +22,23 @@ La prueba del núcleo incluye la ROM de programa y un modelo síncrono de RAM y 
 | immediate_generator_tb | Formatos de inmediato y extensión de signo | PASS; 14298 comprobaciones; finalización a 14298 ns |
 | register_file_tb | Lecturas, escritura, x0, habilitación y reset | PASS; 256 lecturas y prioridad de reset; finalización a 832 ns |
 | instruction_decoder_tb | Decodificación y rechazo de instrucciones no soportadas | PASS; 131072 codificaciones; finalización a 131072 ns |
-| cpu_control_tb | Estados, transiciones, habilitaciones y reset | **EN PROCESO** |
-| cpu_datapath_tb | Rutas de datos, registros intermedios y alineación | **EN PROCESO** |
-| program_rom_tb | Inicialización, lectura síncrona y límites de dirección | **EN PROCESO** |
-| cpu_tb | Ejecución de programas, estado arquitectónico, accesos y latencias | **EN PROCESO** |
+| cpu_control_tb | Estados, transiciones, habilitaciones y reset | PASS; 75 comprobaciones; finalización a 1211 ns |
+| cpu_datapath_tb | Rutas de datos, registros intermedios y alineación | PASS; 9 casos más reset y retención; finalización a 476 ns |
+| program_rom_tb | Inicialización, lectura síncrona y límites de dirección | PASS; 9 comprobaciones; finalización a 96 ns |
+| cpu_tb | Ejecución de programas, estado arquitectónico, accesos y latencias | PASS; 567 instrucciones en 11 programas, 29 operaciones y reset en 10 estados; finalización a 38276 ns |
 
-### Registros de ejecución
+### Extractos de consola
+
+Los archivos siguientes conservan los mensajes finales de las simulaciones, incluidos `PASS` y el instante de finalización. Son extractos de consola; las rutas que aparecen en ellos corresponden al entorno local donde se ejecutaron las pruebas.
 
 - [Registro de simulación de la ALU](resultados/cpu/alu_simulacion.txt).
 - [Registro de simulación del generador de inmediatos](resultados/cpu/inmediatos_simulacion.txt).
 - [Registro de simulación del banco de registros](resultados/cpu/registros_simulacion.txt).
 - [Registro de simulación del decodificador](resultados/cpu/decoder_simulacion.txt).
+- [Registro de simulación del control multiciclo](resultados/cpu/control_simulacion.txt).
+- [Registro de simulación de la ruta de datos](resultados/cpu/datapath_simulacion.txt).
+- [Registro de simulación de la ROM](resultados/cpu/rom_simulacion.txt).
+- [Registro de simulación del CPU integrado](resultados/cpu/cpu_simulacion.txt).
 
 ## Capturas de ondas de Vivado
 
@@ -116,17 +122,57 @@ La prueba del núcleo incluye la ROM de programa y un modelo síncrono de RAM y 
 
 **Figura 16.** Entre 113662 y 113670 ns, el cambio de opcode de `6E` a `6F` activa la decodificación de JAL. En el cursor de 113664,5 ns, `007281EF` produce `legal=1`, `kind=4`, `fmt=4` y `wb=2`. Esta última selección corresponde al enlace PC + 4. Los campos mostrados como funct3 y funct7 forman parte del inmediato J; la captura verifica las selecciones del decodificador, mientras que la ejecución del salto y la escritura en rd corresponden a las pruebas del procesador.
 
-### Control y ruta de datos
+### Control multiciclo
 
-**EN PROCESO**
+![Secuencia de control para una carga](resultados/cpu/control_carga.png)
+
+**Figura 17.** Secuencia de carga (`kind=1`, entre 90 y 181 ns). Después de `FETCH_REQ`, `FETCH_CAPTURE`, `DECODE` y `EXECUTE`, la controladora pasa por `LOAD_REQ` y `LOAD_CAPTURE`. `access_mem` permanece activo durante ambas etapas de lectura; `ld` captura el dato en `LOAD_CAPTURE`, `rf` habilita la escritura en `WRITEBACK` y `pc` actualiza el contador en `COMMIT`.
+
+![Secuencia de control para una escritura](resultados/cpu/control_escritura.png)
+
+**Figura 18.** Secuencia de escritura (`kind=2`, entre 181 y 251 ns). Tras `EXECUTE`, el estado `STORE` activa `access_mem` y `store`. No se habilita la escritura en el banco de registros (`rf=0`); la actualización del PC ocurre en `COMMIT`.
+
+![Estado de fallo y recuperación por reset](resultados/cpu/control_fault_reset.png)
+
+**Figura 19.** Fallos y recuperación (entre 455 y 585 ns). Una dirección de programa inválida (`pcok=0`) lleva a `FAULT`. El reset devuelve la máquina a `FETCH_REQ`. Después, una instrucción no válida (`legal=0`) causa otro fallo; al restablecer el control, una ejecución inválida (`execok=0`) también conduce a `FAULT`. En ese estado no se observan habilitaciones de escritura o acceso a datos.
+
+### Ruta de datos
+
+![Dirección y dato de una escritura](resultados/cpu/datapath_store.png)
+
+**Figura 20.** Escritura de datos (`STORE`, entre 280 y 300 ns). Después de `exe`, la activación de `access_mem` y `store` presenta la dirección `00002004` en `da` y el valor `00000014` en `wd`. Al activarse el reset, ambas salidas vuelven a cero.
+
+![Captura y retorno de un dato leído](resultados/cpu/datapath_carga.png)
+
+**Figura 21.** Carga de datos (entre 325 y 355 ns). `data_in=DEADBEEF` se captura en `load_data_q` con `ld=1`. Luego `wb_data` conserva ese valor mientras `rf=1` habilita la escritura en el banco de registros.
+
+![Validación de alineación y destino de bifurcación](resultados/cpu/datapath_alineacion.png)
+
+**Figura 22.** Validación de direcciones (entre 355 y 445 ns). El `STORE` desalineado se rechaza con `execok=0`. La bifurcación no tomada mantiene `branch_taken=0` y `execok=1`; cuando la bifurcación sí se toma hacia un destino desalineado, `execok` pasa a cero. `pa` permanece en `00000010` porque `pc=0`.
+
+![Retención del PC y prioridad del reset](resultados/cpu/datapath_reset_pc.png)
+
+**Figura 23.** Retención y reset (entre 440 y 476 ns). Aunque `prog_in` cambia a `FFFFFFFF`, `pa` permanece en `00000010` sin habilitación de PC. Con `rst=1` y las habilitaciones activas, el flanco ascendente de 475 ns limpia `pa` e `ins`; ambos valen cero en el cursor de 475,559 ns.
 
 ### ROM de programa
 
-**EN PROCESO**
+![Lecturas de la ROM de programa](resultados/cpu/rom_lectura.png)
+
+**Figura 24.** Lecturas de la ROM (entre 0 y 96 ns). Las direcciones `00000000`, `00000004` y `00001FFC` devuelven las palabras inicializadas en `program_rom_tb.hex` después del flanco ascendente. Las direcciones fuera de rango o desalineadas producen NOP (`00000013`). La salida inicial indefinida corresponde al intervalo anterior a la primera lectura registrada; al final, `checks` alcanza 9.
 
 ### Ejecución integrada del CPU
 
-**EN PROCESO**
+![Inicio de la ejecución multiciclo del CPU](resultados/cpu/cpu_inicio.png)
+
+**Figura 25.** Inicio de la ejecución integrada (entre 40 y 180 ns). La secuencia `FETCH_REQ`, `FETCH_CAPTURE`, `DECODE`, `EXECUTE`, `WRITEBACK` y `COMMIT` completa las primeras instrucciones. `pa` y `reference_pc` avanzan de `00000000` a `00000004` y luego a `00000008`; el contador `retired` aumenta de cero a dos, sin activar `fault`.
+
+![Escritura y lectura de memoria en el CPU](resultados/cpu/cpu_memoria.png)
+
+**Figura 26.** Acceso integrado a memoria (entre 1540 y 1680 ns). Durante `STORE`, `we` se activa con dirección `00002000` y dato `FFFFFFEF`. En la instrucción siguiente, los estados `LOAD_REQ` y `LOAD_CAPTURE` preceden a `WRITEBACK`, y `di` presenta `FFFFFFEF` para la misma dirección. El PC y el contador de instrucciones completadas continúan avanzando.
+
+![Fallo y recuperación por reset del CPU](resultados/cpu/cpu_fault_reset.png)
+
+**Figura 27.** Recuperación desde `FAULT` (entre 38225 y 38276 ns). La instrucción `00000000` lleva el control de `DECODE` a `FAULT` y activa `fault`. Tras activar `rst`, el flanco ascendente devuelve el control a `FETCH_REQ`, limpia `pa` y desactiva `fault`; `we` permanece en cero.
 
 ## Análisis de resultados funcionales
 
@@ -154,36 +200,34 @@ La simulación de `instruction_decoder_tb` finalizó a 131072 ns con `PASS instr
 
 Cada caso compara la validez, clase de instrucción, formato de inmediato, operación ALU, selección de operandos y selección de retorno contra una referencia del testbench. Las codificaciones no soportadas deben producir `legal=0` y selecciones seguras en cero. Las capturas representativas se presentan en la sección de ondas.
 
-### Módulos restantes
+### Control multiciclo
 
-**EN PROCESO**
+La simulación de `cpu_control_tb` registró `PASS cpu_control_tb: 75 comprobaciones` y finalizó a 1211 ns. El testbench recorre las seis clases de instrucción definidas, compara el estado y las habilitaciones esperadas en cada transición, y comprueba que las rutas de carga, escritura y bifurcación activan únicamente las salidas correspondientes.
+
+También verifica la permanencia en FAULT ante direcciones de programa inválidas, instrucciones no soportadas o ejecuciones inválidas, así como la inhibición de efectos durante reset y el retorno a FETCH_REQ desde los diez estados alcanzables. Las secuencias de carga, escritura y fallo se muestran en las figuras 17 a 19.
+
+### Ruta de datos
+
+La simulación de `cpu_datapath_tb` registró `PASS cpu_datapath_tb: 9 casos y reset/retencion` y finalizó a 476 ns. La prueba comprueba operaciones inmediatas y entre registros, escritura de resultados, dirección y dato de `STORE`, retorno de una carga y rechazo de accesos desalineados. También verifica que una bifurcación no tomada no invalida un destino desalineado, que el PC permanece estable sin habilitación y que el reset tiene prioridad sobre las escrituras. Las figuras 20 a 23 muestran los accesos de datos, la validación de direcciones y el reset.
+
+### ROM de programa
+
+La simulación de `program_rom_tb` registró `PASS program_rom_tb: 9 comprobaciones` y finalizó a 96 ns. Se comprobaron las palabras inicializadas en las direcciones `00000000`, `00000004` y `00001FFC`, además de la lectura síncrona: el dato de salida conserva su valor anterior hasta el flanco ascendente. Las direcciones fuera de la ROM y los accesos desalineados devuelven la instrucción NOP `00000013`. La imagen utilizada fue `program_rom_tb.hex`; la secuencia completa se muestra en la figura 24.
+
+### Procesador integrado
+
+La simulación de `cpu_tb` registró `PASS cpu_tb: 567 instrucciones, 11 programas, 29 operaciones y reset en 10 estados` y finalizó a 38276 ns. El testbench ejecuta un programa dirigido, una secuencia reproducible de 500 instrucciones, ocho programas de fallo y una prueba del límite superior de la ROM. Un modelo de referencia comprueba los registros y el PC al completar cada instrucción, mientras el modelo externo de RAM registra las escrituras en el flanco en que ocurren.
+
+La prueba también comprueba las latencias por clase de instrucción, el rechazo de codificaciones y direcciones inválidas, la ausencia de escrituras duplicadas y el reset desde los diez estados de control. Las figuras 25 a 27 muestran la secuencia multiciclo, el acceso a memoria y la recuperación por reset.
 
 ## Síntesis e implementación
 
-La utilización de recursos y el cumplimiento temporal se documentan a partir de los reportes de síntesis e implementación. La simulación de comportamiento no determina estos valores. El análisis aislado del CPU se distingue del correspondiente al sistema completo; en el caso de la ROM, se identifica la imagen de instrucciones utilizada.
-
-| Condición del análisis | Registro |
-|---|---|
-| Módulo superior y alcance | **EN PROCESO** |
-| Dispositivo | **EN PROCESO** |
-| Período de reloj y restricciones de entrada/salida | **EN PROCESO** |
-| Imagen de ROM | **EN PROCESO** |
-
-| Métrica | Resultado |
-|---|---|
-| LUT después de síntesis | **EN PROCESO** |
-| LUT después de enrutamiento | **EN PROCESO** |
-| Registros | **EN PROCESO** |
-| Latches | **EN PROCESO** |
-| Memorias de bloque | **EN PROCESO** |
-| WNS y TNS después de enrutamiento | **EN PROCESO** |
-| WHS y THS después de enrutamiento | **EN PROCESO** |
-| Estado del enrutamiento | **EN PROCESO** |
+La verificación presentada arriba corresponde a simulación funcional. Todavía no se dispone de reportes de síntesis e implementación para este subsistema; por ello no se atribuyen cifras de LUT, registros, memorias de bloque ni márgenes de setup y hold. El dispositivo previsto para el proyecto de Vivado es `xc7a35tcpg236-1`, pero el cumplimiento del objetivo de 100 MHz debe evaluarse con una corrida de implementación y sus restricciones.
 
 ### Reportes y análisis temporal
 
-**EN PROCESO**
+Al registrar una corrida se debe identificar el top, el dispositivo, el período de reloj, las restricciones de entrada/salida y la imagen de ROM utilizada. La síntesis de `cpu` como top aislado no incluye por sí sola la ROM externa ni el bus; sus recursos y tiempos no se deben presentar como resultados del sistema completo. Los valores de utilización y temporización se incorporarán únicamente a partir de reportes de Vivado conservados como evidencia.
 
 ## Integración y simulación temporal
 
-**EN PROCESO**
+`cpu_tb` verifica el procesador y la ROM con modelos de RAM y de registros externos. La conexión con el bus, las memorias y los periféricos reales, la ejecución del programa final y cualquier simulación posterior a implementación corresponden a una etapa distinta que aún no se ha realizado. Los resultados funcionales de este documento no demuestran esa integración.
