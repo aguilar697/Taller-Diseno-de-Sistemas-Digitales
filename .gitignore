@@ -10,6 +10,7 @@
 **/*.runs/
 **/*.sim/
 **/*.srcs/
+**/xsim.dir/
 
 *.jou
 *.log
