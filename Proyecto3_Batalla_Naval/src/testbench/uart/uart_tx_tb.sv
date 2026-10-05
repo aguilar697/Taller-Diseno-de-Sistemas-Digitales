@@ -9,7 +9,7 @@ module uart_tx_tb;
     logic clk=0,rst=1,start=0;
     logic [7:0] data=0;
     logic tx,ready;
-    integer errors=0;
+    integer errores=0;
 
     always #(CLK_PERIOD/2) clk=~clk;
 
@@ -18,50 +18,50 @@ module uart_tx_tb;
         .tx_o(tx),.ready_o(ready)
     );
 
-    task automatic check(input logic condition,input string message);
-        if(!condition)begin errors++;$error("%s",message);end
+    task automatic verificar(input logic condicion,input string mensaje);
+        if(condicion!==1'b1)begin errores++;$error("%s",mensaje);end
     endtask
 
-    task automatic check_byte(input logic [7:0] value);
-        integer index;
+    task automatic verificar_byte(input logic [7:0] valor);
+        integer indice;
         wait(ready);
-        @(negedge clk);data=value;start=1;
+        @(negedge clk);data=valor;start=1;
         @(posedge clk);#1;
-        check(!ready,"ready no baja al iniciar");
+        verificar(!ready,"ready no baja al iniciar");
         fork
             begin @(negedge clk);start=0;end
         join_none
 
         #(BIT_PERIOD/2-1ns);
-        check(tx===1'b0,"bit de inicio incorrecto");
-        for(index=0;index<8;index++)begin
+        verificar(tx===1'b0,"bit de inicio incorrecto");
+        for(indice=0;indice<8;indice++)begin
             #BIT_PERIOD;
-            check(tx===value[index],$sformatf("dato bit %0d incorrecto",index));
-            check(!ready,"ready se activo durante los datos");
+            verificar(tx===valor[indice],$sformatf("dato bit %0d incorrecto",indice));
+            verificar(!ready,"ready se activo durante los datos");
         end
         #BIT_PERIOD;
-        check(tx===1'b1,"bit de parada incorrecto");
+        verificar(tx===1'b1,"bit de parada incorrecto");
         #(BIT_PERIOD/2+2ns);
         wait(ready);
-        check(tx===1'b1,"TX no vuelve a reposo");
+        verificar(tx===1'b1,"TX no vuelve a reposo");
     endtask
 
     initial begin
         repeat(3)@(posedge clk);#1;
-        check(tx===1'b1 && ready===1'b1,"salidas durante reset");
+        verificar(tx===1'b1 && ready===1'b1,"salidas durante reset");
         @(negedge clk);rst=0;
         @(posedge clk);#1;
-        check(tx===1'b1 && ready===1'b1,"reposo despues de reset");
+        verificar(tx===1'b1 && ready===1'b1,"reposo despues de reset");
 
-        check_byte(8'h55);
-        check_byte(8'hA5);
-        check_byte(8'h00);
-        check_byte(8'hFF);
+        verificar_byte(8'h55);
+        verificar_byte(8'hA5);
+        verificar_byte(8'h00);
+        verificar_byte(8'hFF);
 
-        if(errors==0)$display("uart_tx_tb: ALL TESTS PASSED");
-        else $fatal(1,"uart_tx_tb: %0d errores",errors);
+        if(errores==0)$display("uart_tx_tb: TODAS LAS PRUEBAS PASARON");
+        else $fatal(1,"uart_tx_tb: %0d errores",errores);
         $finish;
     end
 
-    initial begin #1ms;$fatal(1,"TIMEOUT uart_tx_tb");end
+    initial begin #1ms;$fatal(1,"TIEMPO DE ESPERA AGOTADO uart_tx_tb");end
 endmodule

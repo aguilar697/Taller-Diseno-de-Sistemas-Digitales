@@ -5,7 +5,7 @@ module sevenseg_peripheral_tb;
     logic [31:0] wdata=0,rdata;
     logic [6:0] seg;
     logic [3:0] an;
-    integer checks=0,errors=0;
+    integer verificaciones=0,errores=0;
 
     always #5 clk=~clk;
 
@@ -14,90 +14,90 @@ module sevenseg_peripheral_tb;
         .wdata_i(wdata),.rdata_o(rdata),.seg_o(seg),.an_o(an)
     );
 
-    function automatic logic [6:0] expected_seg(input logic [3:0] digit);
-        case(digit)
-            0:expected_seg=7'b1000000;1:expected_seg=7'b1111001;
-            2:expected_seg=7'b0100100;3:expected_seg=7'b0110000;
-            4:expected_seg=7'b0011001;5:expected_seg=7'b0010010;
-            6:expected_seg=7'b0000010;7:expected_seg=7'b1111000;
-            8:expected_seg=7'b0000000;9:expected_seg=7'b0010000;
-            default:expected_seg=7'b1111111;
+    function automatic logic [6:0] segmentos_esperados(input logic [3:0] digito);
+        case(digito)
+            0:segmentos_esperados=7'b1000000;1:segmentos_esperados=7'b1111001;
+            2:segmentos_esperados=7'b0100100;3:segmentos_esperados=7'b0110000;
+            4:segmentos_esperados=7'b0011001;5:segmentos_esperados=7'b0010010;
+            6:segmentos_esperados=7'b0000010;7:segmentos_esperados=7'b1111000;
+            8:segmentos_esperados=7'b0000000;9:segmentos_esperados=7'b0010000;
+            default:segmentos_esperados=7'b1111111;
         endcase
     endfunction
 
-    task automatic check(input logic condition,input string test_name);
-        if(!condition)begin errors++;$error("%s",test_name);end else checks++;
+    task automatic verificar(input logic condicion,input string nombre_prueba);
+        if(condicion!==1'b1)begin errores++;$error("%s",nombre_prueba);end else verificaciones++;
     endtask
 
-    task automatic write_score(input logic [7:0] j1,input logic [7:0] j2);
+    task automatic escribir_marcador(input logic [7:0] j1,input logic [7:0] j2);
         @(negedge clk);addr=0;wdata={16'b0,j2,j1};write_enable=1;
         @(posedge clk);#1;
         @(negedge clk);write_enable=0;
     endtask
 
-    task automatic check_sync_read(
-        input logic [1:0] address,input logic [31:0] previous_value,
-        input logic [31:0] expected_value,input string test_name
+    task automatic verificar_lectura_sincrona(
+        input logic [1:0] direccion,input logic [31:0] valor_anterior,
+        input logic [31:0] valor_esperado,input string nombre_prueba
     );
-        addr=address;#1;
-        check(rdata===previous_value,{test_name," cambio antes del flanco"});
+        addr=direccion;#1;
+        verificar(rdata===valor_anterior,{nombre_prueba," cambio antes del flanco"});
         @(posedge clk);#1;
-        check(rdata===expected_value,{test_name," valor despues del flanco"});
+        verificar(rdata===valor_esperado,{nombre_prueba," valor despues del flanco"});
     endtask
 
-    task automatic check_scan(
-        input logic [3:0] j1_tens,input logic [3:0] j1_units,
-        input logic [3:0] j2_tens,input logic [3:0] j2_units
+    task automatic verificar_barrido(
+        input logic [3:0] decenas_j1,input logic [3:0] unidades_j1,
+        input logic [3:0] decenas_j2,input logic [3:0] unidades_j2
     );
-        logic [3:0] seen;
-        logic [3:0] expected_digit;
-        seen=0;
+        logic [3:0] vistos;
+        logic [3:0] digito_esperado;
+        vistos=0;
         repeat(8)begin
             @(posedge clk);#1;
             case(an)
-                4'b1110:begin seen[0]=1;expected_digit=j2_units;end
-                4'b1101:begin seen[1]=1;expected_digit=j2_tens;end
-                4'b1011:begin seen[2]=1;expected_digit=j1_units;end
-                4'b0111:begin seen[3]=1;expected_digit=j1_tens;end
-                default:begin expected_digit=4'hF;errors++;$error("anodo invalido %b",an);end
+                4'b1110:begin vistos[0]=1;digito_esperado=unidades_j2;end
+                4'b1101:begin vistos[1]=1;digito_esperado=decenas_j2;end
+                4'b1011:begin vistos[2]=1;digito_esperado=unidades_j1;end
+                4'b0111:begin vistos[3]=1;digito_esperado=decenas_j1;end
+                default:begin digito_esperado=4'hF;errores++;$error("anodo invalido %b",an);end
             endcase
-            check(seg===expected_seg(expected_digit),"patron de segmentos incorrecto");
+            verificar(seg===segmentos_esperados(digito_esperado),"patron de segmentos incorrecto");
         end
-        check(seen==4'b1111,"no se multiplexaron los cuatro digitos");
+        verificar(vistos==4'b1111,"no se multiplexaron los cuatro digitos");
     endtask
 
     initial begin
         repeat(2)@(posedge clk);#1;
-        check(rdata===32'h00000000,"reset no limpia marcador");
+        verificar(rdata===32'h00000000,"reset no limpia marcador");
         @(negedge clk);rst=0;
 
-        write_score(8'd12,8'd34);
-        check_sync_read(2'b00,32'h00000000,32'h0000220C,"lectura MMIO 12 34");
-        check_scan(4'd1,4'd2,4'd3,4'd4);
+        escribir_marcador(8'd12,8'd34);
+        verificar_lectura_sincrona(2'b00,32'h00000000,32'h0000220C,"lectura MMIO 12 34");
+        verificar_barrido(4'd1,4'd2,4'd3,4'd4);
 
-        check_sync_read(2'b11,32'h0000220C,32'h00000000,"direccion reservada");
-        check_sync_read(2'b00,32'h00000000,32'h0000220C,"regreso a marcador");
+        verificar_lectura_sincrona(2'b11,32'h0000220C,32'h00000000,"direccion reservada");
+        verificar_lectura_sincrona(2'b00,32'h00000000,32'h0000220C,"regreso a marcador");
 
         @(negedge clk);wdata=32'h00005678;write_enable=0;
         @(posedge clk);#1;
-        check(rdata===32'h0000220C,"write_enable cero modifico marcador");
+        verificar(rdata===32'h0000220C,"write_enable cero modifico marcador");
 
-        write_score(8'd5,8'd6);
-        check_sync_read(2'b00,32'h0000220C,32'h00000605,"nueva escritura");
+        escribir_marcador(8'd5,8'd6);
+        verificar_lectura_sincrona(2'b00,32'h0000220C,32'h00000605,"nueva escritura");
 
-        write_score(8'd99,8'd99);
-        check_sync_read(2'b00,32'h00000605,32'h00006363,"lectura MMIO 99 99");
-        check_scan(4'd9,4'd9,4'd9,4'd9);
+        escribir_marcador(8'd99,8'd99);
+        verificar_lectura_sincrona(2'b00,32'h00000605,32'h00006363,"lectura MMIO 99 99");
+        verificar_barrido(4'd9,4'd9,4'd9,4'd9);
 
-        write_score(8'd100,8'd255);
-        check_sync_read(2'b00,32'h00006363,32'h0000FF64,
+        escribir_marcador(8'd100,8'd255);
+        verificar_lectura_sincrona(2'b00,32'h00006363,32'h0000FF64,
                         "lectura conserva valores mayores que 99");
-        check_scan(4'd9,4'd9,4'd9,4'd9);
+        verificar_barrido(4'd9,4'd9,4'd9,4'd9);
 
-        if(errors==0)$display("sevenseg_peripheral_tb: ALL TESTS PASSED");
-        else $fatal(1,"sevenseg_peripheral_tb: %0d errores en %0d checks",errors,checks);
+        if(errores==0)$display("sevenseg_peripheral_tb: TODAS LAS PRUEBAS PASARON");
+        else $fatal(1,"sevenseg_peripheral_tb: %0d errores en %0d verificaciones",errores,verificaciones);
         $finish;
     end
 
-    initial begin #5000;$fatal(1,"TIMEOUT sevenseg_peripheral_tb");end
+    initial begin #5000;$fatal(1,"TIEMPO DE ESPERA AGOTADO sevenseg_peripheral_tb");end
 endmodule

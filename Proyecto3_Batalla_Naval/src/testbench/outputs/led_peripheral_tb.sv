@@ -3,7 +3,7 @@ module led_peripheral_tb;
     logic clk=0,rst=1,write_enable=0;
     logic [1:0] addr=0,led;
     logic [31:0] wdata=0,rdata;
-    integer checks=0,errors=0;
+    integer verificaciones=0,errores=0;
 
     always #5 clk=~clk;
 
@@ -12,59 +12,59 @@ module led_peripheral_tb;
         .wdata_i(wdata),.rdata_o(rdata),.led_o(led)
     );
 
-    task automatic check_led(input logic [1:0] expected,input string test_name);
-        if(led!==expected)begin
-            errors++;$error("%s: led=%b expected=%b",test_name,led,expected);
-        end else checks++;
+    task automatic verificar_led(input logic [1:0] esperado,input string nombre_prueba);
+        if(led!==esperado)begin
+            errores++;$error("%s: led=%b esperado=%b",nombre_prueba,led,esperado);
+        end else verificaciones++;
     endtask
 
-    task automatic write_state(input logic [1:0] value);
-        @(negedge clk);addr=0;wdata={30'b0,value};write_enable=1;
+    task automatic escribir_estado(input logic [1:0] valor);
+        @(negedge clk);addr=0;wdata={30'b0,valor};write_enable=1;
         @(posedge clk);#1;
         @(negedge clk);write_enable=0;
     endtask
 
-    task automatic check_sync_read(
-        input logic [1:0] address,input logic [31:0] previous_value,
-        input logic [31:0] expected_value,input string test_name
+    task automatic verificar_lectura_sincrona(
+        input logic [1:0] direccion,input logic [31:0] valor_anterior,
+        input logic [31:0] valor_esperado,input string nombre_prueba
     );
-        addr=address;#1;
-        if(rdata!==previous_value)begin
-            errors++;$error("%s cambio antes del flanco",test_name);
-        end else checks++;
+        addr=direccion;#1;
+        if(rdata!==valor_anterior)begin
+            errores++;$error("%s cambio antes del flanco",nombre_prueba);
+        end else verificaciones++;
         @(posedge clk);#1;
-        if(rdata!==expected_value)begin
-            errors++;$error("%s valor despues del flanco",test_name);
-        end else checks++;
+        if(rdata!==valor_esperado)begin
+            errores++;$error("%s valor despues del flanco",nombre_prueba);
+        end else verificaciones++;
     endtask
 
     initial begin
         repeat(2)@(posedge clk);#1;
-        check_led(2'b00,"reset LED");
-        if(rdata!==0)begin errors++;$error("reset rdata");end else checks++;
+        verificar_led(2'b00,"reset LED");
+        if(rdata!==0)begin errores++;$error("reset rdata");end else verificaciones++;
         @(negedge clk);rst=0;
 
-        write_state(2'b00);check_led(2'b00,"colocacion");
-        check_sync_read(2'b00,32'h0,32'h0,"lectura colocacion");
-        write_state(2'b01);check_led(2'b01,"batalla");
-        check_sync_read(2'b00,32'h0,32'h1,"lectura batalla");
+        escribir_estado(2'b00);verificar_led(2'b00,"colocacion");
+        verificar_lectura_sincrona(2'b00,32'h0,32'h0,"lectura colocacion");
+        escribir_estado(2'b01);verificar_led(2'b01,"batalla");
+        verificar_lectura_sincrona(2'b00,32'h0,32'h1,"lectura batalla");
 
-        check_sync_read(2'b11,32'h1,32'h0,"direccion reservada");
-        check_sync_read(2'b00,32'h0,32'h1,"regreso a estado LED");
+        verificar_lectura_sincrona(2'b11,32'h1,32'h0,"direccion reservada");
+        verificar_lectura_sincrona(2'b00,32'h0,32'h1,"regreso a estado LED");
 
-        write_state(2'b10);check_led(2'b10,"resultado");
-        check_sync_read(2'b00,32'h1,32'h2,"lectura resultado");
-        write_state(2'b11);check_led(2'b11,"reservado");
-        check_sync_read(2'b00,32'h2,32'h3,"lectura codigo reservado");
+        escribir_estado(2'b10);verificar_led(2'b10,"resultado");
+        verificar_lectura_sincrona(2'b00,32'h1,32'h2,"lectura resultado");
+        escribir_estado(2'b11);verificar_led(2'b11,"reservado");
+        verificar_lectura_sincrona(2'b00,32'h2,32'h3,"lectura codigo reservado");
 
         @(negedge clk);wdata=32'h00000001;write_enable=0;
-        @(posedge clk);#1;check_led(2'b11,"write_enable cero");
-        if(rdata!==32'h3)begin errors++;$error("write_enable cero modifico lectura");end else checks++;
+        @(posedge clk);#1;verificar_led(2'b11,"write_enable cero");
+        if(rdata!==32'h3)begin errores++;$error("write_enable cero modifico lectura");end else verificaciones++;
 
-        if(errors==0)$display("led_peripheral_tb: ALL TESTS PASSED");
-        else $fatal(1,"led_peripheral_tb: %0d errores en %0d checks",errors,checks);
+        if(errores==0)$display("led_peripheral_tb: TODAS LAS PRUEBAS PASARON");
+        else $fatal(1,"led_peripheral_tb: %0d errores en %0d verificaciones",errores,verificaciones);
         $finish;
     end
 
-    initial begin #1000;$fatal(1,"TIMEOUT led_peripheral_tb");end
+    initial begin #1000;$fatal(1,"TIEMPO DE ESPERA AGOTADO led_peripheral_tb");end
 endmodule

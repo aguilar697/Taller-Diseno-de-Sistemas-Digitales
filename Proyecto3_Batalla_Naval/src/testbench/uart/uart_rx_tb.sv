@@ -9,7 +9,7 @@ module uart_rx_tb;
     logic clk=0,rst=1,rx=1;
     logic [7:0] data;
     logic valid;
-    integer errors=0,valid_count=0;
+    integer errores=0,conteo_valid=0;
 
     always #(CLK_PERIOD/2) clk=~clk;
 
@@ -18,54 +18,54 @@ module uart_rx_tb;
     );
 
     always @(posedge clk) begin
-        if(!rst && valid)valid_count++;
+        if(!rst && valid)conteo_valid++;
     end
 
-    task automatic check(input logic condition,input string message);
-        if(!condition)begin errors++;$error("%s",message);end
+    task automatic verificar(input logic condicion,input string mensaje);
+        if(condicion!==1'b1)begin errores++;$error("%s",mensaje);end
     endtask
 
-    task automatic drive_byte(input logic [7:0] value);
-        integer index;
+    task automatic enviar_byte(input logic [7:0] valor);
+        integer indice;
         rx=0;#BIT_PERIOD;
-        for(index=0;index<8;index++)begin
-            rx=value[index];#BIT_PERIOD;
+        for(indice=0;indice<8;indice++)begin
+            rx=valor[indice];#BIT_PERIOD;
         end
         rx=1;#BIT_PERIOD;
     endtask
 
-    task automatic send_and_check(input logic [7:0] value);
-        integer previous_count;
-        previous_count=valid_count;
+    task automatic enviar_y_verificar(input logic [7:0] valor);
+        integer conteo_anterior;
+        conteo_anterior=conteo_valid;
         fork
-            drive_byte(value);
+            enviar_byte(valor);
             begin
                 wait(valid);
                 #1;
-                check(data===value,$sformatf("byte recibido incorrecto: %h",value));
+                verificar(data===valor,$sformatf("byte recibido incorrecto: %h",valor));
                 @(posedge clk);#1;
-                check(!valid,"valid debe durar un ciclo");
+                verificar(!valid,"valid debe durar un ciclo");
             end
         join
-        check(valid_count==previous_count+1,"cantidad de pulsos valid incorrecta");
+        verificar(conteo_valid==conteo_anterior+1,"cantidad de pulsos valid incorrecta");
         #BIT_PERIOD;
     endtask
 
     initial begin
         repeat(3)@(posedge clk);#1;
-        check(data===8'h00 && valid===1'b0,"reset incorrecto");
+        verificar(data===8'h00 && valid===1'b0,"reset incorrecto");
         @(negedge clk);rst=0;
         #BIT_PERIOD;
 
-        send_and_check(8'h55);
-        send_and_check(8'hA5);
-        send_and_check(8'h00);
-        send_and_check(8'hFF);
+        enviar_y_verificar(8'h55);
+        enviar_y_verificar(8'hA5);
+        enviar_y_verificar(8'h00);
+        enviar_y_verificar(8'hFF);
 
-        if(errors==0)$display("uart_rx_tb: ALL TESTS PASSED");
-        else $fatal(1,"uart_rx_tb: %0d errores",errors);
+        if(errores==0)$display("uart_rx_tb: TODAS LAS PRUEBAS PASARON");
+        else $fatal(1,"uart_rx_tb: %0d errores",errores);
         $finish;
     end
 
-    initial begin #1ms;$fatal(1,"TIMEOUT uart_rx_tb");end
+    initial begin #1ms;$fatal(1,"TIEMPO DE ESPERA AGOTADO uart_rx_tb");end
 endmodule
