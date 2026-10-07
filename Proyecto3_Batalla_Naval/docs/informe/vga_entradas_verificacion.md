@@ -519,39 +519,39 @@ Para la validación física se utilizó `subsystem2_basys3_test_top.sv` como top
 
 La versión final del top, con la nueva asignación de controles, reset físico mediante `SW15` e indicadores `LED14` y `LED15`, fue sintetizada, implementada y utilizada para generar el bitstream probado físicamente en la Basys 3.
 
-### 8.1 Reportes de implementación conservados
 
-En el repositorio se conservan los reportes:
+
+### 8.1 Reportes de implementación finales
+
+Para la versión final de `subsystem2_basys3_test_top`, utilizada durante la validación física del Subsistema 2, se regeneraron los reportes de utilización y temporización después de placement y routing.
+
+Los reportes finales se conservan en:
 
 ```text
 resultados/vga_entradas/14_subsystem2_utilization_impl.rpt
 resultados/vga_entradas/15_subsystem2_timing_summary_impl.rpt
 ```
+La utilización obtenida para el top físico final fue:
 
-Estos reportes corresponden a una implementación anterior del mismo Subsistema 2, previa a la reasignación física final de controles y LEDs.
-
-En dicha implementación se observaron:
-
-| Recurso | Uso observado |
+| Recurso | Uso final |
 |---|---:|
-| LUT | 175 |
+| LUT | 172 |
 | FF | 211 |
-| BRAM | 1 RAMB18E1 = 0.5 Block RAM Tile |
+| RAMB18 | 1 |
+| DSP | 0 |
 
-y:
+El análisis temporal final produjo:
 
 | Métrica | Resultado |
 |---|---:|
-| WNS | 4.612 ns |
+| WNS | 4.293 ns |
 | TNS | 0.000 ns |
 | WHS | 0.122 ns |
 | THS | 0.000 ns |
 | Setup failing endpoints | 0 |
 | Hold failing endpoints | 0 |
 
-Estos valores se conservan como evidencia histórica del proceso de implementación, pero no se presentan como los valores temporales definitivos de la última revisión del top físico.
-
-Para documentar métricas exactas de la revisión final deberán exportarse nuevamente los reportes de utilización y timing después de la última implementación.
+Vivado reporta que todas las restricciones temporales especificadas se cumplen. Los márgenes positivos de setup y hold, junto con la ausencia de endpoints fallidos, confirman el cumplimiento temporal de la implementación final para los dominios de 100 MHz y 25 MHz.
 
 ### 8.2 Clocking Wizard
 

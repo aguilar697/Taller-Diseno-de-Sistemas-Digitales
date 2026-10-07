@@ -38,12 +38,14 @@ Toda la lógica del juego corresponde al programa ensamblador RISC-V. La platafo
 | Alcance | Estado documentado |
 |---|---|
 | CPU y ROM | Simulación funcional unitaria e integrada con resultados PASS; síntesis y análisis temporal pendientes |
-| VGA y entradas J1 | Simulaciones e implementación del subsistema documentadas; prueba física parcial, sin validación de imagen en monitor VGA |
+| VGA y entradas J1 | Simulaciones unitarias e integradas, aceptación black-box 27/27, síntesis e implementación con cumplimiento temporal, y validación física de entradas y salida VGA en monitor documentadas |
 | Plataforma de datos, UART y aplicación PC | Diseño de interfaces documentado; implementación y verificación pendientes de incorporar |
 | Programa RISC-V | Diseño de tercer nivel documentado; cuarto nivel, programa y pruebas pendientes de incorporar |
-| Juego completo | Integración, implementación y validación conjunta pendientes |
+| Juego completo | Integración, implementación y validación conjunta pendientes de documentar |
 
-Las pruebas de CPU y del subsistema VGA tienen alcances independientes y todavía no acreditan el funcionamiento del juego completo. El [índice del informe](docs/informe/README.md) reúne los resultados disponibles y los pendientes para completar la entrega.
+La verificación del Subsistema 2 incluye pruebas unitarias e integradas, aceptación black-box, implementación física en Basys 3 y comprobación de la salida VGA mediante monitor. Los resultados finales de utilización y temporización se encuentran documentados en el [informe de verificación del VGA y entradas del Jugador 1](docs/informe/vga_entradas_verificacion.md).
+
+Las pruebas realizadas por subsistema tienen alcances independientes. La validación final del juego completo, incluida la simulación post-implementación temporizada del sistema, se documenta como parte de la integración conjunta del proyecto. El [índice del informe](docs/informe/README.md) reúne los resultados disponibles y los pendientes para completar la entrega.
 
 ## Estructura
 
