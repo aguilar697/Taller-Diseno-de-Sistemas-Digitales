@@ -291,7 +291,8 @@ def send_shot(connection: SerialConnection, row: int, col: int) -> None:
 
 def print_boards(state: GameState) -> None:
     print("\n      TABLERO PROPIO                 TABLERO RIVAL")
-    print("    " + " ".join(map(str, range(8))) + "         " + " ".join(map(str, range(8))))
+    numbers = " ".join(map(str, range(8)))
+    print(f"{'':4}{numbers}{'':11}{numbers}")
     for row in range(8):
         own = " ".join(state.own_board[row])
         enemy = " ".join(state.enemy_board[row])
