@@ -97,6 +97,8 @@ module uart_peripheral_tb;
         enviar_byte_rx(8'h3C);
         addr=2'b00;
         wait(rdata[1]===1'b1);
+        // Cambiar direccion fuera del flanco de lectura evita carreras del TB.
+        @(negedge clk);
         verificar_lectura_sincrona(2'b10,32'h00000003,32'h0000003C,
                         "CONTROL a RX_DATA");
         verificar_lectura_sincrona(2'b00,32'h0000003C,32'h00000003,

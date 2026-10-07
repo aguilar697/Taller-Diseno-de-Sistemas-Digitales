@@ -14,7 +14,7 @@ El diseño se organiza mediante descomposición modular: el primer nivel present
 | 1. CPU RISC-V y ROM | Kevin Aguilar | [Arquitectura del núcleo](nivel_3_cpu.md) | [Datapath, ROM y control](nivel_4_cpu.md) |
 | 2. VGA y entradas J1 | Kenneth Campos | [Bloques e interfaces](nivel_3_vga_entradas.md) | [Video, memoria y entradas](nivel_4_vga_entradas.md) |
 | 3. Plataforma de datos, UART y PC | Daniel Puentes | [Bus, memorias y periféricos](nivel_3_uart.md) | [Bus, RAM, UART y salidas](nivel_4_uart.md) |
-| 4. Lógica del juego en ensamblador | Kevin Cortés | [Organización del software](nivel_3_logica_juego.md) | **EN PROCESO** |
+| 4. Lógica del juego en ensamblador | Kevin Cortés | [Organización del software](nivel_3_logica_juego.md) | [Procedimientos internos](nivel_4_logica_juego.md) |
 
 ## Organización documental
 

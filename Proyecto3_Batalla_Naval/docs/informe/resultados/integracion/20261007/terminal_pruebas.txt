@@ -1,0 +1,52 @@
+test_build_place_ship (test_protocol.BuildFrameTests.test_build_place_ship) ... ok
+test_build_shot (test_protocol.BuildFrameTests.test_build_shot) ... ok
+test_byte_by_byte (test_protocol.FrameParserTests.test_byte_by_byte) ... ok
+test_complete_frame (test_protocol.FrameParserTests.test_complete_frame) ... ok
+test_consecutive_frames (test_protocol.FrameParserTests.test_consecutive_frames) ... ok
+test_fragmented_frame_survives_short_serial_pause (test_protocol.FrameParserTests.test_fragmented_frame_survives_short_serial_pause) ... ok
+test_garbage_before_sof (test_protocol.FrameParserTests.test_garbage_before_sof) ... ok
+test_invalid_length (test_protocol.FrameParserTests.test_invalid_length) ... ok
+test_invalid_type (test_protocol.FrameParserTests.test_invalid_type) ... ok
+test_sof_inside_payload_is_data (test_protocol.FrameParserTests.test_sof_inside_payload_is_data) ... ok
+test_truncated_frame_expires_before_new_game_announcement (test_protocol.FrameParserTests.test_truncated_frame_expires_before_new_game_announcement) ... ok
+test_game_over_updates_score (test_protocol.HandleFrameTests.test_game_over_updates_score) ... 
+Fin de la partida
+Ganador: Jugador 2
+Disparos J1: 9   Disparos J2: 11
+Barcos hundidos por J1: 1   por J2: 3
+Marcador: J1 4 - J2 5
+ok
+test_initial_placement_start_does_not_restart (test_protocol.HandleFrameTests.test_initial_placement_start_does_not_restart) ... 
+Nueva partida. Marcador J1 0 - J2 0.
+ok
+test_invalid_coordinates_leave_boards_unchanged (test_protocol.HandleFrameTests.test_invalid_coordinates_leave_boards_unchanged) ... Notificación inválida: se descartó sin modificar el estado.
+Notificación inválida: se descartó sin modificar el estado.
+ok
+test_invalid_placement_acknowledgment_is_rejected (test_protocol.HandleFrameTests.test_invalid_placement_acknowledgment_is_rejected) ... ok
+test_invalid_player_does_not_change_turn (test_protocol.HandleFrameTests.test_invalid_player_does_not_change_turn) ... Notificación inválida: se descartó sin modificar el estado.
+ok
+test_invalid_result_is_rejected (test_protocol.HandleFrameTests.test_invalid_result_is_rejected) ... ok
+test_invalid_ship_rejection_echoes_original_identifier (test_protocol.HandleFrameTests.test_invalid_ship_rejection_echoes_original_identifier) ... ok
+test_placement_start_signals_new_game (test_protocol.HandleFrameTests.test_placement_start_signals_new_game) ... 
+Nueva partida. Marcador J1 1 - J2 2.
+ok
+test_repeated_shot_asks_again (test_protocol.HandleFrameTests.test_repeated_shot_asks_again) ... La FPGA rechazó la solicitud: esa casilla ya fue disparada.
+ok
+test_truncated_notification_is_rejected (test_protocol.HandleFrameTests.test_truncated_notification_is_rejected) ... Notificación inválida: se descartó sin modificar el estado.
+ok
+test_wrong_turn_does_not_ask_again (test_protocol.HandleFrameTests.test_wrong_turn_does_not_ask_again) ... La FPGA rechazó la solicitud: no es su turno.
+ok
+test_every_fpga_message_is_accepted (test_protocol.ProtocolAgreementTests.test_every_fpga_message_is_accepted) ... ok
+test_lengths_match_design (test_protocol.ProtocolAgreementTests.test_lengths_match_design) ... ok
+test_game_reset_starts_another_placement_and_keeps_score (test_terminal.TerminalTests.test_game_reset_starts_another_placement_and_keeps_score) ... ok
+test_initial_announcement_preserves_pending_placement (test_terminal.TerminalTests.test_initial_announcement_preserves_pending_placement) ... ok
+test_repeated_shot_retries_without_another_turn (test_terminal.TerminalTests.test_repeated_shot_retries_without_another_turn) ... ok
+test_reset_during_first_placement_is_recognized_after_start (test_terminal.TerminalTests.test_reset_during_first_placement_is_recognized_after_start) ... ok
+test_reset_during_keyboard_entry_prevents_stale_command (test_terminal.TerminalTests.test_reset_during_keyboard_entry_prevents_stale_command) ... ok
+test_reset_preserves_later_queued_notifications (test_terminal.TerminalTests.test_reset_preserves_later_queued_notifications) ... ok
+test_session_waits_for_placement_before_sending_commands (test_terminal.TerminalTests.test_session_waits_for_placement_before_sending_commands) ... ok
+
+----------------------------------------------------------------------
+Ran 31 tests in 0.005s
+
+OK

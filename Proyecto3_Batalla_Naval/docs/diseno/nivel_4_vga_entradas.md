@@ -66,8 +66,13 @@ La configuración utilizada para implementación física recibe 100 MHz y genera
 El reset interno del Subsistema 2 continúa utilizando polaridad activa en alto. La adaptación de `SW15` utilizada durante la prueba física se realiza únicamente en el top de tarjeta mediante:
 
 ```systemverilog
-assign rst = ~sw[15];
+(* ASYNC_REG = "TRUE" *) logic [1:0] reset_pipe_q = 2'b11;
+always_ff @(posedge clk)
+    reset_pipe_q <= {reset_pipe_q[0], ~sw[15]};
+assign rst = reset_pipe_q[1];
 ```
+
+La solicitud invertida de `SW15` atraviesa dos etapas a 100 MHz antes de llegar al reset interno. La polaridad se conserva; la activación y la liberación se alinean con el reloj.
 
 Por tanto:
 
@@ -504,8 +509,13 @@ SW15 = 1 -> funcionamiento normal
 La adaptación se realiza mediante:
 
 ```systemverilog
-assign rst = ~sw[15];
+(* ASYNC_REG = "TRUE" *) logic [1:0] reset_pipe_q = 2'b11;
+always_ff @(posedge clk)
+    reset_pipe_q <= {reset_pipe_q[0], ~sw[15]};
+assign rst = reset_pipe_q[1];
 ```
+
+La solicitud invertida de `SW15` atraviesa dos etapas a 100 MHz antes de llegar al reset interno. La polaridad se conserva; la activación y la liberación se alinean con el reloj.
 
 Como `SEL` se encuentra físicamente en un switch, para producir acciones consecutivas debe generarse una nueva transición de `SW0`. La detección de flancos necesaria para la interacción del juego pertenece al software.
 
@@ -1027,8 +1037,13 @@ SW15 -> RUN / habilitación física del top de prueba
 El reset interno continúa activo en alto y se genera en el top mediante:
 
 ```systemverilog
-assign rst = ~sw[15];
+(* ASYNC_REG = "TRUE" *) logic [1:0] reset_pipe_q = 2'b11;
+always_ff @(posedge clk)
+    reset_pipe_q <= {reset_pipe_q[0], ~sw[15]};
+assign rst = reset_pipe_q[1];
 ```
+
+La solicitud invertida de `SW15` atraviesa dos etapas a 100 MHz antes de llegar al reset interno. La polaridad se conserva; la activación y la liberación se alinean con el reloj.
 
 Los indicadores físicos de la prueba son:
 

@@ -7,7 +7,7 @@ module mmio_subsystem_top #(
     parameter int unsigned MISS_HALF_PERIOD = 125_000,
     parameter int unsigned SUNK_HALF_PERIOD = 71_429,
     parameter int unsigned INVALID_HALF_PERIOD = 200_000,
-    parameter int unsigned VICTORY_HALF_PERIOD = 33_333
+    parameter int unsigned VICTORY_HALF_PERIOD = 95_602
 )(
     input  logic        clk_i,
     input  logic        rst_i,

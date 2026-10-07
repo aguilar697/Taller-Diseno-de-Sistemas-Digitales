@@ -4,16 +4,32 @@ module buzzer_peripheral_tb;
     logic [1:0] addr=0;
     logic [31:0] wdata=0,rdata;
     logic buzzer;
+    logic [31:0] rdata_dur;
+    logic buzzer_dur;
     integer verificaciones=0,errores=0;
 
     always #5 clk=~clk;
 
     buzzer_peripheral #(
         .HIT_HALF_PERIOD(2),.MISS_HALF_PERIOD(3),.SUNK_HALF_PERIOD(4),
-        .INVALID_HALF_PERIOD(5),.VICTORY_HALF_PERIOD(6)
+        .INVALID_HALF_PERIOD(5),.VICTORY_HALF_PERIOD(6),
+        .VICTORY_HALF_PERIOD_2(7),.VICTORY_HALF_PERIOD_3(8),.VICTORY_HALF_PERIOD_4(16)
     ) dut(
         .clk_i(clk),.rst_i(rst),.write_enable_i(write_enable),.addr_i(addr),
         .wdata_i(wdata),.rdata_o(rdata),.buzzer_o(buzzer)
+    );
+
+    // Segunda instancia con duraciones cortas para probar que cada sonido
+    // vuelve solo a apagado. Recibe las mismas escrituras que dut.
+    buzzer_peripheral #(
+        .HIT_HALF_PERIOD(2),.MISS_HALF_PERIOD(3),.SUNK_HALF_PERIOD(4),
+        .INVALID_HALF_PERIOD(5),.VICTORY_HALF_PERIOD(6),
+        .VICTORY_HALF_PERIOD_2(7),.VICTORY_HALF_PERIOD_3(8),.VICTORY_HALF_PERIOD_4(16),
+        .HIT_DURATION(10),.MISS_DURATION(12),.SUNK_DURATION(14),
+        .INVALID_DURATION(16),.VICTORY_DURATION(32)
+    ) dut_dur(
+        .clk_i(clk),.rst_i(rst),.write_enable_i(write_enable),.addr_i(addr),
+        .wdata_i(wdata),.rdata_o(rdata_dur),.buzzer_o(buzzer_dur)
     );
 
     task automatic verificar(input logic condicion,input string nombre_prueba);
@@ -88,6 +104,50 @@ module buzzer_peripheral_tb;
         verificar(buzzer==0,"comando cero no apaga inmediatamente");
         verificar_lectura_sincrona(2'b00,32'h00000002,32'h00000000,
                         "lectura despues de apagar buzzer");
+
+        // --- Duracion de cada sonido (dut_dur) ---
+        escribir_comando(3'd1);                 // HIT dura 10 ciclos
+        repeat(4)@(posedge clk);#1;
+        verificar(rdata_dur==32'h1,"el sonido sigue activo antes de su duracion");
+        repeat(8)@(posedge clk);#1;
+        verificar(rdata_dur==32'h0 && buzzer_dur==0,
+                  "al cumplir la duracion el buzzer vuelve solo a apagado");
+
+        escribir_comando(3'd2);                 // MISS dura 12 ciclos
+        repeat(8)@(posedge clk);#1;
+        escribir_comando(3'd2);                 // la misma orden otra vez
+        repeat(8)@(posedge clk);#1;
+        verificar(rdata_dur==32'h2,"una orden nueva reinicia la duracion");
+        repeat(6)@(posedge clk);#1;
+        verificar(rdata_dur==32'h0 && buzzer_dur==0,"la orden repetida tambien termina");
+
+        // Cuatro notas; los maximos 16 y 32 comprueban anchos de potencias de dos.
+        escribir_comando(3'd5);
+        for (int nota = 0; nota < 4; nota++) begin
+            int semiperiodo;
+            logic nivel_esperado;
+            case (nota)
+                0: semiperiodo=6;
+                1: semiperiodo=7;
+                2: semiperiodo=8;
+                3: semiperiodo=16;
+            endcase
+            verificar(dut_dur.note_q==nota, "orden de notas de victoria");
+            verificar(dut_dur.command_q==5, "victoria activa al comenzar nota");
+            verificar(buzzer_dur==0, "cada nota comienza en cero");
+            for (int ciclo = 1; ciclo <= 32; ciclo++) begin
+                @(posedge clk); #1;
+                nivel_esperado = (ciclo < 32) ? ((ciclo/semiperiodo)%2) : 0;
+                verificar(buzzer_dur===nivel_esperado, "frecuencia y duracion de nota");
+                if(ciclo<32)
+                    verificar(dut_dur.note_q==nota && dut_dur.command_q==5,
+                              "nota conserva su duracion completa");
+            end
+        end
+        verificar(dut_dur.command_q==0 && buzzer_dur==0,
+                  "victoria termina tras exactamente 128 ciclos");
+        @(posedge clk); #1;
+        verificar(rdata_dur==0, "lectura sincronica tras finalizar victoria");
 
         if(errores==0)$display("buzzer_peripheral_tb: TODAS LAS PRUEBAS PASARON");
         else $fatal(1,"buzzer_peripheral_tb: %0d errores en %0d verificaciones",errores,verificaciones);

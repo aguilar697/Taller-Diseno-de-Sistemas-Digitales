@@ -1,0 +1,134 @@
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/cpu/cpu_pkg.sv" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/cpu_tb_pkg.sv" into library xil_defaultlib
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/bus/address_decoder.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module address_decoder
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/bus/data_bus.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module data_bus
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/cpu/alu.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module alu
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/cpu/cpu.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module cpu
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/cpu/cpu_control.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module cpu_control
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/cpu/cpu_datapath.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module cpu_datapath
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/cpu/immediate_generator.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module immediate_generator
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/cpu/instruction_decoder.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module instruction_decoder
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/cpu/register_file.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module register_file
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/inputs/debounce.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module debounce
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/inputs/input_sync.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module input_sync
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/inputs/player1_inputs.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module player1_inputs
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/integration/mmio_subsystem_top.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mmio_subsystem_top
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/memory/data_ram.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module data_ram
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/memory/program_rom.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module program_rom
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/outputs/buzzer_peripheral.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module buzzer_peripheral
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/outputs/led_peripheral.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module led_peripheral
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/outputs/sevenseg_driver.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sevenseg_driver
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/outputs/sevenseg_peripheral.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sevenseg_peripheral
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/top/basys3_top.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module basys3_top
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/top/battleship_top.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module battleship_top
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/top/subsystem2_basys3_test_top.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module subsystem2_basys3_test_top
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/uart/uart_peripheral.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module uart_peripheral
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/uart/uart_rx.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module uart_rx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/uart/uart_tx.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module uart_tx
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/vga/glyph_rom.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module glyph_rom
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/vga/pixel_clock.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module pixel_clock
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/vga/pixel_reset_sync.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module pixel_reset_sync
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/vga/subsystem2_vga_inputs.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module subsystem2_vga_inputs
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/vga/tile_renderer.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tile_renderer
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/vga/vga_timing.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module vga_timing
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/design/vga/video_memory.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module video_memory
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/bus/address_decoder_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module address_decoder_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/bus/data_bus_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module data_bus_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/alu_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module alu_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/cpu_control_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module cpu_control_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/cpu_datapath_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module cpu_datapath_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/cpu_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module cpu_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/immediate_generator_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module immediate_generator_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/instruction_decoder_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module instruction_decoder_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/register_file_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module register_file_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/inputs/tb_debounce.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_debounce
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/inputs/tb_input_sync.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_input_sync
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/inputs/tb_player1_inputs.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_player1_inputs
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/basys3_controls_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module basys3_controls_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/boot_switches_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module boot_switches_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/mmio_subsystem_integration_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mmio_subsystem_integration_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/mmio_subsystem_top_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module mmio_subsystem_top_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/pixel_clock_wiz_sim.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module pixel_clock_wiz
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/tb_battleship_system.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_battleship_system
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/tb_subsystem2_peripheral.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_subsystem2_peripheral
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/tb_subsystem2_vga_inputs.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_subsystem2_vga_inputs
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/memory/data_ram_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module data_ram_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/memory/program_rom_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module program_rom_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/outputs/buzzer_peripheral_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module buzzer_peripheral_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/outputs/led_peripheral_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module led_peripheral_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/outputs/sevenseg_peripheral_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module sevenseg_peripheral_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/uart/uart_peripheral_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module uart_peripheral_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/uart/uart_rx_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module uart_rx_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/uart/uart_tx_tb.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module uart_tx_tb
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/vga/tb_glyph_rom.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_glyph_rom
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/vga/tb_pixel_clock.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_pixel_clock
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/vga/tb_pixel_reset_sync.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_pixel_reset_sync
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/vga/tb_tile_renderer.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_tile_renderer
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/vga/tb_vga_timing.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_vga_timing
+INFO: [VRFC 10-2263] Analyzing SystemVerilog file "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/vga/tb_video_memory.sv" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module tb_video_memory
