@@ -6,7 +6,7 @@ Este subsistema conecta la interfaz de datos del procesador RISC-V con la RAM y 
 
 También incluye la comunicación con el Jugador 2 mediante UART, los displays de siete segmentos, el LED de estado y el buzzer. Las entradas del Jugador 1 y la memoria de video se conectan a través del mismo bus, aunque su desarrollo pertenece al subsistema de interfaz local y VGA.
 
-El diseño utiliza un reloj de 100 MHz y reset síncrono activo alto. La UART trabaja a 115200 baud. Este documento presenta la arquitectura prevista; no incluye todavía resultados de implementación o simulación.
+El diseño utiliza un reloj de 100 MHz y reset síncrono activo alto. La UART trabaja a 115200 baud. Las pruebas del RTL se documentan en el [informe MMIO](../informe/mmio_verificacion.md) y la [verificación del sistema completo](../informe/integracion_verificacion.md).
 
 ## Diagrama funcional
 
@@ -52,7 +52,7 @@ El procesador controla todos estos bloques mediante instrucciones de carga y alm
 | RAM | `0x00002000-0x00002FFF` | Memoria de datos de 32 bits |
 | UART CONTROL/STATUS | `0x00010040` | Control y estado de la comunicación |
 | UART TX_DATA | `0x00010044` | Byte que se desea transmitir |
-| UART RX_DATA | `0x00010048` | Próximo byte disponible en la FIFO RX |
+| UART RX_DATA | `0x00010048` | Último byte recibido; lectura sin consumo |
 | Entradas J1 | `0x00010120` | Controles locales del Jugador 1 |
 | Display de siete segmentos | `0x00010130` | Victorias acumuladas |
 | LED de estado | `0x00010138` | Fase de la partida |
@@ -67,7 +67,7 @@ La UART convierte los accesos MMIO del procesador en bytes seriales 8N1 a 115200
 
 La aplicación Python corresponde a la interfaz del Jugador 2. Envía las solicitudes de colocación y disparo, y recibe las respuestas generadas por el programa RISC-V. La aplicación presenta la información al usuario, pero no decide si una jugada es válida ni mantiene una copia independiente de las reglas.
 
-La comunicación debe evitar que un dato nuevo sobrescriba otro que todavía no ha sido atendido. Los bits de control, reconocimiento, disponibilidad y overflow están definidos en el [contrato UART del programa](nivel_3_logica_juego.md) y se aplican al [diseño del periférico](nivel_4_uart.md#3-periférico-uart). La implementación deberá conservar ese contrato y verificarlo antes de la integración.
+El bit 0 de CONTROL indica TX lista y el bit 1 indica RX válida. Escribir TX_DATA inicia la transmisión si TX está lista; escribir uno en CONTROL[1] reconoce el byte recibido. No hay FIFO RX ni bit de overflow: un byte nuevo reemplaza al anterior. El ciclo de servicio atiende RX y distribuye el redibujado VGA para reducir el tiempo entre lecturas. El [contrato UART del programa](nivel_3_logica_juego.md) detalla esta limitación.
 
 ## Salidas locales
 

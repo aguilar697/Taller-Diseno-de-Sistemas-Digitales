@@ -25,25 +25,27 @@ Toda la lógica del juego corresponde al programa ensamblador RISC-V. La platafo
 | CPU y ROM | [Arquitectura](docs/diseno/nivel_3_cpu.md) | [Datapath y control](docs/diseno/nivel_4_cpu.md) |
 | VGA y entradas J1 | [Bloques e interfaces](docs/diseno/nivel_3_vga_entradas.md) | [Desarrollo interno](docs/diseno/nivel_4_vga_entradas.md) |
 | Plataforma de datos, UART y PC | [Arquitectura](docs/diseno/nivel_3_uart.md) | [Bus, RAM y periféricos](docs/diseno/nivel_4_uart.md) |
-| Lógica del juego | [Organización del software](docs/diseno/nivel_3_logica_juego.md) | **EN PROCESO** |
+| Lógica del juego | [Organización del software](docs/diseno/nivel_3_logica_juego.md) | [Procedimientos internos](docs/diseno/nivel_4_logica_juego.md) |
 
 ## Implementación del CPU y la ROM
 
 - [Módulos e interfaces del núcleo](src/design/cpu/README.md).
 - [Testbenches y ejecución en Vivado](src/testbench/cpu/README.md).
 - [Informe de verificación del CPU y la ROM](docs/informe/cpu_verificacion.md).
+- [Ejecución, proyecto de Vivado y controles de Basys 3](docs/uso_basys3.md).
+- [Fuentes y generación de la ROM del juego](src/software_riscv/README.md).
 
 ## Estado de verificación
 
 | Alcance | Estado documentado |
 |---|---|
-| CPU y ROM | Simulación funcional unitaria e integrada con resultados PASS; síntesis y análisis temporal pendientes |
-| VGA y entradas J1 | Simulaciones e implementación del subsistema documentadas; prueba física parcial, sin validación de imagen en monitor VGA |
-| Plataforma de datos, UART y aplicación PC | Diseño de interfaces documentado; implementación y verificación pendientes de incorporar |
-| Programa RISC-V | Diseño de tercer nivel documentado; cuarto nivel, programa y pruebas pendientes de incorporar |
-| Juego completo | Integración, implementación y validación conjunta pendientes |
+| CPU y ROM | Simulación funcional unitaria e integrada con resultados PASS; imagen del juego reproducible desde sus fuentes |
+| VGA y entradas J1 | Simulaciones unitarias e integradas, aceptación black-box 27/27, implementación con cumplimiento temporal y validación física de entradas y salida VGA en monitor documentadas |
+| Plataforma de datos, UART y aplicación PC | Pruebas RTL y 31 pruebas de protocolo/terminal aprobadas; contrato MMIO documentado |
+| Programa RISC-V | ROM comprobada contra fuentes; 5 pruebas del ensamblador aprobadas; juego ejecutado sobre el CPU RTL |
+| Juego completo | 33 testbenches aprobados y partida integrada con comparación de tramas, RAM y marcador; evidencia en el informe de integración |
 
-Las pruebas de CPU y del subsistema VGA tienen alcances independientes y todavía no acreditan el funcionamiento del juego completo. El [índice del informe](docs/informe/README.md) reúne los resultados disponibles y los pendientes para completar la entrega.
+Las simulaciones verifican el comportamiento funcional. El equipo reporta funcionamiento en placa de la rama `kCortes`; la evidencia física y los reportes de implementación deben identificar la revisión del bitstream utilizado. La revisión local conserva correcciones adicionales comprobadas en simulación. El [índice del informe](docs/informe/README.md) distingue ese alcance y reúne las evidencias disponibles.
 
 ## Estructura
 
@@ -56,5 +58,6 @@ Las pruebas de CPU y del subsistema VGA tienen alcances independientes y todaví
 | `src/constraints/` | Restricciones de reloj y asignación de pines |
 | `src/software_riscv/` | Programa ensamblador del juego |
 | `src/software_pc/` | Aplicación remota del Jugador 2 |
+| `scripts/` | Ensamblado, verificación y creación/implementación del proyecto Vivado |
 
 [Repositorio del curso](../README.md)

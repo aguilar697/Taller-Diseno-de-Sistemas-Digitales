@@ -43,3 +43,6 @@ desktop.ini
 .venv/
 __pycache__/
 *.pyc
+
+# Proyectos, bitstreams y resultados regenerables de Batalla Naval
+/Proyecto3_Batalla_Naval/build/

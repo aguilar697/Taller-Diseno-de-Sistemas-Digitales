@@ -1,8 +1,6 @@
 ## ============================================================
 ## Proyecto 3 - Batalla Naval
-## Subsistema 2 - Prueba fisica Basys 3
-## Top: subsystem2_basys3_test_top
-## ============================================================
+## Subsistema 2 - VGA + Entradas Jugador 1
 
 
 ## ============================================================
@@ -21,11 +19,25 @@ create_clock -add -name sys_clk_pin \
 ## ============================================================
 ## SWITCHES
 ##
-## SW0  -> GAME_RST
+## SW0  -> SEL
 ## SW1  -> OK
-## SW15 -> Reset general
+## SW15 -> RUN / habilitacion del Subsistema 2
 ##
-## Se habilitan los 16 porque el top declara sw[15:0].
+## SW15 = 0:
+##     reset interno aplicado
+##     Subsistema 2 inactivo
+##     LED15 apagado
+##
+## SW15 = 1:
+##     reset interno liberado
+##     Subsistema 2 funcionando
+##     LED15 encendido
+##
+## El reset interno sigue siendo activo en alto.
+## La inversion se realiza en el top:
+##
+##     rst = ~sw[15] sincronizado mediante dos flip-flops a 100 MHz
+##
 ## ============================================================
 
 set_property PACKAGE_PIN V17 [get_ports {sw[0]}]
@@ -80,17 +92,19 @@ set_property IOSTANDARD LVCMOS33 [get_ports {sw[15]}]
 ## ============================================================
 ## LEDs
 ##
-## LED0 -> UP
-## LED1 -> DOWN
-## LED2 -> LEFT
-## LED3 -> RIGHT
-## LED4 -> SEL
-## LED5 -> OK
-## LED6 -> GAME_RST
+## LED0  -> UP       = BTNU
+## LED1  -> DOWN     = BTND
+## LED2  -> LEFT     = BTNL
+## LED3  -> RIGHT    = BTNR
+## LED4  -> SEL      = SW0
+## LED5  -> OK       = SW1
+## LED6  -> GAME_RST = BTNC
 ##
-## LED15 -> Inicializacion de VRAM terminada
+## LED7 ... LED13 -> reservados / apagados
 ##
-## Se habilitan los 16 porque el top declara led[15:0].
+## LED14 -> inicializacion de VRAM terminada
+## LED15 -> Subsistema 2 habilitado / RUN
+##
 ## ============================================================
 
 set_property PACKAGE_PIN U16 [get_ports {led[0]}]
@@ -149,21 +163,26 @@ set_property IOSTANDARD LVCMOS33 [get_ports {led[15]}]
 ## BTND -> DOWN
 ## BTNL -> LEFT
 ## BTNR -> RIGHT
-## BTNC -> SEL
+## BTNC -> GAME_RST
 ## ============================================================
 
+## BTNC -> GAME_RST
 set_property PACKAGE_PIN U18 [get_ports btnC]
 set_property IOSTANDARD LVCMOS33 [get_ports btnC]
 
+## BTNU -> UP
 set_property PACKAGE_PIN T18 [get_ports btnU]
 set_property IOSTANDARD LVCMOS33 [get_ports btnU]
 
+## BTNL -> LEFT
 set_property PACKAGE_PIN W19 [get_ports btnL]
 set_property IOSTANDARD LVCMOS33 [get_ports btnL]
 
+## BTNR -> RIGHT
 set_property PACKAGE_PIN T17 [get_ports btnR]
 set_property IOSTANDARD LVCMOS33 [get_ports btnR]
 
+## BTND -> DOWN
 set_property PACKAGE_PIN U17 [get_ports btnD]
 set_property IOSTANDARD LVCMOS33 [get_ports btnD]
 

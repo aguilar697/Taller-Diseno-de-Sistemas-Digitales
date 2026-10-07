@@ -1,0 +1,58 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Wed Oct  7 14:51:02 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_subsystem2_peripheral_test/xsim_script.tcl
+# xsim {tb_subsystem2_peripheral_test} -autoloadwcfg -tclbatch {C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/simular.tcl}
+Time resolution is 1 ps
+source C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/simular.tcl
+## run all
+
+============================================================
+SUBSYSTEM 2 - BLACK-BOX PERIPHERAL ACCEPTANCE TEST
+VGA + PLAYER 1 INPUTS
+============================================================
+
+[PASS] Reset clears Player 1 MMIO output
+[PASS] Reset clears VGA MMIO read output
+[PASS] UP maps to MMIO bit 0
+[PASS] DOWN maps to MMIO bit 1
+[PASS] LEFT maps to MMIO bit 2
+[PASS] RIGHT maps to MMIO bit 3
+[PASS] SEL maps to MMIO bit 4
+[PASS] OK maps to MMIO bit 5
+[PASS] GAME_RST maps to MMIO bit 6
+[PASS] All Player 1 inputs produce 0x0000007F
+[PASS] Input MMIO write does not modify filtered input state
+[PASS] Input MMIO address 01 returns zero
+[PASS] Input MMIO address 10 returns zero
+[PASS] Input MMIO address 11 returns zero
+[PASS] Player 1 inputs return low after release
+[PASS] VGA tile 0 supports CPU write/read
+[PASS] VGA tile 299 supports CPU write/read
+[PASS] Reserved VGA tile 300 ignores writes and reads zero
+[PASS] Water tile data reaches external VGA RGB output
+[PASS] VGA RGB is black during horizontal blanking
+[PASS] HSYNC low pulse width is correct | observado = 3840.0 ns
+[PASS] HSYNC line period is correct | observado = 32000.0 ns
+[PASS] Cursor tile data reaches external VGA RGB output
+[PASS] ASCII A produces visible glyph pixels on external RGB output
+[PASS] VSYNC low pulse width is correct | observado = 64000.0 ns
+[PASS] Final reset clears Player 1 MMIO output
+[PASS] Final reset clears VGA MMIO read output
+
+============================================================
+SUBSYSTEM 2 PERIPHERAL TEST SUMMARY
+Checks : 27
+Errors : 0
+RESULT : TEST PASSED
+============================================================
+
+$finish called at time : 15744356 ns : File "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/integration/tb_subsystem2_peripheral.sv" Line 697
+## quit
+INFO: [Common 17-206] Exiting xsim at Wed Oct  7 14:51:05 2026...

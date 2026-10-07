@@ -1,0 +1,18 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Wed Oct  7 14:49:45 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/immediate_generator_tb_test/xsim_script.tcl
+# xsim {immediate_generator_tb_test} -autoloadwcfg -tclbatch {C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/simular.tcl}
+Time resolution is 1 ps
+source C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/simular.tcl
+## run all
+PASS immediate_generator_tb: 14298 comprobaciones
+$finish called at time : 14298 ns : File "C:/Users/kevin/AppData/Local/Temp/bn_vivado_86cbya9z/src/testbench/cpu/immediate_generator_tb.sv" Line 31
+## quit
+INFO: [Common 17-206] Exiting xsim at Wed Oct  7 14:49:47 2026...

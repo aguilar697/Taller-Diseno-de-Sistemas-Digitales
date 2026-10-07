@@ -1,6 +1,10 @@
 `timescale 1ns/1ps
 // Prueba del nucleo con ROM real y modelo sincrono de la plataforma de datos.
 // El modelo arquitectonico avanza al completar una instruccion, sin reproducir la FSM.
+// VERIFICACIÓN: reference_pc/reference_regs/reference_ram calculan el resultado
+// esperado desde la instrucción. Se comparan al finalizar, junto a escrituras
+// externas y ciclos: no basta con observar formas de onda sin comprobar valores.
+// Este entorno prueba el núcleo y su contrato de memoria, no una partida completa.
 module cpu_tb;
     import cpu_pkg::*; import cpu_tb_pkg::*;
     logic clk=0,rst=1;
@@ -36,6 +40,8 @@ module cpu_tb;
     task automatic emit(input logic[31:0] instruction);
         rom.memory[cursor]=instruction;cursor++;
     endtask
+    // REFERENCIA POR INSTRUCCIÓN: calcula próximo PC y efecto de cada opcode
+    // sin copiar los estados internos del DUT; permite detectar errores de control.
     task automatic check_commit;
         logic[31:0] inst,a,b,value,next_address,address;
         integer opcode,f3,f7,rd,rs1,rs2,imm,expected_cycles,idx;

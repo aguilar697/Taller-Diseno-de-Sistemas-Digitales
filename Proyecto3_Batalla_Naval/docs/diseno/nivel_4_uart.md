@@ -4,7 +4,7 @@
 
 El cuarto nivel desarrolla los bloques presentados en el [tercer nivel](nivel_3_uart.md). El diagrama detalla la decodificación de direcciones, el retorno de lecturas, la memoria RAM, los registros UART y los periféricos de salida.
 
-Todos los accesos del CPU utilizan direcciones y datos de 32 bits. Los registros trabajan con el reloj principal de 100 MHz y reset síncrono activo alto. La lógica descrita corresponde al diseño previsto y todavía debe validarse mediante RTL y testbenches.
+Todos los accesos del CPU utilizan direcciones y datos de 32 bits. Los registros de control trabajan con el reloj principal de 100 MHz y reset síncrono activo alto. El RTL se verifica mediante pruebas unitarias, el [testbench MMIO](../informe/mmio_verificacion.md) y la [prueba del juego completo](../informe/integracion_verificacion.md). La RAM de datos conserva su contenido durante reset; el software inicializa el estado del juego.
 
 ## Diagrama detallado
 
@@ -66,19 +66,19 @@ El periférico UART presenta tres registros MMIO y dos bloques seriales. `UART T
 
 | Dirección | Registro | Función |
 |---|---|---|
-| `0x00010040` | `CONTROL/STATUS` | Inicio, disponibilidad y estado de la comunicación |
+| `0x00010040` | `CONTROL/STATUS` | TX lista en bit 0, RX válida en bit 1; escritura de bit 1 reconoce RX |
 | `0x00010044` | `TX_DATA` | Byte que se transmite hacia la PC |
 | `0x00010048` | `RX_DATA` | Byte recibido desde la PC |
 
-Los bytes útiles de `TX_DATA` y `RX_DATA` ocupan los ocho bits menos significativos del registro de 32 bits; los restantes se leen como cero. El [contrato UART del programa](nivel_3_logica_juego.md) define los bits de `CONTROL/STATUS`: bit 0 para solicitar TX o consultar ocupado, bit 1 para consultar disponibilidad RX o consumir el byte, y bit 2 para consultar o reconocer overflow. Las lecturas conservan el estado; los reconocimientos se realizan escribiendo uno en el bit correspondiente.
+Los bytes útiles de `TX_DATA` y `RX_DATA` ocupan los ocho bits menos significativos del registro de 32 bits; los restantes se leen como cero. El [contrato UART del programa](nivel_3_logica_juego.md) define `CONTROL/STATUS`: bit 0 igual a uno significa que TX puede aceptar un byte; bit 1 igual a uno indica un byte RX disponible. Leer RX no lo consume. Escribir uno en CONTROL[1] limpia RX válida; los otros bits de escritura no producen efectos. No se implementa un indicador de overflow.
 
 ### Transmisión
 
-El programa consulta que TX pueda aceptar un dato, escribe el byte en `TX_DATA` y solicita la transmisión desde `CONTROL/STATUS`. El transmisor genera un bit de inicio, ocho bits LSB-first y un bit de parada. Mientras la trama está activa no se debe aceptar otra solicitud que sobrescriba el byte pendiente.
+El programa consulta CONTROL[0] y escribe el byte en `TX_DATA`. Esa escritura genera el pulso registrado de inicio. El transmisor genera un bit de inicio, ocho bits LSB-first y un bit de parada. Una escritura mientras TX está ocupada se ignora; el software conserva los bytes pendientes en una cola circular en RAM.
 
 ### Recepción
 
-`UART RX` sincroniza la entrada `uart_rx_i`, detecta el bit de inicio y muestrea los ocho bits de datos. El contrato acordado requiere una FIFO RX de al menos 16 bytes: `RX_DATA` presenta el próximo byte disponible y el programa lo consume mediante una escritura en `CONTROL/STATUS`. Si la FIFO está llena, el byte entrante se descarta y se activa overflow. Este comportamiento debe comprobarse con el RTL del periférico antes de integrar el programa.
+`UART RX` sincroniza la entrada `uart_rx_i`, detecta el bit de inicio y muestrea los ocho bits de datos. El periférico conserva un único byte recibido y su indicador de validez. Un byte nuevo reemplaza al anterior y tiene prioridad sobre un reconocimiento simultáneo. No hay FIFO RX: el programa debe consumir cada byte antes del siguiente. En 8N1 a 115200 baud, los bytes consecutivos se separan aproximadamente 86,8 µs. La prueba integrada utiliza bytes consecutivos y comprueba las tramas completas, pero no garantiza recepción sin pérdidas para cualquier carga o tráfico externo.
 
 La aplicación Python se conecta al puente USB-UART de la Basys 3. Las señales `uart_rx_i` y `uart_tx_o` se nombran desde la FPGA. La terminal procesa mensajes del juego, pero la validación final de cada acción pertenece al programa RISC-V.
 
@@ -98,7 +98,7 @@ El reset lleva el registro a un estado conocido. El driver no calcula la fase de
 
 El registro de control del buzzer se encuentra en `0x00010140`. El programa escribe una orden asociada con eventos como impacto, fallo, hundimiento, colocación inválida o victoria.
 
-El generador de tono convierte esa orden en `buzzer_o` mediante un contador o divisor de frecuencia. Cada sonido debe tener frecuencia y duración definidas sin bloquear al CPU. El valor de reset mantiene el buzzer apagado.
+El generador de tono convierte esa orden en `buzzer_o` mediante contadores de semiperíodo y duración. Impacto, fallo, hundimiento y colocación inválida duran 150, 250, 400 y 300 ms. Victoria reproduce Do5, Mi5, Sol5 y Do6 durante 200 ms por nota, 800 ms en total. Los tiempos corresponden al reloj de 100 MHz. Al terminar, el comando vuelve a cero sin intervención del CPU; una nueva escritura reinicia el sonido. Reset mantiene el buzzer apagado.
 
 ## 7. Conexión con entradas y VGA
 

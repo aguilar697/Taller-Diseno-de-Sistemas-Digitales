@@ -20,7 +20,7 @@ El registro `instruction_pc_q` alimenta el sumador PC + 4 y el cálculo de desti
 | 1 | JAL o bifurcación tomada | instruction_pc_q + immediate |
 | 2 | JALR | (operand_a_q + immediate) & 0xFFFFFFFE |
 
-`link_q` captura PC + 4 y `next_pc_q` captura el destino seleccionado al finalizar EXECUTE válido. JAL/JALR retornan `link_q`; el resto de instrucciones no escribe ese enlace en el banco.
+`link_q` captura PC + 4 y `next_pc_q` captura el destino seleccionado al finalizar EXECUTE. Si la ejecución es inválida, se entra en FAULT y esos resultados internos no se escriben en el estado arquitectónico. JAL/JALR retornan `link_q`; el resto de instrucciones no escribe ese enlace en el banco.
 
 La dirección de búsqueda debe tener `pc_q[31:13]=0` y `pc_q[1:0]=00`. Se comprueba el rango completo antes de utilizar `[12:2]` como índice, evitando que direcciones superiores se conviertan en alias de la ROM. El rango de inicios de instrucción es `0x00000000–0x00001FFC`.
 
@@ -116,7 +116,7 @@ La FSM se implementa con un registro `state_q`, lógica combinacional de próxim
 | FETCH_REQ | Ninguna de los registros de CPU | ROM registra la lectura de programa |
 | FETCH_CAPTURE | ir_en | Captura IR e instruction_pc_q |
 | DECODE válido | operands_en | Captura A, B y controles decodificados |
-| EXECUTE válido | execute_en | Captura alu_result_q, next_pc_q y link_q |
+| EXECUTE | execute_en | Captura alu_result_q, next_pc_q y link_q; si hay error, la siguiente etapa es FAULT |
 | LOAD_REQ | Ninguna | El destino registra la lectura de datos |
 | LOAD_CAPTURE | load_en | Captura load_data_q |
 | STORE | we_o | Una escritura externa |
@@ -125,6 +125,8 @@ La FSM se implementa con un registro `state_q`, lógica combinacional de próxim
 | FAULT | Ninguna | Conserva estado detenido y desactiva escrituras |
 
 `execute_en` agrupa la habilitación `result_en` del tercer nivel y las capturas del próximo PC y enlace. No constituye un nuevo puerto externo. Cada habilitación se enmascara con reset y fallo; las señales no indicadas en la tabla permanecen inactivas.
+
+La habilitación de EXECUTE no depende de `execute_valid`: la validación selecciona la siguiente etapa. Una ejecución inválida puede cambiar registros intermedios, pero no alcanza STORE, WRITEBACK ni COMMIT. Esta separación evita extender la ruta crítica de habilitación y mantiene inhibidos los efectos arquitectónicos de instrucciones rechazadas.
 
 ### Validación y prioridad
 
