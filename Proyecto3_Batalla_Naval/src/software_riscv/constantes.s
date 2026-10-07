@@ -55,6 +55,7 @@
 .equ TX_CAP,        192
 
 .equ RX_EDAD_MAX,   2000
+.equ ESPERA_ARRANQUE, 120000
 
 .equ RXS_SOF,       0
 .equ RXS_TYPE,      1

@@ -26,6 +26,12 @@ sistema_init:
     sw      x0, 0(t0)
 
     call    uart_init
+
+    li      t0, ESPERA_ARRANQUE
+si_espera:
+    addi    t0, t0, -1
+    bnez    t0, si_espera
+
     call    partida_init
 
     lw      ra, 12(sp)
