@@ -59,6 +59,8 @@ Recibe el reloj principal de la Basys 3 y genera el reloj utilizado por el domin
 
 La única fuente externa de reloj del sistema es `clk_100_i`. El reloj de 25 MHz se deriva internamente mediante el Clocking Wizard/MMCM.
 
+En esta implementación, el Clocking Wizard utiliza internamente un **MMCM** (`PRIMITIVE = MMCM`). El término *PLL* se conserva únicamente como nombre arquitectónico del bloque definido en los niveles de diseño.
+
 La configuración utilizada para implementación física recibe 100 MHz y genera 25 MHz. La fuente primaria del Clocking Wizard se configuró como `No buffer`, evitando redefinir internamente el reloj primario que ya se encuentra restringido en el XDC superior.
 
 El reset interno del Subsistema 2 continúa utilizando polaridad activa en alto. La adaptación de `SW15` utilizada durante la prueba física se realiza únicamente en el top de tarjeta mediante:
@@ -96,7 +98,7 @@ Genera el reset utilizado por los bloques que trabajan en el dominio `clk_pixel`
 |---|---:|---|
 | `rst_pixel_o` | 1 | reset sincronizado para el dominio VGA |
 
-El dominio VGA permanece en reset mientras el MMCM no se encuentre bloqueado. La liberación de `rst_pixel_o` se sincroniza con el reloj de píxel para evitar una desactivación asíncrona del reset dentro de la lógica de video.
+El dominio VGA permanece en reset mientras el MMCM no se encuentre bloqueado. La solicitud de reset se afirma de forma asíncrona mediante `rst_i | ~locked_i`, mientras que su liberación se sincroniza con `clk_pixel` mediante una cadena de dos etapas. Así se evita desactivar el reset de forma asíncrona dentro de la lógica de video.
 
 La inversión física de `SW15` ocurre antes de esta etapa, por lo que el sincronizador continúa recibiendo un reset interno con la misma polaridad utilizada originalmente por el diseño.
 
@@ -106,16 +108,17 @@ La inversión física de `SW15` ocurre antes de esta etapa, por lo que el sincro
 
 El controlador de temporización produce las coordenadas del píxel actual, la indicación de región visible y los sincronismos necesarios para una salida de **640 × 480 a 60 Hz nominales** utilizando el reloj de píxel de 25 MHz acordado para el proyecto.
 
+Con 800 píxeles por línea y 525 líneas por cuadro, el reloj de 25 MHz produce una frecuencia de cuadro de aproximadamente `59.52 Hz`, correspondiente a la temporización VGA de 60 Hz nominal empleada.
+
 La temporización utilizada es:
 
 ```text
 Horizontal total = 800 píxeles
-Visible           = 0 ... 639
-HSYNC bajo        = 656 ... 751
-
-Vertical total    = 525 líneas
-Visible           = 0 ... 479
-VSYNC bajo        = 490 ... 491
+Visible           = 0 ... 639
+HSYNC bajo        = 656 ... 751
+Vertical total    = 525 líneas
+Visible           = 0 ... 479
+VSYNC bajo        = 490 ... 491
 ```
 
 ---
@@ -344,7 +347,7 @@ Para cada píxel visible:
 
 ```text
 columna = pixel_x >> 5
-fila    = pixel_y >> 5
+fila    = pixel_y >> 5
 tile_index = fila*20 + columna
 ```
 
@@ -412,17 +415,17 @@ La fuente lógica se representa sobre una matriz de 8 × 8 y se escala dentro de
 
 ## 2.4.4 RGB Mux / Pipeline
 
-Selecciona entre el color base del tile y el píxel del glyph, respetando `active_video`.
+Selecciona entre el color base del tile y el píxel del glyph, respetando `active_video`. Cuando `GLYPH_ENABLE = 1` y el bit correspondiente del glyph está activo, el primer plano se representa en blanco (`12'hFFF`); en caso contrario se conserva el color base del tile.
 
 La lógica de pipeline conserva la correspondencia entre:
 
 ```text
 coordenadas de video
-        +
+        +
 palabra leída de VRAM
-        +
+        +
 información de glyph
-        ↓
+        ↓
 salida RGB
 ```
 
@@ -472,15 +475,15 @@ La asignación física inicial utilizaba:
 
 ```text
 BTNC -> SEL
-SW0  -> GAME_RST
+SW0  -> GAME_RST
 ```
 
 La asignación final utiliza:
 
 ```text
 BTNC -> GAME_RST
-SW0  -> SEL
-SW1  -> OK
+SW0  -> SEL
+SW1  -> OK
 ```
 
 Este cambio se realiza únicamente en el top físico. No se modifican:
@@ -575,13 +578,12 @@ Por tanto:
 
 ```text
 GAME_RST:
-    BTNC
-    bit 6 del registro
-    solicitud de nueva partida
-
+    BTNC
+    bit 6 del registro
+    solicitud de reinicio de partida interpretada por el software
 Reset general:
-    señal rst_i
-    independiente de GAME_RST
+    señal rst_i
+    independiente de GAME_RST
 ```
 
 En la prueba física aislada del Subsistema 2, `SW15` controla la aplicación del reset general únicamente a través del top de prueba.
@@ -650,12 +652,12 @@ encapsula las funciones VGA y de entradas del Jugador 1 y constituye la frontera
 La correspondencia física utilizada por el top de prueba es:
 
 ```text
-up_i       <- BTNU
-down_i     <- BTND
-left_i     <- BTNL
-right_i    <- BTNR
-sel_i      <- SW0
-ok_i       <- SW1
+up_i       <- BTNU
+down_i     <- BTND
+left_i     <- BTNL
+right_i    <- BTNR
+sel_i      <- SW0
+ok_i       <- SW1
 game_rst_i <- BTNC
 ```
 
@@ -880,16 +882,15 @@ La relación del switch de habilitación es:
 
 ```text
 SW15 = 0
-    rst = 1
-    Subsistema 2 en reset
-    LED15 = 0
-    LED14 = 0
-
+    rst = 1
+    Subsistema 2 en reset
+    LED15 = 0
+    LED14 = 0
 SW15 = 1
-    rst = 0
-    Subsistema 2 habilitado
-    LED15 = 1
-    comienza la inicialización de VRAM
+    rst = 0
+    Subsistema 2 habilitado
+    LED15 = 1
+    comienza la inicialización de VRAM
 ```
 
 Después de completar la escritura de los 300 tiles:
@@ -924,14 +925,29 @@ La salida VGA también fue validada físicamente conectando un monitor al puerto
 
 Después de la corrección final de controles y reset físico, el bitstream del Subsistema 2 volvió a sintetizarse e implementarse satisfactoriamente.
 
-Los márgenes temporales observados en esta implementación fueron:
+Los resultados finales de implementación del top físico `subsystem2_basys3_test_top` fueron:
+
+| Recurso | Uso final |
+|---|---:|
+| LUT | 172 |
+| FF | 211 |
+| RAMB18E1 | 1 |
+| DSP | 0 |
+
+El análisis temporal final produjo:
 
 | Métrica | Resultado |
 |---|---:|
-| WNS | `+4.541 ns` |
-| WHS | `+0.105 ns` |
+| WNS | `+4.293 ns` |
+| TNS | `0.000 ns` |
+| WHS | `+0.122 ns` |
+| THS | `0.000 ns` |
+| Setup failing endpoints | 0 |
+| Hold failing endpoints | 0 |
 
-Ambos valores son positivos, por lo que la implementación cumple las restricciones temporales establecidas para esta prueba física.
+Vivado reporta explícitamente que todas las restricciones temporales especificadas se cumplen. Los márgenes positivos de setup y hold, junto con la ausencia de endpoints fallidos, confirman el cumplimiento temporal de la implementación final.
+
+Como referencia, el dominio de 100 MHz presenta el peor caso global (`WNS = +4.293 ns`, `WHS = +0.122 ns`), mientras que el dominio VGA de 25 MHz conserva márgenes mayores (`WNS = +34.435 ns`, `WHS = +0.144 ns`).
 
 ---
 
@@ -946,20 +962,17 @@ src/design/vga/
 ├── tile_renderer.sv
 ├── glyph_rom.sv
 └── subsystem2_vga_inputs.sv
-
 src/design/vga/ip/
 └── pixel_clock_wiz.xci
-
 src/design/inputs/
 ├── input_sync.sv
 ├── debounce.sv
 └── player1_inputs.sv
-
 src/design/top/
 └── subsystem2_basys3_test_top.sv
 ```
 
-La reasignación física final únicamente requiere modificar `subsystem2_basys3_test_top.sv` y los comentarios/definiciones correspondientes en `subsystem2_basys3_test.xdc`. Los módulos internos del Subsistema 2 permanecen sin cambios.
+La reasignación física final se realizó únicamente en `subsystem2_basys3_test_top.sv` y en los comentarios/definiciones correspondientes de `subsystem2_basys3_test.xdc`. Los módulos internos del Subsistema 2 permanecen sin cambios.
 
 ---
 
@@ -970,7 +983,6 @@ src/testbench/inputs/
 ├── tb_input_sync.sv
 ├── tb_debounce.sv
 └── tb_player1_inputs.sv
-
 src/testbench/vga/
 ├── tb_pixel_clock.sv
 ├── tb_pixel_reset_sync.sv
@@ -978,7 +990,6 @@ src/testbench/vga/
 ├── tb_video_memory.sv
 ├── tb_glyph_rom.sv
 └── tb_tile_renderer.sv
-
 src/testbench/integration/
 ├── tb_subsystem2_vga_inputs.sv
 └── tb_subsystem2_peripheral.sv
@@ -1008,9 +1019,8 @@ BTND -> DOWN
 BTNL -> LEFT
 BTNR -> RIGHT
 BTNC -> GAME_RST
-
-SW0  -> SEL
-SW1  -> OK
+SW0  -> SEL
+SW1  -> OK
 SW15 -> RUN / habilitación física del top de prueba
 ```
 
@@ -1023,13 +1033,13 @@ assign rst = ~sw[15];
 Los indicadores físicos de la prueba son:
 
 ```text
-LED0  -> UP
-LED1  -> DOWN
-LED2  -> LEFT
-LED3  -> RIGHT
-LED4  -> SEL
-LED5  -> OK
-LED6  -> GAME_RST
+LED0  -> UP
+LED1  -> DOWN
+LED2  -> LEFT
+LED3  -> RIGHT
+LED4  -> SEL
+LED5  -> OK
+LED6  -> GAME_RST
 LED14 -> VRAM inicializada
 LED15 -> Subsistema 2 habilitado / RUN
 ```
