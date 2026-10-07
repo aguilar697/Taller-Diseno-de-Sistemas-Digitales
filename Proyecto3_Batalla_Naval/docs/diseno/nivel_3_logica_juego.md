@@ -163,7 +163,7 @@ Bits ya filtrados de rebote por hardware, niveles activos en uno: `0`=UP, `1`=DO
 
 ### 4.5. Registro BUZZER (`0x00010140`)
 
-`0` OFF, `1` HIT, `2` MISS, `3` SUNK, `4` INVALID_PLACEMENT, `5` VICTORY.
+`0` OFF, `1` HIT, `2` MISS, `3` SUNK, `4` INVALID_PLACEMENT, `5` VICTORY. Cada sonido tiene una duración fija definida por el periférico y al terminar vuelve solo a `OFF`; el programa solo escribe el código del suceso, sin medir tiempo ni escribir `OFF`.
 
 ### 4.6. Protocolo de aplicación UART
 
@@ -188,7 +188,17 @@ Secuencia: al iniciar/reiniciar se envía `PLACEMENT_START`; al completar ambas 
 
 ### 4.7. Registro UART (`0x00010040`–`0x00010048`)
 
-`CONTROL` bit 0: escribir 1 solicita TX, leer 1 = transmisión ocupada. Bit 1: RX disponible; escribir 1 consume el byte (leer no lo consume). Bit 2: overflow (FIFO RX ≥16 bytes llena), se reconoce escribiendo 1; con la FIFO llena se descarta el byte entrante. Ante overflow, el programa descarta la recepción pendiente, reinicia el parser y responde `ERROR/INVALID_MESSAGE` con `rejected_type=0` si no logra identificar la solicitud.
+Contrato del periférico implementado en `src/design/uart/uart_peripheral.sv`:
+
+| Registro | Lectura | Escritura |
+|---|---|---|
+| `CONTROL` (`0x00010040`) | bit 0 = TX lista, bit 1 = hay un byte recibido | bit 1 en 1 consume el byte recibido |
+| `TX_DATA` (`0x00010044`) | último byte aceptado | inicia la transmisión si la TX está lista; con la TX ocupada se ignora |
+| `RX_DATA` (`0x00010048`) | último byte recibido (leer no lo consume) | sin efecto |
+
+- El programa escribe `TX_DATA` solo con `CONTROL` bit 0 en 1, porque un byte escrito con la TX ocupada se pierde sin aviso. Transmite como mucho un byte por vuelta del ciclo de servicio, desde una cola circular en RAM.
+- No hay FIFO de recepción: si llega un byte antes de consumir el anterior, el anterior se pierde. A 115200 baudios llega como máximo un byte cada 8680 ciclos, así que ninguna vuelta del ciclo de servicio puede durar más que eso. Por eso el redibujado de la pantalla se reparte en pasos, uno por vuelta (ver la sección 5).
+- Una trama a la que le falta un byte se abandona por edad, como cualquier trama incompleta, y la PC no recibe respuesta a esa solicitud.
 
 ## 5. Decisiones de diseño acordadas con el equipo
 
@@ -197,6 +207,7 @@ Secuencia: al iniciar/reiniciar se envía `PLACEMENT_START`; al completar ambas 
 | Colocación concurrente (`p1_ready`/`p2_ready` independientes) | Un único ciclo de servicio en ensamblador atiende botones, RX y TX sin bloquear; ningún jugador espera a que el otro termine |
 | Formato de metadata de barcos (`0x2220–0x22DF`) | 8 words/barco: `placed, row, column, orientation, length, hit_count, sunk, reserved` |
 | Detección de "casilla ya disparada" | La validación de disparo revisa el estado de la casilla antes de aplicar el turno; un disparo repetido no lo consume y se responde `ERROR/REPEATED_SHOT` (PC) o se ignora en silencio (J1) |
+| Duración de una vuelta del ciclo de servicio | Menor que un byte de UART (8680 ciclos), porque la UART no tiene FIFO. El redibujado de la pantalla se reparte en 25 pasos, uno por vuelta (fondo, cada fila de cada tablero, cursor, HUD y mensaje); la vuelta más larga de una partida completa dura unos 6 300 ciclos |
 
 El cuarto nivel desarrollará las subrutinas, las convenciones de registros y el uso detallado de la pila.
 

@@ -1,14 +1,23 @@
 import unittest
 
 from naval_terminal import (
+    EXPECTED_LENGTHS,
     Frame,
     FrameParser,
+    GameState,
     SOF,
     TYPE_BATTLE_START,
+    TYPE_ERROR,
+    TYPE_GAME_OVER,
+    TYPE_INCOMING_SHOT,
+    TYPE_PLACE_RESULT,
     TYPE_PLACE_SHIP,
+    TYPE_PLACEMENT_START,
     TYPE_SHOT,
+    TYPE_SHOT_RESULT,
     TYPE_TURN,
     build_frame,
+    handle_frame,
 )
 
 
@@ -39,8 +48,8 @@ class FrameParserTests(unittest.TestCase):
 
     def test_garbage_before_sof(self):
         parser = FrameParser()
-        data = bytes((0x00, 0x11, 0xFF, 0x34)) + build_frame(TYPE_BATTLE_START)
-        self.assertEqual(parser.feed(data), [Frame(TYPE_BATTLE_START, b"")])
+        data = bytes((0x00, 0x11, 0xFF, 0x34)) + build_frame(TYPE_BATTLE_START, (1,))
+        self.assertEqual(parser.feed(data), [Frame(TYPE_BATTLE_START, bytes((1,)))])
 
     def test_consecutive_frames(self):
         parser = FrameParser()
@@ -59,11 +68,70 @@ class FrameParserTests(unittest.TestCase):
     def test_invalid_length(self):
         parser = FrameParser()
         invalid = bytes((SOF, TYPE_SHOT, 3, 1, 2, 3))
-        valid = build_frame(TYPE_BATTLE_START)
+        valid = build_frame(TYPE_BATTLE_START, (1,))
         self.assertEqual(
             parser.feed(invalid + valid),
-            [Frame(TYPE_BATTLE_START, b"")],
+            [Frame(TYPE_BATTLE_START, bytes((1,)))],
         )
+
+    def test_sof_inside_payload_is_data(self):
+        parser = FrameParser()
+        frame = build_frame(TYPE_ERROR, (TYPE_SHOT, 4))
+        data = build_frame(TYPE_SHOT_RESULT, (SOF, 0, 1)) + frame
+        self.assertEqual(
+            parser.feed(data),
+            [Frame(TYPE_SHOT_RESULT, bytes((SOF, 0, 1))), Frame(TYPE_ERROR, bytes((TYPE_SHOT, 4)))],
+        )
+
+
+class ProtocolAgreementTests(unittest.TestCase):
+    """Longitudes de docs/diseno/nivel_3_logica_juego.md, sección 4.6."""
+
+    def test_lengths_match_design(self):
+        self.assertEqual(EXPECTED_LENGTHS, {
+            TYPE_PLACE_SHIP: 4, TYPE_SHOT: 2, TYPE_PLACE_RESULT: 3,
+            TYPE_BATTLE_START: 1, TYPE_TURN: 1, TYPE_SHOT_RESULT: 3,
+            TYPE_INCOMING_SHOT: 3, TYPE_GAME_OVER: 7,
+            TYPE_PLACEMENT_START: 2, TYPE_ERROR: 2,
+        })
+
+    def test_every_fpga_message_is_accepted(self):
+        parser = FrameParser()
+        frames = [
+            build_frame(TYPE_PLACEMENT_START, (0, 0)),
+            build_frame(TYPE_PLACE_RESULT, (0, 1, 0)),
+            build_frame(TYPE_BATTLE_START, (1,)),
+            build_frame(TYPE_TURN, (1,)),
+            build_frame(TYPE_INCOMING_SHOT, (2, 3, 1)),
+            build_frame(TYPE_SHOT_RESULT, (4, 5, 2)),
+            build_frame(TYPE_ERROR, (TYPE_SHOT, 4)),
+            build_frame(TYPE_GAME_OVER, (1, 12, 10, 3, 1, 1, 0)),
+        ]
+        self.assertEqual(len(parser.feed(b"".join(frames))), len(frames))
+
+
+class HandleFrameTests(unittest.TestCase):
+    def test_repeated_shot_asks_again(self):
+        state = GameState()
+        handle_frame(Frame(TYPE_ERROR, bytes((TYPE_SHOT, 4))), state)
+        self.assertTrue(state.retry_shot)
+
+    def test_wrong_turn_does_not_ask_again(self):
+        state = GameState()
+        handle_frame(Frame(TYPE_ERROR, bytes((TYPE_SHOT, 3))), state)
+        self.assertFalse(state.retry_shot)
+
+    def test_game_over_updates_score(self):
+        state = GameState()
+        handle_frame(Frame(TYPE_GAME_OVER, bytes((2, 9, 11, 1, 3, 4, 5))), state)
+        self.assertTrue(state.game_over)
+        self.assertEqual((state.p1_wins, state.p2_wins), (4, 5))
+
+    def test_placement_start_signals_new_game(self):
+        state = GameState()
+        handle_frame(Frame(TYPE_PLACEMENT_START, bytes((1, 2))), state)
+        self.assertTrue(state.new_game)
+        self.assertEqual((state.p1_wins, state.p2_wins), (1, 2))
 
 
 if __name__ == "__main__":

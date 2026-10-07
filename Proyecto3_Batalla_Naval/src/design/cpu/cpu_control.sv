@@ -30,15 +30,21 @@ module cpu_control (
                 else state_d=FAULT;
             end
             EXECUTE: begin
+                // Los registros de EXECUTE se capturan siempre. Si la
+                // instruccion falla, FAULT impide que lleguen a WRITEBACK,
+                // STORE o COMMIT, asi que el estado arquitectonico no cambia.
+                // Hacer depender execute_en_o de execute_valid_i ponia la ALU
+                // y el calculo del salto en la habilitacion de unos cien
+                // registros: era la ruta critica a 100 MHz.
+                execute_en_o=1;
                 if (!execute_valid_i) state_d=FAULT;
                 else begin
-                    execute_en_o=1;
                     case (kind_i)
                         K_LOAD: state_d=LOAD_REQ;
                         K_STORE: state_d=STORE;
                         K_BRANCH: state_d=COMMIT;
                         K_ALU, K_JAL, K_JALR: state_d=WRITEBACK;
-                        default: begin execute_en_o=0; state_d=FAULT; end
+                        default: state_d=FAULT;
                     endcase
                 end
             end

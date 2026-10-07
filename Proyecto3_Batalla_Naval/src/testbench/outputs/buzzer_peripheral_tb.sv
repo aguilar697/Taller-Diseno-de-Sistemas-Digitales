@@ -4,6 +4,8 @@ module buzzer_peripheral_tb;
     logic [1:0] addr=0;
     logic [31:0] wdata=0,rdata;
     logic buzzer;
+    logic [31:0] rdata_dur;
+    logic buzzer_dur;
     integer verificaciones=0,errores=0;
 
     always #5 clk=~clk;
@@ -14,6 +16,18 @@ module buzzer_peripheral_tb;
     ) dut(
         .clk_i(clk),.rst_i(rst),.write_enable_i(write_enable),.addr_i(addr),
         .wdata_i(wdata),.rdata_o(rdata),.buzzer_o(buzzer)
+    );
+
+    // Segunda instancia con duraciones cortas para probar que cada sonido
+    // vuelve solo a apagado. Recibe las mismas escrituras que dut.
+    buzzer_peripheral #(
+        .HIT_HALF_PERIOD(2),.MISS_HALF_PERIOD(3),.SUNK_HALF_PERIOD(4),
+        .INVALID_HALF_PERIOD(5),.VICTORY_HALF_PERIOD(6),
+        .HIT_DURATION(10),.MISS_DURATION(12),.SUNK_DURATION(14),
+        .INVALID_DURATION(16),.VICTORY_DURATION(18)
+    ) dut_dur(
+        .clk_i(clk),.rst_i(rst),.write_enable_i(write_enable),.addr_i(addr),
+        .wdata_i(wdata),.rdata_o(rdata_dur),.buzzer_o(buzzer_dur)
     );
 
     task automatic verificar(input logic condicion,input string nombre_prueba);
@@ -88,6 +102,28 @@ module buzzer_peripheral_tb;
         verificar(buzzer==0,"comando cero no apaga inmediatamente");
         verificar_lectura_sincrona(2'b00,32'h00000002,32'h00000000,
                         "lectura despues de apagar buzzer");
+
+        // --- Duracion de cada sonido (dut_dur) ---
+        escribir_comando(3'd1);                 // HIT dura 10 ciclos
+        repeat(4)@(posedge clk);#1;
+        verificar(rdata_dur==32'h1,"el sonido sigue activo antes de su duracion");
+        repeat(8)@(posedge clk);#1;
+        verificar(rdata_dur==32'h0 && buzzer_dur==0,
+                  "al cumplir la duracion el buzzer vuelve solo a apagado");
+
+        escribir_comando(3'd2);                 // MISS dura 12 ciclos
+        repeat(8)@(posedge clk);#1;
+        escribir_comando(3'd2);                 // la misma orden otra vez
+        repeat(8)@(posedge clk);#1;
+        verificar(rdata_dur==32'h2,"una orden nueva reinicia la duracion");
+        repeat(6)@(posedge clk);#1;
+        verificar(rdata_dur==32'h0 && buzzer_dur==0,"la orden repetida tambien termina");
+
+        escribir_comando(3'd5);                 // VICTORY dura 18 ciclos
+        repeat(16)@(posedge clk);#1;
+        verificar(rdata_dur==32'h5,"la victoria dura mas que el impacto");
+        repeat(4)@(posedge clk);#1;
+        verificar(rdata_dur==32'h0,"la victoria tambien termina sola");
 
         if(errores==0)$display("buzzer_peripheral_tb: TODAS LAS PRUEBAS PASARON");
         else $fatal(1,"buzzer_peripheral_tb: %0d errores en %0d verificaciones",errores,verificaciones);

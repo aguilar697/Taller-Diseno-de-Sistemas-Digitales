@@ -1,6 +1,9 @@
 // Top global estructural del Proyecto 3.
 module battleship_top #(
-    parameter ROM_INIT_FILE = ""
+    parameter ROM_INIT_FILE = "",
+    // Ciclos de estabilidad del filtro de rebotes de J1 (10 ms a 100 MHz).
+    // Se expone para poder acelerarlo en simulacion.
+    parameter int unsigned INPUT_DEBOUNCE_CYCLES = 1_000_000
 )(
     input  logic       clk_i,
     input  logic       rst_i,
@@ -88,7 +91,9 @@ module battleship_top #(
         .vga_write_enable_o   (vga_write_enable)
     );
 
-    subsystem2_vga_inputs vga_inputs_inst (
+    subsystem2_vga_inputs #(
+        .INPUT_DEBOUNCE_CYCLES (INPUT_DEBOUNCE_CYCLES)
+    ) vga_inputs_inst (
         .clk_100_i           (clk_i),
         .rst_i               (rst_i),
         .up_i                (up_i),
