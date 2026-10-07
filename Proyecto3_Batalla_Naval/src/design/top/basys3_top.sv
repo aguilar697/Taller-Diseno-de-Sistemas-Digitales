@@ -9,7 +9,7 @@
 //   BTNC                       GAME_RST (nueva partida, conserva victorias)
 //   SW0                        SEL (rotar el barco)
 //   SW1                        OK (confirmar)
-//   SW15                       reset general del hardware, activo en alto
+//   SW15                       RUN: 0 = reset general (borra victorias), 1 = funcionando
 //
 // LEDs: LED0-LED1 fase del juego, LED2-LED5 flechas presionadas
 // (arriba, abajo, izquierda, derecha), LED15 sistema funcionando.
@@ -43,14 +43,15 @@ module basys3_top #(
     // -------------------------------------------------------------------------
     // Reset general sincronizado
     // -------------------------------------------------------------------------
-    // SW15 es asincrono respecto al reloj. Dos etapas alinean su activacion y
-    // su liberacion con clk, y el valor inicial mantiene el sistema en reset
-    // al terminar la configuracion de la FPGA.
+    // SW15 es asincrono respecto al reloj y, como en el top de prueba del
+    // Subsistema 2, el reset esta activo con SW15 en 0. Dos etapas alinean su
+    // activacion y su liberacion con clk, y el valor inicial mantiene el
+    // sistema en reset al terminar la configuracion de la FPGA.
     (* ASYNC_REG = "TRUE" *) logic [1:0] reset_pipe_q = 2'b11;
     logic rst;
 
     always_ff @(posedge clk) begin
-        reset_pipe_q <= {reset_pipe_q[0], sw[15]};
+        reset_pipe_q <= {reset_pipe_q[0], ~sw[15]};
     end
 
     assign rst = reset_pipe_q[1];
@@ -87,9 +88,9 @@ module basys3_top #(
 
     // LED0-LED1: fase del juego (00 colocacion, 01 batalla, 10 resultado).
     // LED2-LED5: flechas presionadas (arriba, abajo, izquierda, derecha).
-    // LED15: encendido con el reset general en 0 (sistema funcionando).
+    // LED15: indicador RUN, sigue a SW15 (encendido = funcionando).
     // Punto decimal apagado.
-    assign led = {~sw[15], 9'b0, btnR, btnL, btnD, btnU, game_phase_led};
+    assign led = {sw[15], 9'b0, btnR, btnL, btnD, btnU, game_phase_led};
     assign dp  = 1'b1;
 
 endmodule

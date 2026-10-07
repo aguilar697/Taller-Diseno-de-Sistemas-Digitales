@@ -49,7 +49,9 @@ set latches [get_cells -hier -quiet -filter {PRIMITIVE_TYPE =~ REGISTER.LATCH.*}
 set f [open latches.txt w]; puts $f "LATCHES [llength $latches]"; foreach c $latches {puts $f $c}; close $f
 opt_design
 place_design
+phys_opt_design
 route_design
+if {[get_property SLACK [get_timing_paths -delay_type max]] < 0} { phys_opt_design }
 report_timing_summary -max_paths 10 -file timing.rpt
 report_utilization -file utilizacion.rpt
 report_drc -file drc.rpt

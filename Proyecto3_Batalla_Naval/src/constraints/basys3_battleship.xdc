@@ -15,7 +15,7 @@ create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports clk
 
 ## ------------------------------------------------------------
 ## SWITCHES
-## SW0 = SEL, SW1 = OK, SW15 = reset general (activo en alto)
+## SW0 = SEL, SW1 = OK, SW15 = RUN (0 = reset general, 1 = funcionando)
 ## ------------------------------------------------------------
 set_property -dict { PACKAGE_PIN V17 IOSTANDARD LVCMOS33 } [get_ports {sw[0]}]
 set_property -dict { PACKAGE_PIN V16 IOSTANDARD LVCMOS33 } [get_ports {sw[1]}]
@@ -36,7 +36,7 @@ set_property -dict { PACKAGE_PIN R2  IOSTANDARD LVCMOS33 } [get_ports {sw[15]}]
 
 ## ------------------------------------------------------------
 ## LEDS
-## LED0-LED1 = fase, LED2-LED5 = flechas, LED15 = sistema funcionando
+## LED0-LED1 = fase, LED2-LED5 = flechas, LED15 = RUN (sigue a SW15)
 ## ------------------------------------------------------------
 set_property -dict { PACKAGE_PIN U16 IOSTANDARD LVCMOS33 } [get_ports {led[0]}]
 set_property -dict { PACKAGE_PIN E19 IOSTANDARD LVCMOS33 } [get_ports {led[1]}]
