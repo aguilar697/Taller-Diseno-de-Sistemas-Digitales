@@ -36,7 +36,8 @@ set_property -dict { PACKAGE_PIN R2  IOSTANDARD LVCMOS33 } [get_ports {sw[15]}]
 
 ## ------------------------------------------------------------
 ## LEDS
-## LED0-LED1 = fase, LED2-LED5 = flechas, LED15 = RUN (sigue a SW15)
+## LED0-LED6 = UP, DOWN, LEFT, RIGHT, SEL, OK, GAME_RST
+## LED11-LED13 = fase (colocacion, batalla, resultado), LED15 = RUN (SW15)
 ## ------------------------------------------------------------
 set_property -dict { PACKAGE_PIN U16 IOSTANDARD LVCMOS33 } [get_ports {led[0]}]
 set_property -dict { PACKAGE_PIN E19 IOSTANDARD LVCMOS33 } [get_ports {led[1]}]

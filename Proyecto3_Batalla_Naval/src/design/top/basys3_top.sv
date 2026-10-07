@@ -11,8 +11,10 @@
 //   SW1                        OK (confirmar)
 //   SW15                       RUN: 0 = reset general (borra victorias), 1 = funcionando
 //
-// LEDs: LED0-LED1 fase del juego, LED2-LED5 flechas presionadas
-// (arriba, abajo, izquierda, derecha), LED15 sistema funcionando.
+// LEDs (mismo orden que el top de prueba del Subsistema 2):
+//   LED0-LED6    UP, DOWN, LEFT, RIGHT, SEL, OK, GAME_RST
+//   LED11-LED13  un LED por fase: colocacion, batalla, resultado
+//   LED15        RUN, sigue a SW15
 module basys3_top #(
     parameter ROM_INIT_FILE = "program.hex"
 )(
@@ -86,11 +88,35 @@ module basys3_top #(
         .buzzer_o    (JA1)
     );
 
-    // LED0-LED1: fase del juego (00 colocacion, 01 batalla, 10 resultado).
-    // LED2-LED5: flechas presionadas (arriba, abajo, izquierda, derecha).
-    // LED15: indicador RUN, sigue a SW15 (encendido = funcionando).
-    // Punto decimal apagado.
-    assign led = {sw[15], 9'b0, btnR, btnL, btnD, btnU, game_phase_led};
-    assign dp  = 1'b1;
+    // LED0-LED6: entradas del Jugador 1, en el orden de bits del registro
+    // INPUTS y del top de prueba del Subsistema 2.
+    // LED11-LED13: un LED por fase (codigo del LED: 00 colocacion, 01 batalla,
+    // 10 resultado), para que siempre haya uno encendido.
+    // LED15: RUN, sigue a SW15. Punto decimal apagado.
+    logic [2:0] phase_onehot;
+
+    always_comb begin
+        case (game_phase_led)
+            2'b00:   phase_onehot = 3'b001;
+            2'b01:   phase_onehot = 3'b010;
+            2'b10:   phase_onehot = 3'b100;
+            default: phase_onehot = 3'b000;
+        endcase
+    end
+
+    always_comb begin
+        led        = 16'b0;
+        led[0]     = btnU;
+        led[1]     = btnD;
+        led[2]     = btnL;
+        led[3]     = btnR;
+        led[4]     = sw[0];
+        led[5]     = sw[1];
+        led[6]     = btnC;
+        led[13:11] = phase_onehot;
+        led[15]    = sw[15];
+    end
+
+    assign dp = 1'b1;
 
 endmodule

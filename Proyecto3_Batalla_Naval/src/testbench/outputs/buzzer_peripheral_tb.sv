@@ -12,7 +12,8 @@ module buzzer_peripheral_tb;
 
     buzzer_peripheral #(
         .HIT_HALF_PERIOD(2),.MISS_HALF_PERIOD(3),.SUNK_HALF_PERIOD(4),
-        .INVALID_HALF_PERIOD(5),.VICTORY_HALF_PERIOD(6)
+        .INVALID_HALF_PERIOD(5),.VICTORY_HALF_PERIOD(6),
+        .VICTORY_HALF_PERIOD_2(7),.VICTORY_HALF_PERIOD_3(8),.VICTORY_HALF_PERIOD_4(9)
     ) dut(
         .clk_i(clk),.rst_i(rst),.write_enable_i(write_enable),.addr_i(addr),
         .wdata_i(wdata),.rdata_o(rdata),.buzzer_o(buzzer)
@@ -23,8 +24,9 @@ module buzzer_peripheral_tb;
     buzzer_peripheral #(
         .HIT_HALF_PERIOD(2),.MISS_HALF_PERIOD(3),.SUNK_HALF_PERIOD(4),
         .INVALID_HALF_PERIOD(5),.VICTORY_HALF_PERIOD(6),
+        .VICTORY_HALF_PERIOD_2(7),.VICTORY_HALF_PERIOD_3(8),.VICTORY_HALF_PERIOD_4(9),
         .HIT_DURATION(10),.MISS_DURATION(12),.SUNK_DURATION(14),
-        .INVALID_DURATION(16),.VICTORY_DURATION(18)
+        .INVALID_DURATION(16),.VICTORY_DURATION(30)
     ) dut_dur(
         .clk_i(clk),.rst_i(rst),.write_enable_i(write_enable),.addr_i(addr),
         .wdata_i(wdata),.rdata_o(rdata_dur),.buzzer_o(buzzer_dur)
@@ -119,11 +121,24 @@ module buzzer_peripheral_tb;
         repeat(6)@(posedge clk);#1;
         verificar(rdata_dur==32'h0 && buzzer_dur==0,"la orden repetida tambien termina");
 
-        escribir_comando(3'd5);                 // VICTORY dura 18 ciclos
+        // VICTORY: secuencia de 4 notas de 30 ciclos (semiperiodos 6, 7, 8, 9).
+        escribir_comando(3'd5);
         repeat(16)@(posedge clk);#1;
         verificar(rdata_dur==32'h5,"la victoria dura mas que el impacto");
-        repeat(4)@(posedge clk);#1;
-        verificar(rdata_dur==32'h0,"la victoria tambien termina sola");
+        repeat(16)@(posedge clk);#1;            // ya en la segunda nota
+        verificar(rdata_dur==32'h5,"la victoria sigue despues de la primera nota");
+        begin
+            logic anterior;
+            integer ciclos;
+            anterior=buzzer_dur;
+            while(buzzer_dur==anterior)begin @(posedge clk);#1;end
+            anterior=buzzer_dur;ciclos=0;
+            while(buzzer_dur==anterior && ciclos<30)begin @(posedge clk);#1;ciclos++;end
+            verificar(ciclos==7,"la segunda nota de la victoria tiene otra frecuencia");
+        end
+        repeat(80)@(posedge clk);#1;
+        verificar(rdata_dur==32'h0 && buzzer_dur==0,
+                  "la secuencia de victoria termina sola tras las cuatro notas");
 
         if(errores==0)$display("buzzer_peripheral_tb: TODAS LAS PRUEBAS PASARON");
         else $fatal(1,"buzzer_peripheral_tb: %0d errores en %0d verificaciones",errores,verificaciones);
