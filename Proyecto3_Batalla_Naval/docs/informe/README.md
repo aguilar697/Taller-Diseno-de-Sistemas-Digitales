@@ -19,7 +19,8 @@ La simulación funcional integrada está documentada. El equipo reporta comproba
 
 1. Reportes de utilización, DRC y temporización del sistema completo, asociados al top `basys3_top`, al XDC y a la imagen ROM de la versión entregada.
 2. Evidencias de la partida completa en placa: VGA, controles, terminal, sonidos, marcador y reinicios; identificar el bitstream utilizado.
-3. Trazabilidad de requisitos al enunciado y pruebas, bibliografía y conclusiones del equipo, con las cifras de la implementación final.
+3. Simulación post-implementación temporizada del sistema completo, asociada a la misma revisión y restricciones de los reportes.
+4. Trazabilidad de requisitos al enunciado y pruebas, bibliografía y conclusiones del equipo, con las cifras de la implementación final.
 
 Los reportes físicos y temporales ya presentes del Subsistema 2 conservan su alcance independiente. La validación del juego no permite afirmar cierre temporal del sistema completo sin sus reportes correspondientes.
 

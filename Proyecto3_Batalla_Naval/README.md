@@ -45,7 +45,7 @@ Toda la lógica del juego corresponde al programa ensamblador RISC-V. La platafo
 | Programa RISC-V | ROM comprobada contra fuentes; 5 pruebas del ensamblador aprobadas; juego ejecutado sobre el CPU RTL |
 | Juego completo | 33 testbenches aprobados y partida integrada con comparación de tramas, RAM y marcador; evidencia en el informe de integración |
 
-Las simulaciones verifican el comportamiento funcional. El equipo reporta funcionamiento en placa de la rama `kCortes`; la evidencia física y los reportes de implementación deben identificar la revisión del bitstream utilizado. La revisión local conserva correcciones adicionales comprobadas en simulación. El [índice del informe](docs/informe/README.md) distingue ese alcance y reúne las evidencias disponibles.
+Las simulaciones verifican el comportamiento funcional. El equipo reporta funcionamiento en placa de la rama `kCortes`; la evidencia física y los reportes de implementación deben identificar la revisión del bitstream utilizado. La versión integrada conserva correcciones adicionales comprobadas en simulación. Los resultados de implementación y la validación física independiente del VGA y las entradas se encuentran en su [informe de verificación](docs/informe/vga_entradas_verificacion.md). El [índice del informe](docs/informe/README.md) distingue ese alcance y reúne las evidencias disponibles.
 
 ## Estructura
 
