@@ -5,6 +5,8 @@
 // Solo para simulacion funcional: en sintesis se usa el IP real
 // (src/design/vga/ip/pixel_clock_wiz.xci). Divide los 100 MHz entre 4 para
 // obtener 25 MHz y activa locked despues de unos ciclos, como el MMCM.
+// Modelo funcional opcional. Vivado utiliza el IP real cuando esta macro no existe.
+`ifdef BN_FUNCTIONAL_CLOCK
 module pixel_clock_wiz (
     input  logic clk_in1,
     input  logic reset,
@@ -31,3 +33,4 @@ module pixel_clock_wiz (
     assign locked   = (lock_count_q == 4'hF);
 
 endmodule
+`endif

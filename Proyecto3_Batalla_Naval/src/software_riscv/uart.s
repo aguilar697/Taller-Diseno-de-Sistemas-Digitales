@@ -314,7 +314,7 @@ ud_fin:
     ret
 
 # ---------------------------------------------------------------------------
-# Constructores de mensaje. Todos encolan la trama completa y vuelven de
+# Constructores de mensaje: encolan la trama completa sin esperar la transmision.
 # ---------------------------------------------------------------------------
 
 msg_placement_start:

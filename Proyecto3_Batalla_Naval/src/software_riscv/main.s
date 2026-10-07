@@ -27,6 +27,7 @@ sistema_init:
 
     call    uart_init
 
+    # Esperar el filtro de 10 ms antes de fijar los niveles iniciales en BTN_PREV.
     li      t0, ESPERA_ARRANQUE
 si_espera:
     addi    t0, t0, -1

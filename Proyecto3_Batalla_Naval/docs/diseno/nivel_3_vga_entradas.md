@@ -43,8 +43,13 @@ El reset interno del Subsistema 2 continúa siendo activo en alto. Esta condici�
 En el top independiente utilizado para la prueba física, `subsystem2_basys3_test_top.sv`, el switch `SW15` se utiliza como habilitación física del subsistema mediante:
 
 ```systemverilog
-assign rst = ~sw[15];
+(* ASYNC_REG = "TRUE" *) logic [1:0] reset_pipe_q = 2'b11;
+always_ff @(posedge clk)
+    reset_pipe_q <= {reset_pipe_q[0], ~sw[15]};
+assign rst = reset_pipe_q[1];
 ```
+
+La solicitud invertida de `SW15` atraviesa dos etapas a 100 MHz antes de llegar al reset interno. La polaridad se conserva; la activación y la liberación se alinean con el reloj.
 
 Por tanto, en la prueba física:
 

@@ -114,10 +114,17 @@ module tb_battleship_system;
 
     // --- Transmisor serie del Jugador 2 ---
     task automatic enviar_byte(input logic [7:0] v);
-        rx = 1'b0; repeat (BIT) @(posedge clk);
-        for (int k = 0; k < 8; k++) begin rx = v[k]; repeat (BIT) @(posedge clk); end
-        rx = 1'b1; repeat (2 * BIT) @(posedge clk);
+        @(negedge clk);
+        rx = 1'b0; repeat (BIT) @(negedge clk);
+        for (int k = 0; k < 8; k++) begin rx = v[k]; repeat (BIT) @(negedge clk); end
+        rx = 1'b1; repeat (BIT) @(negedge clk);
     endtask
+
+    // Limite global incluso si el guion o una captura no terminan.
+    initial begin
+        #600_000_000;
+        $fatal(1, "Tiempo de espera del sistema agotado");
+    end
 
     // --- Captura de un cuadro VGA (coordenadas desde los sincronismos) ---
     task automatic foto(input string archivo);
@@ -160,11 +167,13 @@ module tb_battleship_system;
         string cmd, archivo;
         fd_tramas = $fopen("tramas.txt", "w");
         fd_buzz   = $fopen("buzzer.txt", "w");
+        if (!fd_tramas || !fd_buzz) $fatal(1, "No se pueden escribir los resultados");
         rst = 1'b1;
         repeat (20) @(posedge clk);
         @(negedge clk); rst = 1'b0;
 
         fd = $fopen("guion.txt", "r");
+        if (!fd) $fatal(1, "No se encontro guion.txt");
         while (!$feof(fd)) begin
             if ($fscanf(fd, "%s", cmd) != 1) break;
             if (cmd == "ESPERA") begin
@@ -194,6 +203,8 @@ module tb_battleship_system;
                 volcado();
             end else if (cmd == "FIN") begin
                 break;
+            end else begin
+                $fatal(1, "Orden de guion desconocida: %s", cmd);
             end
         end
         $fclose(fd);
@@ -203,6 +214,8 @@ module tb_battleship_system;
         comprobar(ciclos_en_falla == 0, "el CPU nunca entra en FAULT durante la partida");
         $display("CICLOS_SIMULADOS %0d", $time / 10);
         $display("RESUMEN tb_battleship_system: %0d comprobaciones, %0d fallos", n_ok + n_fallos, n_fallos);
+        if (n_fallos != 0) $fatal(1, "El sistema no cumple las comprobaciones");
+        $display("PASS tb_battleship_system");
         $finish;
     end
 endmodule

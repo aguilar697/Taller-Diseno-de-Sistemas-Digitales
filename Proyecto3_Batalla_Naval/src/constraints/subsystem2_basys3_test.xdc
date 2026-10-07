@@ -36,7 +36,7 @@ create_clock -add -name sys_clk_pin \
 ## El reset interno sigue siendo activo en alto.
 ## La inversion se realiza en el top:
 ##
-##     rst = ~sw[15]
+##     rst = ~sw[15] sincronizado mediante dos flip-flops a 100 MHz
 ##
 ## ============================================================
 

@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from naval_terminal import (
     EXPECTED_LENGTHS,
@@ -18,6 +19,7 @@ from naval_terminal import (
     TYPE_TURN,
     build_frame,
     handle_frame,
+    valid_notification,
 )
 
 
@@ -32,6 +34,24 @@ class BuildFrameTests(unittest.TestCase):
 
 
 class FrameParserTests(unittest.TestCase):
+    def test_truncated_frame_expires_before_new_game_announcement(self):
+        parser = FrameParser()
+        with patch("naval_terminal.time.monotonic", return_value=10.0):
+            self.assertEqual(parser.feed(bytes((SOF, TYPE_GAME_OVER, 7, 1))), [])
+        with patch("naval_terminal.time.monotonic", return_value=11.0):
+            self.assertEqual(parser.feed(build_frame(TYPE_PLACEMENT_START, (0, 0))),
+                             [Frame(TYPE_PLACEMENT_START, bytes((0, 0)))])
+
+    def test_fragmented_frame_survives_short_serial_pause(self):
+        parser = FrameParser()
+        data = build_frame(TYPE_GAME_OVER, (1, 9, 8, 3, 0, 1, 0))
+        with patch("naval_terminal.time.monotonic", return_value=10.0):
+            self.assertEqual(parser.feed(data[:4]), [])
+        with patch("naval_terminal.time.monotonic", return_value=10.1):
+            self.assertEqual(parser.feed(b""), [])
+        with patch("naval_terminal.time.monotonic", return_value=10.2):
+            self.assertEqual(parser.feed(data[4:]), [Frame(TYPE_GAME_OVER, data[3:])])
+
     def test_complete_frame(self):
         parser = FrameParser()
         frames = parser.feed(build_frame(TYPE_TURN, (2,)))
@@ -128,10 +148,42 @@ class HandleFrameTests(unittest.TestCase):
         self.assertEqual((state.p1_wins, state.p2_wins), (4, 5))
 
     def test_placement_start_signals_new_game(self):
-        state = GameState()
+        state = GameState(placement_started=True)
         handle_frame(Frame(TYPE_PLACEMENT_START, bytes((1, 2))), state)
         self.assertTrue(state.new_game)
         self.assertEqual((state.p1_wins, state.p2_wins), (1, 2))
+
+    def test_initial_placement_start_does_not_restart(self):
+        state = GameState()
+        handle_frame(Frame(TYPE_PLACEMENT_START, bytes((0, 0))), state)
+        self.assertFalse(state.new_game)
+        self.assertTrue(state.placement_started)
+
+    def test_invalid_coordinates_leave_boards_unchanged(self):
+        for message in (TYPE_SHOT_RESULT, TYPE_INCOMING_SHOT):
+            state = GameState()
+            self.assertFalse(handle_frame(Frame(message, bytes((255, 0, 1))), state))
+            self.assertEqual(state.enemy_board, [["?"] * 8 for _ in range(8)])
+            self.assertEqual(state.own_board, [["~"] * 8 for _ in range(8)])
+
+    def test_invalid_player_does_not_change_turn(self):
+        state = GameState(current_turn=1)
+        self.assertFalse(handle_frame(Frame(TYPE_TURN, bytes((3,))), state))
+        self.assertEqual(state.current_turn, 1)
+
+    def test_truncated_notification_is_rejected(self):
+        self.assertFalse(handle_frame(Frame(TYPE_GAME_OVER, bytes((1, 2))), GameState()))
+
+    def test_invalid_result_is_rejected(self):
+        self.assertFalse(valid_notification(Frame(TYPE_SHOT_RESULT, bytes((0, 0, 3)))))
+
+    def test_invalid_placement_acknowledgment_is_rejected(self):
+        self.assertFalse(valid_notification(Frame(TYPE_PLACE_RESULT, bytes((3, 1, 0)))))
+        self.assertFalse(valid_notification(Frame(TYPE_PLACE_RESULT, bytes((0, 1, 4)))))
+
+    def test_invalid_ship_rejection_echoes_original_identifier(self):
+        self.assertTrue(valid_notification(Frame(TYPE_PLACE_RESULT, bytes((255, 0, 3)))))
+        self.assertFalse(valid_notification(Frame(TYPE_PLACE_RESULT, bytes((255, 0, 1)))))
 
 
 if __name__ == "__main__":

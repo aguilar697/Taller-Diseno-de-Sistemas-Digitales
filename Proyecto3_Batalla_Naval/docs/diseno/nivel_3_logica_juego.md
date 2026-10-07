@@ -197,7 +197,7 @@ Contrato del periférico implementado en `src/design/uart/uart_peripheral.sv`:
 | `RX_DATA` (`0x00010048`) | último byte recibido (leer no lo consume) | sin efecto |
 
 - El programa escribe `TX_DATA` solo con `CONTROL` bit 0 en 1, porque un byte escrito con la TX ocupada se pierde sin aviso. Transmite como mucho un byte por vuelta del ciclo de servicio, desde una cola circular en RAM.
-- No hay FIFO de recepción: si llega un byte antes de consumir el anterior, el anterior se pierde. A 115200 baudios llega como máximo un byte cada 8680 ciclos, así que ninguna vuelta del ciclo de servicio puede durar más que eso. Por eso el redibujado de la pantalla se reparte en pasos, uno por vuelta (ver la sección 5).
+- No hay FIFO de recepción: si llega un byte antes de consumir el anterior, el anterior se pierde. A 115200 baudios dos bytes consecutivos se separan aproximadamente 8680 ciclos; la recepción debe atenderse dentro de ese intervalo. El redibujado de la pantalla se reparte en pasos para limitar el trabajo entre lecturas de RX (ver la sección 5).
 - Una trama a la que le falta un byte se abandona por edad, como cualquier trama incompleta, y la PC no recibe respuesta a esa solicitud.
 
 ## 5. Decisiones de diseño acordadas con el equipo
@@ -205,9 +205,10 @@ Contrato del periférico implementado en `src/design/uart/uart_peripheral.sv`:
 | Decisión | Resolución |
 |---|---|
 | Colocación concurrente (`p1_ready`/`p2_ready` independientes) | Un único ciclo de servicio en ensamblador atiende botones, RX y TX sin bloquear; ningún jugador espera a que el otro termine |
+| Arranque con switches estables | `sistema_init` espera `ESPERA_ARRANQUE=120000` iteraciones antes de inicializar la partida. La espera supera los 10 ms del debounce; `BTN_PREV` recibe los niveles iniciales y evita interpretar un switch ya activo como una nueva jugada |
 | Formato de metadata de barcos (`0x2220–0x22DF`) | 8 words/barco: `placed, row, column, orientation, length, hit_count, sunk, reserved` |
 | Detección de "casilla ya disparada" | La validación de disparo revisa el estado de la casilla antes de aplicar el turno; un disparo repetido no lo consume y se responde `ERROR/REPEATED_SHOT` (PC) o se ignora en silencio (J1) |
-| Duración de una vuelta del ciclo de servicio | Menor que un byte de UART (8680 ciclos), porque la UART no tiene FIFO. El redibujado de la pantalla se reparte en 25 pasos, uno por vuelta (fondo, cada fila de cada tablero, cursor, HUD y mensaje); la vuelta más larga de una partida completa dura unos 6 300 ciclos |
+| Atención de UART y redibujado | El redibujado se reparte en 25 pasos, uno por vuelta (fondo, filas de los tableros, cursor, HUD y mensaje). La terminal espera respuesta a cada solicitud y el testbench verifica recepción de tramas con bytes consecutivos 8N1; este caso no constituye una garantía para tráfico arbitrario sin pausas |
 
 El cuarto nivel desarrollará las subrutinas, las convenciones de registros y el uso detallado de la pila.
 

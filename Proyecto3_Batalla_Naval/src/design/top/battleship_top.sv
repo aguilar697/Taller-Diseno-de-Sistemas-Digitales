@@ -47,10 +47,12 @@ module battleship_top #(
 
     logic [11:0] vga_rgb;
 
-    // TODO: sincronizar la entrada de reset antes de la validacion fisica final.
-    // Por ahora rst_i se usa directamente en todo el dominio de 100 MHz. El
-    // subsistema VGA gestiona internamente el reset de su dominio de pixel.
+    // rst_i debe estar sincronizado con clk_i; basys3_top realiza esa funcion.
+    // VGA sincroniza ademas la liberacion del reset con el reloj de pixel.
 
+    // CPU Y ROM: el núcleo ejecuta el programa de juego; este top conecta
+    // sus buses. prog_address/prog_rdata solo llevan instrucciones (Harvard).
+    // data_address/data_wdata/data_rdata llevan RAM/MMIO mediante LW/SW.
     cpu cpu_inst (
         .clk_i         (clk_i),
         .rst_i         (rst_i),
@@ -62,6 +64,8 @@ module battleship_top #(
         .we_o          (data_write_enable)
     );
 
+    // ROM separada del núcleo: ROM_INIT_FILE selecciona la imagen ensamblada.
+    // Comparte clk_i con CPU y responde al flanco; no se borra por rst_i.
     program_rom #(
         .INIT_FILE (ROM_INIT_FILE)
     ) program_rom_inst (
@@ -70,6 +74,9 @@ module battleship_top #(
         .rdata_o (prog_rdata)
     );
 
+    // El bus decodifica la dirección de datos y habilita RAM o periférico.
+    // Así el mismo SW puede escribir RAM, UART, video o salidas según el mapa;
+    // el CPU no contiene estados específicos para las reglas de Batalla Naval.
     mmio_subsystem_top mmio_inst (
         .clk_i                (clk_i),
         .rst_i                (rst_i),

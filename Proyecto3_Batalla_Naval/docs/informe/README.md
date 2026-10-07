@@ -5,26 +5,23 @@
 | Subsistema | Informe y evidencias |
 |---|---|
 | 1. Procesador RISC-V y ROM | [Verificación del CPU y la ROM](cpu_verificacion.md) |
-| 2. VGA y entradas J1 | [Verificación del VGA y entradas del Jugador 1](vga_entradas_verificacion.md) — simulaciones unitarias e integradas, aceptación black-box 27/27, cumplimiento temporal y validación física en monitor |
-| 3. Plataforma de datos, UART y PC | **EN PROCESO** |
-| 4. Programa ensamblador | **EN PROCESO** |
+| 2. VGA y entradas J1 | [Verificación VGA y entradas](vga_entradas_verificacion.md): pruebas unitarias, aceptación 27/27, reportes temporales y evidencia física independiente |
+| 3. Plataforma de datos, UART y PC | [Verificación MMIO](mmio_verificacion.md); regresión RTL y pruebas de terminal en el [informe integrado](integracion_verificacion.md) |
+| 4. Programa ensamblador | [Procedimientos del juego](../diseno/nivel_4_logica_juego.md), [fuentes y ensamblado](../../src/software_riscv/README.md) y [ejecución integrada](integracion_verificacion.md) |
 
-## Integración del sistema
+## Integración y reproducción
 
-**EN PROCESO**
+El [informe de integración](integracion_verificacion.md) identifica la revisión incorporada y el alcance de las pruebas funcionales. Las evidencias recientes incluyen logs de los 33 testbenches, manifiesto de fuentes, tramas y estado de RAM. La [guía de ejecución](../uso_basys3.md) explica dependencias, generación de ROM, simulación, proyecto Vivado, restricciones, IP y controles físicos.
 
-## Pendientes para completar el informe
+## Evidencias necesarias para el cierre de implementación
 
-La documentación disponible permite revisar por separado el CPU y el subsistema VGA/entradas. El cierre del informe requiere completar los siguientes puntos con resultados de la versión integrada:
+La simulación funcional integrada está documentada. El equipo reporta comprobación física de la rama `kCortes`; ese reporte no reemplaza los archivos de evidencia de la revisión final. Para completar el cierre se deben incorporar:
 
-1. **Contexto y referencias.** Incorporar objetivos y requisitos del enunciado, fundamento teórico con fuentes y bibliografía. Identificar la versión del enunciado utilizada y relacionar cada requisito con su diseño, prueba y evidencia.
-2. **Reproducción del proyecto.** Documentar versión de Vivado, dispositivo, archivos fuente, módulos superiores, restricciones, importación y generación de la IP de reloj, y comandos de simulación e implementación. Para el software, incluir herramientas, dependencias, compilación del ensamblador, generación de la imagen de ROM y ejecución de la aplicación PC. Comprobar el procedimiento desde un clon limpio.
-3. **Evidencia de implementación.** Los reportes finales de utilización y temporización del Subsistema 2 se encuentran incorporados junto con su validación física. Para el cierre del proyecto se debe consolidar la síntesis, utilización y análisis temporal del sistema completo integrado, identificando el módulo superior y las restricciones utilizadas.
-4. **Contratos de integración.** Comprobar en RTL la latencia de las lecturas MMIO, el comportamiento UART acordado y la inicialización de VRAM. Precisar el comportamiento ante accesos simultáneos a la misma posición de VRAM, la selección del primer jugador, el formato y límite de los contadores del display y los tiempos de los efectos del buzzer.
-5. **Subsistemas pendientes.** Incorporar el cuarto nivel del programa RISC-V, el código y las pruebas de la plataforma de datos, la aplicación PC y el programa del juego, junto con sus respectivos informes.
-6. **Validación del sistema completo.** Registrar las evidencias finales de la partida integrada: comunicación entre jugadores, colocación y disparos válidos e inválidos, turnos, hundimiento, victoria, reinicio y tratamiento de errores. La salida VGA y las entradas locales ya cuentan con validación física independiente; la evidencia de post-implementación temporizada y de funcionamiento del sistema completo corresponde a la integración final del equipo.
-7. **Análisis final.** Consolidar resultados, recursos, cumplimiento temporal, advertencias, limitaciones y conclusiones. Actualizar los estados de avance únicamente cuando exista evidencia que respalde su cierre.
+1. Reportes de utilización, DRC y temporización del sistema completo, asociados al top `basys3_top`, al XDC y a la imagen ROM de la versión entregada.
+2. Evidencias de la partida completa en placa: VGA, controles, terminal, sonidos, marcador y reinicios; identificar el bitstream utilizado.
+3. Simulación post-implementación temporizada del sistema completo, asociada a la misma revisión y restricciones de los reportes.
+4. Trazabilidad de requisitos al enunciado y pruebas, bibliografía y conclusiones del equipo, con las cifras de la implementación final.
 
-Los resultados de cada ejecución deben permitir identificar el testbench o módulo superior, la versión del código, la herramienta y el alcance de la prueba. Los extractos de consola y las capturas complementan el análisis; los reportes de implementación permiten comprobar las cifras de recursos y temporización.
+Los reportes físicos y temporales ya presentes del Subsistema 2 conservan su alcance independiente. La validación del juego no permite afirmar cierre temporal del sistema completo sin sus reportes correspondientes.
 
 [Planteamiento de diseño](../diseno/README.md) · [Descripción del proyecto](../../README.md)

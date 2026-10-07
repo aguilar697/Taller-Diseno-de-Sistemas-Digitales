@@ -23,8 +23,9 @@ module uart_rx #(
     } rx_state_t;
 
     rx_state_t state_q;
-    logic rx_meta_q;
-    logic rx_sync_q;
+    // Conserva y agrupa las dos etapas que reciben la entrada asincrona.
+    (* ASYNC_REG = "TRUE" *) logic rx_meta_q;
+    (* ASYNC_REG = "TRUE" *) logic rx_sync_q;
     logic [COUNT_WIDTH-1:0] baud_count_q;
     logic [2:0]             bit_index_q;
     logic [7:0]             data_q;

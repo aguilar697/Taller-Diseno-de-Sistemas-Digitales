@@ -32,7 +32,7 @@ Los proyectos se desarrollan siguiendo una metodología de **diseño modular**, 
 |---|---|---|---|
 | [Proyecto 1 — Whack-a-Mole](./Proyecto1_Whack-a-mole/) | Juego híbrido implementado mediante FPGA y lógica discreta, con comunicación serial UART entre ambos subsistemas. | Basys 3, SystemVerilog, UART, lógica 74xx | Finalizado |
 | [Proyecto 2 — Ahorcado](./Proyecto2_Ahorcado/) | Juego controlado por FPGA, terminal Python por UART e interfaz local LCD, displays y buzzer. | Basys 3, SystemVerilog, UART, Python, LCD | Integrado; alcance de verificación documentado |
-| [Proyecto 3 — Batalla Naval](./Proyecto3_Batalla_Naval/) | Juego de dos jugadores controlado por un procesador RISC-V en FPGA, con interfaz VGA y terminal PC por UART. | Basys 3, SystemVerilog, RISC-V, VGA, UART, Python | En desarrollo |
+| [Proyecto 3 — Batalla Naval](./Proyecto3_Batalla_Naval/) | Juego de dos jugadores controlado por un procesador RISC-V en FPGA, con interfaz VGA y terminal PC por UART. | Basys 3, SystemVerilog, RISC-V, VGA, UART, Python | Integrado; verificación funcional y alcance de evidencias documentados |
 
 Cada proyecto dispone de su propio `README.md`, donde se documentan su arquitectura, estructura interna, módulos implementados, procedimiento de uso y referencias hacia la documentación técnica.
 

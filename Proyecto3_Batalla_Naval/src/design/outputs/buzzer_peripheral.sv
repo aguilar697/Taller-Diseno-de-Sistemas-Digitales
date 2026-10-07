@@ -36,13 +36,13 @@ module buzzer_peripheral #(
     localparam int unsigned VIC_B=(VICTORY_HALF_PERIOD_3>VICTORY_HALF_PERIOD_4) ? VICTORY_HALF_PERIOD_3 : VICTORY_HALF_PERIOD_4;
     localparam int unsigned VIC_MAX=(VIC_A>VIC_B) ? VIC_A : VIC_B;
     localparam int unsigned MAX_HALF_PERIOD=(MAX_C>VIC_MAX) ? MAX_C : VIC_MAX;
-    localparam int unsigned COUNT_WIDTH=(MAX_HALF_PERIOD<=1) ? 1 : $clog2(MAX_HALF_PERIOD);
+    localparam int unsigned COUNT_WIDTH=(MAX_HALF_PERIOD<=1) ? 1 : $clog2(MAX_HALF_PERIOD+1);
 
     localparam int unsigned DUR_A=(HIT_DURATION>MISS_DURATION) ? HIT_DURATION : MISS_DURATION;
     localparam int unsigned DUR_B=(SUNK_DURATION>INVALID_DURATION) ? SUNK_DURATION : INVALID_DURATION;
     localparam int unsigned DUR_C=(DUR_A>DUR_B) ? DUR_A : DUR_B;
     localparam int unsigned MAX_DURATION=(DUR_C>VICTORY_DURATION) ? DUR_C : VICTORY_DURATION;
-    localparam int unsigned DURATION_WIDTH=(MAX_DURATION<=1) ? 1 : $clog2(MAX_DURATION);
+    localparam int unsigned DURATION_WIDTH=(MAX_DURATION<=1) ? 1 : $clog2(MAX_DURATION+1);
 
     logic [2:0] command_q;
     logic [COUNT_WIDTH-1:0] tone_count;

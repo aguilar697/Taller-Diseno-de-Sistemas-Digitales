@@ -60,11 +60,17 @@ module subsystem2_basys3_test_top (
      * SW15 = 0 -> subsistema en reset / inactivo
      * SW15 = 1 -> subsistema habilitado / funcionando
      *
-     * Por lo tanto, solamente en este top fisico se invierte SW15.
+     * La inversion y sincronizacion se realizan en este top fisico.
      */
     logic rst;
 
-    assign rst = ~sw[15];
+    // SW15 es asincrono: dos etapas sincronizan el reset con los 100 MHz.
+    // La inicializacion tambien permite arrancar con SW15 ya en RUN.
+    (* ASYNC_REG = "TRUE" *) logic [1:0] reset_pipe_q = 2'b11;
+    always_ff @(posedge clk) begin
+        reset_pipe_q <= {reset_pipe_q[0], ~sw[15]};
+    end
+    assign rst = reset_pipe_q[1];
 
 
     // ============================================================

@@ -1,39 +1,30 @@
-# Programa del juego (Subsistema 4)
+# Programa del juego
 
-Programa en ensamblador RV32I que contiene todas las reglas de Batalla Naval.
-El diseño está en [tercer nivel de la lógica del juego](../../docs/diseno/nivel_3_logica_juego.md).
+El programa utiliza el subconjunto RV32I implementado por la CPU y ejecuta las reglas del juego mediante accesos MMIO. El hardware y la terminal de PC no deciden la validez de las jugadas.
 
-| Archivo | Bloque de segundo nivel |
+| Archivo | Función |
 |---|---|
-| `constantes.s` | Mapa de memoria, registros de periféricos y códigos del protocolo |
+| `constantes.s` | Direcciones, registros, estados y códigos del protocolo |
 | `main.s` | Inicialización y ciclo de servicio |
-| `control_estado.s` | Control de estado del juego |
-| `colocacion.s` | Gestión de colocación de barcos |
-| `turnos.s` | Gestión de turnos y disparos |
-| `victoria.s` | Detección de hundido y victoria |
-| `uart.s` | Comunicación UART |
-| `salidas.s` | Actualización de periféricos de salida (VGA, LED, displays, buzzer) |
-| `program.hex` | Imagen de la ROM: 2048 palabras de 32 bits, una por línea |
+| `control_estado.s` | Fases, reinicio y marcador |
+| `colocacion.s` | Colocación y validación de flotas |
+| `turnos.s` | Alternancia y validación de disparos |
+| `victoria.s` | Hundimientos y condición de victoria |
+| `uart.s` | Recepción, parser y cola de transmisión |
+| `salidas.s` | Actualización de VGA, LED, displays y buzzer |
+| `program.hex` | ROM de 2048 palabras de 32 bits |
 
-`program.hex` ocupa 1735 de 2048 palabras. `program_rom` lo carga con
-`INIT_FILE`, y `basys3_top` lo pasa por defecto.
+Desde la raíz de `Proyecto3_Batalla_Naval`:
 
-## Generación de `program.hex`
+```powershell
+python scripts/ensamblar_programa.py --check
+python scripts/ensamblar_programa.py
+```
 
-Esta imagen se generó con el ensamblador de la carpeta de pruebas
-(`tools/asm.py`), que acepta solo el subconjunto de instrucciones que
-implementa el CPU. Antes de la entrega hay que regenerarla con el toolchain
-GNU acordado (`rv32i`, `ilp32`, sin relajación) y comparar el desensamblado.
+La primera orden comprueba la correspondencia entre las fuentes y el HEX sin modificarlo. La segunda regenera la imagen. El programa ocupa 1739 palabras; las restantes contienen NOP. El ensamblador valida registros, inmediatos, alineación de destinos, símbolos y capacidad de la ROM. No requiere paquetes de Python adicionales.
 
-Las pseudoinstrucciones `call` pueden ocupar dos palabras con el ensamblador
-GNU (`auipc` + `jalr`). Con las 165 llamadas del programa, la ROM llegaría a
-unas 1900 de 2048 palabras, así que todavía cabe.
+Las pseudoinstrucciones `call` se expanden a `jal ra, destino`, y `li` a una o dos instrucciones. Esta expansión reproduce la imagen utilizada en las pruebas de integración. Otro ensamblador puede producir una imagen distinta; cualquier cambio de herramienta o programa requiere repetir las pruebas y generar un nuevo bitstream.
 
-## Contrato con el hardware
+El ciclo principal atiende botones, RX, TX y un paso de redibujado VGA. La UART recibe un byte pendiente, sin FIFO; la terminal espera respuesta a cada solicitud. El programa consume RX mediante escritura de uno en CONTROL bit 1 y transmite cuando CONTROL bit 0 indica disponibilidad. El buzzer limita en hardware la duración de cada sonido.
 
-- UART: el programa transmite solo con `CONTROL` bit 0 en 1 (TX lista) y
-  consume cada byte recibido escribiendo `CONTROL` bit 1. La UART no tiene
-  FIFO, así que ninguna vuelta del ciclo de servicio supera un byte (8680
-  ciclos); el redibujado de la pantalla se hace en 25 pasos, uno por vuelta.
-- Buzzer: el programa solo escribe el código del suceso; el periférico define
-  la duración de cada sonido.
+Al salir del reset general, `sistema_init` ejecuta una espera de `ESPERA_ARRANQUE=120000` iteraciones antes de `partida_init`. En esta CPU multiciclo la espera supera los 10 ms del debounce y permite guardar en `BTN_PREV` los niveles estabilizados de los switches. Un switch que ya esté activo al arrancar no se interpreta como una nueva confirmación o rotación. Esta espera corresponde al arranque del hardware; `GAME_RST` inicia otra partida sin repetirla.
