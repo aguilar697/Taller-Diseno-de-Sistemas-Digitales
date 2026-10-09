@@ -1,0 +1,27 @@
+==================================================================
+BLOQUE: Gestion de turnos y disparos
+  FALLO: el acierto marca la casilla como impacto: se esperaba 3, se obtuvo 1
+  FALLO: el disparo de J1 se notifica como INCOMING_SHOT: se esperaba [0, 0, 1], se obtuvo None
+  FALLO: tras un disparo valido el turno pasa al rival: se esperaba 2, se obtuvo 1
+  FALLO: se contabiliza el disparo de J1: se esperaba 1, se obtuvo 0
+  FALLO: un acierto suena como impacto: se esperaba 1, se obtuvo 4
+  FALLO: el disparo de J2 al agua devuelve fallo: se esperaba ('SHOT_RESULT', [7, 7, 0]), se obtuvo ('ERROR', [17, 3])
+  FALLO: el fallo marca la casilla del tablero de J1: se esperaba 2, se obtuvo 0
+  FALLO: se contabiliza el disparo de J2: se esperaba 1, se obtuvo 0
+  FALLO: un fallo suena distinto: se esperaba 2, se obtuvo 4
+  FALLO: primer disparo de J2 aceptado: se esperaba 'SHOT_RESULT', se obtuvo 'ERROR'
+  FALLO: el disparo valido de J1 cede el turno: se esperaba 2, se obtuvo 1
+  FALLO: un disparo repetido de J2 se responde con ERROR, no con silencio: se esperaba ('ERROR', [17, 4]), se obtuvo ('ERROR', [17, 3])
+  FALLO: un disparo repetido de J2 tampoco consume su turno: se esperaba 2, se obtuvo 1
+  FALLO: una fila fuera del tablero se rechaza: se esperaba ('ERROR', [17, 5]), se obtuvo ('ERROR', [17, 3])
+  FALLO: una columna muy grande se rechaza sin desbordar: se esperaba ('ERROR', [17, 5]), se obtuvo ('ERROR', [17, 3])
+  FALLO: una coordenada invalida no consume el turno: se esperaba 2, se obtuvo 1
+  FALLO: el ultimo impacto de un barco se notifica como hundido: se esperaba [4, 1, 2], se obtuvo None
+  FALLO: la metadata marca el barco como hundido: se esperaba 1, se obtuvo 0
+  FALLO: el barco acumulo sus dos impactos: se esperaba 2, se obtuvo 0
+  FALLO: J1 suma un barco enemigo hundido: se esperaba 1, se obtuvo 0
+  FALLO: el hundimiento tiene sonido propio: se esperaba 3, se obtuvo 4
+  FALLO: tras disparar J1 se anuncia el turno de J2: se esperaba [2], se obtuvo None
+  FALLO: tras disparar J2 se anuncia el turno de J1: se esperaba [1], se obtuvo None
+  RESULTADO: 9 correctas, 23 FALLOS
+==================================================================

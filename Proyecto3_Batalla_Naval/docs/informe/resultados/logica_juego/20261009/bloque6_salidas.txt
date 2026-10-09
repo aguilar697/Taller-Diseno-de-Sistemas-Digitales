@@ -1,0 +1,4 @@
+==================================================================
+BLOQUE: Actualizacion de perifericos de salida
+  RESULTADO: 29 comprobaciones, 0 fallos
+==================================================================

@@ -1,0 +1,5 @@
+Ensamblador de las pruebas contra program.hex del repositorio
+Palabras en program.hex:       2048
+Palabras ensambladas (asm.py): 2048
+Palabras de programa usadas:   1739 / 2048
+RESULTADO: COINCIDEN

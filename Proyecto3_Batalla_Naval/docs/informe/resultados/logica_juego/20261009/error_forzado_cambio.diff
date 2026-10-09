@@ -1,0 +1,4 @@
+78c78
+<     blt     t0, t1, td_aplicar
+---
+>     #blt     t0, t1, td_aplicar
