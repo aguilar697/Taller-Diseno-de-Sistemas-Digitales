@@ -1,9 +1,20 @@
 # ---------------------------------------------------------------------------
 # Bloque 6 de Nivel 2: ACTUALIZACION DE PERIFERICOS DE SALIDA
+#
+# Buzzer, LED, displays y pantalla VGA. Los perifericos solo muestran lo que
+# el programa les escribe; toda decision esta en el programa.
+#
+# La pantalla no se redibuja de golpe: redibujarla completa tarda mas que
+# los 8680 ciclos entre dos bytes de la UART (que no tiene FIFO). Por eso
+# el redibujado se divide en 25 pasos y servicio_video hace uno por vuelta
+# del ciclo de servicio.
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # salidas_buzzer
+# Pide un sonido al buzzer. El periferico decide su duracion y vuelve solo
+# a silencio.
+# Entradas: a0 = codigo de sonido (SND_*).  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 salidas_buzzer:
     li      t0, BUZZER
@@ -12,6 +23,9 @@ salidas_buzzer:
 
 # ---------------------------------------------------------------------------
 # salidas_actualizar
+# Muestra la fase en los LED y el marcador de victorias en los displays
+# (J1 en el byte bajo, J2 en el byte siguiente).
+# Entradas: ninguna.  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 salidas_actualizar:
     li      t0, GAME_PHASE
@@ -24,32 +38,39 @@ salidas_actualizar:
     li      t0, P2_WINS
     lw      t2, 0(t0)
     slli    t2, t2, 8
-    or      t1, t1, t2
+    or      t1, t1, t2              # t1 = P2_WINS<<8 | P1_WINS
     li      t0, DISPLAY
     sw      t1, 0(t0)
     ret
 
 # ---------------------------------------------------------------------------
 # vga_marcar_sucio
+# Pide redibujar la pantalla desde el primer paso. Si habia un redibujado
+# a medias, vuelve a empezar para no mostrar una mezcla de estados.
+# Entradas: ninguna.  Salidas: ninguna.  Modifica: t0, t1
 # ---------------------------------------------------------------------------
 vga_marcar_sucio:
     li      t0, VGA_DIRTY
     li      t1, 1
     sw      t1, 0(t0)
     li      t0, VGA_PASO
-    li      t1, -1
+    li      t1, -1                  # -1 = empezar en la proxima vuelta
     sw      t1, 0(t0)
     ret
 
 # ---------------------------------------------------------------------------
 # vga_tile
+# Escribe un tile de la pantalla de 20x15.
+# Entradas: a0 = fila de pantalla, a1 = columna de pantalla,
+#           a2 = valor del tile ([2:0] color, [3] glyph_en, [11:4] caracter)
+# Salidas:  ninguna.  Modifica: t0, t1
 # ---------------------------------------------------------------------------
 vga_tile:
     slli    t0, a0, 4
     slli    t1, a0, 2
-    add     t0, t0, t1
-    add     t0, t0, a1
-    slli    t0, t0, 2
+    add     t0, t0, t1              # fila*20 = fila*16 + fila*4, sin mul
+    add     t0, t0, a1              # + columna
+    slli    t0, t0, 2               # * 4 bytes por tile
     li      t1, VGA_BASE
     add     t0, t1, t0
     sw      a2, 0(t0)
@@ -57,6 +78,12 @@ vga_tile:
 
 # ---------------------------------------------------------------------------
 # vga_texto
+# Escribe hasta 4 caracteres en color HUD a partir de (fila, columna). Los
+# caracteres van empaquetados en a2, el primero en el byte bajo; un byte 0
+# termina el texto antes. Devuelve la posicion siguiente para poder
+# encadenar llamadas y escribir textos mas largos.
+# Entradas: a0 = fila, a1 = columna, a2 = hasta 4 caracteres ASCII
+# Salidas:  a0 = fila, a1 = columna despues del ultimo caracter
 # ---------------------------------------------------------------------------
 vga_texto:
     addi    sp, sp, -32
@@ -65,15 +92,16 @@ vga_texto:
     sw      s1, 20(sp)
     sw      s2, 16(sp)
     sw      s3, 12(sp)
-    mv      s0, a0
-    mv      s1, a1
-    mv      s2, a2
-    li      s3, 4
+    mv      s0, a0                  # s0 = fila
+    mv      s1, a1                  # s1 = columna
+    mv      s2, a2                  # s2 = caracteres restantes
+    li      s3, 4                   # s3 = maximo de caracteres
 
 vt_bucle:
-    andi    t0, s2, 0xFF
+    andi    t0, s2, 0xFF            # t0 = siguiente caracter
     beqz    t0, vt_fin
 
+    # Tile = caracter<<4 | GLYPH_EN | COL_HUD
     slli    t1, t0, 4
     ori     t1, t1, GLYPH_EN
     ori     t1, t1, COL_HUD
@@ -100,6 +128,10 @@ vt_fin:
 
 # ---------------------------------------------------------------------------
 # vga_num2
+# Escribe un numero de 0 a 99 como dos digitos en color HUD.
+# El CPU no tiene div: las decenas se obtienen con restas sucesivas.
+# Entradas: a0 = fila, a1 = columna, a2 = numero (0..99)
+# Salidas:  a0 = fila, a1 = columna + 2
 # ---------------------------------------------------------------------------
 vga_num2:
     addi    sp, sp, -32
@@ -107,10 +139,11 @@ vga_num2:
     sw      s0, 24(sp)
     sw      s1, 20(sp)
     sw      s2, 16(sp)
-    mv      s0, a0
-    mv      s1, a1
-    mv      s2, a2
+    mv      s0, a0                  # s0 = fila
+    mv      s1, a1                  # s1 = columna
+    mv      s2, a2                  # s2 = numero
 
+    # t0 = decenas, s2 = unidades
     li      t0, 0
     li      t1, 10
 vn_dividir:
@@ -119,9 +152,10 @@ vn_dividir:
     addi    t0, t0, 1
     j       vn_dividir
 vn_listo:
-    addi    t0, t0, 48
+    addi    t0, t0, 48              # a ASCII ('0' = 48)
     addi    s2, s2, 48
 
+    # Decenas
     slli    t1, t0, 4
     ori     t1, t1, GLYPH_EN
     ori     t1, t1, COL_HUD
@@ -130,6 +164,7 @@ vn_listo:
     mv      a2, t1
     call    vga_tile
 
+    # Unidades
     slli    t1, s2, 4
     ori     t1, t1, GLYPH_EN
     ori     t1, t1, COL_HUD
@@ -149,6 +184,11 @@ vn_listo:
 
 # ---------------------------------------------------------------------------
 # servicio_video
+# Tarea del ciclo de servicio. Si hay que redibujar, hace un solo paso:
+# - VGA_PASO = -1: acaba de marcarse sucio; se pone en 0 y no dibuja aun.
+# - Si no, ejecuta vga_paso(VGA_PASO) y avanza. Al terminar el ultimo
+#   paso borra VGA_DIRTY y deja VGA_PASO en 0.
+# Entradas: ninguna.  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 servicio_video:
     addi    sp, sp, -16
@@ -156,19 +196,19 @@ servicio_video:
 
     li      t0, VGA_DIRTY
     lw      t1, 0(t0)
-    beqz    t1, sv_fin
+    beqz    t1, sv_fin              # pantalla al dia
 
     li      t0, VGA_PASO
     lw      a0, 0(t0)
     blt     a0, x0, sv_empezar
-    call    vga_paso
+    call    vga_paso                # a0 = 1 si fue el ultimo paso
 
     li      t0, VGA_PASO
     lw      t1, 0(t0)
     addi    t1, t1, 1
     beqz    a0, sv_guardar
     li      t2, VGA_DIRTY
-    sw      x0, 0(t2)
+    sw      x0, 0(t2)               # redibujado terminado
     li      t1, 0
 sv_guardar:
     sw      t1, 0(t0)
@@ -184,12 +224,21 @@ sv_fin:
 
 # ---------------------------------------------------------------------------
 # vga_paso
+# Ejecuta un paso del redibujado. El orden importa: cada paso pinta encima
+# de los anteriores.
+#   0..2   limpia la pantalla, 100 tiles (5 filas) por paso
+#   3..18  una fila de un tablero: pasos pares J1, impares J2 (8 filas c/u)
+#   19     cursor
+#   20..23 HUD: titulo, fase, rotulos y marcador
+#   24     mensaje de la fila inferior (ultimo paso)
+# Entradas: a0 = numero de paso (0..24)
+# Salida:   a0 = 1 si fue el ultimo paso, 0 si no
 # ---------------------------------------------------------------------------
 vga_paso:
     addi    sp, sp, -16
     sw      ra, 12(sp)
     sw      s0, 8(sp)
-    mv      s0, a0
+    mv      s0, a0                  # s0 = paso
 
     li      t0, 3
     blt     s0, t0, vp_fondo
@@ -212,6 +261,7 @@ vp_fondo:
     call    vga_limpiar_bloque
     j       vp_fin
 
+    # k = paso - 3: fila = k/2, jugador = J1 si k es par, J2 si es impar.
 vp_tablero:
     addi    t0, s0, -3
     srli    a1, t0, 1
@@ -243,7 +293,7 @@ vp_fin:
     li      a0, 0
     li      t0, 24
     bne     s0, t0, vp_ret
-    li      a0, 1
+    li      a0, 1                   # paso 24: redibujado completo
 vp_ret:
     lw      s0, 8(sp)
     lw      ra, 12(sp)
@@ -252,14 +302,16 @@ vp_ret:
 
 # ---------------------------------------------------------------------------
 # vga_limpiar_bloque
+# Pone en COL_FONDO un bloque de 100 tiles (5 filas de pantalla).
+# Entradas: a0 = bloque (0..2).  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 vga_limpiar_bloque:
     slli    t1, a0, 6
     slli    t2, a0, 5
     add     t1, t1, t2
     slli    t2, a0, 2
-    add     t1, t1, t2
-    slli    t1, t1, 2
+    add     t1, t1, t2              # t1 = bloque*100 = bloque*(64+32+4)
+    slli    t1, t1, 2               # * 4 bytes por tile
     li      t0, VGA_BASE
     add     t0, t0, t1
     li      t1, 100
@@ -273,6 +325,13 @@ vlb_bucle:
 
 # ---------------------------------------------------------------------------
 # vga_tablero_fila
+# Pinta una fila (8 casillas) de un tablero.
+# - Tablero de J1 (izquierda, propio): muestra agua, barcos, fallos e
+#   impactos.
+# - Tablero de J2 (derecha, rival): los barcos sin tocar se ven como agua;
+#   solo se muestran fallos e impactos.
+# Entradas: a0 = jugador dueno del tablero, a1 = fila del tablero (0..7)
+# Salidas:  ninguna.
 # ---------------------------------------------------------------------------
 vga_tablero_fila:
     addi    sp, sp, -32
@@ -282,9 +341,9 @@ vga_tablero_fila:
     sw      s2, 16(sp)
     sw      s3, 12(sp)
     sw      s4, 8(sp)
-    mv      s0, a0
-    mv      s1, a1
-    li      s2, 0
+    mv      s0, a0                  # s0 = jugador
+    mv      s1, a1                  # s1 = fila
+    li      s2, 0                   # s2 = columna
 
 vtf_col:
     mv      a0, s0
@@ -292,12 +351,13 @@ vtf_col:
     mv      a1, s1
     mv      a2, s2
     call    casilla_dir
-    lw      s3, 0(a0)
+    lw      s3, 0(a0)               # s3 = estado de la casilla
 
     li      t0, JUGADOR_1
     bne     s0, t0, vtf_rival
 
-    li      s4, COL_AGUA
+    # Tablero propio: AGUA, BARCO, FALLO o HIT con su color.
+    li      s4, COL_AGUA            # s4 = color del tile
     beqz    s3, vtf_pintar
     li      t0, CASILLA_BARCO
     bne     s3, t0, vtf_propio_1
@@ -312,6 +372,7 @@ vtf_propio_2:
     li      s4, COL_IMPACTO
     j       vtf_pintar
 
+    # Tablero rival: los barcos se ocultan.
 vtf_rival:
     li      s4, COL_AGUA
     li      t0, CASILLA_FALLO
@@ -323,6 +384,7 @@ vtf_rival_1:
     bne     s3, t0, vtf_pintar
     li      s4, COL_IMPACTO
 
+    # Posicion en pantalla: fila + TAB_FILA, columna + columna del tablero.
 vtf_pintar:
     li      t0, TAB_FILA
     add     a0, s1, t0
@@ -350,6 +412,13 @@ vtf_col_listo:
 
 # ---------------------------------------------------------------------------
 # vga_cursor
+# Pinta el cursor de J1 encima de los tableros.
+# - Batalla: un tile en el tablero rival, en la casilla apuntada.
+# - Colocacion: la silueta del barco que se va a colocar (su longitud y
+#   orientacion) sobre el tablero propio, recortada en el borde.
+# - Resultado: no pinta nada.
+# Entradas: ninguna (lee CUR_ROW, CUR_COL, J1_SHIP, J1_ORIENT).
+# Salidas:  ninguna.
 # ---------------------------------------------------------------------------
 vga_cursor:
     addi    sp, sp, -32
@@ -359,9 +428,9 @@ vga_cursor:
     sw      s2, 16(sp)
 
     li      t0, CUR_ROW
-    lw      s0, 0(t0)
+    lw      s0, 0(t0)               # s0 = fila
     li      t0, CUR_COL
-    lw      s1, 0(t0)
+    lw      s1, 0(t0)               # s1 = columna
 
     li      t0, GAME_PHASE
     lw      t1, 0(t0)
@@ -384,16 +453,17 @@ vc_coloc:
     li      t0, J1_SHIP
     lw      t1, 0(t0)
     li      t2, NUM_BARCOS
-    bge     t1, t2, vc_fin
+    bge     t1, t2, vc_fin          # ya coloco los 3: no hay silueta
 
     li      a0, JUGADOR_1
     mv      a1, t1
     call    barco_dir
-    lw      s2, SH_LEN(a0)
+    lw      s2, SH_LEN(a0)          # s2 = casillas por pintar
     li      t0, J1_ORIENT
-    lw      t1, 0(t0)
+    lw      t1, 0(t0)               # t1 = orientacion
 
 vc_bucle:
+    # Se detiene al salir del tablero.
     li      t2, TABLERO_N
     sltu    t3, s0, t2
     beqz    t3, vc_fin
@@ -405,16 +475,16 @@ vc_bucle:
     li      t0, TAB_COL_PROPIO
     add     a1, s1, t0
     li      a2, COL_CURSOR
-    sw      t1, 8(sp)
+    sw      t1, 8(sp)               # vga_tile modifica t1: se guarda en la pila
     call    vga_tile
     lw      t1, 8(sp)
 
     li      t0, ORIENT_H
     bne     t1, t0, vc_avanza_fila
-    addi    s1, s1, 1
+    addi    s1, s1, 1               # horizontal: columna siguiente
     j       vc_siguiente
 vc_avanza_fila:
-    addi    s0, s0, 1
+    addi    s0, s0, 1               # vertical: fila siguiente
 vc_siguiente:
     addi    s2, s2, -1
     bnez    s2, vc_bucle
@@ -429,11 +499,14 @@ vc_fin:
 
 # ---------------------------------------------------------------------------
 # vga_hud_titulo
+# Escribe "BATALLA NAVAL" en la fila 0.
+# Entradas: ninguna.  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 vga_hud_titulo:
     addi    sp, sp, -16
     sw      ra, 12(sp)
 
+    # Cada vga_texto devuelve en a0/a1 la posicion siguiente.
     li      a0, 0
     li      a1, 3
     li      a2, ('B') | ('A'<<8) | ('T'<<16) | ('A'<<24)
@@ -451,6 +524,8 @@ vga_hud_titulo:
 
 # ---------------------------------------------------------------------------
 # vga_hud_fase
+# Escribe la fase en la fila 1: "COLOCANDO", "TURNO J1"/"TURNO J2" o "FIN".
+# Entradas: ninguna.  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 vga_hud_fase:
     addi    sp, sp, -16
@@ -482,6 +557,7 @@ vhf_turno:
     call    vga_texto
     li      a2, ('O') | (' '<<8) | ('J'<<16)
     call    vga_texto
+    # Digito del jugador con el turno ('0' + CURRENT_TURN).
     li      t0, CURRENT_TURN
     lw      t1, 0(t0)
     addi    t1, t1, 48
@@ -505,6 +581,9 @@ vhf_fin:
 
 # ---------------------------------------------------------------------------
 # vga_hud_rotulos
+# Escribe en la fila 2 el rotulo de cada tablero: "TU FLOTA" sobre el de
+# J1 y "RIVAL" sobre el de J2.
+# Entradas: ninguna.  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 vga_hud_rotulos:
     addi    sp, sp, -16
@@ -529,6 +608,8 @@ vga_hud_rotulos:
 
 # ---------------------------------------------------------------------------
 # vga_hud_marcador
+# Escribe en la fila 3 el marcador de victorias: "J1:nn" y "J2:nn".
+# Entradas: ninguna.  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 vga_hud_marcador:
     addi    sp, sp, -16
@@ -555,6 +636,10 @@ vga_hud_marcador:
 
 # ---------------------------------------------------------------------------
 # vga_mensaje
+# Escribe en la fila FILA_MSG el mensaje indicado por MSG_CODE: "COLOCA
+# BARCOS", "IMPACTO", "FALLO", "HUNDIDO", "NO VALIDO", "GANA J1" o
+# "GANA J2". Con MSG_NADA no escribe nada.
+# Entradas: ninguna.  Salidas: ninguna.
 # ---------------------------------------------------------------------------
 vga_mensaje:
     addi    sp, sp, -16
