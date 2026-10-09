@@ -1,13 +1,43 @@
 # Tercer nivel — VGA y entradas del Jugador 1
 
-**Subsistema:** S2.  
-**Responsable:** Kenneth Campos.
+**Subsistema:** S2  
+**Responsable:** Kenneth Campos
+
+---
 
 ## 1. Objetivo
 
-El Subsistema 2 implementa la interfaz local del Jugador 1. Su función es generar la salida VGA del sistema, almacenar y leer la memoria de video basada en tiles, producir los sincronismos de video a partir de un reloj de píxel derivado del reloj principal y acondicionar las entradas físicas del Jugador 1 mediante sincronización y debouncing.
+El Subsistema 2 implementa la interfaz local del Jugador 1 y la salida gráfica VGA del sistema de Batalla Naval.
 
-Este subsistema no implementa reglas de Batalla Naval. La colocación de barcos, validación de disparos, detección de impactos, hundimientos, turnos y victoria se resuelven en el programa ensamblador ejecutado por el procesador RISC-V.
+Sus responsabilidades principales son:
+
+- capturar las entradas físicas del Jugador 1;
+- sincronizar las entradas asíncronas con el reloj del sistema;
+- eliminar rebotes mecánicos mediante debounce;
+- presentar el estado de los controles al procesador mediante MMIO;
+- almacenar la representación gráfica de la pantalla en una memoria de video basada en tiles;
+- generar el reloj de píxel requerido por VGA;
+- generar la temporización VGA;
+- transformar los tiles almacenados en memoria en una salida RGB;
+- representar caracteres utilizando una ROM de glyphs.
+
+El Subsistema 2 **no implementa las reglas de Batalla Naval**.
+
+La colocación de barcos, validación de posiciones, turnos, disparos, impactos, fallos, hundimientos, condición de victoria, marcador y reinicio lógico de partida son responsabilidad del programa ensamblador ejecutado por el procesador RISC-V.
+
+La separación se puede resumir como:
+
+```text
+Subsistema 2
+    ↓
+captura entradas + presenta información gráfica
+
+CPU + programa RISC-V
+    ↓
+decide qué ocurre en el juego
+```
+
+---
 
 ## 2. Diagrama del subsistema
 
@@ -15,88 +45,168 @@ Este subsistema no implementa reglas de Batalla Naval. La colocación de barcos,
 
 **Figura 1. Arquitectura interna del Subsistema 2: VGA, memoria de video, reloj de píxel y entradas del Jugador 1.**
 
-Las flechas continuas representan conexiones funcionales de datos y control. Las líneas discontinuas representan distribución de reloj y reset entre dominios. El puerto CPU de la memoria VGA opera con el reloj principal de 100 MHz, mientras que el puerto de video utiliza el reloj de píxel generado por Clocking Wizard mediante MMCM. En el diagrama, este bloque conserva la etiqueta arquitectónica PLL.
+Las flechas continuas representan conexiones funcionales de datos y control.
 
-La reasignación física realizada durante la validación final únicamente modifica la conexión entre los controles de la Basys 3 y las señales lógicas del Subsistema 2. Los módulos internos, el formato del registro de entradas y el mapa MMIO permanecen sin cambios.
+Las líneas discontinuas representan distribución de reloj y reset entre dominios.
 
-## 3. Función de los bloques
+El puerto asociado al CPU de la memoria VGA trabaja con el reloj principal de:
 
-| Bloque | Función e intercambio principal |
+```text
+100 MHz
+```
+
+mientras que el puerto utilizado por la generación VGA trabaja con un reloj de píxel de:
+
+```text
+25 MHz
+```
+
+generado mediante el Clocking Wizard de Vivado utilizando internamente un MMCM.
+
+En algunos diagramas se conserva la denominación arquitectónica **PLL** para este bloque, aunque la implementación física final utiliza un MMCM.
+
+La reasignación de botones, switches y LEDs se realiza en los tops físicos. Los módulos internos del Subsistema 2 mantienen su interfaz lógica y su mapa MMIO.
+
+---
+
+## 3. División funcional del Subsistema 2
+
+El tercer nivel se divide en cinco bloques principales:
+
+| Bloque | Función principal |
 |---|---|
-| Clock / PLL + Pixel Reset | Generar el reloj de píxel de 25 MHz a partir de 100 MHz y acondicionar la liberación de reset en el dominio VGA |
-| VGA Timing Controller | Generar contadores horizontal y vertical, `HSYNC`, `VSYNC`, `active_video`, `pixel_x` y `pixel_y` |
-| Video Memory Dual-Port | Permitir acceso de lectura/escritura desde CPU a 100 MHz y lectura simultánea desde el generador VGA a 25 MHz |
-| Tile / Glyph Renderer | Convertir coordenadas de píxel en índices de tile, interpretar el contenido de la memoria y producir la salida RGB |
-| Player 1 Input Peripheral | Sincronizar y filtrar las siete entradas del Jugador 1 y exponer su estado al CPU mediante MMIO |
+| Clock / PLL + Pixel Reset | Generar `clk_pixel` de 25 MHz desde 100 MHz y producir un reset seguro para el dominio VGA |
+| VGA Timing Controller | Generar coordenadas de píxel, región activa, `HSYNC` y `VSYNC` |
+| Video Memory Dual-Port | Almacenar los tiles mostrados y permitir acceso simultáneo desde CPU y VGA |
+| Tile / Glyph Renderer | Convertir la información almacenada en VRAM en RGB y caracteres |
+| Player 1 Input Peripheral | Sincronizar, filtrar y empaquetar las siete entradas del Jugador 1 para acceso MMIO |
 
-## 4. Interfaz externa del Subsistema 2
+La integración de estos bloques se realiza dentro de:
 
-### 4.1 Señales generales
+```text
+subsystem2_vga_inputs.sv
+```
+
+---
+
+# 4. Interfaz externa del Subsistema 2
+
+## 4.1 Reloj y reset
 
 | Señal | Ancho | Dirección | Función |
 |---|---:|---|---|
-| `clk_100_i` | 1 | Entrada | Reloj principal del sistema, 100 MHz |
-| `rst_i` | 1 | Entrada | Reset síncrono activo alto en el dominio de 100 MHz |
+| `clk_100_i` | 1 | Entrada | Reloj principal del sistema de 100 MHz |
+| `rst_i` | 1 | Entrada | Reset interno activo en alto |
 
-El reset interno del Subsistema 2 continúa siendo activo en alto. Esta condición no fue modificada al cambiar la distribución física de controles.
+Internamente, los módulos del Subsistema 2 trabajan con reset activo en alto.
 
-En el top independiente utilizado para la prueba física, `subsystem2_basys3_test_top.sv`, el switch `SW15` se utiliza como habilitación física del subsistema mediante:
+El Subsistema 2 no interpreta directamente el switch físico `SW15`. Esa adaptación pertenece al top físico.
+
+En el top independiente utilizado para probar el Subsistema 2:
+
+```text
+subsystem2_basys3_test_top.sv
+```
+
+se utiliza:
 
 ```systemverilog
 (* ASYNC_REG = "TRUE" *) logic [1:0] reset_pipe_q = 2'b11;
-always_ff @(posedge clk)
+
+always_ff @(posedge clk) begin
     reset_pipe_q <= {reset_pipe_q[0], ~sw[15]};
+end
+
 assign rst = reset_pipe_q[1];
 ```
 
-La solicitud invertida de `SW15` atraviesa dos etapas a 100 MHz antes de llegar al reset interno. La polaridad se conserva; la activación y la liberación se alinean con el reloj.
-
-Por tanto, en la prueba física:
+Por tanto:
 
 ```text
-SW15 = 0 -> rst = 1 -> Subsistema 2 en reset
-SW15 = 1 -> rst = 0 -> Subsistema 2 habilitado
+SW15 = 0
+    ↓
+solicitud de reset
+    ↓
+rst = 1
+
+SW15 = 1
+    ↓
+funcionamiento normal
+    ↓
+rst = 0
 ```
 
-Esta inversión pertenece exclusivamente al top físico de prueba y no cambia la polaridad interna de `rst_i`.
+La señal procedente de `SW15` atraviesa dos flip-flops antes de utilizarse como reset interno a 100 MHz.
 
-### 4.2 Interfaz VGA hacia el bus/MMIO
+Esto permite alinear la activación y liberación del reset con el reloj del sistema.
 
-| Señal | Ancho | Dirección | Función |
-|---|---:|---|---|
-| `vga_write_enable_i` | 1 | Entrada | Habilita escritura del CPU en la memoria de video |
-| `vga_addr_i` | 9 | Entrada | Índice local de palabra/tile dentro del espacio VGA |
-| `vga_wdata_i` | 32 | Entrada | Palabra escrita por el CPU |
-| `vga_rdata_o` | 32 | Salida | Palabra leída desde memoria de video |
+---
 
-La dirección absoluta reservada para VGA es `0x00011000–0x000117FF`. El bus convierte la dirección absoluta del CPU en un índice local de 9 bits antes de entregarlo al subsistema.
-
-### 4.3 Interfaz del periférico de entradas
+## 4.2 Interfaz VGA/MMIO
 
 | Señal | Ancho | Dirección | Función |
 |---|---:|---|---|
-| `input_write_enable_i` | 1 | Entrada | Señal estándar de escritura MMIO; las escrituras son ignoradas |
+| `vga_write_enable_i` | 1 | Entrada | Habilita escritura sobre VRAM |
+| `vga_addr_i` | 9 | Entrada | Índice local de la palabra de video |
+| `vga_wdata_i` | 32 | Entrada | Palabra escrita en VRAM |
+| `vga_rdata_o` | 32 | Salida | Palabra leída desde VRAM |
+
+En el mapa global de memoria, el espacio reservado para VGA es:
+
+```text
+0x00011000 – 0x000117FF
+```
+
+El bus convierte la dirección absoluta generada por el CPU en un índice local:
+
+```text
+vga_addr = (DataAddress - VGA_BASE) >> 2
+```
+
+donde:
+
+```text
+VGA_BASE = 0x00011000
+```
+
+La división entre cuatro aparece porque cada posición contiene una palabra de:
+
+```text
+32 bits = 4 bytes
+```
+
+---
+
+## 4.3 Interfaz MMIO de entradas
+
+| Señal | Ancho | Dirección | Función |
+|---|---:|---|---|
+| `input_write_enable_i` | 1 | Entrada | Señal estándar de escritura MMIO |
 | `input_addr_i` | 2 | Entrada | Índice local de registro |
-| `input_wdata_i` | 32 | Entrada | Dato de escritura estándar; no modifica el estado de botones |
-| `input_rdata_o` | 32 | Salida | Estado filtrado de las entradas J1 |
+| `input_wdata_i` | 32 | Entrada | Dato del bus; las escrituras se ignoran |
+| `input_rdata_o` | 32 | Salida | Estado sincronizado y filtrado del Jugador 1 |
 
-### 4.4 Entradas físicas del Jugador 1
+El periférico de entradas funciona como un registro de solo lectura desde el punto de vista funcional.
 
-La asignación física final de los controles del Jugador 1 es:
+Las escrituras no modifican el estado de los botones o switches.
 
-| Entrada física | Función |
+---
+
+# 5. Entradas físicas del Jugador 1
+
+La asignación física final del proyecto es:
+
+| Elemento físico | Función lógica |
 |---|---|
-| `BTNU` | `UP` — navegación hacia arriba |
-| `BTND` | `DOWN` — navegación hacia abajo |
-| `BTNL` | `LEFT` — navegación hacia la izquierda |
-| `BTNR` | `RIGHT` — navegación hacia la derecha |
-| `SW0` | `SEL` — selección / rotación |
-| `SW1` | `OK` — confirmación |
-| botón central (`BTNC`) | `GAME_RST` — reinicio de partida |
+| `BTNU` | `UP` |
+| `BTND` | `DOWN` |
+| `BTNL` | `LEFT` |
+| `BTNR` | `RIGHT` |
+| `SW0` | `SEL` |
+| `SW1` | `OK` |
+| `BTNC` | `GAME_RST` |
 
-La distribución inicial utilizaba `BTNC` como `SEL` y `SW0` como `GAME_RST`. Durante la integración final se intercambiaron ambas funciones para utilizar el botón central como reinicio de partida.
-
-Por tanto, la asignación final es:
+Por tanto:
 
 ```text
 BTNU -> UP
@@ -108,139 +218,557 @@ SW1  -> OK
 BTNC -> GAME_RST
 ```
 
-Esta modificación no cambia el mapa MMIO. Únicamente modifica qué elemento físico genera cada señal lógica.
+`SEL` se utiliza principalmente para cambiar la orientación del barco durante colocación.
 
-Como `SEL` se encuentra ahora en `SW0`, para generar acciones sucesivas de selección debe producirse una nueva transición del switch. El software es responsable de detectar el flanco correspondiente y evitar repeticiones mientras la entrada permanece en el mismo nivel.
+`OK` se utiliza para confirmar una colocación o un disparo.
 
-`SW15` no forma parte del registro de entradas del Jugador 1. En el top de prueba se utiliza únicamente como habilitación/reset general del hardware.
+`GAME_RST` solicita al software iniciar una nueva partida.
 
-### 4.5 Salidas físicas VGA
+La asignación física no modifica el formato lógico del periférico.
 
-| Señal | Dirección | Función |
-|---|---|---|
-| `VGA_HSYNC` | Salida | Sincronismo horizontal |
-| `VGA_VSYNC` | Salida | Sincronismo vertical |
-| `VGA_RGB` | Salida | Información de color hacia el monitor |
+---
 
-### 4.6 Indicadores utilizados en la prueba física
+## 5.1 Registro MMIO de entradas
 
-El top independiente `subsystem2_basys3_test_top.sv` utiliza los LEDs de la Basys 3 para observar directamente el estado de las entradas después de sincronización y debounce.
+La dirección absoluta del periférico es:
 
-| LED | Función observada |
+```text
+0x00010120
+```
+
+El registro utiliza el siguiente formato:
+
+| Bit | Señal |
 |---:|---|
-| `LED0` | `UP` |
-| `LED1` | `DOWN` |
-| `LED2` | `LEFT` |
-| `LED3` | `RIGHT` |
-| `LED4` | `SEL` |
-| `LED5` | `OK` |
-| `LED6` | `GAME_RST` |
-| `LED7–LED13` | Reservados / apagados |
-| `LED14` | Inicialización completa de VRAM (`init_done_q`) |
-| `LED15` | Subsistema habilitado / `RUN` |
+| 0 | `UP` |
+| 1 | `DOWN` |
+| 2 | `LEFT` |
+| 3 | `RIGHT` |
+| 4 | `SEL` |
+| 5 | `OK` |
+| 6 | `GAME_RST` |
+| `[31:7]` | 0 |
 
-La relación entre controles físicos y LEDs es:
+Por ejemplo, si únicamente `UP` está activo:
 
 ```text
-BTNU -> UP       -> LED0
-BTND -> DOWN     -> LED1
-BTNL -> LEFT     -> LED2
-BTNR -> RIGHT    -> LED3
-SW0  -> SEL      -> LED4
-SW1  -> OK       -> LED5
-BTNC -> GAME_RST -> LED6
+input_rdata_o = 0x00000001
 ```
 
-Los LEDs `LED0–LED6` no representan directamente la entrada eléctrica sin acondicionar. Se conectan al registro `input_status[6:0]`, por lo que permiten comprobar el valor entregado por el periférico después de sincronización y debounce.
-
-El comportamiento de `LED15` es:
+Si únicamente `OK` está activo:
 
 ```text
-SW15 = 0 -> LED15 apagado -> reset aplicado
-SW15 = 1 -> LED15 encendido -> Subsistema 2 habilitado
+input_rdata_o = 0x00000020
 ```
 
-`LED14` se conecta a `init_done_q`. Su encendido indica que el top de prueba terminó de escribir los 300 tiles visibles de la VRAM y que el patrón gráfico de validación quedó completamente cargado.
+Si todas las entradas están activas:
 
-## 5. Clock / PLL + Pixel Reset
+```text
+input_rdata_o = 0x0000007F
+```
 
-El reloj principal del proyecto es de 100 MHz. El subsistema de video deriva un reloj de 25 MHz mediante el MMCM de Clocking Wizard para la lógica de píxeles.
+---
 
-El dominio de 100 MHz se utiliza para el puerto CPU de la memoria VGA y para el periférico de entradas. El dominio de 25 MHz se utiliza para los contadores VGA, la lectura de video y el renderer.
+## 5.2 Sincronización
 
-La liberación del reset del dominio de píxel se sincroniza con `clk_pixel_25` para evitar una salida de reset asíncrona respecto de la lógica VGA.
+Los botones y switches físicos son señales asíncronas respecto al reloj de 100 MHz.
 
-La adaptación física utilizada con `SW15` en el top de prueba no modifica este mecanismo. El reset entregado al Subsistema 2 continúa siendo una señal activa en alto y el dominio de píxel conserva su sincronización interna.
+Cada entrada atraviesa un sincronizador de dos etapas:
 
-## 6. VGA Timing Controller
+```text
+entrada física
+      ↓
+FF 1
+      ↓
+FF 2
+      ↓
+señal sincronizada
+```
 
-El controlador VGA trabaja con una resolución activa de 640 × 480 a 60 Hz nominales.
+Los flip-flops de sincronización utilizan el atributo:
 
-Internamente contiene:
+```systemverilog
+(* ASYNC_REG = "TRUE" *)
+```
 
-- contador horizontal;
-- contador vertical;
-- generación de `HSYNC`;
-- generación de `VSYNC`;
-- detección de región activa;
-- generación de `pixel_x` y `pixel_y`.
+El objetivo es reducir la probabilidad de propagación de metastabilidad hacia la lógica interna.
 
-La temporización utilizada es:
+La sincronización y el debounce cumplen funciones diferentes:
+
+```text
+Sincronizador
+→ trata el cruce entre señal asíncrona y reloj
+
+Debounce
+→ elimina cambios rápidos producidos por rebote mecánico
+```
+
+Un debouncer no sustituye al sincronizador.
+
+---
+
+## 5.3 Debounce
+
+Después de la sincronización, cada entrada atraviesa un filtro de rebotes.
+
+La implementación física utiliza:
+
+```text
+DEBOUNCE_CYCLES = 1_000_000
+```
+
+Con:
+
+```text
+fclk = 100 MHz
+```
+
+el período del reloj es:
+
+```text
+Tclk = 10 ns
+```
+
+por lo que:
+
+```text
+1 000 000 × 10 ns = 10 ms
+```
+
+El nuevo nivel solo es aceptado cuando permanece estable aproximadamente:
+
+```text
+10 ms
+```
+
+Esto evita interpretar los rebotes de botones y switches como múltiples acciones.
+
+---
+
+## 5.4 Detección de acciones
+
+El Subsistema 2 entrega **niveles**, no eventos de juego.
+
+Por ejemplo:
+
+```text
+SW1 = 1
+    ↓
+OK = 1
+```
+
+El hardware no decide si eso representa una nueva confirmación.
+
+El programa RISC-V mantiene un estado previo y detecta nuevas transiciones.
+
+Por esta razón, para realizar dos confirmaciones consecutivas con `SW1`, debe producirse una nueva transición:
+
+```text
+0 → 1
+```
+
+entre ambas acciones.
+
+---
+
+# 6. `GAME_RST` y reset general
+
+Es importante distinguir:
+
+```text
+GAME_RST
+```
+
+de:
+
+```text
+rst_i
+```
+
+`GAME_RST` es simplemente otra entrada del Jugador 1.
+
+Su recorrido es:
+
+```text
+BTNC
+  ↓
+sincronización
+  ↓
+debounce
+  ↓
+bit 6 del registro MMIO
+  ↓
+CPU
+  ↓
+software RISC-V
+```
+
+El hardware del Subsistema 2 **no se reinicia** cuando se pulsa `BTNC`.
+
+El software interpreta `GAME_RST` y ejecuta la inicialización de una nueva partida.
+
+Ese reinicio lógico conserva el marcador acumulado de victorias.
+
+En cambio, `SW15` controla el reset general del sistema:
+
+```text
+SW15 = 0
+→ reset general solicitado
+
+SW15 = 1
+→ sistema funcionando
+```
+
+El reset general provoca una nueva inicialización del programa y borra el marcador acumulado.
+
+Por tanto:
+
+```text
+BTNC / GAME_RST
+→ nueva partida
+→ conserva victorias
+
+SW15 / reset general
+→ reinicia el sistema
+→ borra victorias
+```
+
+---
+
+# 7. Clock / PLL + Pixel Reset
+
+La Basys 3 proporciona un reloj de:
+
+```text
+100 MHz
+```
+
+El controlador VGA necesita un reloj de aproximadamente:
+
+```text
+25 MHz
+```
+
+Para obtenerlo se utiliza el Clocking Wizard de Vivado.
+
+La implementación física utiliza internamente un:
+
+```text
+MMCM
+```
+
+con:
+
+```text
+100 MHz
+   ↓
+Clocking Wizard / MMCM
+   ↓
+25 MHz
+```
+
+El reloj de 25 MHz se utiliza para:
+
+- contadores VGA;
+- lectura de VRAM por el puerto gráfico;
+- renderer;
+- Glyph ROM;
+- generación de RGB;
+- alineación de `HSYNC` y `VSYNC`.
+
+El dominio de 100 MHz se utiliza para:
+
+- periférico de entradas;
+- acceso del CPU a VRAM;
+- interfaz MMIO.
+
+---
+
+## 7.1 Reset del dominio de píxel
+
+El MMCM produce una señal:
+
+```text
+locked
+```
+
+que indica que el reloj generado es estable.
+
+El dominio VGA debe permanecer en reset mientras:
+
+```text
+locked = 0
+```
+
+El bloque `pixel_reset_sync` utiliza:
+
+```text
+rst_i | ~locked_i
+```
+
+como solicitud de reset y sincroniza su liberación con el reloj de píxel.
+
+El comportamiento conceptual es:
+
+```text
+reset general activo
+        o
+MMCM sin lock
+        ↓
+dominio VGA en reset
+
+locked = 1
+y reset general liberado
+        ↓
+liberación sincronizada con clk_pixel
+```
+
+---
+
+# 8. VGA Timing Controller
+
+La salida VGA utiliza una resolución activa de:
+
+```text
+640 × 480
+```
+
+con una frecuencia nominal de:
+
+```text
+60 Hz
+```
+
+El reloj de píxel utilizado es:
+
+```text
+25 MHz
+```
+
+La temporización horizontal es:
 
 | Parámetro | Valor |
 |---|---:|
-| Resolución horizontal visible | 640 píxeles |
-| Total horizontal | 800 píxeles |
-| Inicio de `HSYNC` | 656 |
-| Fin de `HSYNC` | 751 |
-| Resolución vertical visible | 480 líneas |
-| Total vertical | 525 líneas |
-| Inicio de `VSYNC` | 490 |
-| Fin de `VSYNC` | 491 |
+| Área visible | 640 píxeles |
+| Front porch | 16 píxeles |
+| Pulso `HSYNC` | 96 píxeles |
+| Back porch | 48 píxeles |
+| Total | 800 píxeles |
 
-Los sincronismos `HSYNC` y `VSYNC` son activos en bajo.
-
-`active_video` indica si la coordenada actual pertenece al área visible de 640 × 480. Fuera de esta región, la salida RGB debe permanecer inactiva.
-
-## 7. Video Memory Dual-Port
-
-La memoria de video posee dos puertos independientes:
-
-**Puerto A — CPU**
-
-- dominio de 100 MHz;
-- lectura y escritura;
-- dato de 32 bits;
-- índice local de 9 bits.
-
-**Puerto B — VGA**
-
-- dominio de `clk_pixel_25`;
-- lectura síncrona;
-- solo lectura;
-- entrega `tile_word[31:0]` al renderer.
-
-El rango local de 9 bits permite 512 índices. Los índices `0–299` representan tiles visibles. Los índices `300–511` están reservados; sus lecturas devuelven cero y sus escrituras se ignoran.
-
-Cada tile se actualiza mediante una única escritura de 32 bits desde el CPU.
-
-En el top independiente de prueba, la VRAM se inicializa automáticamente con un patrón conocido. El proceso recorre secuencialmente las direcciones `0–299`. Cuando se alcanza el último tile visible se activa:
+Por tanto:
 
 ```text
-init_done_q = 1
+640 + 16 + 96 + 48 = 800
 ```
 
-y se detienen las escrituras de inicialización.
+La temporización vertical es:
 
-Durante la validación física este estado se observa mediante `LED14`.
+| Parámetro | Valor |
+|---|---:|
+| Área visible | 480 líneas |
+| Front porch | 10 líneas |
+| Pulso `VSYNC` | 2 líneas |
+| Back porch | 33 líneas |
+| Total | 525 líneas |
 
-## 8. Organización gráfica por tiles
+Por tanto:
 
-La pantalla se divide en una matriz de:
+```text
+480 + 10 + 2 + 33 = 525
+```
 
-- 20 columnas;
-- 15 filas;
-- tiles de 32 × 32 píxeles.
+Los sincronismos son activos en bajo.
+
+El intervalo horizontal bajo es:
+
+```text
+HSYNC = 0
+x = 656 ... 751
+```
+
+El intervalo vertical bajo es:
+
+```text
+VSYNC = 0
+y = 490 ... 491
+```
+
+---
+
+## 8.1 Frecuencia de cuadro
+
+Con:
+
+```text
+25 000 000 píxeles/s
+```
+
+y:
+
+```text
+800 × 525 = 420 000 ciclos/frame
+```
+
+se obtiene:
+
+```text
+25 000 000 / 420 000 ≈ 59.524 Hz
+```
+
+Por tanto, el modo implementado corresponde al modo VGA de 60 Hz nominales.
+
+---
+
+## 8.2 Región visible
+
+La señal:
+
+```text
+active_video
+```
+
+vale uno únicamente cuando:
+
+```text
+pixel_x < 640
+pixel_y < 480
+```
+
+Fuera de esa región:
+
+```text
+RGB = negro
+```
+
+---
+
+# 9. Video Memory Dual-Port
+
+La memoria VGA almacena la representación lógica de la pantalla.
+
+Su organización es:
+
+```text
+512 palabras × 32 bits
+```
+
+La dirección local tiene:
+
+```text
+9 bits
+```
+
+lo que permite:
+
+```text
+2^9 = 512 posiciones
+```
+
+Sin embargo, únicamente:
+
+```text
+0 ... 299
+```
+
+corresponden a tiles visibles.
+
+Las posiciones:
+
+```text
+300 ... 511
+```
+
+están reservadas.
+
+Las escrituras en la región reservada se ignoran y sus lecturas retornan cero.
+
+---
+
+## 9.1 Puerto del CPU
+
+El puerto del CPU opera a:
+
+```text
+100 MHz
+```
+
+y permite:
+
+```text
+lectura + escritura
+```
+
+El CPU puede actualizar un tile completo mediante una única escritura de:
+
+```text
+32 bits
+```
+
+---
+
+## 9.2 Puerto VGA
+
+El puerto gráfico opera a:
+
+```text
+25 MHz
+```
+
+y es:
+
+```text
+solo lectura
+```
+
+El renderer solicita una dirección de tile y recibe:
+
+```text
+tile_word[31:0]
+```
+
+La lectura es síncrona.
+
+Eso significa que la palabra solicitada aparece un ciclo de reloj de píxel después.
+
+---
+
+## 9.3 Acceso simultáneo
+
+La arquitectura dual-port permite:
+
+```text
+CPU
+→ escribir/leer VRAM a 100 MHz
+
+al mismo tiempo
+
+VGA
+→ leer VRAM a 25 MHz
+```
+
+Esto evita detener la generación de video mientras el CPU actualiza la pantalla.
+
+El diseño no utiliza doble buffer.
+
+Por tanto, una actualización del CPU puede hacerse visible antes de que termine completamente el frame VGA.
+
+Esto es una característica aceptada de la arquitectura implementada.
+
+---
+
+# 10. Organización gráfica por tiles
+
+La pantalla activa se divide en:
+
+```text
+20 columnas × 15 filas
+```
+
+Cada tile posee:
+
+```text
+32 × 32 píxeles
+```
 
 Por tanto:
 
@@ -249,267 +777,1084 @@ Por tanto:
 15 × 32 = 480
 ```
 
-El índice de tile se calcula como:
+y el número total de tiles visibles es:
 
 ```text
-tile_index = fila * 20 + columna
+20 × 15 = 300
 ```
 
-y la dirección absoluta correspondiente vista por el CPU es:
+---
+
+## 10.1 Cálculo del índice
+
+Para un píxel ubicado en:
 
 ```text
-VGA_BASE + 4*(fila*20 + columna)
+pixel_x
+pixel_y
 ```
 
-La distribución acordada de la pantalla es:
-
-| Región | Ubicación |
-|---|---|
-| HUD / títulos | filas 0–3 |
-| Tablero propio | columnas 1–8, filas 4–11 |
-| Tablero rival | columnas 11–18, filas 4–11 |
-| Mensajes | filas 12–14 |
-
-## 9. Formato de palabra de video
-
-Cada tile ocupa una palabra de 32 bits:
-
-| Bits | Campo | Función |
-|---:|---|---|
-| `[2:0]` | `COLOR` | Selección del color del tile |
-| `[3]` | `GLYPH_ENABLE` | Habilita dibujo de carácter/símbolo |
-| `[11:4]` | `GLYPH/ASCII` | Código del carácter |
-| `[31:12]` | Reservado | Debe permanecer en cero |
-
-Codificación de color acordada:
-
-| Código | Significado |
-|---:|---|
-| 0 | Fondo |
-| 1 | Agua |
-| 2 | Barco propio |
-| 3 | Impacto |
-| 4 | Fallo |
-| 5 | Cursor |
-| 6 | HUD / acento |
-| 7 | Reservado |
-
-El renderer soporta como mínimo espacio, `A–Z`, `0–9`, guion, dos puntos y punto. Los códigos no soportados se representan como espacio.
-
-## 10. Tile / Glyph Renderer
-
-El renderer recibe `pixel_x`, `pixel_y` y `active_video`.
-
-La coordenada de píxel se transforma en:
+se obtiene:
 
 ```text
-tile_col = pixel_x / 32
-tile_row = pixel_y / 32
+tile_col = pixel_x >> 5
+tile_row = pixel_y >> 5
+```
+
+porque:
+
+```text
+32 = 2^5
+```
+
+El índice final es:
+
+```text
 tile_index = tile_row*20 + tile_col
 ```
 
-Como 32 es una potencia de dos, la selección de fila y columna puede implementarse usando los bits superiores de las coordenadas, sin requerir divisores generales.
-
-El renderer solicita `tile_addr[8:0]` a la memoria de video y recibe `tile_word[31:0]`. A partir del campo `COLOR` y, cuando corresponde, de `GLYPH_ENABLE` y `GLYPH/ASCII`, genera la salida RGB correspondiente al píxel actual.
-
-La lectura síncrona de la memoria introduce latencia; por lo tanto, las coordenadas y señales de video deben mantenerse alineadas con el dato de tile leído.
-
-## 11. Periférico de entradas del Jugador 1
-
-Las siete entradas físicas pasan por:
+En hardware:
 
 ```text
-entrada física
-    ↓
-sincronizador
-    ↓
-debouncer
-    ↓
-registro ESTADO
+fila*20
+=
+fila*16 + fila*4
 ```
 
-El registro `ESTADO`, ubicado en `0x00010120`, utiliza la siguiente codificación:
+por lo que puede implementarse utilizando desplazamientos y sumas, sin un multiplicador general.
 
-| Bit | Entrada |
-|---:|---|
-| 0 | UP |
-| 1 | DOWN |
-| 2 | LEFT |
-| 3 | RIGHT |
-| 4 | SEL |
-| 5 | OK |
-| 6 | GAME_RST |
-| `[31:7]` | 0 |
+---
 
-Con la asignación física final, la correspondencia completa queda:
+## 10.2 Ventaja frente a framebuffer por píxel
 
-| Elemento físico | Señal lógica | Bit de `ESTADO` |
-|---|---|---:|
-| `BTNU` | `UP` | 0 |
-| `BTND` | `DOWN` | 1 |
-| `BTNL` | `LEFT` | 2 |
-| `BTNR` | `RIGHT` | 3 |
-| `SW0` | `SEL` | 4 |
-| `SW1` | `OK` | 5 |
-| `BTNC` | `GAME_RST` | 6 |
-
-Las señales filtradas son niveles activos en alto. El hardware no implementa auto-repeat ni detección de flancos asociados a la lógica del juego; el software decide cuándo una transición representa una acción nueva.
-
-La reasignación entre `BTNC` y `SW0` no modifica este registro porque el cambio se realiza antes de ingresar al periférico.
-
-`GAME_RST` no corresponde al reset de hardware `rst_i`. Es una entrada del Jugador 1 que permite solicitar al programa el reinicio de la partida.
-
-El reinicio mediante `GAME_RST` inicia una nueva partida y conserva el contador acumulado de victorias. El reset general del hardware es una señal independiente.
-
-## 12. Dominios de reloj
-
-El subsistema posee dos dominios:
-
-| Dominio | Frecuencia | Bloques |
-|---|---:|---|
-| Sistema | 100 MHz | Puerto CPU de Video RAM, periférico de entradas |
-| VGA | 25 MHz | Timing Controller, puerto VGA de Video RAM, Tile/Glyph Renderer |
-
-La memoria dual-port constituye la frontera principal entre ambos dominios. Cada puerto opera con su propio reloj.
-
-No se transmite lógica de control del juego entre dominios de reloj.
-
-## 13. Estrategia de verificación
-
-La verificación se divide en pruebas unitarias e integradas utilizando testbenches autoverificables.
-
-| Testbench | Verificación principal |
-|---|---|
-| `tb_input_sync.sv` | Sincronización de entradas asíncronas |
-| `tb_debounce.sv` | Rechazo de rebotes y aceptación de niveles estables |
-| `tb_player1_inputs.sv` | Sincronización, debounce, niveles filtrados y empaquetado MMIO |
-| `tb_pixel_clock.sv` | Generación del reloj de píxel |
-| `tb_pixel_reset_sync.sv` | Liberación sincronizada del reset en el dominio VGA |
-| `tb_vga_timing.sv` | Conteos H/V, región activa, periodicidad y polaridad de sincronismos |
-| `tb_video_memory.sv` | Lecturas/escrituras CPU, lectura VGA, índices visibles/reservados y acceso simultáneo |
-| `tb_tile_renderer.sv` | Conversión píxel→tile, colores, glyph enable y blanking |
-| `tb_glyph_rom.sv` | Validación de los caracteres y símbolos implementados |
-| `tb_subsystem2_vga_inputs.sv` | Integración interna de VGA y entradas del Subsistema 2 |
-| `tb_subsystem2_peripheral.sv` | Validación de caja negra del Subsistema 2 desde sus interfaces externas |
-
-Las pruebas del dominio VGA utilizan un reloj independiente de 25 MHz, mientras que el puerto CPU y las entradas utilizan 100 MHz. La simulación comprueba que ambos dominios operan simultáneamente sin depender de una relación de fase específica.
-
-La prueba `tb_subsystem2_peripheral.sv` constituye la validación integrada principal del Subsistema 2, ya que comprueba su comportamiento desde las interfaces externas sin depender de señales internas.
-
-## 14. Validación física del Subsistema 2
-
-Para la validación física independiente se utiliza:
+Utilizando tiles, la pantalla lógica necesita:
 
 ```text
-src/design/top/subsystem2_basys3_test_top.sv
+300 tiles × 4 bytes
+=
+1200 bytes
+```
+
+Un framebuffer hipotético de:
+
+```text
+640 × 480
+```
+
+con color RGB de:
+
+```text
+12 bits/píxel
+```
+
+requeriría:
+
+```text
+640 × 480 × 12 bits
+=
+3 686 400 bits
+```
+
+equivalente a:
+
+```text
+460 800 bytes
+```
+
+Por tanto:
+
+```text
+tiles       → 1 200 bytes lógicos
+framebuffer → 460 800 bytes
+```
+
+La organización por tiles reduce considerablemente la cantidad de información que debe escribir el procesador.
+
+---
+
+# 11. Distribución de pantalla
+
+El contrato utilizado con el software RISC-V organiza la pantalla como:
+
+| Región | Ubicación |
+|---|---|
+| HUD y títulos | filas 0–3 |
+| Tablero propio | columnas 1–8, filas 4–11 |
+| Tablero rival | columnas 11–18, filas 4–11 |
+| Mensajes | fila 13 y región inferior |
+
+Cada tablero es de:
+
+```text
+8 × 8
+```
+
+casillas.
+
+---
+
+# 12. Formato de palabra de video
+
+Cada posición de VRAM almacena:
+
+```text
+32 bits
+```
+
+con el siguiente formato:
+
+| Bits | Campo | Función |
+|---:|---|---|
+| `[2:0]` | `COLOR` | Color base |
+| `[3]` | `GLYPH_ENABLE` | Habilita representación de carácter |
+| `[11:4]` | `ASCII / GLYPH` | Código ASCII |
+| `[31:12]` | Reservado | Actualmente en cero |
+
+---
+
+## 12.1 Paleta de colores
+
+La codificación acordada es:
+
+| Código | Uso | RGB |
+|---:|---|---|
+| 0 | Fondo | `12'h000` |
+| 1 | Agua | `12'h04F` |
+| 2 | Barco propio | `12'h888` |
+| 3 | Impacto | `12'hF00` |
+| 4 | Fallo | `12'hFFF` |
+| 5 | Cursor | `12'hFF0` |
+| 6 | HUD / acento | `12'h0F8` |
+| 7 | Reservado | `12'h000` |
+
+La salida RGB utiliza:
+
+```text
+4 bits rojo
+4 bits verde
+4 bits azul
+```
+
+para un total de:
+
+```text
+12 bits
+```
+
+---
+
+# 13. Tile / Glyph Renderer
+
+El `tile_renderer` convierte una coordenada de píxel y una palabra de VRAM en el valor RGB final.
+
+El flujo es:
+
+```text
+pixel_x / pixel_y
+        ↓
+pixel → tile
+        ↓
+tile_addr
+        ↓
+Video Memory
+        ↓
+tile_word
+        ↓
+COLOR / GLYPH_ENABLE / ASCII
+        ↓
+Tile Renderer + Glyph ROM
+        ↓
+RGB
+```
+
+El renderer determina:
+
+1. en qué tile se encuentra el píxel;
+2. qué palabra está almacenada en ese tile;
+3. cuál es el color base;
+4. si debe mostrarse un glyph;
+5. qué píxel interno del glyph corresponde;
+6. qué valor RGB debe enviarse.
+
+---
+
+# 14. Glyph ROM
+
+La `glyph_rom` almacena conceptualmente la forma gráfica de los caracteres.
+
+Cada carácter se representa mediante una matriz lógica de:
+
+```text
+8 × 8
+```
+
+píxeles.
+
+Dentro de un tile físico de:
+
+```text
+32 × 32
+```
+
+cada píxel lógico del glyph se expande a:
+
+```text
+4 × 4
+```
+
+píxeles físicos.
+
+Por tanto:
+
+```text
+8 × 4 = 32
+```
+
+La ROM recibe:
+
+```text
+ASCII
+glyph_x
+glyph_y
+```
+
+y devuelve:
+
+```text
+glyph_bit
+```
+
+`glyph_bit = 1` significa que el píxel del carácter debe dibujarse.
+
+`glyph_bit = 0` significa que se conserva el color base del tile.
+
+Cuando:
+
+```text
+GLYPH_ENABLE = 1
+```
+
+y:
+
+```text
+glyph_bit = 1
+```
+
+el renderer utiliza:
+
+```text
+12'hFFF
+```
+
+como color de primer plano.
+
+El conjunto implementado incluye:
+
+- espacio;
+- `A–Z`;
+- `0–9`;
+- guion;
+- dos puntos;
+- punto.
+
+Un carácter no soportado se representa en blanco.
+
+---
+
+# 15. Alineación de RGB, HSYNC y VSYNC
+
+La VRAM utiliza lectura síncrona.
+
+Por tanto, desde que el renderer solicita:
+
+```text
+tile_addr
+```
+
+hasta que recibe:
+
+```text
+tile_word
+```
+
+transcurre un ciclo de:
+
+```text
+clk_pixel
+```
+
+Con:
+
+```text
+clk_pixel = 25 MHz
+```
+
+el período es:
+
+```text
+40 ns
+```
+
+Por ello la información RGB aparece un ciclo después de las coordenadas originales.
+
+Para mantener las señales alineadas, también se retrasan un ciclo:
+
+```text
+HSYNC
+VSYNC
+```
+
+El comportamiento es:
+
+```text
+coordenada original
+        ↓
+VRAM
+        ↓
+1 ciclo de latencia
+        ↓
+RGB
+```
+
+y simultáneamente:
+
+```text
+HSYNC raw
+   ↓
+registro de 1 ciclo
+   ↓
+HSYNC salida
+
+VSYNC raw
+   ↓
+registro de 1 ciclo
+   ↓
+VSYNC salida
+```
+
+Así:
+
+```text
+RGB + HSYNC + VSYNC
+```
+
+corresponden temporalmente al mismo píxel.
+
+---
+
+# 16. Uso de la VGA por el programa RISC-V
+
+El Subsistema 2 no decide qué información corresponde a cada fase del juego.
+
+El software RISC-V escribe directamente en la región MMIO de VGA.
+
+Conceptualmente:
+
+```text
+programa RISC-V
+      ↓
+decide qué mostrar
+      ↓
+SW sobre VGA_BASE
+      ↓
+bus MMIO
+      ↓
+video_memory
+      ↓
+tile_renderer
+      ↓
+monitor
+```
+
+La rutina de software calcula la dirección mediante:
+
+```text
+tile_index = fila*20 + columna
+```
+
+y posteriormente:
+
+```text
+direccion = VGA_BASE + 4*tile_index
+```
+
+Esto permite mostrar:
+
+- tablero propio;
+- tablero rival;
+- barcos propios;
+- impactos;
+- fallos;
+- cursor;
+- HUD;
+- marcador;
+- mensajes;
+- caracteres ASCII.
+
+Entre los textos que puede producir el software se encuentran:
+
+```text
+BATALLA NAVAL
+COLOCANDO
+TURNO J1
+TURNO J2
+TU FLOTA
+RIVAL
+FIN
+IMPACTO
+FALLO
+HUNDIDO
+NO VALIDO
+GANA J1
+GANA J2
+```
+
+La lógica del texto pertenece al software.
+
+La representación gráfica de cada carácter pertenece al Subsistema 2.
+
+---
+
+# 17. Cursor y estado del juego
+
+El color de cursor definido en el contrato gráfico es:
+
+```text
+COLOR = 5
+RGB   = 12'hFF0
+```
+
+El programa RISC-V decide dónde escribir ese color.
+
+Durante:
+
+```text
+FASE_COLOC
+```
+
+el cursor se utiliza sobre el tablero propio para indicar la posible posición del barco.
+
+Durante:
+
+```text
+FASE_BATALLA
+```
+
+el cursor se utiliza sobre el tablero rival para seleccionar la casilla del próximo disparo.
+
+El Subsistema 2 no conoce el significado de estas fases.
+
+Únicamente representa el tile recibido.
+
+---
+
+# 18. Integración física: top independiente vs sistema completo
+
+Existen dos contextos físicos diferentes que deben distinguirse.
+
+## 18.1 Top independiente del Subsistema 2
+
+Para validar únicamente VGA + entradas se utiliza:
+
+```text
+subsystem2_basys3_test_top.sv
+```
+
+con:
+
+```text
+subsystem2_basys3_test.xdc
+```
+
+En este top:
+
+| LED | Función |
+|---:|---|
+| `LED0` | `UP` filtrado |
+| `LED1` | `DOWN` filtrado |
+| `LED2` | `LEFT` filtrado |
+| `LED3` | `RIGHT` filtrado |
+| `LED4` | `SEL` filtrado |
+| `LED5` | `OK` filtrado |
+| `LED6` | `GAME_RST` filtrado |
+| `LED7–LED13` | Apagados |
+| `LED14` | Inicialización de VRAM completada |
+| `LED15` | RUN |
+
+Los LEDs `LED0–LED6` se conectan a:
+
+```text
+input_status[6:0]
+```
+
+por lo que representan los niveles **después de sincronización y debounce**.
+
+---
+
+## 18.2 Top del sistema completo
+
+El juego completo utiliza:
+
+```text
+basys3_top.sv
 ```
 
 junto con:
 
 ```text
+basys3_battleship.xdc
+```
+
+En este caso la utilización de LEDs es:
+
+| LED | Función |
+|---:|---|
+| `LED0` | estado físico `BTNU` |
+| `LED1` | estado físico `BTND` |
+| `LED2` | estado físico `BTNL` |
+| `LED3` | estado físico `BTNR` |
+| `LED4` | estado físico `SW0` |
+| `LED5` | estado físico `SW1` |
+| `LED6` | estado físico `BTNC` |
+| `LED7–LED10` | apagados |
+| `LED11` | fase de colocación |
+| `LED12` | fase de batalla |
+| `LED13` | fase de resultado |
+| `LED14` | apagado |
+| `LED15` | RUN / estado de `SW15` |
+
+La diferencia principal es:
+
+```text
+TOP DE PRUEBA S2
+LED0–6 = entradas filtradas
+LED14  = VRAM lista
+
+TOP COMPLETO
+LED0–6 = pines físicos
+LED11  = colocación
+LED12  = batalla
+LED13  = resultado
+LED14  = apagado
+```
+
+Esta distinción evita atribuir al Subsistema 2 funciones que pertenecen a la integración global.
+
+---
+
+# 19. Indicadores LED de fase
+
+Los LEDs de fase **no son generados internamente por el Subsistema 2**.
+
+El flujo real es:
+
+```text
+GAME_PHASE en RAM
+        ↓
+programa RISC-V
+        ↓
+salidas_actualizar
+        ↓
+periférico LED MMIO
+        ↓
+game_phase_led[1:0]
+        ↓
+basys3_top
+        ↓
+decodificación one-hot
+        ↓
+LED11 / LED12 / LED13
+```
+
+El programa utiliza:
+
+```text
+FASE_COLOC   = 0
+FASE_BATALLA = 1
+FASE_RESULT  = 2
+```
+
+El `basys3_top` realiza:
+
+```systemverilog
+case (game_phase_led)
+    2'b00:   phase_onehot = 3'b001;
+    2'b01:   phase_onehot = 3'b010;
+    2'b10:   phase_onehot = 3'b100;
+    default: phase_onehot = 3'b000;
+endcase
+```
+
+y luego:
+
+```systemverilog
+led[13:11] = phase_onehot;
+```
+
+Por tanto:
+
+```text
+00 → LED11 → colocación
+01 → LED12 → batalla
+10 → LED13 → resultado
+11 → ninguno
+```
+
+Esta lógica pertenece al top global y no debe trasladarse a `subsystem2_vga_inputs`.
+
+---
+
+# 20. Dominios de reloj
+
+El Subsistema 2 posee dos dominios principales:
+
+| Dominio | Frecuencia | Elementos |
+|---|---:|---|
+| Sistema | 100 MHz | Entradas, MMIO, puerto CPU de VRAM |
+| VGA | 25 MHz | Timing, puerto VGA de VRAM, renderer |
+
+La memoria dual-port constituye la frontera principal entre ambos dominios.
+
+Cada puerto utiliza su propio reloj.
+
+No se requiere transmitir la lógica de estado del juego entre estos dominios, ya que el estado del juego permanece en software y el CPU únicamente escribe representaciones gráficas en VRAM.
+
+---
+
+# 21. Estrategia de verificación
+
+La verificación se realiza mediante pruebas unitarias, integración del Subsistema 2 y pruebas de integración del sistema completo.
+
+## 21.1 Pruebas propias del Subsistema 2
+
+| Testbench | Función verificada |
+|---|---|
+| `tb_input_sync.sv` | Sincronización de señales asíncronas |
+| `tb_debounce.sv` | Rechazo de rebotes |
+| `tb_player1_inputs.sv` | Entradas completas y registro MMIO |
+| `tb_pixel_clock.sv` | Generación de 25 MHz |
+| `tb_pixel_reset_sync.sv` | Reset seguro del dominio VGA |
+| `tb_vga_timing.sv` | Temporización horizontal y vertical |
+| `tb_video_memory.sv` | VRAM dual-port y región reservada |
+| `tb_glyph_rom.sv` | Caracteres implementados |
+| `tb_tile_renderer.sv` | Mapeo tile, colores, glyph y blanking |
+| `tb_subsystem2_vga_inputs.sv` | Integración interna completa |
+| `tb_subsystem2_peripheral.sv` | Prueba black-box de aceptación |
+
+La prueba principal de aceptación del Subsistema 2 es:
+
+```text
+tb_subsystem2_peripheral.sv
+```
+
+con resultado:
+
+```text
+Checks : 27
+Errors : 0
+RESULT : TEST PASSED
+```
+
+---
+
+## 21.2 Pruebas nuevas de integración física
+
+La integración final añade pruebas que utilizan el Subsistema 2 dentro del sistema completo.
+
+Entre ellas se encuentran:
+
+```text
+basys3_controls_tb.sv
+boot_switches_tb.sv
+all_top_modules_tb.sv
+tb_battleship_system.sv
+```
+
+### `basys3_controls_tb`
+
+Verifica:
+
+- asignación física final de los siete controles;
+- reset inicial;
+- sincronización del reset mediante `SW15`;
+- rechazo de pulsos breves por debounce;
+- comportamiento de las entradas filtradas;
+- `GAME_RST` separado del reset de hardware;
+- `LED11` para colocación;
+- `LED12` para batalla;
+- `LED13` para resultado;
+- `LED15` para RUN;
+- `LED14` como indicador de inicialización de VRAM únicamente en el top de prueba del Subsistema 2.
+
+### `boot_switches_tb`
+
+Verifica el caso en que:
+
+```text
+SEL = 1
+OK  = 1
+```
+
+ya se encuentran activos durante el arranque.
+
+El programa espera que el filtro de debounce se estabilice antes de almacenar el estado inicial de las entradas.
+
+De esta forma, esos niveles iniciales no se interpretan accidentalmente como una rotación o una confirmación nueva.
+
+---
+
+# 22. Validación física del Subsistema 2
+
+La prueba física independiente utiliza:
+
+```text
+src/design/top/subsystem2_basys3_test_top.sv
+```
+
+y:
+
+```text
 src/constraints/subsystem2_basys3_test.xdc
 ```
 
-El top de prueba genera un patrón gráfico conocido y escribe secuencialmente los 300 tiles visibles de la VRAM.
-
-La asignación física utilizada es:
+Después de liberar reset:
 
 ```text
-BTNU -> UP
-BTND -> DOWN
-BTNL -> LEFT
-BTNR -> RIGHT
-SW0  -> SEL
-SW1  -> OK
-BTNC -> GAME_RST
-```
-
-El control de habilitación y reset se realiza con `SW15`:
-
-```text
-SW15 = 0 -> reset aplicado
-SW15 = 1 -> Subsistema 2 habilitado
-```
-
-La indicación mediante LEDs es:
-
-```text
-LED0  -> UP
-LED1  -> DOWN
-LED2  -> LEFT
-LED3  -> RIGHT
-LED4  -> SEL
-LED5  -> OK
-LED6  -> GAME_RST
-LED14 -> init_done_q
-LED15 -> RUN
-```
-
-El comportamiento esperado durante el encendido es:
-
-```text
-SW15 = 0
-    LED15 = 0
-    Subsistema 2 en reset
-
 SW15 = 1
-    LED15 = 1
-    Subsistema 2 habilitado
-    comienza la inicialización de VRAM
-
-Inicialización completa
-    init_done_q = 1
-    LED14 = 1
 ```
 
-Durante la validación física, `LED0–LED6` permiten comprobar que las siete entradas son observadas correctamente después de sincronización y debounce.
+el top escribe automáticamente los:
 
-La salida VGA se valida conectando físicamente un monitor al conector VGA de la Basys 3 y observando el patrón de prueba generado por el top independiente.
+```text
+300 tiles visibles
+```
 
-## 15. Límites de responsabilidad
+de la memoria VGA.
 
-El Subsistema 2:
+Durante la inicialización:
 
-- no valida colocaciones de barcos;
-- no decide turnos;
-- no decide si un disparo es impacto o fallo;
-- no detecta hundimientos;
-- no determina victoria;
-- no modifica contadores de partidas;
-- no implementa reglas del juego;
-- no oculta por sí mismo información del rival.
+```text
+LED14 = 0
+```
 
-El programa RISC-V escribe en la memoria VGA únicamente la representación visual permitida y procesa las entradas del Jugador 1.
+Al terminar:
 
-El uso de `GAME_RST` como entrada física tampoco implementa el reinicio de la partida dentro del Subsistema 2. El periférico únicamente entrega el estado de la señal al CPU y es el software RISC-V quien decide la acción correspondiente.
+```text
+LED14 = 1
+```
 
-## 16. Ubicación en el repositorio
+El funcionamiento normal esperado es:
+
+```text
+LED15 = 1
+→ RUN
+
+LED14 = 1
+→ patrón VGA completamente cargado
+```
+
+El patrón de prueba permite validar:
+
+- VRAM;
+- colores;
+- tableros;
+- glyphs;
+- renderer;
+- `HSYNC`;
+- `VSYNC`;
+- salida RGB.
+
+La salida VGA se verificó físicamente utilizando un monitor conectado a la Basys 3.
+
+---
+
+# 23. Resultados de implementación del Subsistema 2 aislado
+
+La implementación correspondiente a:
+
+```text
+subsystem2_basys3_test_top
+```
+
+obtuvo:
+
+| Recurso | Uso |
+|---|---:|
+| LUT | 172 |
+| FF | 211 |
+| RAMB18 | 1 |
+| DSP | 0 |
+
+El análisis temporal produjo:
+
+| Métrica | Resultado |
+|---|---:|
+| WNS | +4.293 ns |
+| TNS | 0.000 ns |
+| WHS | +0.122 ns |
+| THS | 0.000 ns |
+| Endpoints con fallo de setup | 0 |
+| Endpoints con fallo de hold | 0 |
+
+Estos resultados corresponden exclusivamente al top independiente del Subsistema 2.
+
+---
+
+# 24. Diferencia respecto a la implementación completa
+
+Los resultados anteriores **no deben confundirse** con los del juego completo.
+
+El top:
+
+```text
+basys3_top
+```
+
+incluye:
+
+- CPU;
+- ROM;
+- RAM;
+- bus;
+- UART;
+- seven-segment;
+- LED;
+- buzzer;
+- VGA;
+- entradas.
+
+La implementación global obtuvo:
+
+| Recurso | Uso |
+|---|---:|
+| LUT | 1812 |
+| FF | 1692 |
+| RAMB36E1 | 4 |
+| DSP | 0 |
+| MMCM | 1 |
+| BUFG | 3 |
+
+y:
+
+| Métrica | Resultado |
+|---|---:|
+| WNS | +0.219 ns |
+| TNS | 0.000 ns |
+| WHS | +0.122 ns |
+| THS | 0.000 ns |
+| DRC | 0 infracciones |
+
+Por tanto:
+
+```text
+WNS S2 aislado
+= +4.293 ns
+
+WNS sistema completo
+= +0.219 ns
+```
+
+Ambos diseños cumplen temporización bajo sus respectivas restricciones.
+
+---
+
+# 25. Límites de responsabilidad
+
+El Subsistema 2 sí realiza:
+
+- sincronización de entradas;
+- debounce;
+- empaquetado MMIO;
+- generación de reloj VGA;
+- temporización VGA;
+- almacenamiento de tiles;
+- lectura dual-port;
+- renderizado de colores;
+- renderizado de glyphs;
+- generación RGB;
+- generación y alineación de sincronismos.
+
+El Subsistema 2 **no realiza**:
+
+- validación de colocación;
+- selección automática de barcos;
+- lógica de turnos;
+- validación de disparos;
+- detección de impacto;
+- detección de fallo;
+- conteo de barcos hundidos;
+- decisión de victoria;
+- actualización de marcador;
+- generación de fase del juego;
+- lógica de LED11–LED13;
+- reinicio lógico de partida;
+- ocultamiento lógico del tablero rival.
+
+Estas funciones pertenecen al programa RISC-V o a otros periféricos del sistema.
+
+---
+
+# 26. Relación con otros subsistemas
+
+La integración global puede representarse como:
+
+```text
+                      CPU RISC-V
+                         │
+               ┌─────────┴─────────┐
+               │                   │
+        bus de instrucciones   bus de datos
+               │                   │
+        Program ROM          RAM + MMIO
+                                   │
+              ┌────────────────────┼─────────────────────┐
+              │                    │                     │
+             UART               Salidas              Subsistema 2
+                                                     │           │
+                                                 Entradas       VGA
+```
+
+Desde la perspectiva del CPU:
+
+```text
+INPUTS
+→ ¿qué está haciendo el Jugador 1?
+
+VGA
+→ ¿qué quiero mostrar?
+```
+
+Desde la perspectiva del Subsistema 2:
+
+```text
+entradas físicas
+→ estado MMIO
+
+palabras MMIO
+→ píxeles VGA
+```
+
+---
+
+# 27. Memorias relacionadas con la arquitectura
+
+Para evitar confusiones, el sistema utiliza distintos tipos de memoria:
+
+| Memoria | Función | Subsistema |
+|---|---|---|
+| `program_rom` | Instrucciones RISC-V | CPU / programa |
+| `data_ram` | Variables y estado del programa | Plataforma MMIO |
+| `video_memory` | Tiles mostrados en pantalla | Subsistema 2 |
+| `glyph_rom` | Forma gráfica de caracteres | Subsistema 2 |
+
+La `video_memory` responde:
+
+```text
+¿Qué se muestra?
+```
+
+La `glyph_rom` responde:
+
+```text
+¿Cómo se ve el carácter?
+```
+
+El `tile_renderer` responde:
+
+```text
+¿Qué RGB debe salir en este píxel?
+```
+
+---
+
+# 28. Ubicación en el repositorio
+
+Los principales archivos del Subsistema 2 son:
 
 ```text
 Proyecto3_Batalla_Naval/
+│
 ├── docs/
-│   └── diseno/
-│       ├── nivel_3_vga_entradas.md
-│       └── img/
-│           └── vga_entradas/
-│               └── nivel_3_vga_entradas.svg
+│   ├── diseno/
+│   │   ├── nivel_3_vga_entradas.md
+│   │   ├── nivel_4_vga_entradas.md
+│   │   └── img/
+│   │       └── vga_entradas/
+│   │           └── nivel_3_vga_entradas.svg
+│   │
+│   └── informe/
+│       └── vga_entradas_verificacion.md
 │
 └── src/
     ├── constraints/
-    │   └── subsystem2_basys3_test.xdc
+    │   ├── subsystem2_basys3_test.xdc
+    │   └── basys3_battleship.xdc
     │
     ├── design/
     │   ├── inputs/
+    │   │   ├── input_sync.sv
+    │   │   ├── debounce.sv
+    │   │   └── player1_inputs.sv
+    │   │
     │   ├── vga/
+    │   │   ├── pixel_clock.sv
+    │   │   ├── pixel_reset_sync.sv
+    │   │   ├── vga_timing.sv
+    │   │   ├── video_memory.sv
+    │   │   ├── glyph_rom.sv
+    │   │   ├── tile_renderer.sv
+    │   │   └── subsystem2_vga_inputs.sv
+    │   │
     │   └── top/
-    │       └── subsystem2_basys3_test_top.sv
+    │       ├── subsystem2_basys3_test_top.sv
+    │       ├── battleship_top.sv
+    │       └── basys3_top.sv
     │
     └── testbench/
         ├── inputs/
         ├── vga/
         └── integration/
             ├── tb_subsystem2_vga_inputs.sv
-            └── tb_subsystem2_peripheral.sv
+            ├── tb_subsystem2_peripheral.sv
+            ├── basys3_controls_tb.sv
+            ├── boot_switches_tb.sv
+            ├── all_top_modules_tb.sv
+            └── tb_battleship_system.sv
 ```
 
-[Segundo nivel: arquitectura e interconexiones](nivel_2.md) · [Índice del diseño](README.md)
+---
+
+# 29. Estado final del Subsistema 2
+
+La arquitectura interna del Subsistema 2 permanece estable después de la integración final.
+
+No fue necesario incorporar lógica de estados del juego dentro de los módulos VGA o de entradas.
+
+Las principales modificaciones realizadas durante la integración fueron:
+
+- asignación física final de controles;
+- utilización de `BTNC` como `GAME_RST`;
+- utilización de `SW0` como `SEL`;
+- utilización de `SW1` como `OK`;
+- utilización de `SW15` para RUN/reset general en el top físico;
+- sincronización de la solicitud de reset procedente de `SW15`;
+- integración de la VRAM con el programa RISC-V;
+- utilización real de glyphs y tiles por el software;
+- integración de los indicadores de fase `LED11–LED13` en el top global;
+- ampliación de la verificación con pruebas del sistema completo.
+
+La lógica de fase del juego permanece fuera del Subsistema 2.
+
+Esto conserva una separación clara entre:
+
+```text
+hardware periférico
+        y
+software del juego
+```
+
+y permite que el mismo periférico VGA/entradas sea verificado de forma independiente y posteriormente reutilizado dentro del sistema completo.
+
+---
+
+[Segundo nivel: arquitectura e interconexiones](nivel_2.md) · [Cuarto nivel: VGA y entradas del Jugador 1](nivel_4_vga_entradas.md) · [Índice del diseño](README.md)
