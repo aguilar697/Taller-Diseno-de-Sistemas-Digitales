@@ -1,63 +1,90 @@
 # Proyecto 3 — Batalla Naval
 
-Juego de Batalla Naval para dos jugadores sobre un procesador RISC-V implementado en FPGA. El Jugador 1 utiliza la Basys 3, una pantalla VGA y controles físicos; el Jugador 2 utiliza una aplicación de PC conectada por UART.
+Juego de Batalla Naval para dos jugadores, ejecutado por un procesador RISC-V de 32 bits en una FPGA Basys 3. El Jugador 1 utiliza un monitor VGA y los controles de la tarjeta; el Jugador 2 utiliza una terminal de PC conectada por UART.
 
-Toda la lógica del juego corresponde al programa ensamblador RISC-V. La plataforma utiliza un reloj principal de 100 MHz, salida VGA de 640 × 480 a 60 Hz nominales y UART a 115200 baud.
-
-## Organización del desarrollo
-
-| Subsistema | Responsable | Alcance |
-|---|---|---|
-| 1. CPU y ROM | Kevin Aguilar | Procesador RISC-V, memoria de instrucciones y pruebas del núcleo |
-| 2. VGA y entradas J1 | Kenneth Campos | Memoria de video, reloj de píxel, generación gráfica y acondicionamiento de controles |
-| 3. Plataforma de datos y PC | Daniel Puentes | Bus, RAM, UART, displays, LED, buzzer y aplicación del Jugador 2 |
-| 4. Software del juego | Kevin Cortés | Programa de Batalla Naval en ensamblador RISC-V |
+El programa ensamblador administra tableros de 8 × 8 casillas, flotas de tres barcos, colocación, turnos, disparos y victoria. La CPU, las memorias y los periféricos proporcionan los recursos necesarios para ejecutarlo. El diseño utiliza un reloj principal de 100 MHz, video de 640 × 480 a 60 Hz nominales y comunicación UART a 115200 baud.
 
 ## Documentación
 
-- [Índice del planteamiento de diseño](docs/diseno/README.md).
-- [Primer nivel: sistema y entorno](docs/diseno/nivel_1.md).
-- [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
-- [Informe técnico y verificación](docs/informe/README.md).
-
-| Subsistema | Tercer nivel | Cuarto nivel |
-|---|---|---|
-| CPU y ROM | [Arquitectura](docs/diseno/nivel_3_cpu.md) | [Datapath y control](docs/diseno/nivel_4_cpu.md) |
-| VGA y entradas J1 | [Bloques e interfaces](docs/diseno/nivel_3_vga_entradas.md) | [Desarrollo interno](docs/diseno/nivel_4_vga_entradas.md) |
-| Plataforma de datos, UART y PC | [Arquitectura](docs/diseno/nivel_3_uart.md) | [Bus, RAM y periféricos](docs/diseno/nivel_4_uart.md) |
-| Lógica del juego | [Organización del software](docs/diseno/nivel_3_logica_juego.md) | [Procedimientos internos](docs/diseno/nivel_4_logica_juego.md) |
-
-## Implementación del CPU y la ROM
-
-- [Módulos e interfaces del núcleo](src/design/cpu/README.md).
-- [Testbenches y ejecución en Vivado](src/testbench/cpu/README.md).
-- [Informe de verificación del CPU y la ROM](docs/informe/cpu_verificacion.md).
-- [Ejecución, proyecto de Vivado y controles de Basys 3](docs/uso_basys3.md).
-- [Fuentes y generación de la ROM del juego](src/software_riscv/README.md).
-
-## Estado de verificación
-
-| Alcance | Estado documentado |
+| Documento | Contenido |
 |---|---|
-| CPU y ROM | Simulación funcional unitaria e integrada con resultados PASS; imagen del juego reproducible desde sus fuentes |
-| VGA y entradas J1 | Simulaciones unitarias e integradas, aceptación black-box 27/27, implementación con cumplimiento temporal y validación física de entradas y salida VGA en monitor documentadas |
-| Plataforma de datos, UART y aplicación PC | Pruebas RTL y 31 pruebas de protocolo/terminal aprobadas; contrato MMIO documentado |
-| Programa RISC-V | ROM comprobada contra fuentes; 5 pruebas del ensamblador aprobadas; juego ejecutado sobre el CPU RTL |
-| Juego completo | 33 testbenches aprobados y partida integrada con comparación de tramas, RAM y marcador; evidencia en el informe de integración |
+| [Diseño del sistema](docs/diseno/README.md) | Diagramas de niveles 1–4, interfaces y decisiones de arquitectura |
+| [Informe técnico](docs/informe/informe_general.md) | Objetivos, metodología, resultados, análisis y conclusiones |
+| [Fundamentación teórica](docs/informe/fundamentacion_teorica.md) | RISC-V, MMIO, VGA, entradas y comunicación serial |
+| [Plan de verificación](docs/diseno/estrategia_implementacion_verificacion.md) | Requisitos, pruebas y criterios de aceptación |
+| [Informes por subsistema](docs/informe/README.md) | Análisis detallado y evidencias de CPU, VGA, MMIO e integración |
+| [Instalación y uso](docs/uso_basys3.md) | Proyecto Vivado, simulación, programación de la tarjeta y controles del juego |
+| [Protocolo UART](docs/diseno/protocolo_uart_batalla_naval.md) | Mensajes intercambiados entre la FPGA y la terminal |
 
-Las simulaciones verifican el comportamiento funcional. El equipo reporta funcionamiento en placa de la rama `kCortes`; la evidencia física y los reportes de implementación deben identificar la revisión del bitstream utilizado. La versión integrada conserva correcciones adicionales comprobadas en simulación. Los resultados de implementación y la validación física independiente del VGA y las entradas se encuentran en su [informe de verificación](docs/informe/vga_entradas_verificacion.md). El [índice del informe](docs/informe/README.md) distingue ese alcance y reúne las evidencias disponibles.
+## Requisitos
 
-## Estructura
+- Vivado con soporte para Artix-7 `xc7a35tcpg236-1`. Las pruebas documentadas se realizaron con Vivado/XSim 2026.1.
+- Python 3.10 o posterior y `pyserial` para la terminal.
+- Basys 3, cable USB, monitor VGA y buzzer conectado a JA1.
+
+## Instalación, compilación y ejecución
+
+Desde la raíz del repositorio, entrar en la carpeta del proyecto e instalar la dependencia de la terminal:
+
+```powershell
+cd Proyecto3_Batalla_Naval
+python -m pip install -r src/software_pc/requirements.txt
+```
+
+Comprobar la imagen de programa y ejecutar las pruebas:
+
+```powershell
+python scripts/ensamblar_programa.py --check
+python -m unittest discover -s src/software_pc -v
+python -m unittest discover -s scripts -p "test_*.py" -v
+python scripts/verificar_sistema_completo.py --all
+python scripts/verificar_partida_j2.py
+```
+
+Crear el proyecto para trabajar desde Vivado:
+
+```powershell
+python scripts/implementar_basys3.py --project-only
+```
+
+El comando muestra la ruta del archivo `.xpr`. Para ejecutar también síntesis, implementación y generación de bitstream, utilizar el mismo comando sin `--project-only`. Los scripts buscan Vivado en `PATH` y en sus directorios habituales; `--vivado-bin` permite indicar otra instalación.
+
+Después de programar la tarjeta desde **Hardware Manager**, abrir la terminal, sustituyendo `COM6` por el puerto correspondiente:
+
+```powershell
+python src/software_pc/naval_terminal.py COM6
+```
+
+Con la terminal abierta, subir SW15 para iniciar el sistema. Los pulsadores direccionales mueven el cursor; SW0 cambia la orientación y SW1 confirma. Ambos switches deben volver a cero entre acciones. BTNC inicia otra partida conservando el marcador. La [guía de uso](docs/uso_basys3.md) describe las conexiones y el procedimiento completo.
+
+## Organización
 
 | Carpeta | Contenido |
 |---|---|
 | `docs/diseno/` | Arquitectura, diagramas e interfaces |
-| `docs/informe/` | Análisis de resultados y evidencias de verificación |
-| `src/design/` | Módulos RTL organizados por bloque |
+| `docs/informe/` | Informe técnico, análisis por subsistema y evidencias |
+| `src/design/` | Módulos RTL e IP de reloj |
 | `src/testbench/` | Pruebas unitarias y de integración |
 | `src/constraints/` | Restricciones de reloj y asignación de pines |
-| `src/software_riscv/` | Programa ensamblador del juego |
-| `src/software_pc/` | Aplicación remota del Jugador 2 |
-| `scripts/` | Ensamblado, verificación y creación/implementación del proyecto Vivado |
+| `src/software_riscv/` | Programa ensamblador e imagen de ROM |
+| `src/software_pc/` | Terminal del Jugador 2 y pruebas Python |
+| `scripts/` | Ensamblado, simulación y creación del proyecto Vivado |
+
+Los scripts generan sus resultados en `build/`, carpeta excluida de Git que se crea al ejecutar las herramientas. Las evidencias que acompañan al informe se conservan en `docs/informe/resultados/`.
+
+## Pruebas y resultados
+
+El proyecto incluye pruebas unitarias y de integración para la CPU, las memorias, los periféricos y el programa del juego. La verificación comprende 34 testbenches RTL, 31 pruebas de la terminal y cinco del ensamblador. Las partidas simuladas comprueban la victoria de ambos jugadores, los mensajes UART, el estado de RAM y el marcador. Una prueba con error deliberado comprueba que el banco general identifica el fallo y detiene la ejecución.
+
+La implementación de `basys3_top` ocupa 1812 LUT, 1692 flip-flops y cuatro bloques RAM de 36 Kb. El análisis temporal registra WNS de 0,219 ns y WHS de 0,122 ns bajo las restricciones aplicadas. Los resultados, sus condiciones y el alcance experimental se presentan en el [informe técnico](docs/informe/informe_general.md).
+
+## Integrantes
+
+| Responsable | Subsistema |
+|---|---|
+| Kevin Aguilar | CPU RISC-V y ROM |
+| Kenneth Campos | VGA y entradas del Jugador 1 |
+| Daniel Puentes | Bus, RAM, UART, indicadores y terminal de PC |
+| Kevin Cortés | Programa del juego en ensamblador |
 
 [Repositorio del curso](../README.md)

@@ -14,6 +14,8 @@ La prueba del núcleo incluye la ROM de programa y un modelo síncrono de RAM y 
 | Fechas de ejecución | 28 de septiembre y 4 de octubre de 2026 |
 | Dispositivo del proyecto | xc7a35tcpg236-1 |
 
+Las capturas y extractos corresponden a las fechas indicadas. Las ocho pruebas también forman parte de la regresión del sistema, cuyos [registros de ejecución](resultados/integracion/20261008/) incluyen el manifiesto de fuentes y los resultados por módulo.
+
 ## Resultados funcionales
 
 | Testbench | Aspecto evaluado | Resultado observado |
@@ -220,14 +222,27 @@ La simulación de `cpu_tb` registró `PASS cpu_tb: 567 instrucciones, 11 program
 
 La prueba también comprueba las latencias por clase de instrucción, el rechazo de codificaciones y direcciones inválidas, la ausencia de escrituras duplicadas y el reset desde los diez estados de control. Las figuras 25 a 27 muestran la secuencia multiciclo, el acceso a memoria y la recuperación por reset.
 
-## Síntesis e implementación
+## Relación entre diseño y resultados
 
-La verificación presentada arriba corresponde a simulación funcional. Todavía no se dispone de reportes de síntesis e implementación para este subsistema; por ello no se atribuyen cifras de LUT, registros, memorias de bloque ni márgenes de setup y hold. El dispositivo previsto para el proyecto de Vivado es `xc7a35tcpg236-1`, pero el cumplimiento del objetivo de 100 MHz debe evaluarse con una corrida de implementación y sus restricciones.
+La separación entre solicitud y captura de memoria permite utilizar ROM/RAM síncronas sin depender de una respuesta combinacional durante el mismo ciclo. La prueba del procesador comprueba el CPI de cada clase, además del valor final de sus resultados:
 
-### Reportes y análisis temporal
+| Clase | Ciclos por instrucción | Tiempo con período de 10 ns |
+|---|---:|---:|
+| ALU, LUI/AUIPC y saltos con enlace | 6 | 60 ns |
+| SW | 6 | 60 ns |
+| LW | 8 | 80 ns |
+| Bifurcación | 5 | 50 ns |
 
-Al registrar una corrida se debe identificar el top, el dispositivo, el período de reloj, las restricciones de entrada/salida y la imagen de ROM utilizada. La síntesis de `cpu` como top aislado no incluye por sí sola la ROM externa ni el bus; sus recursos y tiempos no se deben presentar como resultados del sistema completo. Los valores de utilización y temporización se incorporarán únicamente a partir de reportes de Vivado conservados como evidencia.
+LW requiere dos estados de lectura y uno de retorno al banco de registros. SW usa un único estado de escritura y no escribe en ese banco. Las bifurcaciones omiten la etapa de retorno. Estos valores describen instrucciones válidas completadas; el reset y FAULT no son instrucciones adicionales ni un CPI de una aplicación completa.
 
-## Integración y simulación temporal
+El desbordamiento aritmético conserva los 32 bits inferiores y no activa una excepción de overflow. En cambio, instrucciones no admitidas y direcciones desalineadas se rechazan explícitamente. La prueba de x0 y los casos SLT/SLTU y SRL/SRA comprueban diferencias de comportamiento que no se deducen únicamente de observar una suma correcta.
 
-`cpu_tb` verifica el procesador y la ROM con modelos de RAM y de registros externos. La conexión con el bus, las memorias y los periféricos reales, la ejecución del programa final y cualquier simulación posterior a implementación corresponden a una etapa distinta que aún no se ha realizado. Los resultados funcionales de este documento no demuestran esa integración.
+La ROM del juego ocupa **1739 de 2048 palabras**: 6956 bytes, el 84,91 % de sus 8192 bytes. Quedan 309 palabras, equivalentes a 1236 bytes. Esta capacidad restante limita ampliaciones futuras del programa; el ensamblador rechaza imágenes que superan el tamaño reservado. Las pruebas unitarias de ROM usan una imagen pequeña dirigida y las partidas integradas usan `program.hex` completo.
+
+## Síntesis, implementación e integración
+
+La implementación de `basys3_top` en `xc7a35tcpg236-1` incluye CPU, ROM, bus y periféricos. Los [reportes de implementación](resultados/implementacion/20261008/) registran 1812 LUT, 1692 flip-flops, cuatro RAMB36E1 y cero latches. Son cifras del **sistema completo**, no una medición aislada del CPU. El margen global de setup es 0,219 ns y el de hold 0,122 ns para las rutas analizadas bajo las restricciones utilizadas; véase su alcance en el [informe general](informe_general.md).
+
+`cpu_tb` conserva su alcance de núcleo con modelos externos. La conexión con los módulos RTL reales y la ejecución del programa final están comprobadas por las partidas con victorias de J1 y J2, documentadas en el [informe integrado](integracion_verificacion.md). La simulación RTL y el análisis estático de temporización son comprobaciones diferentes; los resultados de netlist con SDF se registran por separado cuando se completa esa prueba.
+
+[Índice del informe](README.md) · [Diseño del CPU](../diseno/nivel_3_cpu.md)

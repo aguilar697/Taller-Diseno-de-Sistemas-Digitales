@@ -1,0 +1,10 @@
+{
+  "fecha": "2026-10-08",
+  "revision_fuentes": "c310d24a3ca2e4ef342bfe3432fc2d07ffbc7a69",
+  "herramienta": "Vivado/XSim 2026.1",
+  "regresion": "20261008_213242_320984",
+  "partida_j2": "20261008_213757_086469",
+  "error_forzado": "error_forzado_20261008_213647",
+  "simulacion": "RTL funcional; BN_FUNCTIONAL_CLOCK para reloj pixel",
+  "testbenches": 34
+}

@@ -1,27 +1,23 @@
 # Informe técnico — Batalla Naval
 
-## Verificación por subsistema
+El [informe general](informe_general.md) presenta la solución completa: objetivos, arquitectura, metodología, resultados, análisis y conclusiones. La [fundamentación teórica](fundamentacion_teorica.md) explica los conceptos de procesadores, periféricos y comunicación utilizados en el diseño.
 
-| Subsistema | Informe y evidencias |
+## Informes y evidencias
+
+| Documento | Alcance |
 |---|---|
-| 1. Procesador RISC-V y ROM | [Verificación del CPU y la ROM](cpu_verificacion.md) |
-| 2. VGA y entradas J1 | [Verificación VGA y entradas](vga_entradas_verificacion.md): pruebas unitarias, aceptación 27/27, reportes temporales y evidencia física independiente |
-| 3. Plataforma de datos, UART y PC | [Verificación MMIO](mmio_verificacion.md); regresión RTL y pruebas de terminal en el [informe integrado](integracion_verificacion.md) |
-| 4. Programa ensamblador | [Procedimientos del juego](../diseno/nivel_4_logica_juego.md), [fuentes y ensamblado](../../src/software_riscv/README.md) y [ejecución integrada](integracion_verificacion.md) |
+| [CPU y ROM](cpu_verificacion.md) | Operaciones, control multiciclo, memorias, fallos y comparación arquitectónica |
+| [VGA y entradas](vga_entradas_verificacion.md) | Generación de video, controles, simulaciones y prueba física del subsistema |
+| [Plataforma MMIO](mmio_verificacion.md) | Bus, RAM, UART e indicadores |
+| [Sistema integrado](integracion_verificacion.md) | Regresión RTL, partidas completas, terminal, ensamblador y detector de errores |
+| [Reportes de implementación](resultados/implementacion/README.md) | Recursos, temporización y reglas de diseño del sistema completo |
 
-## Integración y reproducción
+La organización del programa ensamblador se describe en el [diseño del software](../diseno/nivel_3_logica_juego.md) y sus [procedimientos internos](../diseno/nivel_4_logica_juego.md). Los resultados de su ejecución sobre la CPU se incluyen en la verificación integrada.
 
-El [informe de integración](integracion_verificacion.md) identifica la revisión incorporada y el alcance de las pruebas funcionales. Las evidencias recientes incluyen logs de los 33 testbenches, manifiesto de fuentes, tramas y estado de RAM. La [guía de ejecución](../uso_basys3.md) explica dependencias, generación de ROM, simulación, proyecto Vivado, restricciones, IP y controles físicos.
+Las evidencias se encuentran en `resultados/`. Cada informe identifica el módulo evaluado, las condiciones de prueba y los resultados observados. Los manifiestos permiten comprobar las fuentes utilizadas.
 
-## Evidencias necesarias para el cierre de implementación
+## Reproducción
 
-La simulación funcional integrada está documentada. El equipo reporta comprobación física de la rama `kCortes`; ese reporte no reemplaza los archivos de evidencia de la revisión final. Para completar el cierre se deben incorporar:
-
-1. Reportes de utilización, DRC y temporización del sistema completo, asociados al top `basys3_top`, al XDC y a la imagen ROM de la versión entregada.
-2. Evidencias de la partida completa en placa: VGA, controles, terminal, sonidos, marcador y reinicios; identificar el bitstream utilizado.
-3. Simulación post-implementación temporizada del sistema completo, asociada a la misma revisión y restricciones de los reportes.
-4. Trazabilidad de requisitos al enunciado y pruebas, bibliografía y conclusiones del equipo, con las cifras de la implementación final.
-
-Los reportes físicos y temporales ya presentes del Subsistema 2 conservan su alcance independiente. La validación del juego no permite afirmar cierre temporal del sistema completo sin sus reportes correspondientes.
+El [plan de verificación](../diseno/estrategia_implementacion_verificacion.md) relaciona los requisitos con sus pruebas y criterios de aceptación. La [guía de uso](../uso_basys3.md) contiene las dependencias y los comandos para ensamblar, simular e implementar el proyecto.
 
 [Planteamiento de diseño](../diseno/README.md) · [Descripción del proyecto](../../README.md)

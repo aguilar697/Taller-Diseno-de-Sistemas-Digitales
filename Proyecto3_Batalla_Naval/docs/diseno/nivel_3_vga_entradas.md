@@ -15,7 +15,7 @@ Este subsistema no implementa reglas de Batalla Naval. La colocación de barcos,
 
 **Figura 1. Arquitectura interna del Subsistema 2: VGA, memoria de video, reloj de píxel y entradas del Jugador 1.**
 
-Las flechas continuas representan conexiones funcionales de datos y control. Las líneas discontinuas representan distribución de reloj y reset entre dominios. El puerto CPU de la memoria VGA opera con el reloj principal de 100 MHz, mientras que el puerto de video opera con el reloj de píxel derivado por PLL.
+Las flechas continuas representan conexiones funcionales de datos y control. Las líneas discontinuas representan distribución de reloj y reset entre dominios. El puerto CPU de la memoria VGA opera con el reloj principal de 100 MHz, mientras que el puerto de video utiliza el reloj de píxel generado por Clocking Wizard mediante MMCM. En el diagrama, este bloque conserva la etiqueta arquitectónica PLL.
 
 La reasignación física realizada durante la validación final únicamente modifica la conexión entre los controles de la Basys 3 y las señales lógicas del Subsistema 2. Los módulos internos, el formato del registro de entradas y el mapa MMIO permanecen sin cambios.
 
@@ -164,7 +164,7 @@ SW15 = 1 -> LED15 encendido -> Subsistema 2 habilitado
 
 ## 5. Clock / PLL + Pixel Reset
 
-El reloj principal del proyecto es de 100 MHz. El subsistema de video deriva un reloj nominal de 25 MHz mediante PLL para la lógica de píxeles.
+El reloj principal del proyecto es de 100 MHz. El subsistema de video deriva un reloj de 25 MHz mediante el MMCM de Clocking Wizard para la lógica de píxeles.
 
 El dominio de 100 MHz se utiliza para el puerto CPU de la memoria VGA y para el periférico de entradas. El dominio de 25 MHz se utiliza para los contadores VGA, la lectura de video y el renderer.
 
@@ -174,7 +174,7 @@ La adaptación física utilizada con `SW15` en el top de prueba no modifica este
 
 ## 6. VGA Timing Controller
 
-El controlador VGA trabaja con una resolución activa de 640 × 480 a 60 Hz.
+El controlador VGA trabaja con una resolución activa de 640 × 480 a 60 Hz nominales.
 
 Internamente contiene:
 

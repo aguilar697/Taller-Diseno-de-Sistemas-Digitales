@@ -1,0 +1,18 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Thu Oct  8 21:33:05 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/cpu_datapath_tb_test/xsim_script.tcl
+# xsim {cpu_datapath_tb_test} -autoloadwcfg -tclbatch {C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/simular.tcl}
+Time resolution is 1 ps
+source C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/simular.tcl
+## run all
+PASS cpu_datapath_tb: 9 casos y reset/retencion
+$finish called at time : 476 ns : File "C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/src/testbench/cpu/cpu_datapath_tb.sv" Line 52
+## quit
+INFO: [Common 17-206] Exiting xsim at Thu Oct  8 21:33:06 2026...

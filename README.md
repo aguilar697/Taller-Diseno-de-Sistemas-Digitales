@@ -32,7 +32,7 @@ Los proyectos se desarrollan siguiendo una metodología de **diseño modular**, 
 |---|---|---|---|
 | [Proyecto 1 — Whack-a-Mole](./Proyecto1_Whack-a-mole/) | Juego híbrido implementado mediante FPGA y lógica discreta, con comunicación serial UART entre ambos subsistemas. | Basys 3, SystemVerilog, UART, lógica 74xx | Finalizado |
 | [Proyecto 2 — Ahorcado](./Proyecto2_Ahorcado/) | Juego controlado por FPGA, terminal Python por UART e interfaz local LCD, displays y buzzer. | Basys 3, SystemVerilog, UART, Python, LCD | Integrado; alcance de verificación documentado |
-| [Proyecto 3 — Batalla Naval](./Proyecto3_Batalla_Naval/) | Juego de dos jugadores controlado por un procesador RISC-V en FPGA, con interfaz VGA y terminal PC por UART. | Basys 3, SystemVerilog, RISC-V, VGA, UART, Python | Integrado; verificación funcional y alcance de evidencias documentados |
+| [Proyecto 3 — Batalla Naval](./Proyecto3_Batalla_Naval/) | Juego de dos jugadores controlado por un procesador RISC-V en FPGA, con interfaz VGA y terminal PC por UART. | Basys 3, SystemVerilog, RISC-V, VGA, UART, Python | Integrado; resultados de simulación e implementación documentados |
 
 Cada proyecto dispone de su propio `README.md`, donde se documentan su arquitectura, estructura interna, módulos implementados, procedimiento de uso y referencias hacia la documentación técnica.
 
@@ -54,6 +54,7 @@ Taller-Diseno-de-Sistemas-Digitales/
     │   │   └── img/
     │   └── informe/
     │       └── resultados/
+    ├── scripts/
     └── src/
         ├── design/
         ├── testbench/
@@ -72,7 +73,7 @@ Contiene el planteamiento y la documentación del diseño modular, incluyendo di
 
 ### `docs/informe/`
 
-Contiene los informes técnicos, resultados de simulación, evidencia experimental disponible y resultados de síntesis e implementación. Cada informe identifica el alcance de sus pruebas y las evidencias no incorporadas.
+Contiene los informes técnicos, resultados de simulación, evidencia experimental y reportes de síntesis e implementación. Cada informe describe sus condiciones de prueba y el análisis de los resultados.
 
 ### `src/design/`
 
@@ -170,6 +171,9 @@ Para el Proyecto 3:
 - [Descripción y organización del proyecto](./Proyecto3_Batalla_Naval/README.md)
 - [Planteamiento de diseño](./Proyecto3_Batalla_Naval/docs/diseno/README.md)
 - [Informe técnico y verificación](./Proyecto3_Batalla_Naval/docs/informe/README.md)
+- [Informe general y conclusiones](./Proyecto3_Batalla_Naval/docs/informe/informe_general.md)
+- [Investigación previa](./Proyecto3_Batalla_Naval/docs/informe/fundamentacion_teorica.md)
+- [Estrategia de implementación y plan de pruebas](./Proyecto3_Batalla_Naval/docs/diseno/estrategia_implementacion_verificacion.md)
 
 ## Curso
 
