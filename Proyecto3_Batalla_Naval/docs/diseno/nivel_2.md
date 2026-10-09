@@ -10,7 +10,7 @@ Descomponer el sistema FPGA en procesador, memorias, interconexión y periféric
 
 Las flechas continuas representan conexiones funcionales; las flechas dobles agrupan las solicitudes de acceso y las respuestas de lectura. La flecha desde el programa hasta ROM representa el proceso de preparación del contenido, no un puerto de carga durante la partida. Las flechas discontinuas de reloj/reset resumen su distribución: ROM, bus, RAM, UART, entradas, salidas y el puerto CPU de VGA también trabajan en el dominio de 100 MHz.
 
-El programa no constituye un periférico ni una FSM adicional en RTL. Su ejecución en CPU produce las operaciones de lectura y escritura que controlan la partida. El módulo superior previsto para la integración, `top.sv`, conectará los bloques sin incorporar reglas del juego; todavía no forma parte de las fuentes del sistema completo.
+El programa no constituye un periférico ni una FSM adicional en RTL. Su ejecución en CPU produce las operaciones de lectura y escritura que controlan la partida. El módulo [battleship_top.sv](../../src/design/top/battleship_top.sv) conecta los bloques sin incorporar reglas del juego. [basys3_top.sv](../../src/design/top/basys3_top.sv) adapta sus puertos a la tarjeta, sincroniza el reset general y selecciona la ROM del juego.
 
 ## Función de los bloques
 
@@ -22,7 +22,7 @@ El programa no constituye un periférico ni una FSM adicional en RTL. Su ejecuci
 | RAM | Almacenar tableros, metadata de barcos, contadores, buffers y pila |
 | UART | Exponer registros de transmisión y recepción y convertir entre bytes y señales seriales |
 | Entradas J1 | Sincronizar y filtrar controles locales; exponer su estado para lectura por software |
-| VGA | Almacenar tiles y generar imagen y sincronismos a partir de un reloj de píxel derivado por PLL |
+| VGA | Almacenar tiles y generar imagen y sincronismos a partir de un reloj de píxel generado por Clocking Wizard mediante MMCM |
 | Displays, LED y buzzer | Convertir las escrituras del programa en indicaciones visuales y sonoras |
 | Relojes y reset | Distribuir el reloj principal, generar el reloj de píxel y acondicionar el reset de cada dominio |
 
@@ -78,15 +78,17 @@ La representación enviada a VGA y PC contiene el tablero propio y solo la infor
 
 ## Responsabilidades y ubicación de fuentes
 
-| Responsable | Componentes | Ubicación prevista |
+| Responsable | Componentes | Ubicación |
 |---|---|---|
 | Kevin Aguilar | CPU y ROM | src/design/cpu/ y src/design/memory/ |
-| Kenneth Campos | VGA, PLL y entradas J1 | src/design/vga/ y src/design/inputs/ |
+| Kenneth Campos | VGA, reloj de píxel y entradas J1 | src/design/vga/ y src/design/inputs/ |
 | Daniel Puentes | Bus, RAM, UART, indicadores y terminal PC | src/design/bus/, memory/, uart/, outputs/ y src/software_pc/ |
 | Kevin Cortés | Programa ensamblador | src/software_riscv/ |
 | Integración del equipo | Conexión del sistema y restricciones | src/design/top/ y src/constraints/ |
 
 ROM y RAM comparten la carpeta de memorias, pero mantienen módulos y responsabilidades separados. Los testbenches se organizan por bloque dentro de `src/testbench/`; las pruebas del sistema completo se ubican en `src/testbench/integration/`.
+
+La [estrategia de implementación y plan de verificación](estrategia_implementacion_verificacion.md) relaciona los requisitos con las pruebas. El [informe integrado](../informe/integracion_verificacion.md) conserva los resultados de ejecución del programa con los módulos RTL reales.
 
 ## Referencias
 

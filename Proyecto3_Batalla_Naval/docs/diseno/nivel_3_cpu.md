@@ -121,9 +121,9 @@ El CPU verifica alineación de `lw/sw`, pero no duplica el mapa de periféricos.
 
 La ROM comprende `0x00000000–0x00001FFF`: 8192 bytes, equivalentes a 2048 instrucciones de 32 bits. El índice es `ProgAddress_o[12:2]`, después de comprobar que la dirección completa pertenece al rango y está alineada. El último inicio válido de instrucción es `0x00001FFC`.
 
-El parámetro `INIT_FILE` selecciona el archivo de inicialización sintetizable, previsto como `program.hex` para el juego, con una palabra hexadecimal de ocho dígitos por línea. Su valor predeterminado vacío conserva toda la ROM inicializada con NOP. Cada línea representa una instrucción completa; una conversión desde bytes del ejecutable debe respetar su orden little-endian. Las posiciones libres contienen `00000013` (NOP). El programa no modifica esta memoria durante la ejecución.
+El parámetro `INIT_FILE` selecciona el archivo de inicialización sintetizable, `program.hex` en el sistema completo, con una palabra hexadecimal de ocho dígitos por línea. Su valor predeterminado vacío conserva toda la ROM inicializada con NOP. Cada línea representa una instrucción completa; una conversión desde bytes del ejecutable debe respetar su orden little-endian. Las posiciones libres contienen `00000013` (NOP). El programa no modifica esta memoria durante la ejecución.
 
-La interfaz de datos no permite leer constantes desde ROM. El ensamblador construye constantes mediante instrucciones e inicializa los datos requeridos en RAM. El contenido final debe caber en las 2048 palabras y utilizar exclusivamente instrucciones soportadas; las pseudoinstrucciones se verifican después de su expansión. La frecuencia objetivo de 100 MHz deberá comprobarse mediante implementación y análisis temporal.
+La interfaz de datos no permite leer constantes desde ROM. El ensamblador construye constantes mediante instrucciones e inicializa los datos requeridos en RAM. El programa ocupa 1739 de las 2048 palabras disponibles y utiliza instrucciones soportadas por el núcleo; las pseudoinstrucciones se comprueban después de su expansión. La implementación del sistema a 100 MHz se analiza en el [informe general](../informe/informe_general.md#análisis-de-implementación-y-temporización).
 
 ## Justificación de las decisiones
 
@@ -155,6 +155,6 @@ La etapa de integración del proyecto conecta el núcleo con el bus, la RAM y lo
 
 Los testbenches deben comparar contra valores esperados independientes, acumular casos comprobados y terminar con error ante cualquier discrepancia o timeout. El modelo de memoria reproduce la lectura síncrona del contrato; no reemplaza los módulos de RAM y bus del sistema. Las pruebas del CPU se ubican en `src/testbench/cpu/` y las de ROM en `src/testbench/memory/`.
 
-Posteriormente, la integración comprueba el enlace con la RAM y periféricos reales. El análisis temporal y la simulación posterior a implementación complementan la simulación funcional; sus resultados se documentarán en el informe con las evidencias obtenidas.
+Las pruebas integradas comprueban el enlace con la RAM y los periféricos del sistema. El [informe general](../informe/informe_general.md) reúne los resultados funcionales, el análisis temporal y el alcance de la verificación experimental.
 
 [Cuarto nivel: desarrollo del CPU y ROM](nivel_4_cpu.md) · [Segundo nivel: arquitectura del sistema](nivel_2.md) · [Índice del diseño](README.md)

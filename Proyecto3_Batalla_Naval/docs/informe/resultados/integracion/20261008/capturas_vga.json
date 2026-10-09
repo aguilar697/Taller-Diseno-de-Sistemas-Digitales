@@ -1,0 +1,24 @@
+{
+  "foto_batalla": {
+    "fuente": "build/simulacion/20261008_213242_320984/foto_batalla.txt",
+    "sha256_fuente": "5210845fc241ebed80ba50c07a808c09a49a83b19dd785e9a77e4be08a1731ab",
+    "sha256_png": "02d50c69ace690ba64a117e672f1b2df058dab44ddaed5f1a9083d53a75e4fa7",
+    "resolucion": [
+      640,
+      480
+    ],
+    "conversion": "RGB de tres digitos hexadecimales por pixel; cada canal de 4 bits multiplicado por 17",
+    "alcance": "Cuadro VGA capturado por tb_battleship_system en simulacion RTL; no fotografia fisica."
+  },
+  "foto_resultado": {
+    "fuente": "build/simulacion/20261008_213242_320984/foto_resultado.txt",
+    "sha256_fuente": "f2422c58168b35881dc8c793e0d756073a1a9c3f76eb25d59132e027c4acda24",
+    "sha256_png": "802514dca197b5e1757960b441923a736ff4d9fb9fd41c1e8973f173f675fc64",
+    "resolucion": [
+      640,
+      480
+    ],
+    "conversion": "RGB de tres digitos hexadecimales por pixel; cada canal de 4 bits multiplicado por 17",
+    "alcance": "Cuadro VGA capturado por tb_battleship_system en simulacion RTL; no fotografia fisica."
+  }
+}

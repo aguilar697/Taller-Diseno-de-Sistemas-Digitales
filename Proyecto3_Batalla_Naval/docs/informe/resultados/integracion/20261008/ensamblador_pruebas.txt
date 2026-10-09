@@ -1,0 +1,10 @@
+test_game_fits_rom (test_ensamblar_programa.AssemblerTests.test_game_fits_rom) ... ok
+test_invalid_immediates_and_alignment_are_rejected (test_ensamblar_programa.AssemblerTests.test_invalid_immediates_and_alignment_are_rejected) ... ok
+test_known_encodings (test_ensamblar_programa.AssemblerTests.test_known_encodings) ... ok
+test_li_round_trips_signed_and_unsigned_boundaries (test_ensamblar_programa.AssemblerTests.test_li_round_trips_signed_and_unsigned_boundaries) ... ok
+test_unsupported_unsigned_branches_are_rejected (test_ensamblar_programa.AssemblerTests.test_unsupported_unsigned_branches_are_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.020s
+
+OK

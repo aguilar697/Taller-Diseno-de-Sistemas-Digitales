@@ -6,6 +6,7 @@ El diseño se organiza mediante descomposición modular: el primer nivel present
 
 - [Primer nivel: sistema, entradas y salidas](nivel_1.md).
 - [Segundo nivel: arquitectura e interconexiones](nivel_2.md).
+- [Estrategia de implementación y plan de verificación](estrategia_implementacion_verificacion.md).
 
 ## Diseño por subsistema
 

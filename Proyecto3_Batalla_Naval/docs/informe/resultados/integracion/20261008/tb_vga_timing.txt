@@ -1,0 +1,44 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Thu Oct  8 21:35:25 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_vga_timing_test/xsim_script.tcl
+# xsim {tb_vga_timing_test} -autoloadwcfg -tclbatch {C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/simular.tcl}
+Time resolution is 1 ps
+source C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/simular.tcl
+## run all
+========================================
+TB VGA_TIMING
+========================================
+[PASS] Reset clears horizontal and vertical counters
+[PASS] Origin belongs to active video
+[PASS] Synchronization signals inactive at origin
+[PASS] Pixel x=639 is still visible
+[PASS] Horizontal blanking starts at x=640
+[PASS] HSYNC high before synchronization pulse
+[PASS] HSYNC falls at x=656
+[PASS] HSYNC remains low through x=751
+[PASS] HSYNC returns high at x=752
+[PASS] End-of-line detected at x=799
+[PASS] Horizontal counter wraps and vertical counter increments
+[PASS] End-of-line clears after wrap
+[PASS] Line y=479 is still visible
+[PASS] Vertical blanking starts at y=480
+[PASS] VSYNC high before synchronization pulse
+[PASS] VSYNC falls at y=490
+[PASS] VSYNC remains low through y=491
+[PASS] VSYNC returns high at y=492
+[PASS] Last line ends at coordinate 799,524
+[PASS] Frame wraps back to coordinate 0,0
+[PASS] New frame begins in active video
+----------------------------------------
+TEST PASSED
+========================================
+$finish called at time : 16800061 ns : File "C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/src/testbench/vga/tb_vga_timing.sv" Line 294
+## quit
+INFO: [Common 17-206] Exiting xsim at Thu Oct  8 21:35:27 2026...

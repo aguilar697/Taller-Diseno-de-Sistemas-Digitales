@@ -20,7 +20,7 @@ La interconexión recibe `DataAddress_o[31:0]`, `DataOut_o[31:0]` y `we_o` desde
 
 El decoder compara la dirección absoluta con el mapa de memoria y produce una selección one-hot. Además genera la dirección local que necesita cada destino. La RAM utiliza un índice de palabra dentro de su intervalo; la UART usa un índice de registro; VGA utiliza un índice de tile.
 
-| Selección | Dirección o intervalo | Dirección local prevista |
+| Selección | Dirección o intervalo | Dirección local |
 |---|---|---|
 | `ram_sel` | `0x00002000-0x00002FFF` | Índice de palabra derivado de la dirección |
 | `uart_sel` | `0x00010040`, `0x00010044`, `0x00010048` | Índice local de dos bits: 0 para CONTROL, 1 para TX y 2 para RX |
@@ -50,7 +50,7 @@ La selección debe mantenerse junto con la solicitud durante la latencia de lect
 
 La RAM ocupa `0x00002000-0x00002FFF`, un intervalo de 4096 bytes. Con palabras de 32 bits contiene 1024 posiciones. El índice local se obtiene a partir de los bits de palabra de la dirección, después de comprobar el rango y la alineación.
 
-| Propiedad | Valor previsto |
+| Propiedad | Valor implementado |
 |---|---|
 | Ancho de palabra | 32 bits |
 | Cantidad de palabras | 1024 |
@@ -62,7 +62,7 @@ El programa utiliza esta memoria para tableros, datos de barcos, estado de la pa
 
 ## 3. Periférico UART
 
-El periférico UART presenta tres registros MMIO y dos bloques seriales. `UART TX` convierte el byte paralelo en una trama 8N1; `UART RX` reconstruye el byte recibido. La velocidad prevista es 115200 baud con reloj de sistema de 100 MHz.
+El periférico UART presenta tres registros MMIO y dos bloques seriales. `UART TX` convierte el byte paralelo en una trama 8N1; `UART RX` reconstruye el byte recibido. La velocidad nominal es 115200 baud con reloj de sistema de 100 MHz.
 
 | Dirección | Registro | Función |
 |---|---|---|
@@ -90,7 +90,7 @@ La frecuencia de multiplexado debe ser suficientemente alta para que los cuatro 
 
 ## 5. LED de estado
 
-El registro de estado está mapeado en `0x00010138`. Una escritura válida actualiza el valor que recibe el driver del LED. La codificación prevista representa la fase de colocación, batalla o resultado.
+El registro de estado está mapeado en `0x00010138`. Una escritura válida actualiza el valor que recibe el driver del LED. La codificación representa la fase de colocación, batalla o resultado.
 
 El reset lleva el registro a un estado conocido. El driver no calcula la fase de la partida y no cambia el valor por cuenta propia; refleja la orden escrita por el software.
 

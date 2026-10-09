@@ -210,7 +210,6 @@ Contrato del periférico implementado en `src/design/uart/uart_peripheral.sv`:
 | Detección de "casilla ya disparada" | La validación de disparo revisa el estado de la casilla antes de aplicar el turno; un disparo repetido no lo consume y se responde `ERROR/REPEATED_SHOT` (PC) o se ignora en silencio (J1) |
 | Atención de UART y redibujado | El redibujado se reparte en 25 pasos, uno por vuelta (fondo, filas de los tableros, cursor, HUD y mensaje). La terminal espera respuesta a cada solicitud y el testbench verifica recepción de tramas con bytes consecutivos 8N1; este caso no constituye una garantía para tráfico arbitrario sin pausas |
 
-El cuarto nivel desarrollará las subrutinas, las convenciones de registros y el uso detallado de la pila.
+El [cuarto nivel](nivel_4_logica_juego.md) describe las subrutinas, las convenciones de registros y el uso de la pila.
 
 [Segundo nivel: arquitectura del sistema](nivel_2.md) · [Índice del diseño](README.md)
-

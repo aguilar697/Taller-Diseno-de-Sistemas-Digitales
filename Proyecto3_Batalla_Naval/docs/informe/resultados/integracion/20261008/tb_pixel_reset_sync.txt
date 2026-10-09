@@ -1,0 +1,30 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Thu Oct  8 21:35:18 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_pixel_reset_sync_test/xsim_script.tcl
+# xsim {tb_pixel_reset_sync_test} -autoloadwcfg -tclbatch {C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/simular.tcl}
+Time resolution is 1 ps
+source C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/simular.tcl
+## run all
+========================================
+TB PIXEL_RESET_SYNC
+========================================
+[PASS] General reset asserted
+[PASS] Reset held while PLL unlocked
+[PASS] Reset held during first synchronization stage
+[PASS] Synchronized reset released
+[PASS] PLL lock loss asserted reset
+[PASS] Reset released after PLL recovery
+[PASS] General reset reasserted
+----------------------------------------
+TEST PASSED
+========================================
+$finish called at time : 229 ns : File "C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/src/testbench/vga/tb_pixel_reset_sync.sv" Line 170
+## quit
+INFO: [Common 17-206] Exiting xsim at Thu Oct  8 21:35:20 2026...
