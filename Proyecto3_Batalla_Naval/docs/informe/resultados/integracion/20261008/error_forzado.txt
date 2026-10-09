@@ -1,0 +1,24 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Thu Oct  8 21:36:52 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/error_forzado/xsim_script.tcl
+# xsim {error_forzado} -autoloadwcfg -tclbatch {C:/Users/kevin/AppData/Local/Temp/bn_vivado_3oddiqv0/simular.tcl}
+Time resolution is 1 ps
+source C:/Users/kevin/AppData/Local/Temp/bn_vivado_3oddiqv0/simular.tcl
+## run all
+========================================
+PRUEBA DE TODOS LOS MODULOS TOP
+========================================
+Error: FALLO: FALLO INTENCIONAL PARA PROBAR LA AUTOVERIFICACION (t=54296000)
+Time: 54296 ns  Iteration: 0  Process: /all_top_modules_tb/verificar  Scope: all_top_modules_tb.verificar  File: C:/Users/kevin/AppData/Local/Temp/bn_vivado_3oddiqv0/src/testbench/integration/all_top_modules_tb.sv Line: 187
+Fatal: all_top_modules_tb: 1 errores en 33 verificaciones
+Time: 54356 ns  Iteration: 0  Process: /all_top_modules_tb/Initial218_176  Scope: all_top_modules_tb.Block218_177  File: C:/Users/kevin/AppData/Local/Temp/bn_vivado_3oddiqv0/src/testbench/integration/all_top_modules_tb.sv Line: 374
+$finish called at time : 54356 ns
+## quit
+INFO: [Common 17-206] Exiting xsim at Thu Oct  8 21:36:54 2026...

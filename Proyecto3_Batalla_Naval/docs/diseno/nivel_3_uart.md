@@ -94,6 +94,6 @@ Las entradas J1 y VGA utilizan las direcciones asignadas en el mapa general. El 
 | Integración con CPU | Accesos `lw/sw` con direcciones y latencia acordadas |
 | Aplicación de PC | Envío y recepción de mensajes sin trasladar reglas del juego a Python |
 
-Las pruebas unitarias se ubicarán en las carpetas de cada bloque dentro de `src/testbench/`. La verificación completa se realizará en `src/testbench/integration/` con el CPU, la memoria y los periféricos conectados.
+Las pruebas unitarias se ubican por bloque dentro de `src/testbench/`. Las pruebas de `src/testbench/integration/` conectan CPU, memorias y periféricos. El [informe integrado](../informe/integracion_verificacion.md) conserva los resultados de las partidas completas y de la regresión actual.
 
 [Cuarto nivel: desarrollo del bus, UART y salidas](nivel_4_uart.md) · [Segundo nivel: arquitectura del sistema](nivel_2.md) · [Índice del diseño](README.md)

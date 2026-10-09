@@ -1,0 +1,8 @@
+{
+  "testbench": "all_top_modules_tb",
+  "resultado": "ERROR_FORZADO_DETECTADO",
+  "modificacion": "Activacion de la comprobacion intencional solo en una copia temporal",
+  "sha256_testbench_original": "25592e106109eeb0cf2a0e0b11f777fe7c4b0237e946a55a419f0caec01b568f",
+  "sha256_testbench_prueba_negativa": "2406becd3ec5da8f34ea5166712f250a7f6c649f4837d6d5cd5875b96d486c3b",
+  "fuentes_repositorio_modificadas": false
+}

@@ -1,0 +1,61 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Thu Oct  8 21:35:12 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/tb_glyph_rom_test/xsim_script.tcl
+# xsim {tb_glyph_rom_test} -autoloadwcfg -tclbatch {C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/simular.tcl}
+Time resolution is 1 ps
+source C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/simular.tcl
+## run all
+========================================
+TB GLYPH_ROM
+========================================
+[PASS] A contains active top pixel
+[PASS] A background pixel remains clear
+[PASS] A horizontal bar is present
+[PASS] A horizontal bar reaches right side
+[PASS] Digit 0 top stroke
+[PASS] Digit 0 left stroke
+[PASS] Digit 0 interior remains clear
+[PASS] Hyphen is present
+[PASS] Colon upper dot is present
+[PASS] Colon lower dot is present
+[PASS] Period is present
+[PASS] Space contains no active pixels
+[PASS] Unsupported lowercase character renders blank
+[PASS] Unsupported symbol renders blank
+[PASS] All A-Z glyphs contain visible pixels
+[PASS] All 0-9 glyphs contain visible pixels
+
+Glyph ASCII 0x41 (A)
+........
+...##...
+..#..#..
+.#....#.
+.######.
+.#....#.
+.#....#.
+........
+
+
+Glyph ASCII 0x30 (0)
+........
+..####..
+.#....#.
+.#...##.
+.#..#.#.
+.#.#..#.
+..####..
+........
+
+----------------------------------------
+TEST PASSED
+========================================
+$finish called at time : 2635 ns : File "C:/Users/kevin/AppData/Local/Temp/bn_vivado_ih24_d5x/src/testbench/vga/tb_glyph_rom.sv" Line 310
+## quit
+INFO: [Common 17-206] Exiting xsim at Thu Oct  8 21:35:14 2026...

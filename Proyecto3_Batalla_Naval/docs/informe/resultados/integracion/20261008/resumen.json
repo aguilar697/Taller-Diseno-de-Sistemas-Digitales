@@ -1,0 +1,145 @@
+{
+  "pruebas": [
+    {
+      "testbench": "address_decoder_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "data_bus_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "alu_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "cpu_control_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "cpu_datapath_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "cpu_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "immediate_generator_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "instruction_decoder_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "register_file_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_debounce",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_input_sync",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_player1_inputs",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "all_top_modules_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "basys3_controls_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "boot_switches_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "mmio_subsystem_integration_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "mmio_subsystem_top_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_battleship_system",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_subsystem2_peripheral",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_subsystem2_vga_inputs",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "data_ram_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "program_rom_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "buzzer_peripheral_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "led_peripheral_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "sevenseg_peripheral_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "uart_peripheral_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "uart_rx_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "uart_tx_tb",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_glyph_rom",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_pixel_clock",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_pixel_reset_sync",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_tile_renderer",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_vga_timing",
+      "resultado": "PASS"
+    },
+    {
+      "testbench": "tb_video_memory",
+      "resultado": "PASS"
+    }
+  ],
+  "juego": {
+    "tramas": 44,
+    "palabras_ram": 139,
+    "indicadores": 2
+  }
+}

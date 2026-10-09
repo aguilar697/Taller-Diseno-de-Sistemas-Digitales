@@ -2,7 +2,7 @@
 
 ## 1. Objetivo
 
-La verificación comprueba de manera integrada la plataforma MMIO encargada de conectar la interfaz de datos del procesador con la RAM, la UART y los periféricos de salida. La prueba utiliza el módulo `mmio_subsystem_top` como envolvente estructural y lo estimula mediante señales equivalentes a las que utilizará el CPU.
+La verificación comprueba de manera integrada la plataforma MMIO encargada de conectar la interfaz de datos del procesador con la RAM, la UART y los periféricos de salida. La prueba utiliza el módulo `mmio_subsystem_top` como envolvente estructural y lo estimula mediante señales equivalentes a las del CPU.
 
 El alcance corresponde únicamente al subsistema MMIO. Las interfaces destinadas a entradas y VGA se modelan temporalmente desde el testbench, mientras que sus implementaciones RTL se verifican por separado.
 
@@ -73,7 +73,7 @@ La verificación del bus comprueba:
 - conservación de la RAM ante una escritura inválida;
 - latencia síncrona de lectura.
 
-Para las interfaces todavía externas a este top se utilizaron modelos sencillos. La entrada MMIO devuelve un valor conocido y el modelo VGA permite comprobar las direcciones locales `0` y `511`, además de su habilitación de escritura.
+Las interfaces de entradas y VGA se representan mediante modelos de prueba. La entrada MMIO devuelve un valor conocido y el modelo VGA permite comprobar las direcciones locales `0` y `511`, además de su habilitación de escritura.
 
 ## 5. Verificación de periféricos de salida
 
@@ -157,13 +157,13 @@ En esta prueba, `input_rdata_i` y `vga_rdata_i` se generan mediante modelos sín
 
 Los módulos RTL reales de entradas y VGA cuentan con su propia verificación. Su conexión con el CPU, el subsistema MMIO y el programa RISC-V corresponde al top global de Batalla Naval y queda fuera del alcance específico de esta simulación.
 
-Por lo tanto, este resultado verifica el **subsistema MMIO** y no constituye todavía una validación del sistema completo ni de una partida de Batalla Naval.
+El [informe integrado](integracion_verificacion.md) presenta las pruebas que conectan estos bloques con el CPU, VGA, las entradas y el programa del juego.
 
 ## 10. Conclusiones
 
 La simulación integrada comprobó que los accesos del procesador se decodifican hacia el destino correcto, que las lecturas respetan la latencia síncrona y que los periféricos responden según sus contratos MMIO. También se verificaron las rutas seriales de transmisión y recepción, los registros de salida y el comportamiento del reset.
 
-Las 113 verificaciones finalizaron correctamente en Vivado/XSim. Esta prueba proporciona la evidencia funcional del subsistema antes de su conexión con el CPU, las entradas físicas, el VGA y el software RISC-V en el top global.
+Las 113 verificaciones finalizaron correctamente en Vivado/XSim. El [registro de ejecución](resultados/integracion/20261008/mmio_subsystem_top_tb.txt) complementa la captura de consola. Las pruebas de partidas conectan, por separado, el CPU, las entradas, VGA y el programa RISC-V en el top global.
 
 ## Referencias internas
 

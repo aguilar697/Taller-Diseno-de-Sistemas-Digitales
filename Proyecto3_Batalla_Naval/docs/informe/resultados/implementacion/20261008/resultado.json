@@ -1,0 +1,31 @@
+{
+  "fecha": "2026-10-08",
+  "revision_fuentes": "c310d24a3ca2e4ef342bfe3432fc2d07ffbc7a69",
+  "top": "basys3_top",
+  "dispositivo": "xc7a35tcpg236-1",
+  "herramienta": "Vivado 2026.1",
+  "estado": "Fully Routed",
+  "resultado": "PASS",
+  "bitstream_sha256": "c3a1152066696295643849766e940fab4c4684977041053987d2b4272c30fa55",
+  "program_hex_sha256": "a92936b74f5d24a5d70d39a23c000b1f09cc0ae836003dca08a97359a4592180",
+  "bitstream_incluido_en_git": false,
+  "recursos": {
+    "LUT": 1812,
+    "FF": 1692,
+    "RAMB36E1": 4,
+    "DSP": 0,
+    "MMCME2_ADV": 1,
+    "BUFG": 3,
+    "latches": 0
+  },
+  "temporizacion": {
+    "WNS_ns": 0.219,
+    "TNS_ns": 0.0,
+    "WHS_ns": 0.122,
+    "THS_ns": 0.0,
+    "WPWS_ns": 3.0,
+    "TPWS_ns": 0.0
+  },
+  "drc_infracciones": 0,
+  "alcance_temporal": "Rutas analizadas con las excepciones de basys3_battleship.xdc; no mide retardos externos de los puertos exceptuados."
+}

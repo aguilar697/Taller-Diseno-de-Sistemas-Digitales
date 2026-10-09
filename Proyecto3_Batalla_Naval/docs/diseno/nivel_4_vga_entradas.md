@@ -37,9 +37,9 @@ Los bloques descritos en este nivel se encapsulan dentro de `subsystem2_vga_inpu
 
 ---
 
-# 2.1 Clock / PLL + Pixel Reset
+## 2.1 Clock / PLL + Pixel Reset
 
-## 2.1.1 PLL / Clocking Wizard
+### 2.1.1 PLL / Clocking Wizard
 
 Recibe el reloj principal de la Basys 3 y genera el reloj utilizado por el dominio VGA.
 
@@ -85,7 +85,7 @@ Esta inversión no modifica ningún módulo interno del Subsistema 2.
 
 ---
 
-## 2.1.2 Pixel Reset Synchronizer
+### 2.1.2 Pixel Reset Synchronizer
 
 Genera el reset utilizado por los bloques que trabajan en el dominio `clk_pixel`.
 
@@ -109,7 +109,7 @@ La inversión física de `SW15` ocurre antes de esta etapa, por lo que el sincro
 
 ---
 
-# 2.2 VGA Timing Controller
+## 2.2 VGA Timing Controller
 
 El controlador de temporización produce las coordenadas del píxel actual, la indicación de región visible y los sincronismos necesarios para una salida de **640 × 480 a 60 Hz nominales** utilizando el reloj de píxel de 25 MHz acordado para el proyecto.
 
@@ -128,7 +128,7 @@ VSYNC bajo        = 490 ... 491
 
 ---
 
-## 2.2.1 Contadores horizontal y vertical
+### 2.2.1 Contadores horizontal y vertical
 
 Los contadores recorren la temporización completa del cuadro VGA.
 
@@ -151,7 +151,7 @@ El contador horizontal recorre `0–799`. Al finalizar una línea, el contador v
 
 ---
 
-## 2.2.2 Sync / Active Decoder
+### 2.2.2 Sync / Active Decoder
 
 Decodifica los contadores para identificar la región visible y generar los sincronismos internos.
 
@@ -171,7 +171,7 @@ Las coordenadas y `active_video` se entregan al renderer. Los sincronismos inter
 
 ---
 
-## 2.2.3 Alineación de sincronismos de salida
+### 2.2.3 Alineación de sincronismos de salida
 
 En el nivel de integración, `hsync_raw` y `vsync_raw` se registran durante un ciclo de `clk_pixel` antes de entregarse como salidas del periférico.
 
@@ -203,11 +203,11 @@ La prueba black-box del periférico midió directamente sobre las salidas extern
 
 ---
 
-# 2.3 Video Memory Dual-Port
+## 2.3 Video Memory Dual-Port
 
 La memoria de video se implementa como una memoria de doble puerto lógico de **512 palabras × 32 bits**.
 
-## Organización
+### Organización
 
 - Índices `0–299`: tiles visibles.
 - Índices `300–511`: región reservada.
@@ -216,7 +216,7 @@ La memoria de video se implementa como una memoria de doble puerto lógico de **
 
 ---
 
-## 2.3.1 Puerto A — CPU
+### 2.3.1 Puerto A — CPU
 
 Permite al procesador actualizar o consultar una posición de la memoria de video.
 
@@ -242,7 +242,7 @@ Las escrituras dirigidas a índices `300–511` se ignoran y las lecturas de esa
 
 ---
 
-## 2.3.2 Memoria de video
+### 2.3.2 Memoria de video
 
 La memoria contiene el mapa de tiles empleado por la interfaz gráfica.
 
@@ -277,7 +277,7 @@ El formato de cada palabra es:
 
 ---
 
-## 2.3.3 Puerto B — VGA
+### 2.3.3 Puerto B — VGA
 
 Proporciona al renderer la palabra correspondiente al tile visible en el píxel actual.
 
@@ -298,7 +298,7 @@ La lectura es síncrona e introduce una latencia de un ciclo de reloj de píxel.
 
 ---
 
-## 2.3.4 Acceso simultáneo CPU / VGA
+### 2.3.4 Acceso simultáneo CPU / VGA
 
 Los dos puertos permiten que el CPU y la lógica VGA operen simultáneamente con relojes diferentes.
 
@@ -321,13 +321,13 @@ Esta decisión evita trasladar reglas del juego o mecanismos de sincronización 
 
 ---
 
-# 2.4 Tile / Glyph Renderer
+## 2.4 Tile / Glyph Renderer
 
 El renderer transforma la posición del píxel y la palabra almacenada en memoria en el color enviado al monitor.
 
 ---
 
-## 2.4.1 Pixel → Tile Mapper
+### 2.4.1 Pixel → Tile Mapper
 
 La pantalla se divide en:
 
@@ -373,7 +373,7 @@ tile_index = fila*20 + columna
 
 ---
 
-## 2.4.2 Tile Word Decoder
+### 2.4.2 Tile Word Decoder
 
 Interpreta la palabra de 32 bits almacenada en la memoria VGA.
 
@@ -399,7 +399,7 @@ Codificación de color acordada:
 
 ---
 
-## 2.4.3 Glyph ROM
+### 2.4.3 Glyph ROM
 
 Genera el bit gráfico correspondiente al carácter seleccionado cuando `GLYPH_ENABLE = 1`.
 
@@ -418,7 +418,7 @@ La fuente lógica se representa sobre una matriz de 8 × 8 y se escala dentro de
 
 ---
 
-## 2.4.4 RGB Mux / Pipeline
+### 2.4.4 RGB Mux / Pipeline
 
 Selecciona entre el color base del tile y el píxel del glyph, respetando `active_video`. Cuando `GLYPH_ENABLE = 1` y el bit correspondiente del glyph está activo, el primer plano se representa en blanco (`12'hFFF`); en caso contrario se conserva el color base del tile.
 
@@ -448,7 +448,7 @@ Durante la región no visible, la salida RGB se fuerza a negro.
 
 ---
 
-# 2.5 Player 1 Input Peripheral
+## 2.5 Player 1 Input Peripheral
 
 Este periférico captura los controles físicos del Jugador 1 y entrega al CPU únicamente señales sincronizadas y filtradas.
 
@@ -521,7 +521,7 @@ Como `SEL` se encuentra físicamente en un switch, para producir acciones consec
 
 ---
 
-## 2.5.1 Synchronizers ×7
+### 2.5.1 Synchronizers ×7
 
 Cada señal física atraviesa un sincronizador de dos flip-flops para ingresar al dominio de `clk_100_i`.
 
@@ -543,7 +543,7 @@ La sincronización resuelve el problema de cruce de dominio de las entradas así
 
 ---
 
-## 2.5.2 Debouncers ×7
+### 2.5.2 Debouncers ×7
 
 Cada entrada sincronizada se filtra de forma independiente para eliminar rebotes mecánicos.
 
@@ -565,7 +565,7 @@ Las señales filtradas son niveles activos en alto. El hardware no implementa au
 
 ---
 
-## 2.5.3 Status Packer
+### 2.5.3 Status Packer
 
 Empaqueta los siete controles en el registro de estado:
 
@@ -600,7 +600,7 @@ En la prueba física aislada del Subsistema 2, `SW15` controla la aplicación de
 
 ---
 
-## 2.5.4 MMIO Read Interface
+### 2.5.4 MMIO Read Interface
 
 El registro de entradas está mapeado en:
 
@@ -629,7 +629,7 @@ Las escrituras se ignoran. `input_write_enable_i` e `input_wdata_i` se conservan
 
 ---
 
-# 2.6 Integración como periférico completo
+## 2.6 Integración como periférico completo
 
 El módulo:
 
@@ -639,7 +639,7 @@ subsystem2_vga_inputs
 
 encapsula las funciones VGA y de entradas del Jugador 1 y constituye la frontera principal del Subsistema 2 para integración y verificación.
 
-## 2.6.1 Entradas externas
+### 2.6.1 Entradas externas
 
 | Señal | Ancho | Función |
 |---|---:|---|
@@ -673,7 +673,7 @@ game_rst_i <- BTNC
 
 Esta correspondencia no forma parte del contrato lógico de `subsystem2_vga_inputs`; pertenece al nivel superior que conecta el periférico con la tarjeta.
 
-## 2.6.2 Salidas externas
+### 2.6.2 Salidas externas
 
 | Señal | Ancho | Función |
 |---|---:|---|
@@ -687,7 +687,7 @@ Desde el punto de vista del sistema, el Subsistema 2 puede tratarse como una caj
 
 ---
 
-# Dominios de reloj
+## Dominios de reloj
 
 | Dominio | Frecuencia | Bloques |
 |---|---:|---|
@@ -700,11 +700,11 @@ La memoria dual-port constituye la frontera principal de datos entre ambos domin
 
 ---
 
-# Límites de responsabilidad
+## Límites de responsabilidad
 
 El Subsistema 2:
 
-## Sí realiza
+### Sí realiza
 
 - generación del reloj de píxel;
 - reset sincronizado del dominio VGA;
@@ -719,7 +719,7 @@ El Subsistema 2:
 - exposición MMIO de controles;
 - interfaz MMIO de memoria VGA.
 
-## No realiza
+### No realiza
 
 - colocación o validación de barcos;
 - control de turnos;
@@ -736,7 +736,7 @@ En particular, `GAME_RST` únicamente aparece como un bit del registro de entrad
 
 ---
 
-# Verificación implementada
+## Verificación implementada
 
 La estrategia de verificación se divide en dos niveles:
 
@@ -747,7 +747,7 @@ Las pruebas unitarias se conservan como evidencia de desarrollo, pero la evidenc
 
 ---
 
-## Pruebas unitarias de respaldo
+### Pruebas unitarias de respaldo
 
 Los siguientes bloques poseen testbenches autoverificables:
 
@@ -768,7 +768,7 @@ Estas pruebas permiten aislar fallos durante el desarrollo, pero no constituyen 
 
 ---
 
-## Prueba black-box del periférico completo
+### Prueba black-box del periférico completo
 
 El testbench:
 
@@ -837,7 +837,7 @@ El resultado de 27 comprobaciones con cero errores constituye la evidencia princ
 
 ---
 
-# Validación física
+## Validación física
 
 ![Validación física de la salida VGA del Subsistema 2](../informe/resultados/vga_entradas/16_subsystem2_vga_monitor_physical.jpeg)
 
@@ -961,7 +961,7 @@ Como referencia, el dominio de 100 MHz presenta el peor caso global (`WNS = +4.2
 
 ---
 
-# Archivos RTL implementados
+## Archivos RTL implementados
 
 ```text
 src/design/vga/
@@ -986,7 +986,7 @@ La reasignación física final se realizó únicamente en `subsystem2_basys3_tes
 
 ---
 
-# Testbenches implementados
+## Testbenches implementados
 
 ```text
 src/testbench/inputs/
@@ -1007,7 +1007,7 @@ src/testbench/integration/
 
 ---
 
-# Restricciones e integración física
+## Restricciones e integración física
 
 El top físico utiliza el FPGA:
 
@@ -1067,7 +1067,7 @@ src/constraints/subsystem2_basys3_test.xdc
 
 ---
 
-# Estado de verificación del Subsistema 2
+## Estado de verificación del Subsistema 2
 
 | Elemento | Estado |
 |---|:---:|
@@ -1103,7 +1103,7 @@ src/constraints/subsystem2_basys3_test.xdc
 
 ---
 
-# Referencias internas
+## Referencias internas
 
 - [Diseño de tercer nivel — VGA y entradas](nivel_3_vga_entradas.md)
 - [Segundo nivel: arquitectura e interconexiones](nivel_2.md)

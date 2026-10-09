@@ -523,7 +523,7 @@ La versión final del top, con la nueva asignación de controles, reset físico 
 
 ### 8.1 Reportes de implementación finales
 
-Para la versión final de `subsystem2_basys3_test_top`, utilizada durante la validación física del Subsistema 2, se regeneraron los reportes de utilización y temporización después de placement y routing.
+Los reportes de `subsystem2_basys3_test_top` corresponden al ensayo independiente del Subsistema 2 después de placement y routing. La implementación del sistema completo se documenta en el [informe general](informe_general.md#análisis-de-implementación-y-temporización).
 
 Los reportes finales se conservan en:
 
@@ -621,13 +621,16 @@ equivalente a aproximadamente 10 ms con un reloj de 100 MHz.
 
 El reset interno del Subsistema 2 continúa siendo activo en alto.
 
-En el top físico se utiliza:
+La solicitud de reset procede de `~sw[15]`. En el top de prueba incluido en el repositorio atraviesa dos etapas de sincronización:
 
 ```systemverilog
-assign rst = ~sw[15];
+(* ASYNC_REG = "TRUE" *) logic [1:0] reset_pipe_q = 2'b11;
+always_ff @(posedge clk)
+    reset_pipe_q <= {reset_pipe_q[0], ~sw[15]};
+assign rst = reset_pipe_q[1];
 ```
 
-Por tanto:
+La activación y la liberación se alinean con el reloj de 100 MHz. Una vez propagada la solicitud:
 
 ```text
 SW15 = 0

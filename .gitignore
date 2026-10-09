@@ -20,6 +20,7 @@
 *.ltx
 *.pb
 *.wdf
+*.wdb
 
 # El proyecto .xpr de Vivado contiene rutas locales
 *.xpr
