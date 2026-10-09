@@ -1,0 +1,39 @@
+{
+  "fecha": "2026-10-09",
+  "python": "3.13.15",
+  "comando": "python scripts/logica_juego/run_tests.py",
+  "resultado": {
+    "comprobaciones": 251,
+    "fallos": 0,
+    "herramientas": 38,
+    "vuelta_mas_larga_ciclos": 6251,
+    "byte_uart_ciclos": 8680
+  },
+  "fuentes": {
+    "src/software_riscv/constantes.s": "7c348f9c53268900c79e0a1338c8444296a01d7322ebab82c83d9de5bbf3b695",
+    "src/software_riscv/main.s": "9d4d91ad769910e7c9439675b455d6c636316c6bf16eafa78e42500a955c83f3",
+    "src/software_riscv/control_estado.s": "91122b71282cef6bbc03e14ab12fd75ef7edba4035606277b7a14b4e7d55d91f",
+    "src/software_riscv/colocacion.s": "341749d713687264a97b131deac15c82263c3f59cec6d71edd5f860a13c327b3",
+    "src/software_riscv/turnos.s": "9d25660d9398d77ff390e229c98f2fe894afb30f0a6dcf11a4ac6b2f5e5a86eb",
+    "src/software_riscv/victoria.s": "80ebc24bba1814ecaff4d9a315090b1d613b1e31050699b9d92a43b55b6037e6",
+    "src/software_riscv/uart.s": "88a29ce547d75a0737f17deee8d3602431032e2ff352364ff9aa699ccefded56",
+    "src/software_riscv/salidas.s": "7695a10034276ac5436b2b5c3fed32f373ea5b8c5fee7e280bd02990bdbbb35e",
+    "src/software_riscv/program.hex": "a92936b74f5d24a5d70d39a23c000b1f09cc0ae836003dca08a97359a4592180"
+  },
+  "scripts": {
+    "scripts/logica_juego/asm.py": "e3dd296489f8cea8d0e7a6717d2cac295a345d3f67b7efc92f380cce0dc072b9",
+    "scripts/logica_juego/comun.py": "8385a21c36cb5c5cba3991de0e3d0ef8d818f0cf274250b4edb1bdcbf0fd7a05",
+    "scripts/logica_juego/emu.py": "e09e33bfc647beebce340d58c070b6b419df4b17d4e68a7b86ec1421bace18b6",
+    "scripts/logica_juego/escenario.py": "cecaec09aa7826b051a60164467ea4e70f8029be6c54eddb5c0b3d0524892338",
+    "scripts/logica_juego/medir_ciclo_servicio.py": "a9f6b011684f844b5790f95deb46d7bbcf8354847c0d2dc06abcfc4d7e98e96e",
+    "scripts/logica_juego/run_tests.py": "35b4db3d84fb55eeee6ccb1c639a391ada764455c9b1af17167d9b227c5479dc",
+    "scripts/logica_juego/test_colocacion.py": "cffe657b6d37b92c8fdf91389059d2f1dfaf680df93a6fc8168183281f6deba6",
+    "scripts/logica_juego/test_control_estado.py": "6a666dd26e57f26c13e818efc3e7296eab9236e9db39756626d541b58bb3a5ad",
+    "scripts/logica_juego/test_herramientas.py": "b3c749a23863ace80d310d5ac1e51318b32d89462d61b330afc9de08d9d92fee",
+    "scripts/logica_juego/test_integracion.py": "52f1a3e2088078ad19a97e77bdf4be3d1a95358da021056d6baffa850de117a4",
+    "scripts/logica_juego/test_salidas.py": "6160881b0ee9149144e871867161b978af90bcc6ca6521d0ed434c8bd6adcf3f",
+    "scripts/logica_juego/test_turnos.py": "45b11c6ea9341babd90590241ad77b12c941d05dc2a52a6f8be243a828437586",
+    "scripts/logica_juego/test_uart.py": "8c696c6e2a420e405d3f71c48006c937f877a4860babeabdd370dbc664b90117",
+    "scripts/logica_juego/test_victoria.py": "e5ea8f8817b7d369591ad970b7f577d62060011cee514c28712c7b40ee53c942"
+  }
+}

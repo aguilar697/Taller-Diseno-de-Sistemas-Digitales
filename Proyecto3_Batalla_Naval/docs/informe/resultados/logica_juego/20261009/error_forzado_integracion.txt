@@ -1,0 +1,38 @@
+==================================================================
+BLOQUE: Integracion: partidas completas
+  FALLO: el disparo 1 de J1 se notifica a la PC
+  FALLO: el disparo 2 de J1 se notifica a la PC
+  FALLO: el disparo 3 de J1 se notifica a la PC
+  FALLO: el disparo 4 de J1 se notifica a la PC
+  FALLO: el disparo 5 de J1 se notifica a la PC
+  FALLO: el disparo 6 de J1 se notifica a la PC
+  FALLO: el disparo 7 de J1 se notifica a la PC
+  FALLO: el disparo 8 de J1 se notifica a la PC
+  FALLO: el disparo 9 de J1 se notifica a la PC
+  FALLO: la partida termina: se esperaba 2, se obtuvo 1
+  FALLO: gana J1: se esperaba 1, se obtuvo 0
+  FALLO: el marcador de J1 sube a 1: se esperaba 1, se obtuvo 0
+  FALLO: J1 hundio los tres barcos rivales: se esperaba 3, se obtuvo 0
+  FALLO: se emite GAME_OVER
+  FALLO: el LED indica resultado: se esperaba 2, se obtuvo 1
+  FALLO: los displays muestran la victoria de J1: se esperaba 1, se obtuvo 0
+  FALLO: el marcador se conserva tras GAME_RST: se esperaba 1, se obtuvo 0
+  FALLO: la nueva partida anuncia el marcador acumulado: se esperaba [1, 0], se obtuvo [0, 0]
+  FALLO: el disparo 1 de J2 acierta y se responde
+  FALLO: el disparo 2 de J2 acierta y se responde
+  FALLO: el disparo 3 de J2 acierta y se responde
+  FALLO: el disparo 4 de J2 acierta y se responde
+  FALLO: el disparo 5 de J2 acierta y se responde
+  FALLO: el disparo 6 de J2 acierta y se responde
+  FALLO: el disparo 7 de J2 acierta y se responde
+  FALLO: el disparo 8 de J2 acierta y se responde
+  FALLO: el disparo 9 de J2 acierta y se responde
+  FALLO: la segunda partida termina: se esperaba 2, se obtuvo 1
+  FALLO: gana J2 la segunda partida: se esperaba 2, se obtuvo 0
+  FALLO: J1 conserva su victoria anterior: se esperaba 1, se obtuvo 0
+  FALLO: J2 suma su primera victoria: se esperaba 1, se obtuvo 0
+  FALLO: los displays muestran una victoria por jugador: se esperaba 257, se obtuvo 0
+  FALLO: las nueve casillas de la flota de J1 estan impactadas: se esperaba 9, se obtuvo 0
+  FALLO: los tres barcos de J1 figuran hundidos
+  RESULTADO: 22 correctas, 34 FALLOS
+==================================================================

@@ -233,7 +233,7 @@ En cada vuelta, `servicio_uart_rx` entrega como máximo un byte a `uart_parser_b
 
 ## Criterios de comprobación
 
-El programa se verifica en cuatro etapas, de la más aislada a la más completa. Los resultados de las etapas 3 y 4 están en la [verificación del sistema integrado](../informe/integracion_verificacion.md).
+El programa se verifica en cuatro etapas, de la más aislada a la más completa. Los resultados de las etapas 1 y 2 están en la [verificación de la lógica del juego](../informe/logica_juego_verificacion.md); los de las etapas 3 y 4, en la [verificación del sistema integrado](../informe/integracion_verificacion.md).
 
 | Etapa | Qué se comprueba | Cómo |
 |---|---|---|

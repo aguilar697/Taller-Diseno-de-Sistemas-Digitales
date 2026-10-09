@@ -1,0 +1,6 @@
+Vuelta mas larga del ciclo de servicio: 6251 ciclos
+Un byte de UART a 115200 baudios:       8680 ciclos
+Margen:                                 28.0 %
+Bytes recibidos perdidos:               0
+Escrituras a TX con la TX ocupada:      0
+RESULTADO: CUMPLE
