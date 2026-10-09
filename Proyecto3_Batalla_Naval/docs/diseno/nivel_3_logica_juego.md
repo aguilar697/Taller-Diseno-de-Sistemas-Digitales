@@ -49,6 +49,7 @@ El programa se organiza en 6 bloques de lógica y 2 regiones de RAM compartida.
 - **Objetivo:** mantener y arbitrar `game_phase` y `current_turn` como fuente única de verdad del estado global.
 - **Entradas:** `p1_ready`, `p2_ready` (desde Colocación); `p1_wins`/`p2_wins`/`game_phase` (desde Victoria); `r_state_RAM`.
 - **Salidas:** `current_turn` (hacia Turnos); `w_state_RAM`.
+- En la implementación, este bloque también lee `btn_j1` (`servicio_botones`): convierte los niveles en flancos, atiende GAME_RST en cualquier fase y entrega los demás flancos a Colocación o a Turnos según `game_phase`. Por eso en la Figura 2 `btn_j1` llega a esos dos bloques.
 
 ### 3.2. Gestión de colocación de barcos
 
@@ -151,7 +152,7 @@ Metadata de cada barco (8 words): `placed, row, column, orientation, length, hit
 
 ### 4.2. Registro INPUTS (`0x00010120`)
 
-Bits ya filtrados de rebote por hardware, niveles activos en uno: `0`=UP, `1`=DOWN, `2`=LEFT, `3`=RIGHT, `4`=SEL, `5`=OK, `6`=GAME_RST, `[31:7]`=0. El software detecta flancos ascendentes por polling; mantener una entrada activa no repite la acción. Al iniciar partida se toma una instantánea como referencia, para ignorar switches (SEL/OK) que hayan quedado en alto de una activación previa.
+Bits ya filtrados de rebote por hardware, niveles activos en uno: `0`=UP, `1`=DOWN, `2`=LEFT, `3`=RIGHT, `4`=SEL, `5`=OK, `6`=GAME_RST, `[31:7]`=0. El software detecta flancos ascendentes por polling; mantener una entrada activa no repite la acción. Al iniciar partida se toma una instantánea como referencia, para ignorar switches (SEL/OK) que hayan quedado en alto de una activación previa. Tras el reset general, esa instantánea se toma después de la espera de arranque, cuando el antirrebote ya entrega el nivel real (ver la sección 5).
 
 ### 4.3. Registro DISPLAY (`0x00010130`)
 
@@ -207,9 +208,15 @@ Contrato del periférico implementado en `src/design/uart/uart_peripheral.sv`:
 | Colocación concurrente (`p1_ready`/`p2_ready` independientes) | Un único ciclo de servicio en ensamblador atiende botones, RX y TX sin bloquear; ningún jugador espera a que el otro termine |
 | Arranque con switches estables | `sistema_init` espera `ESPERA_ARRANQUE=120000` iteraciones antes de inicializar la partida. La espera supera los 10 ms del debounce; `BTN_PREV` recibe los niveles iniciales y evita interpretar un switch ya activo como una nueva jugada |
 | Formato de metadata de barcos (`0x2220–0x22DF`) | 8 words/barco: `placed, row, column, orientation, length, hit_count, sunk, reserved` |
-| Detección de "casilla ya disparada" | La validación de disparo revisa el estado de la casilla antes de aplicar el turno; un disparo repetido no lo consume y se responde `ERROR/REPEATED_SHOT` (PC) o se ignora en silencio (J1) |
+| Detección de "casilla ya disparada" | La validación de disparo revisa el estado de la casilla antes de aplicar el turno; un disparo repetido no lo consume y se responde `ERROR/REPEATED_SHOT` (PC) o suena INVALID en el buzzer (J1) |
 | Atención de UART y redibujado | El redibujado se reparte en 25 pasos, uno por vuelta (fondo, filas de los tableros, cursor, HUD y mensaje). La terminal espera respuesta a cada solicitud y el testbench verifica recepción de tramas con bytes consecutivos 8N1; este caso no constituye una garantía para tráfico arbitrario sin pausas |
+| Una palabra por casilla y por byte del protocolo | El CPU solo tiene `lw`/`sw` (sin `lb`/`sb`). Empaquetar obligaría a enmascarar y desplazar en cada acceso, y la RAM sobra: los dos tableros ocupan 128 de 1024 palabras |
+| Metadata por barco (posición, orientación, longitud, impactos) | Permite saber a qué barco pertenece un impacto y detectar el hundido sin recorrer el tablero, aunque haya barcos pegados. La victoria se decide con los `sunk` del rival, no con un contador |
+| J1 y J2 usan las mismas subrutinas de reglas | Las colocaciones de ambos jugadores pasan por `coloc_intentar` y los disparos por `turnos_disparar`: las reglas existen una sola vez y no pueden diferir entre jugadores |
+| Validar antes de modificar | Todas las comprobaciones de una colocación o un disparo se hacen antes de escribir en RAM; un rechazo no deja cambios que deshacer y no consume turno |
+| Ocultar la flota rival en un único punto | La memoria de video no conoce reglas: `vga_tablero_fila` pinta como agua un barco rival sin tocar. Es el único lugar donde se decide qué ve J1 del tablero de J2 |
+| Orden de las respuestas por UART | La respuesta a una solicitud (`PLACE_RESULT`) se encola antes que las notificaciones que provoca (`BATTLE_START`, `TURN`), para que la PC las reciba en un orden coherente con su propia petición |
 
-El [cuarto nivel](nivel_4_logica_juego.md) describe las subrutinas, las convenciones de registros y el uso de la pila.
+El [cuarto nivel](nivel_4_logica_juego.md) presenta el ciclo de servicio, los diagramas de estados de la partida y del parser UART, las subrutinas de cada bloque, las convenciones de registros y el uso de la pila.
 
 [Segundo nivel: arquitectura del sistema](nivel_2.md) · [Índice del diseño](README.md)
