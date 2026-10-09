@@ -118,7 +118,7 @@ La experiencia de integración mostró que una prueba debe identificar tanto el 
 
 ## Alcance experimental y limitaciones
 
-Los resultados del sistema completo comprenden simulación RTL, síntesis, enrutado y análisis temporal estático. La simulación temporizada con SDF está preparada, pero no se completó. Tampoco se han incorporado capturas de una partida física del sistema completo. La evidencia física disponible corresponde al subsistema VGA/entradas.
+Los resultados del sistema completo comprenden simulación RTL, síntesis, enrutado y análisis temporal estático. La simulación temporizada con SDF está preparada, pero no se completó. La [prueba física del sistema completo](integracion_verificacion.md#prueba-física-del-sistema-completo) documenta partidas en la Basys 3 contra la terminal de J2 mediante fotografías de la placa, del monitor y de la terminal; los sonidos del buzzer no se registran en ellas.
 
 La UART RX conserva un byte y carece de indicador de desbordamiento: una demora excesiva del software puede ocasionar pérdida de datos. La transmisión dispone de una cola finita. La VRAM permite acceso desde los dominios de CPU y píxel sin doble buffer; una actualización puede hacerse visible antes de completar el cuadro. Estas restricciones delimitan la carga de comunicación y actualización gráfica admitida por el diseño.
 
