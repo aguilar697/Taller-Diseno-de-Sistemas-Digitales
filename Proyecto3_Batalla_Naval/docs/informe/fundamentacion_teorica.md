@@ -59,7 +59,7 @@ El instructivo del curso define la variante implementada: tablero de **8 × 8**,
 
 UART transmite sin compartir una señal de reloj entre los extremos. En 8N1, cada byte incluye un inicio bajo, ocho bits de datos enviados desde el menos significativo y una parada alta. Ambos extremos deben acordar la velocidad. La interfaz USB-UART de Basys 3 proporciona la conexión serial con PC; sus señales hacia el FPGA se describen en el [manual de la tarjeta](https://digilent.com/reference/_media/reference/programmable-logic/basys-3/basys3_rm.pdf).
 
-Con 100 MHz y un divisor de 868 ciclos, el bit dura 8,68 µs: aproximadamente 115207 baud, un error de 0,0064 % respecto a 115200. La UART del Proyecto 2 se reutiliza como periférico de bytes. Encima de ella, el [protocolo del juego](../diseno/protocolo_uart_batalla_naval.md) agrega inicio `0xA5`, tipo, longitud y payload. UART no valida coordenadas ni turnos; esas reglas pertenecen al programa RISC-V. El registro RX mantiene un byte, sin FIFO: el servicio de software debe consumirlo antes de la siguiente recepción.
+Con 100 MHz y un divisor de 868 ciclos, el bit dura 8,68 µs: aproximadamente 115207 baud, un error de 0,0064 % respecto a 115200. La UART actual se implementa en SystemVerilog como periférico de bytes; no instancia el núcleo VHDL ni el protocolo de Ahorcado del Proyecto 2. Encima de ella, el [protocolo del juego](../diseno/protocolo_uart_batalla_naval.md) agrega inicio `0xA5`, tipo, longitud y payload. UART no valida coordenadas ni turnos; esas reglas pertenecen al programa RISC-V. El registro RX mantiene un byte, sin FIFO: el servicio de software debe consumirlo antes de la siguiente recepción.
 
 ## 9. Aplicación PC y pySerial
 

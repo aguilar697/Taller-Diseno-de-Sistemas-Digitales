@@ -84,7 +84,7 @@ La implementación de `basys3_top` ocupa 1812 LUT, 1692 flip-flops y cuatro bloq
 |---|---|
 | Kevin Aguilar | CPU RISC-V y ROM |
 | Kenneth Campos | VGA y entradas del Jugador 1 |
-| Daniel Puentes | Bus, RAM, UART, indicadores y terminal de PC |
+| Daniel Puentes | Plataforma de datos, comunicación y periféricos MMIO; terminal de PC |
 | Kevin Cortés | Programa del juego en ensamblador |
 
 [Repositorio del curso](../README.md)

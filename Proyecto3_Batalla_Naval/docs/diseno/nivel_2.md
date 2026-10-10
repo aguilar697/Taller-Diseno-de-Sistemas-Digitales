@@ -28,6 +28,24 @@ El programa no constituye un periférico ni una FSM adicional en RTL. Su ejecuci
 
 ## Interfaces principales
 
+### Plataforma de datos, comunicación y periféricos MMIO
+
+La plataforma recibe los accesos de datos del CPU y conecta la RAM, UART e indicadores mediante `mmio_subsystem_top`. También entrega las interfaces de acceso a VGA y entradas J1, sin duplicar sus módulos. La aplicación de PC es el extremo remoto de la comunicación UART, no un módulo dentro de la FPGA.
+
+| Bloque general | Objetivo y función | Entradas principales | Salidas principales |
+|---|---|---|---|
+| Interconexión de datos | Seleccionar un destino para cada acceso del CPU | Dirección absoluta, dato de escritura y `we_o` | Direcciones locales, habilitaciones individuales y dato leído al CPU |
+| Memoria de datos | Conservar tableros, estado, buffers y pila en 4 KiB | Índice de palabra, dato y habilitación de escritura | Palabra leída de 32 bits |
+| Comunicación UART | Intercambiar bytes con J2 a 115200 baud, 8N1 | Accesos de registros y línea RX | Datos/estado registrados y línea TX |
+| Visualización del marcador | Mostrar victorias de J1 y J2 en cuatro dígitos | Dos valores binarios escritos por software | Segmentos y habilitaciones de dígitos |
+| Señalización | Mostrar fase y reproducir avisos sonoros | Estado de fase y comando de sonido | LED y buzzer con duración automática |
+| Interfaces VGA/entradas | Permitir al CPU consultar controles y actualizar video | Acceso del CPU y respuestas de los bloques externos | Solicitudes de lectura/escritura hacia VGA y entradas J1 |
+| Terminal de PC | Presentar la interfaz remota y enviar solicitudes | Datos del usuario y notificaciones UART | Tramas de colocación/disparo y tableros visibles de J2 |
+
+Los [bloques funcionales](nivel_3_uart.md) y su [implementación](nivel_4_uart.md) desarrollan estas funciones. El programa RISC-V mantiene la autoridad sobre las reglas, el turno y la victoria.
+
+### Contrato del bus
+
 | Conexión | Señales | Convención |
 |---|---|---|
 | CPU → ROM | ProgAddress_o[31:0] | Dirección de instrucción expresada en bytes |
@@ -41,7 +59,7 @@ El programa no constituye un periférico ni una FSM adicional en RTL. Su ejecuci
 
 `we_o=1` indica escritura y `we_o=0` lectura. La habilitación de cada destino combina la selección de dirección y la operación solicitada. Una escritura no afecta a otros periféricos. Los accesos `lw/sw` utilizan palabras alineadas a cuatro bytes.
 
-Las lecturas cumplen un contrato común: la dirección está estable antes del flanco N, el destino entrega el dato después de ese flanco y el CPU lo captura en N+1. El bus adapta las lecturas de registros sin agregar otro ciclo a las memorias que ya tienen respuesta registrada. La escritura ocurre una vez en el flanco habilitado. Las lecturas no borran datos ni reconocen eventos; esos efectos requieren una escritura explícita.
+Las lecturas cumplen un contrato común: la dirección está estable antes del flanco N, el destino registra el dato en N y el CPU lo captura en N+1. El bus registra en N el destino de lectura y selecciona su respuesta después de ese flanco, sin agregar otro ciclo a los datos. La escritura ocurre una vez en el flanco habilitado. Las lecturas no borran datos ni reconocen eventos; esos efectos requieren una escritura explícita.
 
 ## Mapa de memoria
 
@@ -82,7 +100,7 @@ La representación enviada a VGA y PC contiene el tablero propio y solo la infor
 |---|---|---|
 | Kevin Aguilar | CPU y ROM | src/design/cpu/ y src/design/memory/ |
 | Kenneth Campos | VGA, reloj de píxel y entradas J1 | src/design/vga/ y src/design/inputs/ |
-| Daniel Puentes | Bus, RAM, UART, indicadores y terminal PC | src/design/bus/, memory/, uart/, outputs/ y src/software_pc/ |
+| Daniel Puentes | Plataforma de datos, comunicación y periféricos MMIO | src/design/bus/, memory/, uart/, outputs/, integration/ y src/software_pc/ |
 | Kevin Cortés | Programa ensamblador | src/software_riscv/ |
 | Integración del equipo | Conexión del sistema y restricciones | src/design/top/ y src/constraints/ |
 

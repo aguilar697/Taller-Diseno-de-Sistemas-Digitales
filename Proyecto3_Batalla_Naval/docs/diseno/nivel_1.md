@@ -40,6 +40,8 @@ GAME_RST es una entrada del juego que atiende el programa. Se distingue del rese
 
 La PC muestra el tablero propio de J2 y el estado conocido del tablero rival. Ninguna interfaz revela la ubicación de barcos enemigos que todavía no se han descubierto mediante disparos.
 
+La Plataforma de datos, comunicación y periféricos MMIO proporciona la comunicación con la PC y las indicaciones de victorias, fase y sonido. El display muestra J1 a la izquierda y J2 a la derecha. El buzzer termina cada sonido automáticamente, incluida la secuencia de cuatro notas de victoria. Estas salidas representan las decisiones del programa; no calculan resultados del juego.
+
 ## Funcionamiento general
 
 Cada jugador dispone de un tablero de 8 × 8 casillas y tres barcos de longitudes 4, 3 y 2. Durante la colocación, ambos jugadores pueden avanzar de forma independiente. El programa comprueba orientación, límites y ausencia de traslapes antes de aceptar cada barco.
@@ -47,6 +49,8 @@ Cada jugador dispone de un tablero de 8 × 8 casillas y tres barcos de longitude
 Cuando ambos completan la flota, comienza la batalla. Los disparos nuevos válidos alternan el turno; los repetidos no lo consumen. El programa determina fallo, impacto o hundimiento y actualiza las interfaces local y remota. La partida termina cuando se hunden todos los barcos de un jugador. El resultado permanece visible hasta GAME_RST, que inicia otra colocación y conserva las victorias.
 
 Todas las reglas se ejecutan en ensamblador sobre el procesador de la FPGA. Los periféricos realizan operaciones de entrada/salida y la aplicación de PC valida formatos y presenta las respuestas.
+
+El intercambio UART usa tramas binarias de tipo y longitud definidos en el [protocolo de Batalla Naval](protocolo_uart_batalla_naval.md). No utiliza los mensajes ASCII del juego Ahorcado del Proyecto 2.
 
 ## Referencia
 

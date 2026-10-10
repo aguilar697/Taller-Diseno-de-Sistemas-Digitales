@@ -14,10 +14,12 @@ El diseño se organiza mediante descomposición modular: el primer nivel present
 |---|---|---|---|
 | 1. CPU RISC-V y ROM | Kevin Aguilar | [Arquitectura del núcleo](nivel_3_cpu.md) | [Datapath, ROM y control](nivel_4_cpu.md) |
 | 2. VGA y entradas J1 | Kenneth Campos | [Bloques e interfaces](nivel_3_vga_entradas.md) | [Video, memoria y entradas](nivel_4_vga_entradas.md) |
-| 3. Plataforma de datos, UART y PC | Daniel Puentes | [Bus, memorias y periféricos](nivel_3_uart.md) | [Bus, RAM, UART y salidas](nivel_4_uart.md) |
+| 3. Plataforma de datos, comunicación y periféricos MMIO | Daniel Puentes | [Bloques funcionales e interfaces](nivel_3_uart.md) | [Bus, RAM, UART e indicadores](nivel_4_uart.md) |
 | 4. Lógica del juego en ensamblador | Kevin Cortés | [Organización del software](nivel_3_logica_juego.md) | [Procedimientos internos](nivel_4_logica_juego.md) |
 
 ## Organización documental
+
+La plataforma MMIO incluye la decodificación de direcciones, el bus de datos, la RAM, los registros UART, TX/RX, los displays, los LED y el buzzer. `mmio_subsystem_top` integra estos módulos; las entradas J1 y VGA conservan su implementación propia. La aplicación `naval_terminal.py` completa la comunicación del Jugador 2. El [protocolo UART vigente](protocolo_uart_batalla_naval.md) define las tramas que intercambian la terminal y el programa RISC-V.
 
 Los niveles generales se nombran `nivel_1.md` y `nivel_2.md`. Los documentos de subsistema utilizan `nivel_3_<subsistema>.md` y `nivel_4_<subsistema>.md`. Las imágenes se almacenan en `img/`, con nombres que identifican el nivel, el subsistema y, cuando corresponde, la vista representada.
 

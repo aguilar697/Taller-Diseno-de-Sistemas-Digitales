@@ -4,6 +4,8 @@
 
 La verificación comprueba de manera integrada la plataforma MMIO encargada de conectar la interfaz de datos del procesador con la RAM, la UART y los periféricos de salida. La prueba utiliza el módulo `mmio_subsystem_top` como envolvente estructural y lo estimula mediante señales equivalentes a las del CPU.
 
+El subsistema se denomina Plataforma de datos, comunicación y periféricos MMIO. Su alcance de diseño también incluye la terminal de PC; esta prueba independiente evalúa el hardware MMIO y no ejecuta la aplicación Python ni las reglas del juego.
+
 El alcance corresponde únicamente al subsistema MMIO. Las interfaces destinadas a entradas y VGA se modelan temporalmente desde el testbench, mientras que sus implementaciones RTL se verifican por separado.
 
 ## 2. Arquitectura verificada
@@ -98,6 +100,8 @@ Para cada código se verifica la salida física y el valor retornado mediante le
 
 Los comandos `1` a `5` se escriben individualmente y deben producir actividad en `buzzer_o`. Cada comando también se lee mediante MMIO. Finalmente, el comando `0` debe detener la señal y mantener el buzzer apagado.
 
+Esta captura corresponde a la comprobación de acceso MMIO y actividad del buzzer. El RTL actual añade duraciones automáticas y cuatro notas de victoria; sus períodos, apagado y secuencia se comprueban en `buzzer_peripheral_tb`, dentro de la [regresión integrada](integracion_verificacion.md). No se atribuye esa cobertura adicional a las 113 verificaciones de esta evidencia.
+
 ## 6. Verificación UART
 
 La UART trabaja con un reloj de 100 MHz, una velocidad de 115200 baud y formato 8N1.
@@ -124,6 +128,8 @@ La entrada serial recibe una trama válida con el byte `8'hA5`. La prueba compru
 - conservación de `rx_valid` después de leer `RX_DATA`;
 - limpieza W1C mediante una escritura de uno en `CONTROL[1]`;
 - retorno del registro de estado a `tx_ready=1` y `rx_valid=0`.
+
+El byte `0xA5` de esta prueba verifica la recepción eléctrica y el registro MMIO; aquí no se interpreta como SOF del protocolo de aplicación. El hardware conserva un único byte, sin FIFO ni indicador de overflow. El parser y los mensajes del juego se comprueban en las pruebas de software y partidas completas.
 
 ## 7. Verificación de reset
 
@@ -167,7 +173,7 @@ Las 113 verificaciones finalizaron correctamente en Vivado/XSim. El [registro de
 
 ## Referencias internas
 
-- [Diseño de tercer nivel de la plataforma de datos y UART](../diseno/nivel_3_uart.md).
-- [Diseño de cuarto nivel del bus, RAM, UART y salidas](../diseno/nivel_4_uart.md).
+- [Tercer nivel de la Plataforma de datos, comunicación y periféricos MMIO](../diseno/nivel_3_uart.md).
+- [Cuarto nivel: bus, RAM, UART e indicadores](../diseno/nivel_4_uart.md).
 - [Protocolo UART de Batalla Naval](../diseno/protocolo_uart_batalla_naval.md).
 - [Índice del informe técnico](README.md).

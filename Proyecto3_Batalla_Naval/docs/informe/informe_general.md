@@ -37,6 +37,12 @@ La [fundamentación teórica](fundamentacion_teorica.md) explica la arquitectura
 
 La organización separa el acceso de programa del bus de datos: ROM de 8 KiB desde cero y RAM de 4 KiB desde `0x2000`. El bus selecciona RAM o registros de periféricos por dirección absoluta. Las escrituras habilitan un destino; las lecturas conservan un contrato común de respuesta registrada. Los permisos y efectos se documentan en el [diseño de plataforma](../diseno/nivel_4_uart.md).
 
+La Plataforma de datos, comunicación y periféricos MMIO reúne `address_decoder`, `data_bus`, `data_ram`, UART TX/RX y su periférico, display/driver, LED y buzzer. `mmio_subsystem_top` los conecta y expone los accesos a VGA y entradas, que mantienen sus propios módulos. El bus registra el destino al mismo flanco que la respuesta de lectura; el CPU captura el dato en el siguiente. La RAM no se borra por reset: la inicialización del estado corresponde al programa.
+
+La terminal `naval_terminal.py` completa la comunicación de J2 mediante tramas binarias con SOF `0xA5`, tipo y longitud. TX_DATA inicia la transmisión al estar lista; STATUS[0] informa disponibilidad y STATUS[1] recepción pendiente, reconocida mediante W1C. RX almacena un único byte, sin FIFO ni indicador de overflow. Los mensajes completos y la cola TX residen en el programa RISC-V; la terminal no decide turnos ni resultados. El [contrato de protocolo](../diseno/protocolo_uart_batalla_naval.md) incluye GAME_OVER de siete bytes, PLACEMENT_START y ERROR.
+
+El display convierte dos marcadores binarios a decenas y unidades, con saturación visual a 99. Los LED representan la fase escrita por software. El buzzer genera tonos diferenciados de duración automática y cuatro notas de victoria durante 800 ms; se apaga sin bloquear al CPU. Estos detalles se desarrollan en los niveles [tercero](../diseno/nivel_3_uart.md) y [cuarto](../diseno/nivel_4_uart.md) de la plataforma.
+
 El reloj principal es 100 MHz. Clocking Wizard utiliza MMCM para obtener 25 MHz. La pantalla contiene 300 tiles; el puerto de escritura CPU y el de lectura gráfica operan en sus respectivos dominios. La lectura síncrona de VRAM se alinea con coordenadas y sincronismos. El reset de píxel se mantiene activo durante la pérdida de `locked` y se libera sincronizado.
 
 J1 utiliza pulsadores direccionales, SW0 para rotación, SW1 para confirmación y BTNC para nueva partida. Las entradas pasan por sincronización y filtro de 10 ms. SW15 bajo solicita reset general. Los LED de controles del top completo muestran pines físicos; el programa consulta el estado filtrado. La [guía de uso](../uso_basys3.md) detalla asignación, displays, sonidos y conexión de terminal.
@@ -58,6 +64,7 @@ La implementación utiliza el IP real y el XDC de Basys 3. El script comprueba a
 | Regresión RTL completa | 34 TB aprobados | [Resumen](resultados/integracion/20261008/resumen.json) |
 | CPU | 567 instrucciones, 11 programas, 29 operaciones; reset en diez estados | [Log](resultados/integracion/20261008/cpu_tb.txt), [análisis CPU/ROM](cpu_verificacion.md) |
 | TB general de tops | 32 comprobaciones aprobadas | [Log](resultados/integracion/20261008/all_top_modules_tb.txt) |
+| Subsistema MMIO independiente | 113 verificaciones, cero errores; `TODAS LAS PRUEBAS PASARON` | [Informe](mmio_verificacion.md), [captura](resultados/mmio/verificacion_mmio.png) |
 | Error deliberado del TB | Un error identificado y terminación `$fatal` en copia aislada | [Log negativo](resultados/integracion/20261008/error_forzado.txt) |
 | Partida J1 | 44 tramas, 139 palabras RAM y dos registros de salida comparados | [Tramas](resultados/integracion/20261008/tramas.txt), [RAM](resultados/integracion/20261008/estado_sistema.txt) |
 | Partida J2 | 50 tramas; igual alcance de RAM/salidas; reinicio conserva victoria J2 | [Resultado](resultados/integracion/20261008/j2_adicionales.json) |
