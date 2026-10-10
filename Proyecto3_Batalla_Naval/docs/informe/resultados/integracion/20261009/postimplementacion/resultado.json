@@ -1,0 +1,19 @@
+{
+  "resultado": "PASS",
+  "testbench": "basys3_postimplementacion_tb",
+  "comprobaciones": 52,
+  "process_corner": "slow",
+  "retardos": "max",
+  "proyecto": "C:\\Users\\kc020\\AppData\\Local\\Temp\\bn_vivado_3070m8ol\\build\\proyecto_vivado\\batalla_naval.xpr",
+  "trabajo": "C:\\Users\\kc020\\AppData\\Local\\Temp\\bn_postimpl_i5m5oa_4",
+  "alcance": [
+    "arranque",
+    "identificador de barco invalido",
+    "disparo en fase incorrecta"
+  ],
+  "sha256": {
+    "circuito.v": "8cd4df546b9169794b31b1f40c212186c567a756325b718579d57770ebcf3cd0",
+    "circuito.sdf": "ab4fe6c47b2faebdd241165d6a52efd95feff9de626daa1f9acb15f1328040a4",
+    "prueba.sv": "b5fd70c99f585cd7c1b0401e16587016aaf503e6958dd458cbc826be3af9cc79"
+  }
+}
