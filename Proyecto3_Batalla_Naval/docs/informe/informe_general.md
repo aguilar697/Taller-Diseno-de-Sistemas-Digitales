@@ -11,7 +11,7 @@
 
 Se desarrolló una plataforma FPGA que ejecuta Batalla Naval mediante un procesador RISC-V y un programa ensamblador almacenado en ROM. J1 utiliza controles locales y VGA; J2 utiliza una terminal PC conectada por UART. El hardware proporciona cálculo, memorias y periféricos; el software decide colocaciones, disparos, turnos, hundimientos y victoria.
 
-La verificación comprendió 34 testbenches RTL, 31 pruebas de la terminal y cinco del ensamblador, todos aprobados. Dos guiones comprobaron partidas completas con victoria de cada jugador mediante la comparación de mensajes, RAM y marcador. El banco general completó 32 comprobaciones y detectó un fallo deliberado en un ensayo separado. La implementación generó un bitstream sin infracciones DRC ni latches, con un margen de setup de 0,219 ns a 100 MHz. Este informe presenta los resultados funcionales y de implementación, junto con sus condiciones de prueba y limitaciones.
+La verificación comprendió 34 testbenches RTL, 31 pruebas de la terminal y cinco del ensamblador, todos aprobados. Dos guiones comprobaron partidas completas con victoria de cada jugador mediante la comparación de mensajes, RAM y marcador. El banco general completó 32 comprobaciones y detectó un fallo deliberado en un ensayo separado. La implementación generó un bitstream sin infracciones DRC ni latches, con un margen de setup de 0,219 ns a 100 MHz. La simulación post-implementación temporizada del netlist enrutado completó 52 comprobaciones sin violaciones de setup ni hold. Este informe presenta los resultados funcionales y de implementación, junto con sus condiciones de prueba y limitaciones.
 
 ## Objetivos y requisitos
 
@@ -71,6 +71,7 @@ La implementación utiliza el IP real y el XDC de Basys 3. El script comprueba a
 | Aplicación PC | 31 pruebas aprobadas | [Log](resultados/integracion/20261008/terminal_pruebas.txt) |
 | Ensamblador e imagen | Cinco pruebas; HEX coincide, 1739/2048 palabras | [Tests](resultados/integracion/20261008/ensamblador_pruebas.txt), [HEX](resultados/integracion/20261008/rom_verificada.txt) |
 | Implementación completa | Enrutado y bitstream generados; cero latches/infracciones DRC | [Utilización](resultados/implementacion/20261008/utilizacion.rpt), [DRC](resultados/implementacion/20261008/drc.rpt) |
+| Simulación post-implementación | Netlist enrutado con SDF de esquina lenta: arranque, colocación y disparo rechazados; 52 comprobaciones, sin violaciones temporales | [Resultado](resultados/integracion/20261009/postimplementacion/resultado.json), [log](resultados/integracion/20261009/postimplementacion/simulacion.txt) |
 
 El [informe integrado](integracion_verificacion.md) describe el alcance de cada ensayo y su reproducción. Los informes de [VGA/entradas](vga_entradas_verificacion.md) y [MMIO](mmio_verificacion.md) conservan las capturas y resultados específicos de sus subsistemas.
 
@@ -125,7 +126,7 @@ La experiencia de integración mostró que una prueba debe identificar tanto el 
 
 ## Alcance experimental y limitaciones
 
-Los resultados del sistema completo comprenden simulación RTL, síntesis, enrutado y análisis temporal estático. La simulación temporizada con SDF está preparada, pero no se completó. La [prueba física del sistema completo](integracion_verificacion.md#prueba-física-del-sistema-completo) documenta partidas en la Basys 3 contra la terminal de J2 mediante fotografías de la placa, del monitor y de la terminal; los sonidos del buzzer no se registran en ellas.
+Los resultados del sistema completo comprenden simulación RTL, síntesis, enrutado, análisis temporal estático y [simulación post-implementación temporizada](integracion_verificacion.md#simulación-post-implementación-temporizada). Esta última cubre el arranque y dos rechazos por UART, no una partida completa: simular 15,8 ms con retardos requirió cerca de cuatro horas. La [prueba física del sistema completo](integracion_verificacion.md#prueba-física-del-sistema-completo) documenta partidas en la Basys 3 contra la terminal de J2 mediante fotografías de la placa, del monitor y de la terminal; los sonidos del buzzer no se registran en ellas.
 
 La UART RX conserva un byte y carece de indicador de desbordamiento: una demora excesiva del software puede ocasionar pérdida de datos. La transmisión dispone de una cola finita. La VRAM permite acceso desde los dominios de CPU y píxel sin doble buffer; una actualización puede hacerse visible antes de completar el cuadro. Estas restricciones delimitan la carga de comunicación y actualización gráfica admitida por el diseño.
 

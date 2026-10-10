@@ -125,6 +125,29 @@ Se completaron síntesis, enrutado y generación de bitstream para `basys3_top`,
 
 La [identificación de implementación](resultados/implementacion/20261008/resultado.json) incluye los hashes del bitstream y de la ROM. El script de implementación regenera el bitstream en `build/vivado/`, excluido de Git. El [análisis temporal](informe_general.md#análisis-de-implementación-y-temporización) explica las excepciones de puertos y las advertencias metodológicas.
 
+## Simulación post-implementación temporizada
+
+Se simuló el netlist enrutado de `basys3_top` con los retardos SDF de esquina lenta (`slow`, retardos máximos), el MMCM y la ROM del diseño implementado. El script exporta el netlist `timesim` y el SDF desde `impl_1`, y compila contra ellos el banco `basys3_postimplementacion_tb`. El banco actúa únicamente sobre los puertos externos (SW15 y `RsRx`) y observa `RsTx` y los LED; no fuerza registros internos ni sustituye el reloj o la memoria de programa.
+
+La implementación utilizada se generó el 9 de octubre de 2026 y reproduce los resultados de la sección anterior: 1812 LUT, 1692 FF, cuatro RAMB36E1, cero latches, WNS=0,219 ns y WHS=0,122 ns.
+
+| Comprobación | Tramas UART comparadas | Resultado |
+|---|---|---|
+| Arranque: espera del programa (~13,2 ms), inicialización y anuncio de partida | `A5 86 02 00 00` (`PLACEMENT_START`, marcador 00–00) | Aprobada |
+| Fase indicada por los LED tras el arranque | LED11 activo | Aprobada |
+| `PLACE` con identificador 255 | `A5 80 03 FF 00 03` (`PLACE_RESULT` rechazado, motivo 3) | Aprobada |
+| Fase tras la colocación inválida | LED11 activo | Aprobada |
+| `SHOT` durante la colocación | `A5 87 02 11 02` (`ERROR`, disparo rechazado por fase incorrecta) | Aprobada |
+| Fase y punto decimal tras el disparo rechazado | LED11 activo, `dp` apagado | Aprobada |
+
+Cada byte recibido comprueba además sus bits de inicio y de parada. La ejecución completó **52 comprobaciones** y terminó con `PASS basys3_postimplementacion_tb`. El script rechaza el resultado si el registro contiene un error fatal o una violación temporal de setup o hold; no se registró ninguna. El [resultado](resultados/integracion/20261009/postimplementacion/resultado.json) conserva los hashes SHA-256 del netlist, del SDF y del banco; el [registro de simulación](resultados/integracion/20261009/postimplementacion/simulacion.txt), la [exportación](resultados/integracion/20261009/postimplementacion/exportacion.txt) y la [elaboración](resultados/integracion/20261009/postimplementacion/elaboracion.txt) documentan la ejecución.
+
+![Ondas de la simulación post-implementación](resultados/integracion/20261009/postimplementacion/ondas_postimpl.png)
+
+**Figura 18.** Ondas de la simulación post-implementación entre 13 ms y 15,8 ms. En `tx` se observan las tres respuestas de la FPGA: `PLACEMENT_START`, `PLACE_RESULT` y `ERROR`. En `rx`, las dos tramas del banco: `PLACE` con identificador inválido y `SHOT` durante la colocación. `sw=8000` indica SW15 activo y `led=8800` corresponde a LED15 (funcionamiento) y LED11 (colocación), que se mantienen hasta el final.
+
+El ensayo ejecuta sobre el circuito implementado el arranque del programa, el parser UART, la validación de una colocación y la validación de un disparo. Se simularon 15,8 ms en cerca de cuatro horas de cómputo; por ese costo, la partida completa se verifica en RTL y en la tarjeta, no con retardos.
+
 ## Reproducción
 
 Desde la raíz de `Proyecto3_Batalla_Naval`:
@@ -136,12 +159,13 @@ python -m unittest discover -s src/software_pc -v
 python scripts/verificar_sistema_completo.py --all
 python scripts/verificar_partida_j2.py
 python scripts/implementar_basys3.py
+python scripts/verificar_postimplementacion.py --project "<ruta del .xpr que imprime implementar_basys3.py>"
 ```
 
 Cada ejecución genera su propia carpeta en `build/`. Los logs conservan las rutas y horas del entorno donde se ejecutaron. La [guía de uso](../uso_basys3.md) permite crear solo el proyecto para continuar en la interfaz de Vivado y describe el procedimiento de simulación postimplementación.
 
 ## Alcance de los resultados
 
-Las pruebas de partidas y regresión son funcionales RTL. La implementación aporta, por separado, recursos y análisis temporal estático, y la prueba física muestra el sistema completo funcionando en la tarjeta. El [alcance experimental del informe general](informe_general.md#alcance-experimental-y-limitaciones) identifica la evidencia física disponible, el estado del ensayo SDF y las limitaciones de recepción UART y actualización gráfica.
+Las pruebas de partidas y regresión son funcionales RTL. La implementación aporta, por separado, recursos y análisis temporal estático; la simulación post-implementación ejecuta el arranque y dos validaciones sobre el netlist enrutado con retardos, y la prueba física muestra el sistema completo funcionando en la tarjeta. El [alcance experimental del informe general](informe_general.md#alcance-experimental-y-limitaciones) identifica la evidencia física disponible, el estado del ensayo SDF y las limitaciones de recepción UART y actualización gráfica.
 
 [Informe general](informe_general.md) · [Índice del informe](README.md)

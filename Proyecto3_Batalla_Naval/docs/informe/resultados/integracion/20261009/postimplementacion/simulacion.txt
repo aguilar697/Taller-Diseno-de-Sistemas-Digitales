@@ -1,0 +1,251 @@
+
+****** xsim v2026.1 (64-bit)
+  **** SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+  **** IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+  **** SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+  **** Start of session at: Fri Oct  9 19:12:34 2026
+    ** Copyright 1986-2022 Xilinx, Inc. All Rights Reserved.
+    ** Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+
+source xsim.dir/postimpl/xsim_script.tcl
+# xsim {postimpl} -autoloadwcfg -tclbatch {simular.tcl}
+Time resolution is 1 ps
+source simular.tcl
+## log_wave /basys3_postimplementacion_tb/clk /basys3_postimplementacion_tb/sw /basys3_postimplementacion_tb/rx /basys3_postimplementacion_tb/tx /basys3_postimplementacion_tb/led /basys3_postimplementacion_tb/hs /basys3_postimplementacion_tb/vs
+## for {set tramo 1} {$tramo <= 300} {incr tramo} {
+##     run 100 us
+##     puts "POSTIMPLEMENTACION: tramo $tramo de 100 us"
+##     flush stdout
+##     if {[get_value /basys3_postimplementacion_tb/prueba_terminada] eq "1"} {break}
+## }
+POSTIMPLEMENTACION: tramo 1 de 100 us
+POSTIMPLEMENTACION: tramo 2 de 100 us
+POSTIMPLEMENTACION: tramo 3 de 100 us
+POSTIMPLEMENTACION: tramo 4 de 100 us
+POSTIMPLEMENTACION: tramo 5 de 100 us
+POSTIMPLEMENTACION: tramo 6 de 100 us
+POSTIMPLEMENTACION: tramo 7 de 100 us
+POSTIMPLEMENTACION: tramo 8 de 100 us
+POSTIMPLEMENTACION: tramo 9 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 1000000000
+POSTIMPLEMENTACION: tramo 10 de 100 us
+POSTIMPLEMENTACION: tramo 11 de 100 us
+POSTIMPLEMENTACION: tramo 12 de 100 us
+POSTIMPLEMENTACION: tramo 13 de 100 us
+POSTIMPLEMENTACION: tramo 14 de 100 us
+POSTIMPLEMENTACION: tramo 15 de 100 us
+POSTIMPLEMENTACION: tramo 16 de 100 us
+POSTIMPLEMENTACION: tramo 17 de 100 us
+POSTIMPLEMENTACION: tramo 18 de 100 us
+POSTIMPLEMENTACION: tramo 19 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 2000000000
+POSTIMPLEMENTACION: tramo 20 de 100 us
+POSTIMPLEMENTACION: tramo 21 de 100 us
+POSTIMPLEMENTACION: tramo 22 de 100 us
+POSTIMPLEMENTACION: tramo 23 de 100 us
+POSTIMPLEMENTACION: tramo 24 de 100 us
+POSTIMPLEMENTACION: tramo 25 de 100 us
+POSTIMPLEMENTACION: tramo 26 de 100 us
+POSTIMPLEMENTACION: tramo 27 de 100 us
+POSTIMPLEMENTACION: tramo 28 de 100 us
+POSTIMPLEMENTACION: tramo 29 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 3000000000
+POSTIMPLEMENTACION: tramo 30 de 100 us
+POSTIMPLEMENTACION: tramo 31 de 100 us
+POSTIMPLEMENTACION: tramo 32 de 100 us
+POSTIMPLEMENTACION: tramo 33 de 100 us
+POSTIMPLEMENTACION: tramo 34 de 100 us
+POSTIMPLEMENTACION: tramo 35 de 100 us
+POSTIMPLEMENTACION: tramo 36 de 100 us
+POSTIMPLEMENTACION: tramo 37 de 100 us
+POSTIMPLEMENTACION: tramo 38 de 100 us
+POSTIMPLEMENTACION: tramo 39 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 4000000000
+POSTIMPLEMENTACION: tramo 40 de 100 us
+POSTIMPLEMENTACION: tramo 41 de 100 us
+POSTIMPLEMENTACION: tramo 42 de 100 us
+POSTIMPLEMENTACION: tramo 43 de 100 us
+POSTIMPLEMENTACION: tramo 44 de 100 us
+POSTIMPLEMENTACION: tramo 45 de 100 us
+POSTIMPLEMENTACION: tramo 46 de 100 us
+POSTIMPLEMENTACION: tramo 47 de 100 us
+POSTIMPLEMENTACION: tramo 48 de 100 us
+POSTIMPLEMENTACION: tramo 49 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 5000000000
+POSTIMPLEMENTACION: tramo 50 de 100 us
+POSTIMPLEMENTACION: tramo 51 de 100 us
+POSTIMPLEMENTACION: tramo 52 de 100 us
+POSTIMPLEMENTACION: tramo 53 de 100 us
+POSTIMPLEMENTACION: tramo 54 de 100 us
+POSTIMPLEMENTACION: tramo 55 de 100 us
+POSTIMPLEMENTACION: tramo 56 de 100 us
+POSTIMPLEMENTACION: tramo 57 de 100 us
+POSTIMPLEMENTACION: tramo 58 de 100 us
+POSTIMPLEMENTACION: tramo 59 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 6000000000
+POSTIMPLEMENTACION: tramo 60 de 100 us
+POSTIMPLEMENTACION: tramo 61 de 100 us
+POSTIMPLEMENTACION: tramo 62 de 100 us
+POSTIMPLEMENTACION: tramo 63 de 100 us
+POSTIMPLEMENTACION: tramo 64 de 100 us
+POSTIMPLEMENTACION: tramo 65 de 100 us
+POSTIMPLEMENTACION: tramo 66 de 100 us
+POSTIMPLEMENTACION: tramo 67 de 100 us
+POSTIMPLEMENTACION: tramo 68 de 100 us
+POSTIMPLEMENTACION: tramo 69 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 7000000000
+POSTIMPLEMENTACION: tramo 70 de 100 us
+POSTIMPLEMENTACION: tramo 71 de 100 us
+POSTIMPLEMENTACION: tramo 72 de 100 us
+POSTIMPLEMENTACION: tramo 73 de 100 us
+POSTIMPLEMENTACION: tramo 74 de 100 us
+POSTIMPLEMENTACION: tramo 75 de 100 us
+POSTIMPLEMENTACION: tramo 76 de 100 us
+POSTIMPLEMENTACION: tramo 77 de 100 us
+POSTIMPLEMENTACION: tramo 78 de 100 us
+POSTIMPLEMENTACION: tramo 79 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 8000000000
+POSTIMPLEMENTACION: tramo 80 de 100 us
+POSTIMPLEMENTACION: tramo 81 de 100 us
+POSTIMPLEMENTACION: tramo 82 de 100 us
+POSTIMPLEMENTACION: tramo 83 de 100 us
+POSTIMPLEMENTACION: tramo 84 de 100 us
+POSTIMPLEMENTACION: tramo 85 de 100 us
+POSTIMPLEMENTACION: tramo 86 de 100 us
+POSTIMPLEMENTACION: tramo 87 de 100 us
+POSTIMPLEMENTACION: tramo 88 de 100 us
+POSTIMPLEMENTACION: tramo 89 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 9000000000
+POSTIMPLEMENTACION: tramo 90 de 100 us
+POSTIMPLEMENTACION: tramo 91 de 100 us
+POSTIMPLEMENTACION: tramo 92 de 100 us
+POSTIMPLEMENTACION: tramo 93 de 100 us
+POSTIMPLEMENTACION: tramo 94 de 100 us
+POSTIMPLEMENTACION: tramo 95 de 100 us
+POSTIMPLEMENTACION: tramo 96 de 100 us
+POSTIMPLEMENTACION: tramo 97 de 100 us
+POSTIMPLEMENTACION: tramo 98 de 100 us
+POSTIMPLEMENTACION: tramo 99 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 10000000000
+POSTIMPLEMENTACION: tramo 100 de 100 us
+POSTIMPLEMENTACION: tramo 101 de 100 us
+POSTIMPLEMENTACION: tramo 102 de 100 us
+POSTIMPLEMENTACION: tramo 103 de 100 us
+POSTIMPLEMENTACION: tramo 104 de 100 us
+POSTIMPLEMENTACION: tramo 105 de 100 us
+POSTIMPLEMENTACION: tramo 106 de 100 us
+POSTIMPLEMENTACION: tramo 107 de 100 us
+POSTIMPLEMENTACION: tramo 108 de 100 us
+POSTIMPLEMENTACION: tramo 109 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 11000000000
+POSTIMPLEMENTACION: tramo 110 de 100 us
+POSTIMPLEMENTACION: tramo 111 de 100 us
+POSTIMPLEMENTACION: tramo 112 de 100 us
+POSTIMPLEMENTACION: tramo 113 de 100 us
+POSTIMPLEMENTACION: tramo 114 de 100 us
+POSTIMPLEMENTACION: tramo 115 de 100 us
+POSTIMPLEMENTACION: tramo 116 de 100 us
+POSTIMPLEMENTACION: tramo 117 de 100 us
+POSTIMPLEMENTACION: tramo 118 de 100 us
+POSTIMPLEMENTACION: tramo 119 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 12000000000
+POSTIMPLEMENTACION: tramo 120 de 100 us
+POSTIMPLEMENTACION: tramo 121 de 100 us
+POSTIMPLEMENTACION: tramo 122 de 100 us
+POSTIMPLEMENTACION: tramo 123 de 100 us
+POSTIMPLEMENTACION: tramo 124 de 100 us
+POSTIMPLEMENTACION: tramo 125 de 100 us
+POSTIMPLEMENTACION: tramo 126 de 100 us
+POSTIMPLEMENTACION: tramo 127 de 100 us
+POSTIMPLEMENTACION: tramo 128 de 100 us
+POSTIMPLEMENTACION: tramo 129 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 13000000000
+POSTIMPLEMENTACION: tramo 130 de 100 us
+POSTIMPLEMENTACION: tramo 131 de 100 us
+POSTIMPLEMENTACION: tramo 132 de 100 us
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 133 de 100 us
+OK: bit de parada UART
+OK: UART esperado=a5 observado=a5
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 134 de 100 us
+OK: bit de parada UART
+OK: UART esperado=86 observado=86
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 135 de 100 us
+OK: bit de parada UART
+OK: UART esperado=02 observado=02
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 136 de 100 us
+OK: bit de parada UART
+OK: UART esperado=00 observado=00
+POSTIMPLEMENTACION: tramo 137 de 100 us
+OK: bit de inicio UART
+OK: bit de parada UART
+OK: UART esperado=00 observado=00
+OK: fase de colocacion
+POSTIMPLEMENTACION: tramo 138 de 100 us
+POSTIMPLEMENTACION: tramo 139 de 100 us
+POSTIMPLEMENTACION: tiempo simulado 14000000000
+POSTIMPLEMENTACION: tramo 140 de 100 us
+POSTIMPLEMENTACION: tramo 141 de 100 us
+POSTIMPLEMENTACION: tramo 142 de 100 us
+POSTIMPLEMENTACION: tramo 143 de 100 us
+POSTIMPLEMENTACION: tramo 144 de 100 us
+OK: bit de inicio UART
+OK: bit de parada UART
+OK: UART esperado=a5 observado=a5
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 145 de 100 us
+OK: bit de parada UART
+OK: UART esperado=80 observado=80
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 146 de 100 us
+OK: bit de parada UART
+OK: UART esperado=03 observado=03
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 147 de 100 us
+OK: bit de parada UART
+OK: UART esperado=ff observado=ff
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 148 de 100 us
+OK: bit de parada UART
+OK: UART esperado=00 observado=00
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 149 de 100 us
+OK: bit de parada UART
+OK: UART esperado=03 observado=03
+OK: colocacion invalida conserva fase
+POSTIMPLEMENTACION: tiempo simulado 15000000000
+POSTIMPLEMENTACION: tramo 150 de 100 us
+POSTIMPLEMENTACION: tramo 151 de 100 us
+POSTIMPLEMENTACION: tramo 152 de 100 us
+POSTIMPLEMENTACION: tramo 153 de 100 us
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 154 de 100 us
+OK: bit de parada UART
+OK: UART esperado=a5 observado=a5
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 155 de 100 us
+OK: bit de parada UART
+OK: UART esperado=87 observado=87
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 156 de 100 us
+OK: bit de parada UART
+OK: UART esperado=02 observado=02
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 157 de 100 us
+OK: bit de parada UART
+OK: UART esperado=11 observado=11
+OK: bit de inicio UART
+POSTIMPLEMENTACION: tramo 158 de 100 us
+OK: bit de parada UART
+OK: UART esperado=02 observado=02
+OK: disparo rechazado conserva fase
+OK: punto decimal apagado
+PASS basys3_postimplementacion_tb: 52 comprobaciones
+$finish called at time : 15816110026 ps : File "C:/Users/kc020/AppData/Local/Temp/bn_postimpl_i5m5oa_4/prueba.sv" Line 107
+POSTIMPLEMENTACION: tramo 159 de 100 us
+## quit
+INFO: xsimkernel Simulation Memory Usage: 115088 KB (Peak: 115088 KB), Simulation CPU Usage: 13585249 ms
+INFO: [Common 17-206] Exiting xsim at Fri Oct  9 23:01:23 2026...
