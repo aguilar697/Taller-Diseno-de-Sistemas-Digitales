@@ -4,6 +4,8 @@ Repositorio de trabajo del curso **EL3313 Taller de Diseño Digital**, de la Esc
 
 El repositorio reúne los proyectos desarrollados durante el curso, incluyendo documentación de diseño, código RTL en SystemVerilog, testbenches, archivos de restricciones para FPGA e informes técnicos.
 
+El Proyecto 4 se desarrolla conjuntamente con **EL4201 Procesamiento Electrónico de Potencia**, integrando control digital sobre FPGA con un inversor monofásico.
+
 Los proyectos se desarrollan siguiendo una metodología de **diseño modular**, avanzando desde la arquitectura general del sistema hasta la implementación y verificación de los módulos individuales.
 
 ---
@@ -33,6 +35,7 @@ Los proyectos se desarrollan siguiendo una metodología de **diseño modular**, 
 | [Proyecto 1 — Whack-a-Mole](./Proyecto1_Whack-a-mole/) | Juego híbrido implementado mediante FPGA y lógica discreta, con comunicación serial UART entre ambos subsistemas. | Basys 3, SystemVerilog, UART, lógica 74xx | Finalizado |
 | [Proyecto 2 — Ahorcado](./Proyecto2_Ahorcado/) | Juego controlado por FPGA, terminal Python por UART e interfaz local LCD, displays y buzzer. | Basys 3, SystemVerilog, UART, Python, LCD | Integrado; alcance de verificación documentado |
 | [Proyecto 3 — Batalla Naval](./Proyecto3_Batalla_Naval/) | Juego de dos jugadores controlado por un procesador RISC-V en FPGA, con interfaz VGA y terminal PC por UART. | Basys 3, SystemVerilog, RISC-V, VGA, UART, Python | Integrado; resultados de simulación e implementación documentados |
+| [Proyecto 4 — Inversor monofásico](./Proyecto4_Inversor_Monofasico/) | Control de corriente de una carga RL mediante un regulador PR discreto sobre MicroBlaze V. | MicroBlaze V, AXI4-Lite, SystemVerilog, C, PLECS | Organización por subsistemas |
 
 Cada proyecto dispone de su propio `README.md`, donde se documentan su arquitectura, estructura interna, módulos implementados, procedimiento de uso y referencias hacia la documentación técnica.
 
@@ -47,20 +50,27 @@ Taller-Diseno-de-Sistemas-Digitales/
 ├── README.md
 ├── Proyecto1_Whack-a-mole/
 ├── Proyecto2_Ahorcado/
-└── Proyecto3_Batalla_Naval/
+├── Proyecto3_Batalla_Naval/
+│   ├── README.md
+│   ├── docs/
+│   │   ├── diseno/
+│   │   │   └── img/
+│   │   └── informe/
+│   │       └── resultados/
+│   ├── scripts/
+│   └── src/
+│       ├── design/
+│       ├── testbench/
+│       ├── constraints/
+│       ├── software_riscv/
+│       └── software_pc/
+└── Proyecto4_Inversor_Monofasico/
     ├── README.md
     ├── docs/
-    │   ├── diseno/
-    │   │   └── img/
-    │   └── informe/
-    │       └── resultados/
+    ├── src/
+    ├── software/
     ├── scripts/
-    └── src/
-        ├── design/
-        ├── testbench/
-        ├── constraints/
-        ├── software_riscv/
-        └── software_pc/
+    └── modelos/
 ```
 
 ---
@@ -96,6 +106,8 @@ Durante el desarrollo de los proyectos se utilizan principalmente:
 
 - **AMD/Xilinx Vivado** — síntesis, implementación, análisis temporal y simulación.
 - **SystemVerilog** — descripción RTL y desarrollo de testbenches.
+- **Vitis y C** — desarrollo del software embebido para MicroBlaze V en el Proyecto 4.
+- **PLECS** — modelado y simulación de potencia y control en el Proyecto 4.
 - **Digilent Basys 3** — tarjeta de desarrollo basada en FPGA **Xilinx Artix-7 XC7A35T**.
 - **Lógica discreta de la familia 74xx** — implementación de subsistemas digitales externos a la FPGA.
 - **GitHub** — control de versiones y desarrollo colaborativo.
@@ -174,6 +186,13 @@ Para el Proyecto 3:
 - [Informe general y conclusiones](./Proyecto3_Batalla_Naval/docs/informe/informe_general.md)
 - [Investigación previa](./Proyecto3_Batalla_Naval/docs/informe/fundamentacion_teorica.md)
 - [Estrategia de implementación y plan de pruebas](./Proyecto3_Batalla_Naval/docs/diseno/estrategia_implementacion_verificacion.md)
+
+Para el Proyecto 4:
+
+- [Descripción y organización del proyecto](./Proyecto4_Inversor_Monofasico/README.md)
+- [Diseño e interfaces del sistema](./Proyecto4_Inversor_Monofasico/docs/diseno/README.md)
+- [Documentación de resultados](./Proyecto4_Inversor_Monofasico/docs/informe/README.md)
+- [Verificación del hardware](./Proyecto4_Inversor_Monofasico/src/testbench/README.md)
 
 ## Curso
 

@@ -47,3 +47,13 @@ __pycache__/
 
 # Proyectos, bitstreams y resultados regenerables de Batalla Naval
 /Proyecto3_Batalla_Naval/build/
+
+# Productos generados del sistema MicroBlaze V y del software de control
+/Proyecto4_Inversor_Monofasico/build/
+/Proyecto4_Inversor_Monofasico/.metadata/
+/Proyecto4_Inversor_Monofasico/.Xil/
+/Proyecto4_Inversor_Monofasico/**/*.o
+/Proyecto4_Inversor_Monofasico/**/*.elf
+/Proyecto4_Inversor_Monofasico/**/*.map
+/Proyecto4_Inversor_Monofasico/**/*.xsa
+/Proyecto4_Inversor_Monofasico/**/compile_commands.json
