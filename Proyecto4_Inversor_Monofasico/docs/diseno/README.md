@@ -2,6 +2,11 @@
 
 El sistema integra una plataforma MicroBlaze V, un periférico PWM, adquisición de corriente y una aplicación de control PR. El diseño modular relaciona las interfaces digitales con la instrumentación y la etapa de potencia del inversor.
 
+## Diagramas generales
+
+- [Primer nivel: objetivo, entradas, salidas y entorno del sistema digital](nivel_1.md).
+- [Segundo nivel: bloques, interfaces y secuencia de control](nivel_2.md).
+
 ## Documentación por subsistema
 
 | Subsistema | Responsable | Contenido del diseño |

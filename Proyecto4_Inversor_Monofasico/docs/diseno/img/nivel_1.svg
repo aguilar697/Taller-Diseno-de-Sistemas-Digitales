@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1100" viewBox="0 0 1800 1100" role="img" aria-labelledby="title desc">
+<title id="title">Primer nivel: sistema digital de control de corriente</title>
+<desc id="desc">La FPGA recibe reloj, reset, botón y medición acondicionada. Genera órdenes PWM hacia la etapa de potencia, datos UART y estado. La medición cierra el lazo desde la carga RL.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="1800" height="1100" fill="#FFFFFF"/>
+<text x="900" y="48" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" fill="#0F172A">CONTROL DE CORRIENTE DEL INVERSOR MONOFÁSICO</text>
+<text x="900" y="88" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">Primer nivel · Sistema digital y entorno físico</text>
+<rect x="630" y="190" width="500" height="690" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="880" y="355" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="bold" fill="#0F172A">SISTEMA DIGITAL EN FPGA</text>
+<text x="880" y="415" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#0F172A">MicroBlaze V y aplicación de control</text>
+<text x="880" y="457" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#0F172A">Adquisición y actuación</text>
+<text x="880" y="499" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#0F172A">Registro y comunicación</text>
+<text x="880" y="610" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#334155">Referencia sinusoidal: 50 Hz</text>
+<text x="880" y="642" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#334155">Amplitudes: 0,2 / 0,5 / 1,0 A pico</text>
+<text x="880" y="795" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#334155">Control de corriente en lazo cerrado</text>
+<ellipse cx="250" cy="275" rx="185" ry="48" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="250" y="275" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Reloj de la tarjeta</text>
+<polyline points="435,275 630,275" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="532" y="253" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">clk_i</text>
+<ellipse cx="250" cy="415" rx="185" ry="48" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="250" y="415" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Reset externo</text>
+<polyline points="435,415 630,415" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="532" y="393" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">reset_req</text>
+<ellipse cx="250" cy="555" rx="185" ry="48" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="250" y="555" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Botón de exportación</text>
+<polyline points="435,555 630,555" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="532" y="533" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">export_req</text>
+<ellipse cx="1565" cy="290" rx="175" ry="52" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1565" y="290" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">PC: registro y análisis</text>
+<polyline points="1130,290 1390,290" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1260" y="267" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">uart_tx</text>
+<ellipse cx="1565" cy="445" rx="175" ry="48" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1565" y="445" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Indicadores locales</text>
+<polyline points="1130,445 1390,445" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1260" y="422" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">led_status</text>
+<rect x="1400" y="600" width="330" height="140" rx="10" fill="#FFF7ED" stroke="#C2410C" stroke-width="2"/>
+<text x="1565" y="634" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Drivers y puente H</text>
+<text x="1565" y="675" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Carga RL</text>
+<text x="1565" y="704" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Alimentación DC: 12–24 V</text>
+<polyline points="1130,640 1400,640" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1265" y="617" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">PWM[3:0]</text>
+<rect x="1400" y="815" width="330" height="120" rx="10" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+<text x="1565" y="850" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#0F172A">Sensor de corriente</text>
+<text x="1565" y="883" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="normal" fill="#0F172A">y acondicionamiento</text>
+<polyline points="1565,740 1565,815" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1612" y="779" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">iL(t)</text>
+<polyline points="1565,935 1565,1000 520,1000 520,775 630,775" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1030" y="978" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">v_sense(t) · realimentación analógica acondicionada</text>
+<text x="900" y="1060" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#64748B">La frontera central corresponde a la FPGA; la etapa de potencia y la instrumentación forman el entorno.</text>
+</svg>

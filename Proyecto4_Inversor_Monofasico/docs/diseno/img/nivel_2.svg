@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1300" viewBox="0 0 1900 1300" role="img" aria-labelledby="title desc">
+<title id="title">Segundo nivel: arquitectura MicroBlaze V y periféricos</title>
+<desc id="desc">MicroBlaze V accede a memoria y periféricos AXI. El Timer interrumpe al procesador; el PWM dispara la adquisición ADC. La aplicación PR se ejecuta en C dentro del procesador.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="1900" height="1300" fill="#FFFFFF"/>
+<text x="950" y="44" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" fill="#0F172A">ARQUITECTURA DEL SISTEMA DE CONTROL</text>
+<text x="950" y="83" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">Segundo nivel · Plataforma, periféricos y ejecución del software</text>
+<rect x="20" y="125" width="1835" height="800" rx="10" fill="none" stroke="#94A3B8" stroke-width="2" stroke-dasharray="9 7"/>
+<text x="1805" y="150" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="bold" fill="#64748B">FPGA</text>
+<rect x="95" y="160" width="360" height="180" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="275" y="198" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Reloj y reset</text>
+<text x="275" y="248" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Sistema a 100 MHz</text>
+<text x="275" y="280" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Acondicionamiento y distribución</text>
+<polyline points="165,125 165,160" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="375,125 375,160" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="165" y="109" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">clk_i</text>
+<text x="375" y="109" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">reset_req</text>
+<rect x="690" y="160" width="530" height="200" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="955" y="195" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="bold" fill="#0F172A">MicroBlaze V</text>
+<text x="955" y="234" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">100 MHz · caché de instrucciones: 8 KB</text>
+<text x="955" y="278" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="normal" fill="#9A3412">C: PR y rutina periódica</text>
+<text x="955" y="309" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="normal" fill="#9A3412">Referencia, buffer y exportación</text>
+<polyline points="455,240 690,240" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" stroke-dasharray="6 5"/>
+<text x="571" y="216" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">clk / reset</text>
+<rect x="1370" y="160" width="355" height="200" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="1547" y="205" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Memoria local: 32 KB</text>
+<text x="1547" y="257" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Programa y datos</text>
+<text x="1547" y="290" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Estados PR e histórico</text>
+<polyline points="1220,240 1370,240" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1295" y="216" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Memoria</text>
+<rect x="120" y="485" width="1660" height="80" rx="10" fill="#F1F5F9" stroke="#64748B" stroke-width="2"/>
+<text x="950" y="525" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">INTERCONEXIÓN AXI4-Lite · acceso a registros de 32 bits</text>
+<polyline points="955,360 955,485" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1070" y="422" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">Accesos MMIO</text>
+<rect x="95" y="730" width="280" height="160" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="235" y="768" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">Temporizador</text>
+<text x="235" y="815" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Base de tiempo</text>
+<text x="235" y="844" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Interrupción periódica</text>
+<polyline points="235,565 235,730" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="247" y="594" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">AXI</text>
+<rect x="445" y="730" width="280" height="160" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="585" y="768" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">GPIO</text>
+<text x="585" y="815" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Botón e indicadores</text>
+<text x="585" y="844" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Registros de entrada/salida</text>
+<polyline points="585,565 585,730" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="597" y="594" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">AXI</text>
+<rect x="795" y="730" width="280" height="160" rx="10" fill="#EFF6FF" stroke="#2563EB" stroke-width="2"/>
+<text x="935" y="768" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">UART</text>
+<text x="935" y="815" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Exportación de muestras</text>
+<text x="935" y="844" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Estado de transmisión</text>
+<polyline points="935,565 935,730" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="947" y="594" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">AXI</text>
+<rect x="1145" y="730" width="280" height="160" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1285" y="768" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">PWM personalizado</text>
+<text x="1285" y="815" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Unipolar y tiempo muerto</text>
+<text x="1285" y="844" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Referencia y estado</text>
+<polyline points="1285,565 1285,730" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1297" y="594" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">AXI</text>
+<rect x="1495" y="730" width="330" height="160" rx="10" fill="#F0FDFA" stroke="#0D9488" stroke-width="2"/>
+<text x="1660" y="768" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">Adquisición ADC/XADC</text>
+<text x="1660" y="815" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Conversión sincronizada</text>
+<text x="1660" y="844" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Dato y disponibilidad</text>
+<polyline points="1660,565 1660,730" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1672" y="594" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">AXI</text>
+<polyline points="95,790 35,790 35,415 760,415 760,360" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="390" y="392" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">irq_timer · interrupción al procesador</text>
+<polyline points="1350,730 1350,650 1580,650 1580,730" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1465" y="626" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">pwm_trigger_o</text>
+<ellipse cx="465" cy="1080" rx="100" ry="50" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="465" y="1067" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Botón</text>
+<text x="465" y="1093" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">exportar</text>
+<ellipse cx="690" cy="1080" rx="90" ry="50" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="690" y="1067" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">LED de</text>
+<text x="690" y="1093" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">estado</text>
+<polyline points="465,1030 465,950 525,950 525,890" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="645,890 645,950 690,950 690,1030" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<ellipse cx="935" cy="1080" rx="105" ry="50" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="935" y="1067" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">PC</text>
+<text x="935" y="1093" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Registro y análisis</text>
+<polyline points="935,890 935,1030" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="990" y="970" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">uart_tx</text>
+<ellipse cx="1285" cy="1100" rx="155" ry="65" fill="#FFF7ED" stroke="#94A3B8" stroke-width="2"/>
+<text x="1285" y="1087" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Drivers y puente H</text>
+<text x="1285" y="1113" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Carga RL · 12–24 V DC</text>
+<polyline points="1285,890 1285,1035" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1335" y="970" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">PWM[3:0]</text>
+<ellipse cx="1660" cy="1100" rx="160" ry="65" fill="#F0FDFA" stroke="#94A3B8" stroke-width="2"/>
+<text x="1660" y="1087" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Sensor y</text>
+<text x="1660" y="1113" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">acondicionamiento</text>
+<polyline points="1660,1035 1660,890" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1720" y="970" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">v_sense(t)</text>
+<polyline points="1440,1100 1500,1100" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1470" y="1078" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">iL(t)</text>
+<text x="950" y="1200" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">Azul: plataforma · Violeta: PWM · Verde: adquisición · Texto naranja: aplicación en C</text>
+<text x="950" y="1236" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#64748B">Reloj y resets se distribuyen a los bloques secuenciales. Las flechas dobles agrupan solicitudes y respuestas.</text>
+<text x="950" y="1267" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#64748B">La plataforma incorpora depuración MDM; su conexión se desarrolla con el Block Design.</text>
+</svg>

@@ -18,6 +18,8 @@ Cada responsable documenta y verifica su subsistema. Las interfaces entre plataf
 ## Documentación
 
 - [Diseño e interfaces del sistema](docs/diseno/README.md).
+- [Primer nivel: sistema, entradas y salidas](docs/diseno/nivel_1.md).
+- [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
 - [Organización del informe y las evidencias](docs/informe/README.md).
 - [Módulos de hardware](src/design/README.md).
 - [Verificación por subsistema](src/testbench/README.md).
