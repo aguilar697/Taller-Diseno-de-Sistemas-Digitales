@@ -20,6 +20,8 @@ Cada responsable documenta y verifica su subsistema. Las interfaces entre plataf
 - [Diseño e interfaces del sistema](docs/diseno/README.md).
 - [Primer nivel: sistema, entradas y salidas](docs/diseno/nivel_1.md).
 - [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
+- [Tercer nivel del PWM: bloques e interfaz propuesta](docs/diseno/nivel_3_pwm.md).
+- [Cuarto nivel del PWM: circuitos y secuencias](docs/diseno/nivel_4_pwm.md).
 - [Organización del informe y las evidencias](docs/informe/README.md).
 - [Módulos de hardware](src/design/README.md).
 - [Verificación por subsistema](src/testbench/README.md).

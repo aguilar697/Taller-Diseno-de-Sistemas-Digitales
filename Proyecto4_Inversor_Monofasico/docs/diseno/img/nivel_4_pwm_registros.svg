@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1390" viewBox="0 0 2000 1390" role="img" aria-labelledby="title desc">
+<title id="title">Cuarto nivel PWM: AXI y registros</title>
+<desc id="desc">Capturas independientes AW/W, escritura única, respuestas B/R registradas y transferencia coherente de referencia pendiente al comienzo de período.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="2000" height="1390" fill="#FFFFFF"/>
+<text x="1000" y="45" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" fill="#0F172A">PWM · INTERFAZ AXI Y REGISTROS</text>
+<text x="1000" y="87" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">Cuarto nivel · Recepción, validación y actualización</text>
+<text x="80" y="140" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">A. Escritura</text>
+<rect x="80" y="190" width="280" height="120" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="220.0" y="224" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Captura AW</text>
+<text x="220.0" y="267" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Dirección y aw_full</text>
+<rect x="80" y="370" width="280" height="120" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="220.0" y="404" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Captura W</text>
+<text x="220.0" y="447" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Datos, WSTRB y w_full</text>
+<polyline points="20,250 80,250" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="25" y="226" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">AW</text>
+<polyline points="20,430 80,430" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="25" y="406" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">W</text>
+<rect x="540" y="280" width="330" height="150" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="705.0" y="314" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Escritura única</text>
+<text x="705.0" y="357" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">aw_full y w_full</text>
+<text x="705.0" y="385" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Sin respuesta B pendiente</text>
+<polyline points="360,250 440,250 440,325 540,325" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<polyline points="360,430 440,430 440,390 540,390" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="1060" y="280" width="330" height="150" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1225.0" y="314" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Decoder y validación</text>
+<text x="1225.0" y="357" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Offset, campos y WSTRB</text>
+<text x="1225.0" y="385" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Resultado del acceso</text>
+<polyline points="870,355 1060,355" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="965" y="330" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">wr_req</text>
+<rect x="1570" y="280" width="330" height="150" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1735.0" y="314" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Registro B</text>
+<text x="1735.0" y="357" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">BRESP y BVALID</text>
+<text x="1735.0" y="385" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Conservar hasta BREADY</text>
+<polyline points="1390,355 1570,355" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1480" y="330" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">OKAY / SLVERR</text>
+<polyline points="1900,355 1975,355" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1938" y="330" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">Canal B</text>
+<text x="1225" y="490" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">wr_req: actualización del banco de la vista C</text>
+<text x="80" y="590" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">B. Lectura</text>
+<rect x="80" y="650" width="280" height="130" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="220.0" y="684" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Aceptación AR</text>
+<text x="220.0" y="727" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">ARVALID y ARREADY</text>
+<text x="220.0" y="755" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Una respuesta pendiente</text>
+<rect x="540" y="650" width="330" height="130" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="705.0" y="684" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Selector de lectura</text>
+<text x="705.0" y="727" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">rd_req: valor del banco</text>
+<text x="705.0" y="755" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Contenido previo al flanco</text>
+<polyline points="360,715 540,715" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="450" y="690" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Dirección</text>
+<rect x="1060" y="650" width="330" height="130" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1225.0" y="684" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Registro R</text>
+<text x="1225.0" y="727" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">RDATA, RRESP y RVALID</text>
+<text x="1225.0" y="755" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Conservar hasta RREADY</text>
+<polyline points="870,715 1060,715" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="965" y="690" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Dato / respuesta</text>
+<ellipse cx="1730" cy="715" rx="160" ry="65" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1730" y="702" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">MicroBlaze V</text>
+<text x="1730" y="728" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Canal R</text>
+<polyline points="1390,715 1570,715" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1480" y="690" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Lectura</text>
+<text x="80" y="920" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="bold" fill="#0F172A">C. Configuración y referencia</text>
+<rect x="80" y="980" width="280" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="220.0" y="1014" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Configuración</text>
+<text x="220.0" y="1057" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Enable, frecuencia</text>
+<text x="220.0" y="1085" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Tiempo muerto y fase ADC</text>
+<rect x="540" y="980" width="330" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="705.0" y="1014" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Referencia pendiente</text>
+<text x="705.0" y="1057" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Saturación de m</text>
+<text x="705.0" y="1085" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Umbrales para N seleccionado</text>
+<polyline points="360,1065 540,1065" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="450" y="1040" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">N</text>
+<rect x="1060" y="980" width="330" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1225.0" y="1014" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Captura activa</text>
+<text x="1225.0" y="1057" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">m, hA y hB juntos</text>
+<text x="1225.0" y="1085" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Prioridad: pareja anterior</text>
+<polyline points="870,1065 1060,1065" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="965" y="1040" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">period_start</text>
+<ellipse cx="1730" cy="1065" rx="160" ry="65" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="1730" y="1052" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Generación PWM</text>
+<text x="1730" y="1078" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">y control de salidas</text>
+<polyline points="1390,1065 1570,1065" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1480" y="1040" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Pareja activa</text>
+<polyline points="220,1150 220,1240 1730,1240 1730,1130" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1000" y="1210" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">Apagado / reset: desactivación prioritaria</text>
+<text x="1000" y="1335" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#64748B">Las etiquetas wr_req y rd_req relacionan las vistas. Reloj común de 100 MHz y reset activo bajo.</text>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="1260" viewBox="0 0 1800 1260" role="img" aria-labelledby="title desc">
+<title id="title">Cuarto nivel PWM: estados de tiempo muerto por rama</title>
+<desc id="desc">Cada rama tiene APAGADO, SINCRONIZAR, ESPERA, SUPERIOR e INFERIOR. Se inicia sobre un borde real y se mantiene una separación D antes de activar la orden complementaria.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="1800" height="1260" fill="#FFFFFF"/>
+<text x="900" y="45" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" fill="#0F172A">PWM · TIEMPO MUERTO POR RAMA</text>
+<text x="900" y="86" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">Cuarto nivel · Una máquina idéntica para cada rama del puente H</text>
+<ellipse cx="900" cy="200" rx="220" ry="70" fill="#F5F3FF" stroke="#94A3B8" stroke-width="2"/>
+<text x="900" y="173" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">APAGADO</text>
+<text x="900" y="210" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Salidas: 00</text>
+<ellipse cx="900" cy="400" rx="260" ry="75" fill="#F5F3FF" stroke="#94A3B8" stroke-width="2"/>
+<text x="900" y="373" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">SINCRONIZAR</text>
+<text x="900" y="410" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Salidas: 00</text>
+<text x="900" y="436" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Esperar primer cambio ideal</text>
+<polyline points="900,270 900,325" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1040" y="295" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">Enable y configuración válida</text>
+<ellipse cx="900" cy="700" rx="260" ry="100" fill="#F5F3FF" stroke="#94A3B8" stroke-width="2"/>
+<text x="900" y="673" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">ESPERA</text>
+<text x="900" y="710" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Salidas: 00 · contador restante</text>
+<text x="900" y="736" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Objetivo nuevo: reiniciar D−1</text>
+<text x="900" y="762" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Mismo objetivo: contar hasta cero</text>
+<polyline points="900,475 900,600" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1040" y="539" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">Primer borde; cargar D−1</text>
+<ellipse cx="400" cy="1030" rx="200" ry="80" fill="#F5F3FF" stroke="#94A3B8" stroke-width="2"/>
+<text x="400" y="1003" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">SUPERIOR</text>
+<text x="400" y="1040" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Salidas: 10</text>
+<ellipse cx="1400" cy="1030" rx="200" ry="80" fill="#F5F3FF" stroke="#94A3B8" stroke-width="2"/>
+<text x="1400" y="1003" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">INFERIOR</text>
+<text x="1400" y="1040" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Salidas: 01</text>
+<polyline points="800,792 800,870 400,870 400,950" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="600" y="840" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Contador=0 y objetivo superior</text>
+<polyline points="1000,792 1000,870 1400,870 1400,950" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1200" y="840" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Contador=0 y objetivo inferior</text>
+<polyline points="200,1030 90,1030 90,700 640,700" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="350" y="645" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">Solicitar inferior: apagar</text>
+<text x="350" y="671" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">y cargar D−1</text>
+<polyline points="1600,1030 1710,1030 1710,700 1160,700" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1450" y="645" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">Solicitar superior: apagar</text>
+<text x="1450" y="671" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">y cargar D−1</text>
+<text x="900" y="1170" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">Reset o deshabilitación: APAGADO desde cualquier estado, salidas cero y contador limpio.</text>
+<text x="900" y="1205" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#64748B">Sin condición de salida, el estado se conserva. D≥1; apagar en k permite encender como pronto en k+D.</text>
+</svg>

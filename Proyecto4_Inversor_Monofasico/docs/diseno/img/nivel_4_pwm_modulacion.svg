@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2100" height="1410" viewBox="0 0 2100 1410" role="img" aria-labelledby="title desc">
+<title id="title">Cuarto nivel PWM: portadora, umbrales y disparo</title>
+<desc id="desc">La referencia saturada se cuantiza simétricamente. Un contador de fase genera la portadora y el evento ADC; dos comparadores alimentan las máquinas de tiempo muerto.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="2100" height="1410" fill="#FFFFFF"/>
+<text x="1050" y="45" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" fill="#0F172A">PWM · PORTADORA, UMBRALES Y DISPARO</text>
+<text x="1050" y="87" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">Cuarto nivel · Ruta de modulación y correspondencia temporal</text>
+<ellipse cx="180" cy="270" rx="150" ry="65" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="180" y="257" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Escritura</text>
+<text x="180" y="283" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">REFERENCE</text>
+<rect x="400" y="190" width="300" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="550.0" y="224" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Saturación con signo</text>
+<text x="550.0" y="267" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">m_sat entre −L y +L</text>
+<text x="550.0" y="295" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Extensión antes de operar</text>
+<polyline points="330,270 400,270" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="890" y="190" width="400" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1090.0" y="224" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Cuantización simétrica</text>
+<text x="1090.0" y="267" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Redondear |m_sat| · N / 65536</text>
+<text x="1090.0" y="295" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">r con signo; hA=N/2+r</text>
+<text x="1090.0" y="323" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">hB=N/2−r</text>
+<polyline points="700,270 890,270" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="795" y="245" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">m_sat</text>
+<rect x="1470" y="190" width="380" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1660.0" y="224" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Umbrales registrados</text>
+<text x="1660.0" y="267" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Pareja pendiente</text>
+<text x="1660.0" y="295" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Transferencia en period_start</text>
+<polyline points="1290,270 1470,270" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1380" y="245" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">hA / hB</text>
+<rect x="400" y="550" width="300" height="180" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="550.0" y="584" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Contador de fase</text>
+<text x="550.0" y="627" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">p: 0 a P−1</text>
+<text x="550.0" y="655" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">P=2N; retorno a cero</text>
+<text x="550" y="515" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">N / habilitación</text>
+<rect x="890" y="550" width="400" height="180" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1090.0" y="584" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Portadora entera</text>
+<text x="1090.0" y="627" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">c2=2p+1 si p&lt;N</text>
+<text x="1090.0" y="655" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">c2=2(P−p)−1 en otro caso</text>
+<polyline points="700,640 890,640" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="795" y="615" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">p</text>
+<rect x="1480" y="550" width="360" height="180" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1660.0" y="584" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Comparadores A/B</text>
+<text x="1660.0" y="627" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">raw_AH: c2 &lt; 2hA</text>
+<text x="1660.0" y="655" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">raw_BH: c2 &lt; 2hB</text>
+<text x="1660.0" y="683" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Inferiores: complementarias</text>
+<polyline points="1290,640 1480,640" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1385" y="615" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">c2</text>
+<polyline points="1660,360 1660,550" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1710" y="456" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">hA / hB activos</text>
+<rect x="950" y="990" width="280" height="150" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1090.0" y="1024" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Tiempo muerto A</text>
+<text x="1090.0" y="1067" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Estado y contador</text>
+<text x="1090.0" y="1095" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Salidas registradas</text>
+<rect x="1360" y="990" width="280" height="150" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1500.0" y="1024" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Tiempo muerto B</text>
+<text x="1500.0" y="1067" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Estado y contador</text>
+<text x="1500.0" y="1095" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Salidas registradas</text>
+<polyline points="1570,730 1570,850 1090,850 1090,990" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1320" y="823" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Orden ideal A</text>
+<polyline points="1750,730 1750,930 1500,930 1500,990" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1640" y="903" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Orden ideal B</text>
+<ellipse cx="1090" cy="1240" rx="140" ry="50" fill="#FFF7ED" stroke="#94A3B8" stroke-width="2"/>
+<text x="1090" y="1240" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">pwm_ah / pwm_al</text>
+<polyline points="1090,1140 1090,1190" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<ellipse cx="1500" cy="1240" rx="140" ry="50" fill="#FFF7ED" stroke="#94A3B8" stroke-width="2"/>
+<text x="1500" y="1240" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">pwm_bh / pwm_bl</text>
+<polyline points="1500,1140 1500,1190" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="400" y="990" width="300" height="150" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="550.0" y="1024" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">Disparo registrado</text>
+<text x="550.0" y="1067" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Comparar fase con phi</text>
+<text x="550.0" y="1095" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Un ciclo si está habilitado</text>
+<polyline points="550,730 550,990" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="600" y="855" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">p</text>
+<ellipse cx="170" cy="1065" rx="130" ry="55" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="170" y="1065" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">TRIGGER_PHASE</text>
+<polyline points="300,1065 400,1065" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<ellipse cx="550" cy="1240" rx="145" ry="50" fill="#F0FDFA" stroke="#94A3B8" stroke-width="2"/>
+<text x="550" y="1240" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">pwm_trigger_o</text>
+<polyline points="550,1140 550,1190" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1050" y="1350" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">Los cálculos del nuevo intervalo usan la fase y la pareja activa posteriores al flanco.</text>
+<text x="1050" y="1382" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#64748B">Tiempo muerto y habilitación llegan a ambas máquinas. El apagado prevalece sobre cualquier actualización.</text>
+</svg>
