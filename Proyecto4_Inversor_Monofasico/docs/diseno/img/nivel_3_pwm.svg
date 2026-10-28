@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2000" height="1240" viewBox="0 0 2000 1240" role="img" aria-labelledby="title desc">
+<title id="title">Tercer nivel: periférico PWM unipolar</title>
+<desc id="desc">El procesador accede a la interfaz AXI y al banco de configuración. Una base de tiempo alimenta al modulador y al disparo ADC. Las órdenes de ambas ramas pasan por inserción de tiempo muerto.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0,0 L10,4 L0,8 Z" fill="#475569"/></marker></defs>
+<rect width="2000" height="1240" fill="#FFFFFF"/>
+<text x="1000" y="46" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="bold" fill="#0F172A">PWM UNIPOLAR Y ACTUACIÓN</text>
+<text x="1000" y="86" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">Tercer nivel · Interfaz, configuración y generación de señales</text>
+<ellipse cx="180" cy="310" rx="165" ry="65" fill="#F8FAFC" stroke="#94A3B8" stroke-width="2"/>
+<text x="180" y="297" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">MicroBlaze V</text>
+<text x="180" y="323" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Maestro AXI4-Lite</text>
+<rect x="400" y="230" width="300" height="160" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="550" y="268" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Interfaz AXI4-Lite</text>
+<text x="550" y="315" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Accesos de 32 bits</text>
+<text x="550" y="345" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Direcciones, datos y respuestas</text>
+<polyline points="345,310 400,310" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="850" y="230" width="400" height="160" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1050" y="268" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Registros y configuración</text>
+<text x="1050" y="315" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Validación, estado y lectura</text>
+<text x="1050" y="345" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Referencia pendiente y activa</text>
+<polyline points="700,310 850,310" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="775" y="282" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">Accesos internos</text>
+<rect x="260" y="450" width="1440" height="65" rx="10" fill="#F8FAFC" stroke="#64748B" stroke-width="2"/>
+<text x="980" y="483" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="21" font-weight="bold" fill="#0F172A">DISTRIBUCIÓN DE CONFIGURACIÓN Y SINCRONIZACIÓN INTERNAS</text>
+<polyline points="1050,390 1050,450" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="400" y="620" width="300" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="550" y="661" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Base de tiempo</text>
+<text x="550" y="710" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Portadora triangular</text>
+<text x="550" y="740" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Fase y comienzo de período</text>
+<polyline points="550,515 550,620" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="580" y="567" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">Frecuencia /</text>
+<text x="580" y="590" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="normal" fill="#475569">comienzo de período</text>
+<rect x="850" y="620" width="400" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1050" y="661" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Modulador unipolar</text>
+<text x="1050" y="710" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Referencia activa y portadora</text>
+<text x="1050" y="740" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Órdenes ideales A/B</text>
+<polyline points="1050,515 1050,620" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1090" y="569" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">m_activa</text>
+<polyline points="700,705 850,705" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="775" y="679" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Portadora</text>
+<rect x="1400" y="620" width="300" height="170" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="1550" y="661" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Tiempo muerto</text>
+<text x="1550" y="710" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Separación por rama</text>
+<text x="1550" y="740" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Habilitación y apagado</text>
+<polyline points="1550,515 1550,620" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1590" y="569" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">DT / enable</text>
+<polyline points="1250,705 1400,705" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1325" y="679" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Órdenes A/B</text>
+<ellipse cx="1870" cy="705" rx="115" ry="70" fill="#FFF7ED" stroke="#94A3B8" stroke-width="2"/>
+<text x="1870" y="679" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Drivers</text>
+<text x="1870" y="705" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">pwm_ah / pwm_al</text>
+<text x="1870" y="731" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">pwm_bh / pwm_bl</text>
+<polyline points="1700,705 1755,705" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="400" y="970" width="300" height="160" rx="10" fill="#F5F3FF" stroke="#7C3AED" stroke-width="2"/>
+<text x="550" y="1008" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="bold" fill="#0F172A">Disparo ADC</text>
+<text x="550" y="1054" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Posición en el período</text>
+<text x="550" y="1084" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#0F172A">Pulso de un ciclo</text>
+<polyline points="550,790 550,970" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="595" y="870" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Fase /</text>
+<text x="595" y="895" text-anchor="start" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">comienzo de período</text>
+<polyline points="300,515 300,1050 400,1050" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="190" y="850" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">Fase ADC</text>
+<text x="190" y="877" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#475569">y enable</text>
+<ellipse cx="1850" cy="1050" rx="130" ry="65" fill="#F0FDFA" stroke="#94A3B8" stroke-width="2"/>
+<text x="1850" y="1037" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Interfaz ADC</text>
+<text x="1850" y="1063" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#0F172A">Evento de adquisición</text>
+<polyline points="700,1050 1720,1050" fill="none" stroke="#475569" stroke-width="2.3" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="1210" y="1025" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="normal" fill="#475569">pwm_trigger_o · un ciclo de reloj</text>
+<text x="1000" y="1182" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="17" font-weight="normal" fill="#475569">Reloj común: 100 MHz · Reset AXI activo bajo: s_axi_aresetn</text>
+<text x="1000" y="1215" text-anchor="middle" dominant-baseline="middle" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="normal" fill="#64748B">La banda agrupa señales internas; no representa otra interfaz AXI. Las flechas dobles agrupan solicitudes y respuestas.</text>
+</svg>

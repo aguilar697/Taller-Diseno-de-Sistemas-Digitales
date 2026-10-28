@@ -7,6 +7,11 @@ El sistema integra una plataforma MicroBlaze V, un periférico PWM, adquisición
 - [Primer nivel: objetivo, entradas, salidas y entorno del sistema digital](nivel_1.md).
 - [Segundo nivel: bloques, interfaces y secuencia de control](nivel_2.md).
 
+## Diseño del PWM
+
+- [Tercer nivel: bloques funcionales, interfaz y configuración](nivel_3_pwm.md).
+- [Cuarto nivel: registros, contadores, comparadores y tiempo muerto](nivel_4_pwm.md).
+
 ## Documentación por subsistema
 
 | Subsistema | Responsable | Contenido del diseño |
