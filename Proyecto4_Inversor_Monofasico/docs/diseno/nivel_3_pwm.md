@@ -70,9 +70,9 @@ La saturación limita el valor al intervalo operativo definido. Leer REFERENCE d
 
 La base de tiempo utiliza una portadora triangular común para ambas ramas. Para el modelo ideal, antes de cuantización y tiempo muerto, los ciclos de trabajo son:
 
-$$
+```math
 d_A = \frac{1+m}{2}, \qquad d_B = \frac{1-m}{2}.
-$$
+```
 
 La tensión media diferencial ideal resulta `v_AB = Vdc · (d_A − d_B) = Vdc · m`. Las órdenes inferiores son complementarias a las superiores antes de insertar el tiempo muerto. La discretización temporal y los retardos de conmutación se consideran al analizar la actuación real.
 

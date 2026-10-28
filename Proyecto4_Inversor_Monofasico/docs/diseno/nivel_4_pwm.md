@@ -79,12 +79,12 @@ En reposo, `p_q=0`. Al habilitar, se inicia el intervalo de fase cero. Cada flan
 
 Se compara utilizando una portadora triangular entera en puntos medios:
 
-$$
+```math
 c_2(p)=\begin{cases}
 2p+1, & 0\le p<N,\\
 2(P-p)-1, & N\le p<P.
 \end{cases}
-$$
+```
 
 La secuencia es `1, 3, …, 2N−1, 2N−1, …, 3, 1`, con exactamente 2N intervalos. Los dos valores consecutivos del máximo representan dos muestras alrededor del vértice; no añaden ciclos al período.
 
@@ -94,10 +94,10 @@ Primero se interpreta la referencia como un entero con signo y se satura a `[-L,
 
 Se define:
 
-$$
+```math
 a=\left\lfloor\frac{N\,|m_{sat}|+32768}{65536}\right\rfloor,
 \qquad r=\begin{cases}-a,&m_{sat}<0,\\a,&m_{sat}\ge0.\end{cases}
-$$
+```
 
 Luego, `h_A=N/2+r` y `h_B=N/2−r`. Los N de evaluación son pares. El redondeo al entero más cercano, con empates alejándose de cero, mantiene `h_A+h_B=N` y la simetría al cambiar el signo de la referencia.
 
@@ -115,10 +115,10 @@ La referencia equivalente cuantizada es `m_q=2r/N`; su diferencia respecto a la 
 
 Antes de habilitar, se exige frecuencia válida, `0 ≤ phi < P`, D≥1 y parámetros de integración válidos. Además se obtiene:
 
-$$
+```math
 h_{min}=N/2-\left\lfloor\frac{N\,L+32768}{65536}\right\rfloor,
 \qquad 2h_{min}\ge D+MIN\_ON\_CYCLES.
-$$
+```
 
 Esta condición mantiene los umbrales dentro del período y deja margen para el pulso activo después de retrasar su encendido. Se comprueba para la frecuencia seleccionada y todo el rango de referencia permitido. Los valores de D y phi pueden configurarse por separado en reposo; la coherencia conjunta se comprueba al habilitar.
 
