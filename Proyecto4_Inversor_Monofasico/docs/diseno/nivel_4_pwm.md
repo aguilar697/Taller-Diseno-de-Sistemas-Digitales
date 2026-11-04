@@ -77,14 +77,12 @@ Los anchos se derivan de los máximos configurables cuando se cambie la tabla de
 
 En reposo, `p_q=0`. Al habilitar, se inicia el intervalo de fase cero. Cada flanco activo avanza una posición; P−1 retorna a cero y produce el evento `period_start`.
 
-Se compara utilizando una portadora triangular entera en puntos medios:
+Se compara utilizando una portadora triangular entera en puntos medios, definida por los dos tramos siguientes:
 
-```math
-c_2(p)=\begin{cases}
-2p+1, & 0\le p<N,\\
-2(P-p)-1, & N\le p<P.
-\end{cases}
-```
+| Tramo | Condición de fase | Valor de `c_2(p)` |
+|---|---|---|
+| Ascendente | `0 ≤ p < N` | `2p + 1` |
+| Descendente | `N ≤ p < P` | `2(P − p) − 1` |
 
 La secuencia es `1, 3, …, 2N−1, 2N−1, …, 3, 1`, con exactamente 2N intervalos. Los dos valores consecutivos del máximo representan dos muestras alrededor del vértice; no añaden ciclos al período.
 
@@ -95,9 +93,15 @@ Primero se interpreta la referencia como un entero con signo y se satura a `[-L,
 Se define:
 
 ```math
-a=\left\lfloor\frac{N\,|m_{sat}|+32768}{65536}\right\rfloor,
-\qquad r=\begin{cases}-a,&m_{sat}<0,\\a,&m_{sat}\ge0.\end{cases}
+a=\left\lfloor\frac{N\,|m_{sat}|+32768}{65536}\right\rfloor
 ```
+
+El desplazamiento `r` recupera el signo de la referencia saturada:
+
+| Condición | Valor de `r` |
+|---|---|
+| `m_sat < 0` | `−a` |
+| `m_sat ≥ 0` | `a` |
 
 Luego, `h_A=N/2+r` y `h_B=N/2−r`. Los N de evaluación son pares. El redondeo al entero más cercano, con empates alejándose de cero, mantiene `h_A+h_B=N` y la simetría al cambiar el signo de la referencia.
 
