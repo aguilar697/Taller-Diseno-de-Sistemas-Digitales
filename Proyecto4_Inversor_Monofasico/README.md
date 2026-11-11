@@ -22,6 +22,7 @@ Cada responsable documenta y verifica su subsistema. Las interfaces entre plataf
 - [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
 - [Tercer nivel del PWM: bloques e interfaz propuesta](docs/diseno/nivel_3_pwm.md).
 - [Cuarto nivel del PWM: circuitos y secuencias](docs/diseno/nivel_4_pwm.md).
+- [Potencia: componentes, simulaciones y pendientes](Potencia/README.md).
 - [Organización del informe y las evidencias](docs/informe/README.md).
 - [Módulos de hardware](src/design/README.md).
 - [Verificación por subsistema](src/testbench/README.md).
@@ -34,6 +35,11 @@ Cada responsable documenta y verifica su subsistema. Las interfaces entre plataf
 ```text
 Proyecto4_Inversor_Monofasico/
 ├── README.md
+├── Potencia/
+│   ├── README.md
+│   ├── 01_diseno_y_componentes.md
+│   ├── 02_simulacion_y_resultados.md
+│   └── 03_pendientes_y_validacion.md
 ├── docs/
 │   ├── diseno/
 │   │   └── img/
@@ -63,6 +69,7 @@ Proyecto4_Inversor_Monofasico/
 │   ├── vitis/
 │   └── verificacion/
 └── modelos/
+    ├── analisis/
     └── plecs/
 ```
 

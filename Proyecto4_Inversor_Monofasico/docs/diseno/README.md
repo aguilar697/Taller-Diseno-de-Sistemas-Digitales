@@ -43,6 +43,8 @@ La dirección base de cada periférico se asigna en el Block Design; sus offsets
 
 ## Integración y validación
 
+La [documentación de potencia](../../Potencia/README.md) reúne los componentes disponibles, el diseño de la carga, las simulaciones iniciales y las decisiones pendientes de accionamiento y medición. Sus parámetros se coordinan con las interfaces digitales del sistema.
+
 La integración avanza desde la plataforma base y las pruebas individuales hasta el intercambio entre PWM, ADC y software. El modelo de potencia permite evaluar el controlador antes de su puesta en marcha experimental. El plan de cada subsistema incluye casos nominales, límites, reset y fallos identificables.
 
 Las interfaces compartidas se revisan con sus responsables antes de cambiar puertos, registros o parámetros. El [directorio de testbenches](../../src/testbench/README.md) describe los ámbitos de prueba y el [informe](../informe/README.md) organiza los resultados.
