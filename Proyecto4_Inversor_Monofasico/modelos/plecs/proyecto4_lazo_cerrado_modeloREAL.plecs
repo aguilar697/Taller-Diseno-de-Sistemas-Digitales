@@ -80,7 +80,7 @@ Plecs {
       Type          MosfetWithDiode
       Name          "FETD"
       Show          on
-      Position      [835, 410]
+      Position      [835, 345]
       Direction     up
       Flipped       off
       LabelPosition east
@@ -119,7 +119,7 @@ Plecs {
       Type          MosfetWithDiode
       Name          "FETD1"
       Show          on
-      Position      [835, 580]
+      Position      [835, 515]
       Direction     up
       Flipped       off
       LabelPosition east
@@ -158,7 +158,7 @@ Plecs {
       Type          MosfetWithDiode
       Name          "FETD2"
       Show          on
-      Position      [1140, 410]
+      Position      [1140, 345]
       Direction     up
       Flipped       off
       LabelPosition east
@@ -197,7 +197,7 @@ Plecs {
       Type          MosfetWithDiode
       Name          "FETD3"
       Show          on
-      Position      [1140, 580]
+      Position      [1140, 515]
       Direction     up
       Flipped       off
       LabelPosition east
@@ -236,7 +236,7 @@ Plecs {
       Type          Resistor
       Name          "R1"
       Show          on
-      Position      [1035, 495]
+      Position      [1035, 430]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -250,13 +250,13 @@ Plecs {
       Type          Inductor
       Name          "L1"
       Show          on
-      Position      [920, 495]
+      Position      [920, 430]
       Direction     left
       Flipped       off
       LabelPosition north
       Parameter {
         Variable      "L"
-        Value         "9.3e-3"
+        Value         "10e-3"
         Show          on
       }
       Parameter {
@@ -269,13 +269,13 @@ Plecs {
       Type          DCVoltageSource
       Name          "V_dc"
       Show          on
-      Position      [650, 495]
+      Position      [650, 430]
       Direction     down
       Flipped       on
       LabelPosition east
       Parameter {
         Variable      "V"
-        Value         "12"
+        Value         "24"
         Show          on
       }
     }
@@ -283,7 +283,7 @@ Plecs {
       Type          Resistor
       Name          "R2"
       Show          on
-      Position      [965, 495]
+      Position      [965, 430]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -297,7 +297,7 @@ Plecs {
       Type          Ammeter
       Name          "Am1"
       Show          on
-      Position      [870, 495]
+      Position      [870, 430]
       Direction     left
       Flipped       off
       LabelPosition south
@@ -306,7 +306,7 @@ Plecs {
       Type          Ground
       Name          "Ground"
       Show          off
-      Position      [650, 650]
+      Position      [650, 585]
       Direction     up
       Flipped       off
       LabelPosition east
@@ -315,7 +315,7 @@ Plecs {
       Type          Voltmeter
       Name          "Vm1"
       Show          on
-      Position      [965, 560]
+      Position      [965, 495]
       Direction     left
       Flipped       off
       LabelPosition south
@@ -324,7 +324,7 @@ Plecs {
       Type          Scope
       Name          "Scope"
       Show          on
-      Position      [1010, 315]
+      Position      [1010, 250]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -405,7 +405,7 @@ Plecs {
       Type          SineGenerator
       Name          "Sine Wave"
       Show          on
-      Position      [45, 490]
+      Position      [45, 425]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -439,7 +439,7 @@ Plecs {
       Type          Gain
       Name          "Gain"
       Show          on
-      Position      [200, 490]
+      Position      [200, 425]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -473,7 +473,7 @@ Plecs {
       Type          SignalMux
       Name          "Mux"
       Show          off
-      Position      [285, 485]
+      Position      [285, 420]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -489,7 +489,7 @@ Plecs {
       SrcComponent  "Components/Control/Modulators/Symmetrical PWM"
       Name          "Symmetrical PWM"
       Show          on
-      Position      [365, 485]
+      Position      [365, 420]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -534,7 +534,7 @@ Plecs {
       Type          SignalDemux
       Name          "Demux"
       Show          off
-      Position      [455, 485]
+      Position      [455, 420]
       Direction     right
       Flipped       on
       LabelPosition south
@@ -549,7 +549,7 @@ Plecs {
       Type          LogicalOperator
       Name          "Logical\nOperator"
       Show          on
-      Position      [550, 450]
+      Position      [550, 385]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -568,7 +568,7 @@ Plecs {
       Type          LogicalOperator
       Name          "Logical\nOperator1"
       Show          on
-      Position      [550, 515]
+      Position      [550, 450]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -587,7 +587,7 @@ Plecs {
       Type          SineGenerator
       Name          "i_ref"
       Show          on
-      Position      [115, 290]
+      Position      [115, 225]
       Direction     down
       Flipped       off
       LabelPosition west
@@ -621,7 +621,7 @@ Plecs {
       Type          Sum
       Name          "Sum"
       Show          off
-      Position      [185, 290]
+      Position      [185, 225]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -650,7 +650,7 @@ Plecs {
       Type          Gain
       Name          "Kp"
       Show          on
-      Position      [295, 215]
+      Position      [295, 150]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -684,7 +684,7 @@ Plecs {
       Type          TransferFunction
       Name          "Resonante"
       Show          on
-      Position      [295, 290]
+      Position      [295, 225]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -709,7 +709,7 @@ Plecs {
       Type          Sum
       Name          "Sum1"
       Show          off
-      Position      [395, 215]
+      Position      [395, 150]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -738,7 +738,7 @@ Plecs {
       Type          Gain
       Name          "Gain1"
       Show          on
-      Position      [460, 215]
+      Position      [460, 150]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -772,7 +772,7 @@ Plecs {
       Type          Saturation
       Name          "Saturation"
       Show          on
-      Position      [525, 215]
+      Position      [525, 150]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -791,7 +791,7 @@ Plecs {
       Type          Scope
       Name          "Scope1"
       Show          on
-      Position      [235, 370]
+      Position      [235, 305]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -894,7 +894,7 @@ Plecs {
       Type          Scope
       Name          "Scope2"
       Show          on
-      Position      [640, 215]
+      Position      [640, 150]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -953,7 +953,7 @@ Plecs {
       Type          VoltageSource
       Name          "V"
       Show          on
-      Position      [725, 495]
+      Position      [725, 430]
       Direction     down
       Flipped       on
       LabelPosition east
@@ -972,7 +972,7 @@ Plecs {
       Type          Step
       Name          "Step"
       Show          on
-      Position      [510, 740]
+      Position      [510, 675]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -1001,7 +1001,7 @@ Plecs {
       Type          Step
       Name          "Step1"
       Show          on
-      Position      [510, 795]
+      Position      [510, 730]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -1030,7 +1030,7 @@ Plecs {
       Type          Sum
       Name          "Sum2"
       Show          off
-      Position      [580, 740]
+      Position      [580, 675]
       Direction     up
       Flipped       off
       LabelPosition south
@@ -1059,7 +1059,7 @@ Plecs {
       Type          Resistor
       Name          "R3"
       Show          on
-      Position      [1095, 470]
+      Position      [1095, 405]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -1073,7 +1073,7 @@ Plecs {
       Type          Switch
       Name          "S1"
       Show          on
-      Position      [1095, 520]
+      Position      [1095, 455]
       Direction     right
       Flipped       off
       LabelPosition north
@@ -1097,7 +1097,7 @@ Plecs {
       Type          Step
       Name          "Step2"
       Show          on
-      Position      [985, 670]
+      Position      [985, 605]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -1126,20 +1126,21 @@ Plecs {
       Type          Wire
       SrcComponent  "FETD1"
       SrcTerminal   2
-      Points        [835, 625]
+      Points        [835, 560]
       Branch {
-        Points        [1140, 625]
+        Points        [1140, 560]
         DstComponent  "FETD3"
         DstTerminal   2
       }
       Branch {
-        Points        [650, 625]
+        Points        [725, 560]
         Branch {
+          Points        [650, 560]
           DstComponent  "Ground"
           DstTerminal   1
         }
         Branch {
-          DstComponent  "V_dc"
+          DstComponent  "V"
           DstTerminal   2
         }
       }
@@ -1169,29 +1170,29 @@ Plecs {
       Type          Wire
       SrcComponent  "FETD3"
       SrcTerminal   1
-      Points        [1140, 555]
+      Points        [1140, 490]
       Branch {
-        Points        [1140, 495]
+        Points        [1140, 430]
         Branch {
           DstComponent  "FETD2"
           DstTerminal   2
         }
         Branch {
-          Points        [1125, 495]
+          Points        [1125, 430]
           Branch {
-            Points        [1125, 470]
+            Points        [1125, 405]
             DstComponent  "R3"
             DstTerminal   1
           }
           Branch {
-            Points        [1125, 520]
+            Points        [1125, 455]
             DstComponent  "S1"
             DstTerminal   1
           }
         }
       }
       Branch {
-        Points        [1045, 555; 1045, 560]
+        Points        [1045, 490; 1045, 495]
         DstComponent  "Vm1"
         DstTerminal   2
       }
@@ -1200,15 +1201,15 @@ Plecs {
       Type          Wire
       SrcComponent  "FETD"
       SrcTerminal   2
-      Points        [835, 495]
+      Points        [835, 430]
       Branch {
-        Points        [835, 540]
+        Points        [835, 475]
         Branch {
           DstComponent  "FETD1"
           DstTerminal   1
         }
         Branch {
-          Points        [865, 540; 865, 560]
+          Points        [865, 475; 865, 495]
           DstComponent  "Vm1"
           DstTerminal   1
         }
@@ -1243,7 +1244,7 @@ Plecs {
       Type          Signal
       SrcComponent  "Vm1"
       SrcTerminal   3
-      Points        [965, 310]
+      Points        [965, 245]
       DstComponent  "Scope"
       DstTerminal   1
     }
@@ -1251,13 +1252,13 @@ Plecs {
       Type          Signal
       SrcComponent  "Demux"
       SrcTerminal   2
-      Points        [490, 480; 490, 450]
+      Points        [490, 415; 490, 385]
       Branch {
         DstComponent  "Logical\nOperator"
         DstTerminal   2
       }
       Branch {
-        Points        [490, 410]
+        Points        [490, 345]
         DstComponent  "FETD"
         DstTerminal   3
       }
@@ -1266,7 +1267,7 @@ Plecs {
       Type          Signal
       SrcComponent  "Logical\nOperator"
       SrcTerminal   1
-      Points        [780, 450; 780, 580]
+      Points        [780, 385; 780, 515]
       DstComponent  "FETD1"
       DstTerminal   3
     }
@@ -1274,7 +1275,7 @@ Plecs {
       Type          Signal
       SrcComponent  "Logical\nOperator1"
       SrcTerminal   1
-      Points        [625, 515; 625, 610; 985, 610; 985, 580]
+      Points        [625, 450; 625, 545; 985, 545; 985, 515]
       DstComponent  "FETD3"
       DstTerminal   3
     }
@@ -1282,13 +1283,13 @@ Plecs {
       Type          Signal
       SrcComponent  "Demux"
       SrcTerminal   3
-      Points        [490, 490; 490, 515]
+      Points        [490, 425; 490, 450]
       Branch {
         DstComponent  "Logical\nOperator1"
         DstTerminal   2
       }
       Branch {
-        Points        [490, 600; 955, 600; 955, 410]
+        Points        [490, 535; 955, 535; 955, 345]
         DstComponent  "FETD2"
         DstTerminal   3
       }
@@ -1297,20 +1298,20 @@ Plecs {
       Type          Signal
       SrcComponent  "Am1"
       SrcTerminal   3
-      Points        [870, 440; 945, 440; 945, 340]
+      Points        [870, 375; 945, 375; 945, 275]
       Branch {
-        Points        [945, 320]
+        Points        [945, 255]
         DstComponent  "Scope"
         DstTerminal   2
       }
       Branch {
-        Points        [185, 340]
+        Points        [185, 275]
         Branch {
           DstComponent  "Sum"
           DstTerminal   3
         }
         Branch {
-          Points        [185, 370]
+          Points        [185, 305]
           DstComponent  "Scope1"
           DstTerminal   2
         }
@@ -1320,9 +1321,9 @@ Plecs {
       Type          Signal
       SrcComponent  "Sum"
       SrcTerminal   1
-      Points        [225, 290]
+      Points        [225, 225]
       Branch {
-        Points        [225, 215]
+        Points        [225, 150]
         DstComponent  "Kp"
         DstTerminal   1
       }
@@ -1335,7 +1336,7 @@ Plecs {
       Type          Signal
       SrcComponent  "Resonante"
       SrcTerminal   2
-      Points        [395, 290]
+      Points        [395, 225]
       DstComponent  "Sum1"
       DstTerminal   3
     }
@@ -1364,24 +1365,24 @@ Plecs {
       Type          Signal
       SrcComponent  "Saturation"
       SrcTerminal   2
-      Points        [570, 215]
+      Points        [570, 150]
       Branch {
         DstComponent  "Scope2"
         DstTerminal   1
       }
       Branch {
-        Points        [570, 405; 205, 405]
+        Points        [570, 340; 205, 340]
         DstComponent  "Scope1"
         DstTerminal   3
       }
       Branch {
-        Points        [570, 150; 90, 150; 90, 490; 155, 490]
+        Points        [570, 85; 90, 85; 90, 425; 155, 425]
         Branch {
           DstComponent  "Gain"
           DstTerminal   1
         }
         Branch {
-          Points        [155, 450; 240, 450; 240, 480]
+          Points        [155, 385; 240, 385; 240, 415]
           DstComponent  "Mux"
           DstTerminal   2
         }
@@ -1398,7 +1399,7 @@ Plecs {
       Type          Signal
       SrcComponent  "Step1"
       SrcTerminal   1
-      Points        [580, 795]
+      Points        [580, 730]
       DstComponent  "Sum2"
       DstTerminal   3
     }
@@ -1406,7 +1407,7 @@ Plecs {
       Type          Signal
       SrcComponent  "Sum2"
       SrcTerminal   1
-      Points        [695, 740; 695, 495]
+      Points        [695, 675; 695, 430]
       DstComponent  "V"
       DstTerminal   3
     }
@@ -1414,7 +1415,7 @@ Plecs {
       Type          Signal
       SrcComponent  "Step2"
       SrcTerminal   1
-      Points        [1095, 670]
+      Points        [1095, 605]
       DstComponent  "S1"
       DstTerminal   3
     }
@@ -1422,14 +1423,14 @@ Plecs {
       Type          Signal
       SrcComponent  "i_ref"
       SrcTerminal   1
-      Points        [145, 310]
+      Points        [145, 245]
       Branch {
-        Points        [145, 290]
+        Points        [145, 225]
         DstComponent  "Sum"
         DstTerminal   2
       }
       Branch {
-        Points        [145, 360]
+        Points        [145, 295]
         DstComponent  "Scope1"
         DstTerminal   1
       }
@@ -1438,30 +1439,29 @@ Plecs {
       Type          Wire
       SrcComponent  "FETD"
       SrcTerminal   1
-      Points        [835, 365]
+      Points        [835, 300]
       Branch {
-        Points        [1140, 365]
+        Points        [1140, 300]
         DstComponent  "FETD2"
         DstTerminal   1
       }
       Branch {
-        Points        [650, 365]
-        DstComponent  "V_dc"
+        Points        [725, 300]
+        DstComponent  "V"
         DstTerminal   1
       }
     }
     Connection {
       Type          Wire
-      SrcComponent  "R1"
-      SrcTerminal   1
-      Points        [1065, 495]
+      SrcComponent  "R3"
+      SrcTerminal   2
+      Points        [1065, 405; 1065, 430]
       Branch {
-        Points        [1065, 470]
-        DstComponent  "R3"
-        DstTerminal   2
+        DstComponent  "R1"
+        DstTerminal   1
       }
       Branch {
-        Points        [1065, 520]
+        Points        [1065, 455]
         DstComponent  "S1"
         DstTerminal   2
       }
