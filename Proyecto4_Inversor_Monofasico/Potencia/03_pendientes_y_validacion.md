@@ -4,8 +4,8 @@
 
 | Orden | Actividad | Resultado necesario |
 |---|---|---|
-| 1 | Cerrar el accionamiento | Seleccionar IR2101 o alternativa, alimentación, bootstrap, resistencias de compuerta, desacoplo y tiempo muerto; dibujar el esquema |
-| 2 | Acondicionar el ACS712 | Definir rango de salida compatible con XADC, offset, ganancia, filtro y limitación de entrada; calibrar cero y sensibilidad |
+| 1 | Verificar el esquema de accionamiento IR2110 | Revisar el diagrama y la tabla de terminales en diseño y componentes; conseguir auxiliares, comprobar apagado, bootstrap, arranque y tiempo muerto; acordar SD automático y pines con plataforma |
+| 2 | Evaluar la adaptación del ACS712 | Probar el divisor de 4,7 kΩ/1 kΩ, calibrar y medir ruido y precisión a 0,2 A; confirmar canal XADC, alineación de dato y filtrado; añadir ganancia si los resultados lo requieren |
 | 3 | Completar la carga y la protección | Identificar devanado, comprobar resistencia y comportamiento con corriente; definir cambio de carga, límite de fuente, fusible y desconexión |
 | 4 | Preparar la simulación con los componentes comprados | Crear una copia de los modelos iniciales e incorporar los parámetros de los componentes, tiempo muerto, medición y control discreto; conservar los archivos originales y separar los ensayos de bus y carga |
 | 5 | Coordinar el lazo digital | Acordar frecuencia PWM, instante de adquisición, período de control, escalas, saturación y coeficientes PR con adquisición y software |

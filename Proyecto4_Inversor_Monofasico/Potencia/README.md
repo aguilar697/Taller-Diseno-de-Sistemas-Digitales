@@ -4,7 +4,7 @@ El inversor utiliza un puente H con PWM unipolar para regular una corriente sinu
 
 ## Estado del desarrollo
 
-Se realizaron simulaciones exploratorias del puente ideal en lazo abierto y con un PR continuo. Se dispone de cuatro IRF540N, un módulo ACS712 de 5 A, tres resistencias de 3,3 Ω y 5 W y un transformador cuyo secundario se propone como inductancia de carga. Falta cerrar los drivers, el acondicionamiento para XADC y el circuito de protección, y validar el montaje físico.
+Se realizaron simulaciones exploratorias del puente ideal en lazo abierto y con un PR continuo. Se dispone de cuatro IRF540N, dos IR2110 DIP-14, un módulo ACS712 de 5 A, tres resistencias de 3,3 Ω y 5 W y un transformador cuyo secundario se propone como inductancia de carga. Falta completar el circuito de accionamiento, comprobar el acondicionamiento para XADC, cerrar la protección y validar el montaje físico.
 
 | Documento | Contenido |
 |---|---|

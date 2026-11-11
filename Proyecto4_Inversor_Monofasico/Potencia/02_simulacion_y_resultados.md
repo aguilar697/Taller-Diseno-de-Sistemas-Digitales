@@ -15,6 +15,7 @@ La comparación cuantitativa final requiere repetir los casos con parámetros id
 | [proyecto4.plecs](../modelos/plecs/proyecto4.plecs) | Archivo inicial de trabajo; puente a 12 V, L = 4,7 mH, resistencia externa de 6,6 Ω y resistencia serie de 1 Ω |
 | [proyecto4_lazo_abierto.plecs](../modelos/plecs/proyecto4_lazo_abierto.plecs) | PWM unipolar a 10 kHz, referencia de modulación sinusoidal a 50 Hz y misma carga inicial |
 | [proyecto4_lazo_cerrado.plecs](../modelos/plecs/proyecto4_lazo_cerrado.plecs) | PR continuo, referencia de 0,5 A pico, L = 9,3 mH, devanado de 0,6 Ω y cambio de resistencia externa de 6,6 a 9,9 Ω |
+| [proyecto4_lazo_cerrado_modeloREAL.plecs](../modelos/plecs/proyecto4_lazo_cerrado_modeloREAL.plecs) | Copia de trabajo con bus de 24 V, L = 10 mH y devanado de 0,6 Ω; conserva MOSFET ideales con Ron = 0 y aún no incluye IR2110 ni ACS712 |
 
 Los archivos indican formato PLECS 5.0. El modelo de lazo cerrado tiene duración de 1 s, selección automática de solver, tolerancia relativa de 10⁻⁵ y paso máximo de 1 µs. La inductancia es constante y los interruptores se modelan con MOSFET y diodo ideales, con resistencia de conducción nula. No representan todavía el IRF540N, el transformador no lineal ni el ACS712 adquirido.
 
