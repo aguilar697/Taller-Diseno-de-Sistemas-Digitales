@@ -1,0 +1,28 @@
+{
+  "modelo": "Puente H ideal, PWM unipolar centrado y planta RL lineal",
+  "metodo": "Integración exponencial exacta por segmento de tensión constante",
+  "excitación": "Tensión requerida por una senoide; referencia retenida desde el inicio del período PWM",
+  "metrica": "Máximo por período PWM de pico-pico(i_conmutada - i_promediada)",
+  "frecuencia_referencia_hz": 50,
+  "ciclos_asentamiento": 5,
+  "ciclos_medida": 5,
+  "numero_casos": 144,
+  "caso_figura_ventana": {
+    "vdc": 24.0,
+    "inductancia": 0.0047,
+    "frecuencia_pwm": 10000.0,
+    "corriente_pico": 1.0,
+    "resistencia_externa": 6.8,
+    "resistencia_devanado": 1.0,
+    "frecuencia_referencia": 50.0
+  },
+  "exclusiones": [
+    "PR",
+    "cuantización digital",
+    "tiempo muerto",
+    "caídas de semiconductores",
+    "saturación magnética",
+    "sensor y ADC",
+    "tolerancias y ruido"
+  ]
+}

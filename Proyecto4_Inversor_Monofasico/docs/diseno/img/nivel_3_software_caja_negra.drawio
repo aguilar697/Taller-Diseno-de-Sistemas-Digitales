@@ -1,0 +1,67 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="n3cn" name="Software como caja negra">
+    <mxGraphModel dx="1030" dy="534" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1150" pageHeight="640" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="SW" parent="1" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#333333;strokeWidth=2;fontSize=13;" value="&lt;b style=&quot;font-size:17px&quot;&gt;Software de control PR y comunicación&lt;/b&gt;&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="380" width="420" x="390" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="P" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" value="Parámetros de configuración" vertex="1">
+          <mxGeometry height="60" width="200" x="500" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="T" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" value="Interrupción del Timer" vertex="1">
+          <mxGeometry height="60" width="180" x="40" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="A" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" value="Registros del ADC" vertex="1">
+          <mxGeometry height="60" width="180" x="40" y="245" as="geometry" />
+        </mxCell>
+        <mxCell id="W" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" value="Registros del PWM" vertex="1">
+          <mxGeometry height="60" width="180" x="40" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="G" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" value="GPIO: salida de medición" vertex="1">
+          <mxGeometry height="60" width="180" x="40" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="K" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" value="GPIO: botones e interruptores" vertex="1">
+          <mxGeometry height="60" width="190" x="1010" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="E" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" value="GPIO: LED" vertex="1">
+          <mxGeometry height="60" width="190" x="1010" y="290" as="geometry" />
+        </mxCell>
+        <mxCell id="U" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" value="UART TX" vertex="1">
+          <mxGeometry height="60" width="190" x="1010" y="410" as="geometry" />
+        </mxCell>
+        <mxCell id="APP" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;dashed=1;fontSize=12;" value="&lt;b&gt;Aplicación de PC&lt;/b&gt;&lt;br&gt;CSV, gráficas, error y desfase" vertex="1">
+          <mxGeometry height="60" width="190" x="1010" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="eP" edge="1" parent="1" source="P" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="SW" value="coeficientes, Vdc, I_max, escalas">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eT" edge="1" parent="1" source="T" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.5;entryX=0;entryY=0.1316;" target="SW" value="inicia una iteración">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eA" edge="1" parent="1" source="A" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.5;entryX=0;entryY=0.3816;" target="SW" value="código, n, estado">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eW" edge="1" parent="1" source="SW" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=0;exitY=0.6316;entryX=1;entryY=0.5;" target="W" value="REFERENCE, CONTROL&lt;br&gt;(lee running)">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eG" edge="1" parent="1" source="SW" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=0;exitY=0.8816;entryX=1;entryY=0.5;" target="G" value="pulso durante la ISR">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eK" edge="1" parent="1" source="K" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=0;exitY=0.5;entryX=1;entryY=0.1842;" target="SW" value="exportar, habilitar,&lt;br&gt;reconocer, amplitud">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eE" edge="1" parent="1" source="SW" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" target="E" value="operación, falla,&lt;br&gt;exportando, latido">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eU" edge="1" parent="1" source="SW" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.8158;entryX=0;entryY=0.5;" target="U" value="trama con CRC">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="eAPP" edge="1" parent="1" source="U" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" target="APP" value="puerto serie">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

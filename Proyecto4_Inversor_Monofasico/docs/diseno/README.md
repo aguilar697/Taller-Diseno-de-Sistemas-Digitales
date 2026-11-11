@@ -12,6 +12,11 @@ El sistema integra una plataforma MicroBlaze V, un periférico PWM, adquisición
 - [Tercer nivel: bloques funcionales, interfaz y configuración](nivel_3_pwm.md).
 - [Cuarto nivel: registros, contadores, comparadores y tiempo muerto](nivel_4_pwm.md).
 
+## Diseño de adquisición ADC/XADC
+
+- [Tercer nivel: arquitectura, interfaces y sincronización](nivel_3_adc.md).
+- [Cuarto nivel: conversión, registros, captura y diagnóstico](nivel_4_adc.md).
+
 ## Documentación por subsistema
 
 | Subsistema | Responsable | Contenido del diseño |
@@ -37,6 +42,8 @@ Cada documento describe el objetivo del bloque, sus entradas y salidas, su arqui
 La dirección base de cada periférico se asigna en el Block Design; sus offsets, permisos, valores de reset y efectos de lectura y escritura se documentan con el periférico. Las frecuencias PWM, el período de control, el tiempo muerto y los componentes se seleccionan mediante el análisis de potencia y temporización.
 
 ## Integración y validación
+
+La [documentación de potencia](../../Potencia/README.md) reúne los componentes disponibles, el diseño de la carga, las simulaciones iniciales y las decisiones pendientes de accionamiento y medición. Sus parámetros se coordinan con las interfaces digitales del sistema.
 
 La integración avanza desde la plataforma base y las pruebas individuales hasta el intercambio entre PWM, ADC y software. El modelo de potencia permite evaluar el controlador antes de su puesta en marcha experimental. El plan de cada subsistema incluye casos nominales, límites, reset y fallos identificables.
 

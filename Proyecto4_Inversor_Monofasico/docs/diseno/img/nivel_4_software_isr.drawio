@@ -1,0 +1,115 @@
+<mxfile host="drawio">
+  <diagram id="n4isr" name="Flujo de la ISR">
+    <mxGraphModel dx="900" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="900" pageHeight="1580" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="ini" value="Interrupción del Timer" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="200" y="20" width="200" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p1" value="Salida de medición = 1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="100" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p2" value="Aplicar solicitudes del lazo principal&lt;br&gt;(habilitar o apagar el PWM)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="180" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p3" value="Leer ADC: código, n y estado" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="260" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p4" value="Convertir a A y supervisar:&lt;br&gt;|i_med|, rango del código, Δn" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="340" width="300" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Decisiones, en el orden del flujo -->
+        <mxCell id="d1" value="¿Condición&lt;br&gt;de falla?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="190" y="420" width="220" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="d2" value="¿Estado =&lt;br&gt;OPERACIÓN?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="190" y="530" width="220" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="p5" value="Referencia: θ += Δθ en cada iteración&lt;br&gt;amplitud nueva si θ da la vuelta" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="640" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="d3" value="¿Muestra&lt;br&gt;nueva?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="190" y="720" width="220" height="80" as="geometry"/>
+        </mxCell>
+
+        <!-- Ramas laterales -->
+        <mxCell id="f1" value="CONTROL = 0&lt;br&gt;estado = FALLA, guardar causa" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="500" y="430" width="230" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="f3" value="Estados del PR en cero&lt;br&gt;sin referencia ni PR" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="500" y="540" width="230" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="f2" value="No ejecutar el PR&lt;br&gt;mantener REFERENCE" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="500" y="730" width="230" height="60" as="geometry"/>
+        </mxCell>
+
+        <!-- Cálculo del lazo, solo con muestra nueva -->
+        <mxCell id="p6" value="PR: r* y v_PR (sin actualizar estados)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="830" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p7" value="m = sat(v_PR / Vdc) → q en Q1.15" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="910" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p8" value="Escribir REFERENCE = q" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="990" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p9" value="Actualizar estados del PR&lt;br&gt;(integración condicional)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="1070" width="300" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Punto donde se reúnen todos los caminos -->
+        <mxCell id="p10" value="Registrar (1 de cada K_REG, si no está congelado)&lt;br&gt;fuera de OPERACIÓN: i_ref = m = 0&lt;br&gt;e iniciar conversión por software" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="1145" width="300" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="p11" value="Medir duración con el Timer&lt;br&gt;actualizar t_isr_max y supervisar" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="1250" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p12" value="Reconocer la interrupción" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="1330" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="p13" value="Salida de medición = 0" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="150" y="1410" width="300" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="fin" value="Retorno" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="200" y="1490" width="200" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Flujo principal -->
+        <mxCell id="a0" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="ini" target="p1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p1" target="p2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p2" target="p3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p3" target="p4"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a4" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p4" target="d1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a5" value="No" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="d1" target="d2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a6" value="Sí" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="d2" target="p5"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a7" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p5" target="d3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a8" value="Sí" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;" edge="1" parent="1" source="d3" target="p6"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a9" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p6" target="p7"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a10" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p7" target="p8"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a11" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p8" target="p9"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a12" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p9" target="p10"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a13" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p10" target="p11"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a14" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p11" target="p12"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a15" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p12" target="p13"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="a16" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;" edge="1" parent="1" source="p13" target="fin"><mxGeometry relative="1" as="geometry"/></mxCell>
+
+        <!-- Ramas -->
+        <mxCell id="b1" value="Sí" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;strokeColor=#b85450;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="d1" target="f1"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b2" value="No" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="d2" target="f3"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="b3" value="No" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;labelBackgroundColor=#ffffff;fontSize=11;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="d3" target="f2"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="c1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="1" source="f1" target="p10">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="790" y="460"/><mxPoint x="790" y="1185"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="c3" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="1" source="f3" target="p10">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="790" y="570"/><mxPoint x="790" y="1185"/></Array></mxGeometry>
+        </mxCell>
+        <mxCell id="c2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=block;endFill=1;exitX=1;exitY=0.5;entryX=1;entryY=0.5;" edge="1" parent="1" source="f2" target="p10">
+          <mxGeometry relative="1" as="geometry"><Array as="points"><mxPoint x="790" y="760"/><mxPoint x="790" y="1185"/></Array></mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
