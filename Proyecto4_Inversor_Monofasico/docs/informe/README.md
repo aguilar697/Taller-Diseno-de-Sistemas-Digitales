@@ -15,6 +15,11 @@ El informe técnico reúne la fundamentación, las decisiones de diseño, los re
 
 Cada responsable aporta el análisis y las evidencias de su subsistema. Los resultados de integración identifican las versiones de hardware, software y parámetros utilizados en el ensayo.
 
+## Análisis disponibles
+
+- [Simulación de potencia y control](../../Potencia/02_simulacion_y_resultados.md): modelos ideales de PLECS, configuración guardada y alcance de los ensayos exploratorios.
+- [Análisis numéricos](../../modelos/analisis/README.md): barrido inicial de 144 escenarios de rizado y comprobación lineal del PR. Los datos conservados corresponden a cálculos, no a mediciones físicas.
+
 ## Evidencias
 
 Las evidencias se conservan en `resultados/`, agrupadas por subsistema o ensayo. Cada registro identifica el montaje, los valores de R y L, la alimentación, las frecuencias, el período de control, las unidades y el método de medición que corresponda. Las figuras indican señales, escalas y condiciones de prueba.
