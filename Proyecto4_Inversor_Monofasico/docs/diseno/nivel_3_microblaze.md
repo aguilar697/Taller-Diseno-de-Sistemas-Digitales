@@ -4,7 +4,7 @@
 
 La plataforma proporciona los recursos de procesamiento, memoria y comunicación necesarios para ejecutar el control de corriente del inversor monofásico. MicroBlaze V ejecuta la aplicación en C, accede a los periféricos mediante AXI y atiende la interrupción periódica del temporizador. La generación PWM y la conversión de corriente se realizan en sus propios bloques de hardware.
 
-El subsistema de Daniel Puentes comprende la plataforma MicroBlaze V, memoria local, interconexión AXI, AXI Timer, reloj/reset, depuración y configuración de UART/GPIO. Su integración se desarrolla en Vivado y el entorno de ejecución en Vitis. El PWM pertenece al subsistema de actuación; el ADC/XADC, al de adquisición; el PR y su rutina de atención, al software de control. Aquí se describen sus conexiones, no sus implementaciones internas.
+El subsistema comprende la plataforma MicroBlaze V, memoria local, interconexión AXI, AXI Timer, reloj/reset, depuración y configuración de UART/GPIO. Su integración se desarrolla en Vivado y el entorno de ejecución en Vitis. El PWM pertenece al subsistema de actuación; el ADC/XADC, al de adquisición; el PR y su rutina de atención, al software de control. Aquí se describen sus conexiones, no sus implementaciones internas.
 
 Se conserva la arquitectura del [segundo nivel](nivel_2.md): procesador a 100 MHz, caché de instrucciones de 8 KB y memoria local de 32 KB. Son requisitos de configuración; todavía no existe un Block Design validado ni resultados de implementación de esta plataforma en el repositorio. Los nombres agrupados del diagrama no deben interpretarse como una lista definitiva de puertos de IP.
 
