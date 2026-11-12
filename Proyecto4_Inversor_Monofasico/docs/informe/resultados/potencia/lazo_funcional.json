@@ -1,0 +1,203 @@
+{
+  "motor": "PLECS Standalone 5.0",
+  "ts_s": 0.0001,
+  "pwm_hz": 10000,
+  "retardo_periodos": 1,
+  "ventana_fundamental_s": [
+    0.4,
+    0.5
+  ],
+  "paso_exportacion_s": 2e-06,
+  "modelos_sha256": {
+    "proyecto4_pr_discreto": "841ba199f2299bdb71e211c93b8d649b5efdf79a41d2be1cc58673b0c32b06ce",
+    "proyecto4_funcional": "f8aa710213130e34fd6141de57a47c2e270246d728e154fc58ed454e776ca3ae"
+  },
+  "casos": [
+    {
+      "modelo": "proyecto4_pr_discreto",
+      "ensayo": "carga_66_99",
+      "variables": {
+        "Iref": 0.5,
+        "T_cambio_R": 0.205
+      },
+      "fundamental_a_pico": 0.4767052029675229,
+      "fase_grados": -0.9210509161111499,
+      "error_amplitud_porcentaje": -4.658959406495422,
+      "pico_corriente_total_a": 0.48980436366620494,
+      "modulacion_max_abs": 0.43537871861038885
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "nominal_12V_0.2A",
+      "variables": {
+        "Vbus": 12,
+        "Iref": 0.2,
+        "Iref_final": 0.2
+      },
+      "fundamental_a_pico": 0.19127650054280354,
+      "fase_grados": -0.8813279409493291,
+      "error_amplitud_porcentaje": -4.36174972859823,
+      "pico_corriente_total_a": 0.19865078630269625,
+      "modulacion_max_abs": 0.15325087966833287,
+      "error_medicion_rms_a": 0.003777644863081092
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "nominal_12V_0.5A",
+      "variables": {
+        "Vbus": 12,
+        "Iref": 0.5,
+        "Iref_final": 0.5
+      },
+      "fundamental_a_pico": 0.48043939608996317,
+      "fase_grados": -0.8541945491040741,
+      "error_amplitud_porcentaje": -3.9121207820073667,
+      "pico_corriente_total_a": 0.4900135568009884,
+      "modulacion_max_abs": 0.34453653672316903,
+      "error_medicion_rms_a": 0.007759307417321817
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "nominal_12V_1.0A",
+      "variables": {
+        "Vbus": 12,
+        "Iref": 1.0,
+        "Iref_final": 1.0
+      },
+      "fundamental_a_pico": 0.9623099144891234,
+      "fase_grados": -0.8213979388918655,
+      "error_amplitud_porcentaje": -3.7690085510876603,
+      "pico_corriente_total_a": 0.9735703544646673,
+      "modulacion_max_abs": 0.6625423165593182,
+      "error_medicion_rms_a": 0.014602002502469338
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "nominal_24V_0.2A",
+      "variables": {
+        "Vbus": 24,
+        "Iref": 0.2,
+        "Iref_final": 0.2
+      },
+      "fundamental_a_pico": 0.19417335024893087,
+      "fase_grados": -0.47790744152008274,
+      "error_amplitud_porcentaje": -2.913324875534573,
+      "pico_corriente_total_a": 0.20158035428180512,
+      "modulacion_max_abs": 0.09066875014205189,
+      "error_medicion_rms_a": 0.0038887480696344723
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "nominal_24V_0.5A",
+      "variables": {
+        "Vbus": 24,
+        "Iref": 0.5,
+        "Iref_final": 0.5
+      },
+      "fundamental_a_pico": 0.48755148586816366,
+      "fase_grados": -0.3963301426899826,
+      "error_amplitud_porcentaje": -2.4897028263672683,
+      "pico_corriente_total_a": 0.49959292290946516,
+      "modulacion_max_abs": 0.187542018893656,
+      "error_medicion_rms_a": 0.008261774400075339
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "nominal_24V_1.0A",
+      "variables": {
+        "Vbus": 24,
+        "Iref": 1.0,
+        "Iref_final": 1.0
+      },
+      "fundamental_a_pico": 0.9771795427006964,
+      "fase_grados": -0.40323823071609155,
+      "error_amplitud_porcentaje": -2.28204572993036,
+      "pico_corriente_total_a": 0.9943055307567739,
+      "modulacion_max_abs": 0.3481573988073803,
+      "error_medicion_rms_a": 0.01541197616983394
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "referencia_02_05",
+      "variables": {
+        "Iref": 0.2,
+        "Iref_final": 0.5,
+        "T_cambio_ref": 0.205
+      },
+      "fundamental_a_pico": 0.480437253737076,
+      "fase_grados": -0.8533531189401843,
+      "error_amplitud_porcentaje": -3.912549252584796,
+      "pico_corriente_total_a": 0.490020598634972,
+      "modulacion_max_abs": 0.4488407048793815,
+      "error_medicion_rms_a": 0.007763284812364869
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "referencia_05_10",
+      "variables": {
+        "Iref": 0.5,
+        "Iref_final": 1.0,
+        "T_cambio_ref": 0.205
+      },
+      "fundamental_a_pico": 0.9622975373270422,
+      "fase_grados": -0.8229823282561151,
+      "error_amplitud_porcentaje": -3.770246267295785,
+      "pico_corriente_total_a": 0.973598754137021,
+      "modulacion_max_abs": 0.8362274967180146,
+      "error_medicion_rms_a": 0.014594755101070658
+    },
+    {
+      "modelo": "proyecto4_funcional",
+      "ensayo": "carga_66_99",
+      "variables": {
+        "Iref": 0.5,
+        "T_cambio_R": 0.205,
+        "Iref_final": 0.5
+      },
+      "fundamental_a_pico": 0.47190280138742197,
+      "fase_grados": -0.8760033919961657,
+      "error_amplitud_porcentaje": -5.619439722515606,
+      "pico_corriente_total_a": 0.4900135568009884,
+      "modulacion_max_abs": 0.4593121312765414,
+      "error_medicion_rms_a": 0.008130015429080378
+    }
+  ],
+  "hipotesis_funcional": {
+    "ron_ohm": 0.044,
+    "tiempo_muerto_s": 1e-06,
+    "sensor_sensibilidad_v_a": 0.185,
+    "sensor_offset_v": 2.5,
+    "sensor_polo_hz": 80000,
+    "divisor": [
+      4700,
+      1000
+    ],
+    "c_adc_evaluacion_f": 1e-08,
+    "adc_bits": 12,
+    "cero_calibrado": "Promedio ideal de 2,5 V/5,7; sin error ni deriva"
+  },
+  "exclusiones": [
+    "ruido medido",
+    "dispersión del sensor y fuente de 5 V",
+    "temperatura",
+    "bootstrap y VGS",
+    "parásitos",
+    "pérdidas de conmutación",
+    "caída directa y recuperación de diodos",
+    "saturación magnética",
+    "cuantización Q1.15 de la actuación",
+    "anti-windup"
+  ],
+  "ordenes": {
+    "ventana_s": [
+      0.1,
+      0.101
+    ],
+    "paso_s": 1e-07,
+    "muestras_con_solapamiento": 0,
+    "actividad_en_las_cuatro_ordenes": true,
+    "huecos_completos": 40,
+    "hueco_minimo_muestreado_s": 1e-06,
+    "alcance": "Órdenes lógicas, no tensiones VGS"
+  }
+}

@@ -15,6 +15,8 @@ La plataforma integra adquisición ADC/XADC, un periférico PWM unipolar persona
 
 Cada responsable documenta y verifica su subsistema. Las interfaces entre plataforma, PWM, adquisición y control se acuerdan antes de integrar modificaciones que afecten a otros bloques.
 
+La evaluación se organiza por curso. Taller de Diseño Digital comprende a los cuatro integrantes. En Procesamiento Electrónico de Potencia participan Kevin Aguilar, Kenneth Campos y Kevin Cortés. El diseño digital se conserva en `docs/diseno/` y el de potencia en `Potencia/`; los informes de cada curso se preparan por separado conforme al [índice de informes](docs/informe/README.md). Las evidencias de integración se comparten mediante referencias a los mismos archivos.
+
 ## Documentación
 
 - [Diseño e interfaces del sistema](docs/diseno/README.md).
