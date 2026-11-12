@@ -16,6 +16,7 @@ El sistema integra una plataforma MicroBlaze V, un periférico PWM, adquisición
 
 - [Tercer nivel: arquitectura, interfaces y sincronización](nivel_3_adc.md).
 - [Cuarto nivel: conversión, registros, captura y diagnóstico](nivel_4_adc.md).
+- [Implementación ADC/XADC: fuentes, protocolo ACK y reproducción de pruebas](adc/README.md).
 
 ## Documentación por subsistema
 
