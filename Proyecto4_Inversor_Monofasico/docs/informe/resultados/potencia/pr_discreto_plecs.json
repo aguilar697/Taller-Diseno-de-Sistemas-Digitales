@@ -1,0 +1,79 @@
+{
+  "modelo": "proyecto4_pr_discreto.plecs",
+  "sha256_modelo": "841ba199f2299bdb71e211c93b8d649b5efdf79a41d2be1cc58673b0c32b06ce",
+  "motor": "PLECS Standalone 5.0",
+  "ts_s": 0.0001,
+  "retardo_periodos": 1,
+  "r_total_ohm": 7.2,
+  "l_h": 0.01,
+  "normalizacion_v": 12,
+  "ventana_s": [
+    0.4,
+    0.5
+  ],
+  "paso_exportacion_s": 1e-06,
+  "metodo": "Proyección seno/coseno a 50 Hz sobre cinco períodos",
+  "exclusiones": [
+    "sensor y ADC",
+    "tiempo muerto y driver",
+    "pérdidas",
+    "saturación magnética",
+    "anti-windup"
+  ],
+  "casos": [
+    {
+      "bus_v": 12,
+      "referencia_a_pico": 0.2,
+      "fundamental_a_pico": 0.19354087287497726,
+      "fase_grados": -0.8990420727685586,
+      "corriente_max_abs_a": 0.1966109280406059,
+      "modulacion_max_abs": 0.12670075965595323,
+      "error_amplitud_porcentaje": -3.2295635625113728
+    },
+    {
+      "bus_v": 12,
+      "referencia_a_pico": 0.5,
+      "fundamental_a_pico": 0.48385026892372646,
+      "fase_grados": -0.8990388950019722,
+      "corriente_max_abs_a": 0.4898043636831568,
+      "modulacion_max_abs": 0.3167506481659439,
+      "error_amplitud_porcentaje": -3.2299462152547087
+    },
+    {
+      "bus_v": 12,
+      "referencia_a_pico": 1.0,
+      "fundamental_a_pico": 0.9676868776847651,
+      "fase_grados": -0.899028077649519,
+      "corriente_max_abs_a": 0.9746820218857567,
+      "modulacion_max_abs": 0.6334923615541916,
+      "error_amplitud_porcentaje": -3.2313122315234866
+    },
+    {
+      "bus_v": 24,
+      "referencia_a_pico": 0.2,
+      "fundamental_a_pico": 0.19672192792060952,
+      "fase_grados": -0.45158367395250787,
+      "corriente_max_abs_a": 0.20000388586048948,
+      "modulacion_max_abs": 0.06438811947925456,
+      "error_amplitud_porcentaje": -1.6390360396952408
+    },
+    {
+      "bus_v": 24,
+      "referencia_a_pico": 0.5,
+      "fundamental_a_pico": 0.49180431263570984,
+      "fase_grados": -0.4515838220384364,
+      "corriente_max_abs_a": 0.49929023225063945,
+      "modulacion_max_abs": 0.16097011932940325,
+      "error_amplitud_porcentaje": -1.6391374728580321
+    },
+    {
+      "bus_v": 24,
+      "referencia_a_pico": 1.0,
+      "fundamental_a_pico": 0.9836049891760186,
+      "fase_grados": -0.4515823179598309,
+      "corriente_max_abs_a": 0.9957087861950122,
+      "modulacion_max_abs": 0.32193895833940067,
+      "error_amplitud_porcentaje": -1.6395010823981426
+    }
+  ]
+}

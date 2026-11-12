@@ -1,0 +1,106 @@
+\documentclass[conference]{IEEEtran}
+\input{comun}
+\hypersetup{pdftitle={Diseño del inversor monofásico: documento de trabajo}}
+\begin{document}
+\title{Diseño de un inversor monofásico con control proporcional resonante de corriente}
+\autores\maketitle\estado
+\begin{abstract}
+Se propone un puente H para regular corriente sinusoidal de 50 Hz en una carga RL con alimentación de 12 a 24 V y referencias de 0,2, 0,5 y 1 A pico. Se documentan la topología, los componentes disponibles, el dimensionamiento, el modelo promediado, un candidato PR discreto y el plan de validación. Las simulaciones respaldan la evaluación inicial bajo hipótesis identificadas. El accionamiento, la medición y los parámetros finales deberán contrastarse experimentalmente.
+\end{abstract}
+\begin{IEEEkeywords}inversor monofásico, PWM unipolar, control PR, corriente.\end{IEEEkeywords}
+
+\section{Objetivos y alcance}
+El objetivo es diseñar y comprobar un lazo de corriente sinusoidal. El instructivo exige error de amplitud fundamental no mayor del 10\,\% y rizado de conmutación no mayor de 0,20 A pico a pico en los puntos nominales \cite{enunciado}. El desfase se mide y reporta, sin límite adicional. La ejecución sobre MicroBlaze V se coordina con Taller; la evaluación propia de Potencia requiere igualmente una demostración física con PR discreto.
+
+\section{Topología, carga y selección}
+El puente H utiliza cuatro MOSFET de canal N. En PWM unipolar, las ramas comparan referencias de signos opuestos con una portadora común y producen niveles diferenciales $+V_{dc}$, 0 y $-V_{dc}$. Se distinguen la frecuencia por transistor y las componentes predominantes en la tensión diferencial.
+
+\begin{table}[ht]\caption{Componentes principales disponibles}\centering\small
+\begin{tabular}{@{}cll@{}}\toprule
+Cant. & Elemento & Función\\\midrule
+4 & IRF540N & Interruptores\\
+2 & IR2110 DIP-14 & Accionamiento por rama\\
+1 & ACS712 de 5 A & Medición de corriente\\
+3 & $3,3\ \Omega$, 5 W & Carga resistiva\\
+1 & Secundario de transformador & Carga inductiva\\\bottomrule
+\end{tabular}\end{table}
+
+Dos resistencias forman $R_{\mathrm{ext}}=6,6\ \Omega$; la tercera permite llegar a $9,9\ \Omega$, un aumento del 50\,\%. La inserción debe conservar un camino para la corriente inductiva.
+
+Se midieron 9,291 mH a 120 Hz y 6,984 mH a 1 kHz en el secundario, con el primario abierto. La resistencia observada del devanado es aproximadamente $0,6\ \Omega$. El modelo usa 10 mH constantes como hipótesis; no es una medición a 50 Hz ni una extrapolación validada. El primario permanecerá abierto y con terminales aislados. La corriente nominal del transformador no demuestra linealidad como inductor.
+
+\section{Modelo y dimensionamiento}
+Para $R=6,6+0,6=7,2\ \Omega$:
+\begin{equation}
+L\frac{di_L}{dt}+Ri_L=v_{AB},\qquad G_{vi}(s)=\frac{1}{Ls+R}.
+\end{equation}
+En promedio ideal, $\overline v_{AB}=mV_{dc}$. Se adopta inicialmente $|m|\leq0,85$. La amplitud necesaria para una senoide es
+\begin{equation}
+V_{1,pk}=I_{pk}\sqrt{R^2+(2\pi f_0L)^2}.
+\end{equation}
+Con L de 10 mH y 50 Hz, $|Z|\approx7,856\ \Omega$. A 1 A pico se requieren aproximadamente 7,856 V pico: $m_{pk}\approx0,655$ a 12 V y 0,327 a 24 V, antes de caídas y tiempo muerto.
+
+Para una senoide, $I_{\mathrm{rms}}=I_{pk}/\sqrt2$. A 1 A pico, cada resistencia disipa 1,65 W y el devanado pierde aproximadamente 0,30 W por resistencia de cobre. Las resistencias de 5 W ofrecen margen nominal, sujeto a temperatura y montaje. No se incluyen pérdidas magnéticas.
+
+\subsection{Semiconductores y pérdidas}
+El IRF540N tiene tensión nominal de 100 V y Ron máxima de 44 m$\Omega$ especificada a $V_{GS}=10$ V y 25 $^\circ$C \cite{irf}. El umbral de compuerta no equivale a una tensión suficiente de accionamiento; se requieren drivers.
+
+Con dos canales conduciendo, $P_{\mathrm{cond}}\approx2R_{\mathrm{DS(on)}}I_{\mathrm{rms}}^2$, equivalente a 0,044 W para 1 A pico y 44 m$\Omega$, sin pérdidas de diodos ni variación térmica. La estimación de conmutación se completará con
+\begin{equation}
+P_{\mathrm{sw}}\approx\sum_j \tfrac12 V_{\mathrm{DS},j}|I_j|
+(t_{r,j}+t_{f,j})f_{\mathrm{sw}}.
+\end{equation}
+\pendiente{tiempos efectivos con las resistencias de compuerta elegidas, pérdidas de diodos, temperatura y margen térmico final}
+
+\subsection{Accionamiento y frecuencia}
+Se propone un IR2110 por rama, con VDD de 3,3 V y VCC fijo de 12 V, separado del bus variable \cite{ir}. El capacitor bootstrap se conecta entre VB y VS; HO se mide respecto a VS y LO respecto a COM. El esquema de una rama y su tabla de terminales se conservan en la documentación de componentes.
+
+Se evalúan resistencias de compuerta de $22\ \Omega$, resistencias compuerta--fuente de 10 k$\Omega$, desacoplos locales y tiempo muerto de 1 $\mu$s. Se verificarán apagado y ausencia de conducción simultánea antes de energizar el bus.
+
+Se toma 10 kHz como frecuencia inicial, con control cada 100 $\mu$s y 200 actualizaciones por ciclo de 50 Hz. La selección final debe contrastar rizado, pérdidas, resolución y ejecución. Las frecuencias digitales adicionales de 20 y 25 kHz aún requieren validación de potencia.
+
+\section{Medición}
+El ACS712 de 5 A se conecta en serie con la carga y se alimenta a 5 V regulados. Nominalmente, $v_s=2,5+0,185i_L$ \cite{acs}. El divisor propuesto de 4,7 k$\Omega$/1 k$\Omega$ produce
+\begin{equation}
+v_{\mathrm{ADC}}=v_s/5,7\approx0,4386+0,03246i_L.
+\end{equation}
+A $\pm1$ A, resulta aproximadamente 0,406--0,471 V. El XADC se usa en el rango unipolar de 0 a 1 V y 12 bits \cite{xadc}: la resolución ideal equivale a unos 7,52 mA por código. A 0,2 A pico la excursión es de unos 27 códigos respecto al cero.
+
+La copia funcional evalúa 10 nF en el nodo ADC, con $\tau\approx8,25\ \mu$s. No es un filtro final validado. Se medirán cero, sensibilidad, signo, ruido, precisión y retardo; si el rango útil es insuficiente, se revisará la ganancia analógica.
+
+\section{Control PR y discretización}
+Se estudia la estructura de ancho de banda finito \cite{pr}:
+\begin{equation}
+C(s)=K_p+\frac{2K_r\omega_cs}{s^2+2\omega_cs+\omega_0^2}.
+\end{equation}
+El candidato usa $K_p=12$ V/A, $K_r=200$ V/A, $\omega_0=2\pi50$ rad/s y $\omega_c=2\pi2$ rad/s. La estructura concentra ganancia alrededor de la referencia. Estos parámetros son un candidato evaluado, no una sintonización final demostrada.
+
+Se aplica Tustin preajustado a 50 Hz:
+\begin{equation}
+s=\kappa\frac{1-z^{-1}}{1+z^{-1}},\qquad
+\kappa=\frac{\omega_0}{\tan(\omega_0T_s/2)}.
+\end{equation}
+Con $T_s=100\ \mu$s, la rama resonante cumple
+\begin{align}
+r[k]={}&b_0(e[k]-e[k-2])\nonumber\\
+&-a_1r[k-1]-a_2r[k-2],
+\end{align}
+con $b_0=0,2509707453602995$, $a_1=-1,996504651666988$ y $a_2=0,9974902925463971$. Se calcula $v_{\mathrm{PR}}=12e+r$ y se aplica $m[k]=\mathrm{sat}_{0,85}(v_{\mathrm{PR}}[k-1]/12)$, con normalización fija y una muestra de retardo.
+
+Para la planta con retención, $A=e^{-RT_s/L}$ y $B=(1-A)/R$. Con $q=z^{-1}$ y $C(q)=N_C(q)/D(q)$, el polinomio cerrado es
+\begin{equation}
+(1-Aq)D(q)+(V_{dc}/12)Bq^2N_C(q).
+\end{equation}
+La recursión de Schur confirma estabilidad en doce combinaciones de R total de 7,2/10,5 $\Omega$, L de 6,984/9,291/10 mH y bus de 12/24 V. Esta comprobación lineal excluye medición, tiempo muerto y saturación.
+
+\pendiente{procedimiento y justificación de sintonización final, márgenes, retardos medidos, saturación y anti-windup}
+
+\section{Plan de validación}
+Primero se comprobarán auxiliares, apagado, bootstrap, compuertas y tiempo muerto; se documentarán límite de corriente, fusible y desconexión. Se calibrará el ACS712 con una medida independiente y se comprobará la carga.
+
+Se realizarán por separado: (i) las tres referencias nominales; (ii) cambios de 0,2 a 0,5 A y de 0,5 a 1 A pico; (iii) cambio resistivo de al menos 25\,\% a 0,5 A pico. Cada registro identificará referencia, corriente, tensión de carga, PWM y parámetros reales. La fundamental se extraerá en al menos cinco períodos completos. El rizado local se separará de la componente de baja frecuencia.
+
+\section{Estado del diseño}
+Se dispone de componentes principales, mediciones preliminares y modelos reproducibles. Falta completar el esquema del montaje, caracterizar la medición, cerrar pérdidas y controlador y verificar físicamente los criterios. Los datos experimentales permitirán actualizar el documento de diseño y sustentar el informe final.
+\referencias
+\end{document}

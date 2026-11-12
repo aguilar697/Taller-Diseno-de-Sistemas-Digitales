@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="1160" viewBox="0 0 1500 1160" role="img" aria-labelledby="title desc">
+  <title id="title">Accionamiento de una rama del puente H con IR2110 DIP-14</title>
+  <desc id="desc">Conexiones por nombre y número de terminal del driver, MOSFET superior e inferior, bootstrap y componentes auxiliares. La rama B repite el circuito usando sus propias señales y bootstrap.</desc>
+  <style>
+    text{font-family:Arial,Helvetica,sans-serif;fill:#172b41;font-size:19px}
+    .title{font-size:29px;font-weight:700}.sub{font-size:18px;fill:#486078}
+    .head{font-size:21px;font-weight:700}.small{font-size:16px}.pin{font-size:18px;font-weight:700}
+    .wire{fill:none;stroke:#253d53;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+    .power{fill:none;stroke:#a44b19;stroke-width:3}
+    .box{fill:#fff;stroke:#253d53;stroke-width:2}.panel{fill:#f5f8fc;stroke:#cbd7e3;stroke-width:1.5}
+    .node{fill:#253d53}.net{fill:#006b78;font-weight:700}.muted{fill:#53687c}
+  </style>
+  <rect width="1500" height="1160" fill="white"/>
+  <text x="40" y="48" class="title">Accionamiento con IR2110 DIP-14</text>
+  <text x="40" y="80" class="sub">Rama A · Conexiones eléctricas para evaluación · Valores iniciales sujetos a medición</text>
+  <text x="40" y="115" class="small">La rama B utiliza otro IR2110, pwm_bh / pwm_bl y su propio bootstrap. Los retornos de señal y potencia comparten GND.</text>
+
+  <rect x="370" y="195" width="310" height="610" rx="10" class="box"/>
+  <text x="525" y="230" text-anchor="middle" class="head">U_A · IR2110</text>
+  <text x="388" y="282" class="pin">9  VDD</text>
+  <text x="388" y="357" class="pin">10  HIN</text>
+  <text x="388" y="457" class="pin">12  LIN</text>
+  <text x="388" y="557" class="pin">11  SD</text>
+  <text x="388" y="657" class="pin">3  VCC</text>
+  <text x="388" y="717" class="pin">2  COM</text>
+  <text x="388" y="767" class="pin">13  VSS</text>
+  <text x="661" y="282" text-anchor="end" class="pin">VB  6</text>
+  <text x="661" y="357" text-anchor="end" class="pin">HO  7</text>
+  <text x="661" y="477" text-anchor="end" class="pin">VS  5</text>
+  <text x="661" y="657" text-anchor="end" class="pin">LO  1</text>
+  <text x="525" y="600" text-anchor="middle" class="small muted">4, 8 y 14: sin conexión</text>
+
+  <path d="M155 275H370 M155 350H370 M155 450H370 M155 550H370 M155 650H370 M155 710H370 M155 760H370" class="wire"/>
+  <text x="155" y="260" class="net">+3,3 V</text>
+  <text x="155" y="335" class="net">pwm_ah</text>
+  <text x="155" y="435" class="net">pwm_al</text>
+  <text x="155" y="535" class="net">SD_común</text>
+  <text x="155" y="635" class="net">+12 V_aux</text>
+  <text x="155" y="695" class="net">GND</text>
+  <text x="155" y="745" class="net">GND</text>
+  <text x="155" y="385" class="small muted">HIN y LIN: 10 kΩ a GND</text>
+
+  <path d="M680 275H830 M680 470H830" class="wire"/>
+  <text x="739" y="259" class="net">VB_A</text>
+  <text x="739" y="454" class="net">A</text>
+  <text x="739" y="498" class="small muted">Fuente superior</text>
+  <text x="739" y="521" class="small muted">y drenador inferior</text>
+
+  <path d="M680 350H820 M900 350H1050 M680 650H820 M900 650H1050" class="wire"/>
+  <rect x="820" y="338" width="80" height="24" class="box"/>
+  <rect x="820" y="638" width="80" height="24" class="box"/>
+  <text x="860" y="320" text-anchor="middle" class="small">Rg_AH · 22 Ω</text>
+  <text x="860" y="620" text-anchor="middle" class="small">Rg_AL · 22 Ω</text>
+
+  <rect x="1050" y="290" width="190" height="120" rx="6" class="box"/>
+  <rect x="1050" y="590" width="190" height="120" rx="6" class="box"/>
+  <text x="1145" y="331" text-anchor="middle" class="head">Q_AH</text>
+  <text x="1145" y="361" text-anchor="middle">IRF540N</text>
+  <text x="1061" y="382" class="small">G</text>
+  <text x="1159" y="309" class="small">D</text>
+  <text x="1159" y="401" class="small">S</text>
+  <text x="1145" y="631" text-anchor="middle" class="head">Q_AL</text>
+  <text x="1145" y="661" text-anchor="middle">IRF540N</text>
+  <text x="1061" y="682" class="small">G</text>
+  <text x="1159" y="609" class="small">D</text>
+  <text x="1159" y="701" class="small">S</text>
+
+  <path d="M1145 185V290 M1145 410V590 M1145 710V785 M1145 470H1405" class="power"/>
+  <text x="1145" y="166" text-anchor="middle" class="net">+Vbus · 12–24 V</text>
+  <text x="1270" y="454" class="net">A → carga RL → B</text>
+  <text x="1145" y="812" text-anchor="middle" class="net">GND</text>
+  <circle cx="1145" cy="470" r="5" class="node"/>
+
+  <path d="M970 350V390 M970 450V480 M970 650V690 M970 750V780" class="wire"/>
+  <rect x="959" y="390" width="22" height="60" class="box"/>
+  <rect x="959" y="690" width="22" height="60" class="box"/>
+  <circle cx="970" cy="350" r="4" class="node"/>
+  <circle cx="970" cy="650" r="4" class="node"/>
+  <text x="938" y="409" text-anchor="end" class="small">10 kΩ</text>
+  <text x="938" y="432" text-anchor="end" class="small">G–S</text>
+  <text x="938" y="709" text-anchor="end" class="small">10 kΩ</text>
+  <text x="938" y="732" text-anchor="end" class="small">G–S</text>
+  <text x="970" y="505" text-anchor="middle" class="net">A</text>
+  <text x="970" y="807" text-anchor="middle" class="net">GND</text>
+
+  <rect x="40" y="850" width="710" height="230" rx="8" class="panel"/>
+  <text x="60" y="884" class="head">Bootstrap por rama</text>
+  <path d="M85 962H195 M265 962H345 M385 962H555V994 M555 1016V1040" class="wire"/>
+  <rect x="195" y="950" width="70" height="24" class="box"/>
+  <path d="M345 947L375 962L345 977Z M379 946V978" class="wire"/>
+  <path d="M532 994H578 M532 1016H578" class="wire"/>
+  <text x="85" y="936" class="net">+12 V_aux</text>
+  <text x="230" y="928" text-anchor="middle" class="small">Rb · 2,2 Ω</text>
+  <text x="375" y="910" text-anchor="middle" class="small">Dboot · SB1100</text>
+  <text x="375" y="932" text-anchor="middle" class="small">banda hacia VB</text>
+  <text x="555" y="944" text-anchor="middle" class="net">VB_A</text>
+  <text x="599" y="988" class="small">1 µF</text>
+  <text x="599" y="1012" class="small">‖ 100 nF</text>
+  <text x="555" y="1067" text-anchor="middle" class="net">A = VS</text>
+  <text x="60" y="1035" class="small muted">Capacitores ≥25 V; capacitancia efectiva ≥1 µF.</text>
+  <text x="60" y="1060" class="small muted">Rama B: usar VB_B y B = VS; no compartir capacitor.</text>
+
+  <rect x="780" y="850" width="680" height="230" rx="8" class="panel"/>
+  <text x="800" y="884" class="head">Desacoplo y permiso de pruebas</text>
+  <text x="800" y="924">Por IR2110: VCC–COM → 100 nF ‖ 10 µF.</text>
+  <text x="800" y="956">Por IR2110: VDD–VSS → 100 nF ‖ 1 µF.</text>
+  <text x="800" y="988">SD_común → 10 kΩ a +3,3 V.</text>
+  <text x="800" y="1020">Interruptor de permiso entre SD_común y GND:</text>
+  <text x="800" y="1052" class="small">abierto = apagado · cerrado = permite las órdenes HIN/LIN.</text>
+
+  <text x="40" y="1114" class="small muted">Símbolos funcionales: no representan la distribución física de las patas ni el trazado de la placa.</text>
+  <text x="40" y="1140" class="small muted">Para medir: HO respecto a VS; LO respecto a COM. Control definitivo de SD y validación del montaje pendientes.</text>
+</svg>
