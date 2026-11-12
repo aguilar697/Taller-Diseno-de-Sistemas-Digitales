@@ -6,7 +6,7 @@ Este documento desarrolla los bloques del [tercer nivel del software](nivel_3_so
 
 ![Diagrama de flujo de la rutina periódica](img/nivel_4_software_isr.png)
 
-**Figura 1.** Flujo de una iteración de la ISR. Las tres decisiones, en orden, separan una falla, el control detenido y la muestra no nueva. En OPERACIÓN la fase de la referencia avanza en cada iteración, incluso si la muestra se repite; el PR solo se ejecuta con una muestra nueva. Todos los caminos se reúnen antes del registro de la muestra, de modo que el histórico conserva también lo ocurrido en DETENIDO y en FALLA.
+**Figura 1.** Flujo de una iteración de la ISR. Las cuatro decisiones, en orden, separan una falla, el control detenido, el arranque y la muestra no nueva. En OPERACIÓN la fase de la referencia avanza en cada iteración, incluso si la muestra se repite; el PR solo se ejecuta con una muestra nueva. Todos los caminos se reúnen antes del registro de la muestra, de modo que el histórico conserva también lo ocurrido en DETENIDO y en FALLA.
 
 ### Secuencia
 
@@ -16,7 +16,7 @@ Este documento desarrolla los bloques del [tercer nivel del software](nivel_3_so
 | 2 | Aplicar las solicitudes del lazo principal | Habilitar o apagar el PWM. Se hace aquí para que el PWM arranque siempre a la misma distancia de la interrupción |
 | 3 | Leer el ADC | Código, número de muestra `n` y estado, en una lectura coherente |
 | 4 | Convertir y supervisar | Corriente en amperios, rango del código, continuidad de `n` y sobrecorriente |
-| 5 | Decidir el estado | Una falla apaga el PWM y salta al paso 11. Fuera de OPERACIÓN no hay control: los estados del PR se ponen en cero y se salta al paso 11 |
+| 5 | Decidir el estado | Una falla apaga el PWM y salta al paso 11. Fuera de OPERACIÓN no hay control: los estados del PR se ponen en cero y se salta al paso 11. En los primeros `N_ARRANQUE` períodos después de habilitar se escribe REFERENCE = 0 para cargar el bootstrap de los drivers y se salta al paso 11; al terminar, `θ` arranca en cero con la amplitud pedida |
 | 6 | Referencia | En OPERACIÓN, avanzar la fase en cada iteración y aplicar el cambio de amplitud en el cruce por cero, aunque la muestra no sea nueva |
 | 7 | PR | Solo con muestra nueva: calcular la parte resonante y `v_PR` sin actualizar todavía los estados. Con una muestra repetida se mantiene REFERENCE y se salta al paso 11 |
 | 8 | Modulación | `m = sat(v_PR/Vdc)` y conversión a Q1.15 |
@@ -223,14 +223,15 @@ Al usar un número entero de períodos, la transformada en 50 Hz no tiene fuga e
 | Driver | Función | Descripción |
 |---|---|---|
 | PWM | `pwm_apagar()` | Escribe `CONTROL = 0` |
-| PWM | `pwm_configurar(freq_sel, deadtime, phase)` | Escribe y comprueba DEADTIME y TRIGGER_PHASE; devuelve error si no coinciden |
+| PWM | `pwm_configurar(freq_sel, deadtime, phase)` | Apaga, escribe frecuencia, DEADTIME, TRIGGER_PHASE y REFERENCE = 0 y los comprueba leyendo de vuelta; devuelve error si no coinciden |
 | PWM | `pwm_habilitar(freq_sel)` | Escribe CONTROL con `enable = 1` y comprueba `running` |
 | PWM | `pwm_escribir_referencia(q)` | Escribe REFERENCE con el entero Q1.15 |
-| ADC | `adc_leer(&codigo, &n, &estado)` | Lectura coherente de la muestra; registros pendientes de la adquisición |
+| ADC | `adc_configurar()` | Comprueba que ERROR esté en cero al iniciar |
+| ADC | `adc_leer(&codigo, &n, &estado)` | Lee STATUS y SAMPLE (ID y código en una lectura) y reconoce la muestra escribiendo su token en ACK_ID |
 | ADC | `adc_iniciar_conversion()` | Inicio por software, usado en DETENIDO y FALLA |
-| GPIO | `gpio_leer_entradas()`, `gpio_escribir_led(mascara)`, `gpio_medicion(nivel)` | Canales y bits según la plataforma |
-| UART | `uart_tx_llena()`, `uart_escribir(byte)` | Bit de FIFO llena y escritura de un byte, sin espera |
-| Timer | `timer_configurar(carga)`, `timer_reconocer()`, `timer_contador()` | Modo de generación, reconocimiento y lectura para medir la duración |
+| GPIO | `gpio_iniciar()`, `gpio_leer_entradas()`, `gpio_escribir_led(mascara)`, `gpio_medicion(nivel)` | Canales y bits según la plataforma; LED y medición en canales distintos para que la ISR y el lazo no se pisen |
+| UART | `uart_iniciar()`, `uart_tx_llena()`, `uart_escribir(byte)` | Reinicio de FIFOs, bit de FIFO llena y escritura de un byte, sin espera |
+| Timer | `timer_configurar(carga)`, `timer_arrancar()`, `timer_reconocer()`, `timer_contador()` | Contador 0 en modo de generación con recarga e interrupción; contador 1 libre para medir la duración |
 
 Las direcciones base se toman de `xparameters.h`, que genera Vitis a partir del hardware exportado. Así, un cambio en el Address Editor no requiere editar el código. Los offsets del PWM y de la adquisición se definen en el encabezado de cada driver, según sus contratos.
 
@@ -247,6 +248,7 @@ Las direcciones base se toman de `xparameters.h`, que genera Vitis a partir del 
 | `AMPLITUDES` | Enunciado | 0,2; 0,5 y 1,0 A pico |
 | `N_BUF`, `K_REG` | Software | Registro de muestras |
 | `N_FALLA_MUESTRAS`, `MARGEN_ISR`, `T_REBOTE` | Software | Supervisión y botones |
+| `N_ARRANQUE` | Aguilar | Períodos con REFERENCE = 0 al habilitar (bootstrap) |
 
 ## 7. Comprobaciones por bloque
 
