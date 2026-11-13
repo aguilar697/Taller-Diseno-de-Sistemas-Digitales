@@ -24,7 +24,43 @@ El PR y la adquisición pertenecen a los subsistemas de control y medición. La 
 | 3 | Resistencia de 3,3 Ω y 5 W | Dos unidades forman la carga nominal de 6,6 Ω; la tercera permite aumentarla a 9,9 Ω |
 | 1 | Secundario de transformador | Elemento inductivo disponible; se utiliza con el primario abierto y sus terminales aislados |
 
-Se dispone de los dos IR2110 en encapsulado DIP-14 necesarios para el puente, uno por rama. El acondicionamiento analógico y los elementos auxiliares de alimentación y protección permanecen en diseño.
+La lista anterior corresponde a los componentes principales disponibles. Los auxiliares de las tablas siguientes completan la selección eléctrica del puente. El divisor del ACS712 es la primera alternativa de acondicionamiento y debe verificarse antes de utilizarse como realimentación.
+
+### Topología y alimentaciones
+
+Se utiliza un puente H completo porque la corriente de referencia cambia de signo. Las dos ramas permiten aplicar tensión positiva, negativa o nula a una carga alimentada desde una fuente DC. La modulación unipolar centrada utiliza una portadora común y referencias opuestas para las ramas, con tiempo muerto independiente en cada una.
+
+| Conexión | Elementos conectados |
+|---|---|
+| +Vbus, variable entre 12 y 24 V | Drenadores de Q_AH y Q_BH |
+| GND de potencia | Fuentes de Q_AL y Q_BL |
+| Nodo A | Fuente de Q_AH, drenador de Q_AL y VS del driver A |
+| Nodo B | Fuente de Q_BH, drenador de Q_BL y VS del driver B |
+| Camino de carga | A → terminal de corriente del ACS712 → segundo terminal del sensor → devanado L → dos resistencias de 3,3 Ω en serie → B |
+
+El orden de los elementos en serie no modifica el modelo RL. Ningún extremo de la carga se conecta directamente a GND: ambos extremos pertenecen a nodos conmutados. El camino de corriente del ACS712 está separado de sus terminales VCC, OUT y GND. El signo de la lectura depende del sentido de paso por el módulo.
+
+Los estados ideales del puente son los siguientes; cada orden inferior es complementaria de la superior de su propia rama antes de insertar el tiempo muerto.
+
+| Orden superior A | Orden superior B | MOSFET con orden activa | Tensión ideal A−B |
+|---|---|---|---|
+| 1 | 0 | Q_AH y Q_BL | +Vbus |
+| 0 | 1 | Q_AL y Q_BH | −Vbus |
+| 0 | 0 | Q_AL y Q_BL | 0 V |
+| 1 | 1 | Q_AH y Q_BH | 0 V |
+
+Los dos estados de tensión nula conectan ambos extremos de la carga al mismo riel y permiten recirculación. Durante el tiempo muerto, la corriente inductiva encuentra camino por los diodos internos de los MOSFET según su sentido. Estos diodos no son los SB360 del bootstrap. La necesidad de diodos externos de potencia se evalúa con la recuperación y los transitorios medidos. Activar simultáneamente el superior y el inferior de una misma rama cortocircuita el bus; el tiempo muerto debe impedir esa combinación.
+
+| Alimentación | Valor | Destino y criterio |
+|---|---|---|
+| Bus de potencia | 12–24 V DC | Energía del puente; su variación es una perturbación para el lazo |
+| Auxiliar de accionamiento | 12 V DC regulados | VCC de ambos IR2110; se mantiene fija al variar el bus |
+| Lógica de drivers | 3,3 V regulados, fuente externa | VDD de ambos IR2110 y resistencia de polarización de SD |
+| Sensor | 5 V regulados | VCC del ACS712; su estabilidad afecta al cero y a la sensibilidad |
+
+Los negativos de estas alimentaciones y GND de la Basys 3 comparten referencia. La fuente externa de 3,3 V no se conecta en paralelo con la salida de alimentación de 3,3 V de la placa. Los retornos de potencia se conducen por recorridos cortos y separados de los retornos del sensor y de la FPGA hasta el punto común, para reducir errores de medición por caídas en cables y contactos.
+
+En el IRF540N, visto de frente con la inscripción legible y las patillas hacia abajo, los terminales son G, D y S de izquierda a derecha; la aleta metálica está unida al drenador. La conexión del disipador debe respetar ese potencial eléctrico.
 
 ### MOSFET y accionamiento
 
@@ -53,27 +89,44 @@ La figura utiliza símbolos de conexión, no la distribución física de las pat
 | 12 | LIN | `pwm_al` para A; `pwm_bl` para B |
 | 13 | VSS | Retorno lógico, unido a COM |
 
-El bootstrap comprende un diodo desde VCC hacia VB y un capacitor entre VB y VS. Se propone SB1100, Schottky de 1 A y 100 V, con la banda del cátodo hacia VB y una resistencia serie inicial de 2,2 Ω. Se emplean 1 µF efectivo y 100 nF en paralelo entre VB y VS, con tensión nominal de al menos 25 V; su tensión es flotante y no se referencia a GND. El capacitor debe conservar su capacitancia con la polarización aplicada. [Hoja de datos SB1100](https://www.diodes.com/datasheet/download/SB1100.pdf).
+El bootstrap comprende un diodo desde VCC hacia VB y un capacitor entre VB y VS. Se selecciona **SB360**, Schottky de 3 A y 60 V, por disponibilidad y por su conmutación rápida y baja caída directa. Los 60 V proporcionan margen nominal respecto al bus de 24 V; los transitorios reales deben permanecer por debajo de su tensión inversa admisible. Su corriente nominal de 3 A corresponde al diodo, no a la corriente que circula continuamente por el bootstrap. [Datos del fabricante SB360](https://www.diodes.com/part/view/SB360).
+
+La conexión por rama es `+12 V_aux → 2,2 Ω → ánodo SB360 → cátodo (banda) → VB`. Entre VB y VS se conectan 1 µF de película, 50 V, y 100 nF cerámicos, 50 V, en paralelo. La película permite conservar la capacitancia sin la reducción por polarización de algunos cerámicos. Estos capacitores están referidos a VS, no a GND. La rama B utiliza su propio diodo, resistencia y capacitores.
 
 Como comprobación inicial de dimensionamiento, a 10 kHz y modulación máxima de 0,85 la orden superior puede durar 92,5 µs. Un presupuesto de carga de 100 nC para compuerta, 230 µA para el driver, 0,5 mA de fuga de diodo y 1,2 mA para la resistencia compuerta–fuente produce unos 279 nC. Con 1 µF efectivo, la caída calculada es de unos 0,28 V. Es una estimación conservadora a temperatura ambiente, no una garantía térmica ni de recarga: se medirá VB−VS con el circuito real, incluyendo la caída del diodo y los intervalos mínimos de conducción inferior.
 
 ### Auxiliares para los dos drivers
 
-Los componentes siguientes completan la propuesta de accionamiento; no se registran todavía como comprados. Los valores son iniciales y se ajustan con las mediciones de compuerta.
+La tabla indica las cantidades totales para las dos ramas, independientemente del orden de montaje. Los valores de resistencias de compuerta, bootstrap y tiempo muerto son de diseño inicial y se contrastan con las señales reales.
 
 | Cantidad | Componente | Conexión o función |
 |---|---|---|
-| 2 | SB1100 | Diodos de bootstrap, uno por rama |
+| 2 | SB360, Schottky de 3 A y 60 V | Diodos de bootstrap, uno por rama |
 | 2 | 2,2 Ω, 0,5 W, aptas para pulsos | Serie con cada diodo de bootstrap; limitar corriente de carga |
-| 2 | 1 µF, ≥25 V, capacitancia efectiva ≥1 µF | Capacitores de bootstrap; cerámicos X7R con margen de polarización o película |
-| 6 | 100 nF cerámicos, ≥25 V | Dos para bootstrap, dos para VCC y dos para VDD |
+| 2 | 1 µF de película, 50 V | Capacitores de bootstrap entre VB y VS |
+| 6 | 100 nF cerámicos, 50 V | Dos para bootstrap, dos para VCC y dos para VDD |
 | 2 | 10 µF, ≥25 V | Desacoplo VCC–COM, uno junto a cada driver |
-| 2 | 1 µF, ≥10 V | Desacoplo VDD–VSS, uno junto a cada driver |
+| 2 | 1 µF, ≥10 V; puede utilizarse película de 50 V | Desacoplo VDD–VSS, uno junto a cada driver |
 | 4 | 22 Ω, 0,25 W | Serie con cada compuerta, cerca del MOSFET |
 | 9 | 10 kΩ, 0,25 W | Cuatro compuerta–fuente, cuatro HIN/LIN a GND y una SD común a +3,3 V |
 | 1 | Interruptor de permiso | Entre SD común y GND; abierto mantiene apagados los drivers |
 
-La alimentación lógica puede tomarse de 3,3 V de la Basys para estos dos drivers; se comprobarán tensión y secuencia de encendido. Para la primera evaluación se usará una salida auxiliar de laboratorio a 12 V, separada del bus variable y con el retorno unido a COM. Los capacitores se colocan junto a los terminales correspondientes. El retorno de las compuertas inferiores llega a COM con un recorrido corto, evitando que la corriente de carga circule por el cable de tierra del sensor o de la FPGA.
+Se utiliza una fuente externa regulada de 3,3 V para VDD y una salida auxiliar de laboratorio a 12 V para VCC, separadas del bus variable y con referencia común en COM/VSS. Se comprobarán los niveles y la secuencia de encendido. Los capacitores se colocan junto a los terminales correspondientes. El retorno de las compuertas inferiores llega a COM con un recorrido corto, evitando que la corriente de carga circule por el cable de tierra del sensor o de la FPGA.
+
+Las resistencias de 22 Ω limitan la corriente instantánea de compuerta y ayudan a amortiguar oscilaciones; un valor excesivo alarga la conmutación y aumenta las pérdidas. Las resistencias de 10 kΩ entre compuerta y fuente mantienen apagado cada MOSFET sin accionamiento. En los superiores retornan a A o B, respectivamente, y en los inferiores a GND. Las de HIN/LIN evitan entradas flotantes y la de SD establece el apagado por defecto. La resistencia de 2,2 Ω limita el pulso de recarga del bootstrap; su valor debe permitir recuperar la carga durante el intervalo inferior disponible.
+
+### Auxiliares comunes y medición
+
+| Cantidad | Componente | Conexión o función |
+|---|---|---|
+| 1 | Electrolítico de 100 µF, 50 V | Entre +Vbus y GND, próximo al puente, positivo hacia +Vbus |
+| 1 | Cerámico de 100 nF, 50 V | En paralelo con el electrolítico del bus, con conexiones cortas |
+| 1 | Resistencia de 4,7 kΩ, 1 %, 0,25 W | Desde OUT del ACS712 hasta el nodo analógico |
+| 1 | Resistencia de 1 kΩ, 1 %, 0,25 W | Desde el nodo analógico hasta GND del sensor |
+
+Los siete capacitores de 100 nF de ambas tablas corresponden a seis del accionamiento y uno del bus. Los cuatro de 1 µF corresponden a dos bootstrap y dos desacoplos de lógica; pueden adquirirse todos de película de 50 V. El desacoplo de 5 V del ACS712 se revisa en el módulo adquirido y se complementa junto a VCC–GND si su implementación o el cableado lo requieren.
+
+El capacitor del bus entrega parte de los pulsos de corriente localmente y reduce la inductancia del recorrido hasta la fuente. El valor de 100 µF es inicial, no una garantía de ausencia de sobretensión: se verifican la tensión del bus y la energía devuelta por la carga durante los transitorios.
 
 El PWM debe insertar tiempo muerto: el IR2110 no sustituye esa función. Se propone comenzar la evaluación con 1 µs, equivalente a 100 ciclos de 100 MHz, y ajustar según las señales reales de compuerta. Se medirá HO respecto a VS y LO respecto a COM; la pinza de tierra de un osciloscopio convencional no se conectará a VS, pues ese nodo conmuta. El montaje inicial se realizará en protoboard con recorridos cortos de compuerta y retorno, bootstrap y desacoplo junto a cada driver y conexiones de carga firmes. Se comprobarán los transitorios y el calentamiento de contactos; si el montaje limita los ensayos, se trasladará a placa soldada o PCB.
 
@@ -147,7 +200,29 @@ Esta adaptación solo proporciona unos 133 códigos por amperio con un resultado
 
 La calibración se realizará con corriente nula y una corriente conocida, obteniendo `i_L = (n − n_cero) / K`, con K en códigos por amperio y signo verificado. Adquisición y software deben acordar primero la alineación del dato: una lectura DRP de 16 bits no equivale a un ADC de 16 bits. Se propone evaluar VAUX6, accesible por JXADC1(P) y JXADC7(N), sujeto a confirmación de Kenneth y al archivo de pines final.
 
+Las magnitudes anteriores son nominales. No debe fijarse el cero en 2,5 V ni utilizarse una sensibilidad positiva sin verificar el módulo y su orientación. Si OUT disminuye con la corriente definida como positiva, K es negativo. La conversión entregada al PR debe conservar la convención `e = i_ref − i_L`; invertir el signo de la realimentación puede convertir el lazo en realimentación positiva. También debe comprobarse que la relación del divisor permanezca constante con la carga y que las medidas se refieran al mismo retorno analógico.
+
 La caracterización del ACS712 puede comenzar antes de construir el puente: alimentar el módulo a 5 V regulados, medir el cero y aplicar corrientes DC conocidas mediante una carga resistiva y una fuente limitada. Se contrastará la corriente con un instrumento independiente y se medirá la tensión después del divisor antes de conectar el XADC. Se obtendrán cero, sensibilidad y signo para ambas polaridades, además del ruido con corriente nula y a 0,2 A. Finalmente se comprobarán la conversión XADC y la respuesta a 50 Hz, incluyendo el efecto del filtro. Estos ensayos determinan si el divisor basta o si se necesita una etapa con ganancia; la simulación no mide la dispersión ni el ruido del módulo adquirido.
+
+## Interfaz con el control digital
+
+| Magnitud o señal | Criterio para la integración |
+|---|---|
+| Referencia de corriente | Senoidal de 50 Hz, amplitudes de 0,2; 0,5 y 1 A **pico**, equivalentes a 0,141; 0,354 y 0,707 A RMS |
+| Orden de actuación | `m` con signo, Q1.15: entero / 32768; no representa corriente ni un ciclo de trabajo directo |
+| Puente ideal | `d_A = (1+m)/2`, `d_B = (1−m)/2` y tensión media `v_AB = Vbus·m`, antes de tiempo muerto y pérdidas |
+| Límites iniciales | `abs(m) ≤ 0,85`, equivalente a magnitud máxima 27853 en Q1.15 |
+| Frecuencia nominal de evaluación | PWM de 10 kHz y período de control de 100 µs; cambiar el período requiere recalcular y comprobar el PR discreto |
+| Tiempo muerto inicial | 1 µs por rama, equivalente a 100 ciclos de 100 MHz; confirmar con VGS reales |
+| Órdenes físicas | `pwm_ah`/`pwm_al` a HIN/LIN del driver A; `pwm_bh`/`pwm_bl` a HIN/LIN del driver B; todas a 3,3 V |
+| Adquisición | `pwm_trigger_o` sincroniza el ADC; su fase y el retardo hasta aplicar `m` deben acordarse con adquisición y software |
+| Apagado | SD alto deshabilita ambos drivers; `enable=0` debe mantener las cuatro órdenes bajas |
+
+Con `m=0` y PWM habilitado puede haber conmutación aunque la tensión media diferencial sea cero. Esa condición es distinta del apagado. La alimentación bootstrap exige intervalos de conducción inferior; no permite mantener indefinidamente encendido el MOSFET superior sin recarga.
+
+El software convierte la salida del PR en modulación mediante una tensión de normalización. El modelo de evaluación utiliza 12 V fijos; variar el bus a 24 V cambia la ganancia de la planta y el lazo debe rechazar esa perturbación. Normalizar con Vbus medido constituye otra estrategia y requiere un canal de medición y validación propios; no se supone que el sistema disponga de esa lectura. Los coeficientes, latencias y escalas definitivos se contrastan con [las simulaciones](02_simulacion_y_resultados.md), el [contrato PWM](../docs/diseno/nivel_3_pwm.md) y la [integración del ADC](../docs/diseno/adc/integracion_pendiente.md).
+
+Los valores de cero y ganancia de ADC presentes en software son nominales hasta realizar la calibración. El divisor no implica que la entrada XADC admita 5 V: el nodo de entrada debe permanecer dentro de su rango de 0 a 1 V en operación normal, arranque y apagado.
 
 ## Protección y puesta en marcha
 
