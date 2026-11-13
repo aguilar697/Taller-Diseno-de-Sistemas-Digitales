@@ -31,7 +31,7 @@
   <text x="525" y="600" text-anchor="middle" class="small muted">4, 8 y 14: sin conexión</text>
 
   <path d="M155 275H370 M155 350H370 M155 450H370 M155 550H370 M155 650H370 M155 710H370 M155 760H370" class="wire"/>
-  <text x="155" y="260" class="net">+3,3 V</text>
+  <text x="155" y="260" class="net">+3,3 V externos</text>
   <text x="155" y="335" class="net">pwm_ah</text>
   <text x="155" y="435" class="net">pwm_al</text>
   <text x="155" y="535" class="net">SD_común</text>
@@ -91,13 +91,13 @@
   <path d="M532 994H578 M532 1016H578" class="wire"/>
   <text x="85" y="936" class="net">+12 V_aux</text>
   <text x="230" y="928" text-anchor="middle" class="small">Rb · 2,2 Ω</text>
-  <text x="375" y="910" text-anchor="middle" class="small">Dboot · SB1100</text>
+  <text x="375" y="910" text-anchor="middle" class="small">Dboot · SB360</text>
   <text x="375" y="932" text-anchor="middle" class="small">banda hacia VB</text>
   <text x="555" y="944" text-anchor="middle" class="net">VB_A</text>
   <text x="599" y="988" class="small">1 µF</text>
   <text x="599" y="1012" class="small">‖ 100 nF</text>
   <text x="555" y="1067" text-anchor="middle" class="net">A = VS</text>
-  <text x="60" y="1035" class="small muted">Capacitores ≥25 V; capacitancia efectiva ≥1 µF.</text>
+  <text x="60" y="1035" class="small muted">1 µF de película y 100 nF cerámicos; ambos de 50 V.</text>
   <text x="60" y="1060" class="small muted">Rama B: usar VB_B y B = VS; no compartir capacitor.</text>
 
   <rect x="780" y="850" width="680" height="230" rx="8" class="panel"/>

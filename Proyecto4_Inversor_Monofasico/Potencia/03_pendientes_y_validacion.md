@@ -21,7 +21,7 @@ El diseño de potencia y su informe corresponden a Kevin Aguilar, Kenneth Campos
 
 | Orden | Actividad | Resultado necesario |
 |---|---|---|
-| 1 | Verificar el esquema de accionamiento IR2110 | Revisar el diagrama y la tabla de terminales en diseño y componentes; conseguir auxiliares, comprobar apagado, bootstrap, arranque y tiempo muerto; acordar SD automático y pines con plataforma |
+| 1 | Verificar el esquema de accionamiento IR2110 | Contrastar el diagrama y las cantidades totales de auxiliares seleccionados, incluidos SB360 y fuentes externas; comprobar apagado, bootstrap, arranque y tiempo muerto; acordar SD automático y pines con plataforma |
 | 2 | Evaluar la adaptación del ACS712 | Probar el divisor de 4,7 kΩ/1 kΩ, calibrar y medir ruido y precisión a 0,2 A; confirmar canal XADC, alineación de dato y filtrado; añadir ganancia si los resultados lo requieren |
 | 3 | Completar la carga y la protección | Identificar devanado, comprobar resistencia y comportamiento con corriente; definir cambio de carga, límite de fuente, fusible y desconexión |
 | 4 | Completar la simulación con los componentes comprados | Contrastar la copia funcional con mediciones del sensor, accionamiento y carga; completar diodos, pérdidas, saturación y rizado; separar ensayos de bus y carga |
