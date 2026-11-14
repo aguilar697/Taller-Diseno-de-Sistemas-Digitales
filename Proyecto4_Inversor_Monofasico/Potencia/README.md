@@ -13,6 +13,9 @@ Se realizaron simulaciones exploratorias del puente ideal en lazo abierto y con 
 | [Diseño y componentes](01_diseno_y_componentes.md) | Configuración, materiales disponibles, mediciones del devanado, carga, margen de tensión e interfaces |
 | [Simulación y resultados](02_simulacion_y_resultados.md) | Ensayos ideales, configuración de los archivos PLECS, controlador inicial y análisis numéricos |
 | [Pendientes y validación](03_pendientes_y_validacion.md) | Decisiones por cerrar, secuencia de trabajo y criterios del instructivo |
+| [Registro de laboratorio](04_registro_laboratorio.md) | Alimentaciones, lecturas de drivers y ACS712, diagnóstico pendiente y secuencia para retomar las pruebas |
+
+La salida inferior del driver izquierdo respondió a las órdenes estáticas de activación y apagado. En la posición derecha permanece baja incluso después de intercambiar el integrado y desconectar la salida de la compuerta. El [registro de laboratorio](04_registro_laboratorio.md) conserva las condiciones y mediciones; la siguiente sesión comienza con la verificación de retornos y conexiones de esa posición, manteniendo el bus apagado.
 
 ## Configuración eléctrica seleccionada
 
