@@ -26,6 +26,8 @@ El PR y la adquisición pertenecen a los subsistemas de control y medición. La 
 
 La lista anterior corresponde a los componentes principales disponibles. Los auxiliares de las tablas siguientes completan la selección eléctrica del puente. El divisor del ACS712 es la primera alternativa de acondicionamiento y debe verificarse antes de utilizarse como realimentación.
 
+La adquisición de los auxiliares se completó para continuar las pruebas. Los valores y conexiones de estas tablas son la especificación de diseño; sus resultados de laboratorio y las comprobaciones pendientes se conservan en el [registro de pruebas](04_registro_laboratorio.md).
+
 ### Topología y alimentaciones
 
 Se utiliza un puente H completo porque la corriente de referencia cambia de signo. Las dos ramas permiten aplicar tensión positiva, negativa o nula a una carga alimentada desde una fuente DC. La modulación unipolar centrada utiliza una portadora común y referencias opuestas para las ramas, con tiempo muerto independiente en cada una.

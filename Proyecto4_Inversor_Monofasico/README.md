@@ -25,6 +25,7 @@ La evaluación se organiza por curso. Taller de Diseño Digital comprende a los 
 - [Tercer nivel del PWM: bloques e interfaz propuesta](docs/diseno/nivel_3_pwm.md).
 - [Cuarto nivel del PWM: circuitos y secuencias](docs/diseno/nivel_4_pwm.md).
 - [Potencia: componentes, simulaciones y pendientes](Potencia/README.md).
+- [Registro de laboratorio de potencia y continuidad de pruebas](Potencia/04_registro_laboratorio.md).
 - [Organización del informe y las evidencias](docs/informe/README.md).
 - [Módulos de hardware](src/design/README.md).
 - [Verificación por subsistema](src/testbench/README.md).
@@ -41,7 +42,8 @@ Proyecto4_Inversor_Monofasico/
 │   ├── README.md
 │   ├── 01_diseno_y_componentes.md
 │   ├── 02_simulacion_y_resultados.md
-│   └── 03_pendientes_y_validacion.md
+│   ├── 03_pendientes_y_validacion.md
+│   └── 04_registro_laboratorio.md
 ├── docs/
 │   ├── diseno/
 │   │   └── img/
