@@ -1,0 +1,17 @@
+[
+  {
+    "top": "tb_pwm_timing",
+    "resultado": "PASS",
+    "comprobaciones": 81,
+    "simulador": "xsim",
+    "codigo_salida": 0,
+    "fuentes": {
+      "build\\pwm\\sdf_entrega_02\\tb_pwm_timing\\pwm_timesim.v": "bb7f936f61128fe1ba7e7dc476c0a8c38b6900b2e3059ab59b6ba1fe586d5892",
+      "glbl.v": "6270251cf35e1fce3119fc79f8fb968912f7983027e43cf030409ba68f048936",
+      "src\\testbench\\pwm\\tb_pwm_timing.sv": "8bab782449d4e670a0a2a814c3d477b447697340c51d511ded75de6a2a58d24d",
+      "src\\testbench\\pwm\\pwm_axi_tb.svh": "5529b2c42645cbfa3f596fbe85d31d75c62a6af9ef8d84c4d7cae15f98473c66",
+      "scripts\\verificacion\\pwm\\ejecutar_pruebas_pwm.py": "bcefac22d40ad269172b2787c2957cdd6e84d01f652179ab7b3aa20d36b2c5dd",
+      "build\\pwm\\sdf_entrega_02\\tb_pwm_timing\\pwm_timesim.sdf": "c38c0fc50beccc93f14342734e876fa980fc6803847435d0e6ad01de67f0b80e"
+    }
+  }
+]

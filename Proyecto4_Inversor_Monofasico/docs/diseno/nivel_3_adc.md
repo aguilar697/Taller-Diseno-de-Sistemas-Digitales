@@ -51,10 +51,10 @@ La frecuencia del PWM, el período de control y la duración de conversión debe
 
 - El [PWM](nivel_4_pwm.md) entrega un solo pulso `pwm_trigger_o` por período activo y no espera una señal de ocupado. La adquisición absorbe o diagnostica cada evento.
 - MicroBlaze V asigna la dirección base en el Block Design; los offsets, la respuesta AXI y el orden de lectura pertenecen al periférico ADC.
-- El contrato con [software](nivel_3_software.md) incluye código, número modular de 16 bits, dato nuevo, sobrescritura e inicio por software. SAMPLE preserva la correspondencia entre código e identificador aunque llegue otra conversión durante la transacción. STATUS y ERROR se consultan por separado; el reconocimiento y la asociación de sus banderas con la muestra deben acordarse con software, como indica el cuarto nivel.
+- El contrato con [software](nivel_3_software.md) incluye código, número modular de 16 bits, dato nuevo, sobrescritura e inicio por software. SAMPLE preserva la correspondencia entre código e identificador aunque llegue otra conversión durante la transacción. STATUS y ERROR se consultan por separado; ACK_ID en 0x10 devuelve el token de 32 bits capturado con SAMPLE y permite reconocer esa publicación; los lectores y el reset deben coordinarse según el [contrato implementado](adc/mapa_registros.md).
 - El sensor y el acondicionamiento deben permitir reconstruir la magnitud y el signo de corriente con una calibración trazable. Se fijan canal, referencias, límites de código y escala después de validar la instrumentación.
 - La latencia de disparo a dato válido, el tratamiento de eventos simultáneos y los límites de diagnóstico se verifican antes de fijar `TRIGGER_PHASE` y el período de control.
 
-El [cuarto nivel](nivel_4_adc.md) propone la secuencia interna y un mapa de registros para acordar con plataforma y software; los parámetros eléctricos y temporales aún no se declaran validados.
+El [cuarto nivel](nivel_4_adc.md) resume la implementación digital y enlaza su [mapa definitivo](adc/mapa_registros.md). El periférico se verificó de forma aislada en Vivado 2026.1; la compatibilidad con 2025.1, la integración MicroBlaze V y los parámetros físicos siguen pendientes.
 
 [Segundo nivel del sistema](nivel_2.md) · [Índice del diseño](README.md)

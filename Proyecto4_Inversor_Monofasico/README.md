@@ -15,14 +15,19 @@ La plataforma integra adquisición ADC/XADC, un periférico PWM unipolar persona
 
 Cada responsable documenta y verifica su subsistema. Las interfaces entre plataforma, PWM, adquisición y control se acuerdan antes de integrar modificaciones que afecten a otros bloques.
 
+La evaluación se organiza por curso. Taller de Diseño Digital comprende a los cuatro integrantes. En Procesamiento Electrónico de Potencia participan Kevin Aguilar, Kenneth Campos y Kevin Cortés. El diseño digital se conserva en `docs/diseno/` y el de potencia en `Potencia/`; los informes de cada curso se preparan por separado conforme al [índice de informes](docs/informe/README.md). Las evidencias de integración se comparten mediante referencias a los mismos archivos.
+
 ## Documentación
 
 - [Diseño e interfaces del sistema](docs/diseno/README.md).
 - [Primer nivel: sistema, entradas y salidas](docs/diseno/nivel_1.md).
 - [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
-- [Tercer nivel del PWM: bloques e interfaz propuesta](docs/diseno/nivel_3_pwm.md).
+- [Tercer nivel del PWM: bloques e interfaz](docs/diseno/nivel_3_pwm.md).
 - [Cuarto nivel del PWM: circuitos y secuencias](docs/diseno/nivel_4_pwm.md).
+- [Integración del PWM con ADC, Timer y software](docs/diseno/pwm_integracion.md).
+- [Verificación independiente del PWM](docs/informe/pwm_verificacion.md).
 - [Potencia: componentes, simulaciones y pendientes](Potencia/README.md).
+- [Registro de laboratorio de potencia y continuidad de pruebas](Potencia/04_registro_laboratorio.md).
 - [Organización del informe y las evidencias](docs/informe/README.md).
 - [Módulos de hardware](src/design/README.md).
 - [Verificación por subsistema](src/testbench/README.md).
@@ -39,7 +44,8 @@ Proyecto4_Inversor_Monofasico/
 │   ├── README.md
 │   ├── 01_diseno_y_componentes.md
 │   ├── 02_simulacion_y_resultados.md
-│   └── 03_pendientes_y_validacion.md
+│   ├── 03_pendientes_y_validacion.md
+│   └── 04_registro_laboratorio.md
 ├── docs/
 │   ├── diseno/
 │   │   └── img/

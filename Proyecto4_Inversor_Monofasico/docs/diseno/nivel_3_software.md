@@ -161,7 +161,7 @@ La aplicación de PC recibe la trama, comprueba el CRC y guarda los datos en arc
 - el desfase;
 - el residuo de baja frecuencia, que queda al restar la fundamental.
 
-La muestra se toma en el valle de la portadora, donde la corriente coincide con su valor medio en el período, y se registra a 8–10 kHz como máximo. Por eso el histórico representa la componente de baja frecuencia y no el rizado de conmutación. El rizado pico a pico que pide el enunciado se mide con el osciloscopio.
+La adquisición se dispara en la fase configurada del PWM: inicialmente a los 50 µs del período de 100 µs. El [contrato de integración](pwm_integracion.md) define su coordinación con la ISR. La correspondencia entre la lectura y el valor medio se comprueba con el montaje; el rizado pico a pico se mide con el osciloscopio. La adquisición y el registro deben evitar que el rizado se confunda por aliasing con la componente de baja frecuencia.
 
 ### Estados de la aplicación
 
@@ -207,7 +207,7 @@ La propuesta es:
 - configurar TRIGGER_PHASE para que la conversión termine antes de la interrupción;
 - que la ISR lea siempre la última muestra disponible y compruebe con su número que sea nueva.
 
-El retardo total entre muestreo y aplicación es de aproximadamente un período de control, y lo usa PEDP en su análisis de estabilidad.
+Con disparo a mitad del período, lectura en la siguiente ISR y aplicación al siguiente límite PWM, el retardo nominal de muestreo a actuación es cercano a 1,5 Ts. La fase efectiva de Timer respecto al PWM, las latencias AXI y la duración de ISR deben comprobarse en integración; no se deduce un retardo exacto únicamente por habilitar el PWM dentro de la ISR.
 
 El presupuesto de la ISR (atención, lectura, cálculo, escritura, registro y reconocimiento) debe ser menor que el período de control, con margen para el lazo principal. Se mide con la salida GPIO de medición: se activa al entrar a la ISR y se desactiva al salir. En el osciloscopio se ven el período efectivo, el jitter y la duración, que son los indicadores de la prueba de precisión temporal del enunciado.
 

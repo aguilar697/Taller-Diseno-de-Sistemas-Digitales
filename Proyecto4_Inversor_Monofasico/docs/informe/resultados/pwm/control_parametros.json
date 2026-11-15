@@ -1,0 +1,233 @@
+{
+  "metodo": "Modelo RL promediado lineal, ZOH y retardos enteros. No valida el retardo fraccionario integrado ni saturacion.",
+  "coeficientes_c": [
+    0.2509707454,
+    0.0,
+    -0.2509707454,
+    -1.996504651667,
+    0.997490292546
+  ],
+  "diferencia_maxima_coeficientes": 3.970046513757097e-11,
+  "casos": [
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.006984,
+      "bus_v": 12,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -3.241319191476122,
+      "fase_grados": -0.6627156829072143
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.006984,
+      "bus_v": 12,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -3.2057916810840026,
+      "fase_grados": -0.7208712672513169
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.006984,
+      "bus_v": 24,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -1.645713308730945,
+      "fase_grados": -0.336816551064086
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.006984,
+      "bus_v": 24,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -1.6270611446471905,
+      "fase_grados": -0.366307233223335
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.006984,
+      "bus_v": 12,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -4.675929328078454,
+      "fase_grados": -0.6936864085665777
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.006984,
+      "bus_v": 12,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -4.639259696694376,
+      "fase_grados": -0.7776710714698821
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.006984,
+      "bus_v": 24,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -2.3921465791298835,
+      "fase_grados": -0.3551465030281037
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.006984,
+      "bus_v": 24,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -2.3724675406251228,
+      "fase_grados": -0.3980694110023423
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.009291,
+      "bus_v": 12,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -3.230404994409386,
+      "fase_grados": -0.8520110077849401
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.009291,
+      "bus_v": 12,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -3.185147290740753,
+      "fase_grados": -0.9099615648672477
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.009291,
+      "bus_v": 24,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -1.639001533206863,
+      "fase_grados": -0.4329994485633312
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.009291,
+      "bus_v": 24,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -1.615245864575865,
+      "fase_grados": -0.4623441050701439
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.009291,
+      "bus_v": 12,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -4.6655039837606775,
+      "fase_grados": -0.880038235154933
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.009291,
+      "bus_v": 12,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -4.619536653202195,
+      "fase_grados": -0.9638323184322604
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.009291,
+      "bus_v": 24,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -2.3855921047154283,
+      "fase_grados": -0.45052904452517983
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.009291,
+      "bus_v": 24,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -2.360928225062109,
+      "fase_grados": -0.49331075719028533
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.01,
+      "bus_v": 12,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -3.227261902962264,
+      "fase_grados": -0.9102063322972125
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.01,
+      "bus_v": 12,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -3.179011667632725,
+      "fase_grados": -0.9681014945295395
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.01,
+      "bus_v": 24,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -1.6369939394623945,
+      "fase_grados": -0.4625674521327073
+    },
+    {
+      "r_ohm": 7.2,
+      "l_h": 0.01,
+      "bus_v": 24,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -1.6116689823569508,
+      "fase_grados": -0.4918692202218024
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.01,
+      "bus_v": 12,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -4.662500924536372,
+      "fase_grados": -0.937341342979509
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.01,
+      "bus_v": 12,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -4.613673493022041,
+      "fase_grados": -1.0210841174208847
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.01,
+      "bus_v": 24,
+      "retardo_periodos": 1,
+      "estable": true,
+      "error_amplitud_pct": -2.3836310908683767,
+      "fase_grados": -0.4798575975006891
+    },
+    {
+      "r_ohm": 10.5,
+      "l_h": 0.01,
+      "bus_v": 24,
+      "retardo_periodos": 2,
+      "estable": true,
+      "error_amplitud_pct": -2.357434074905773,
+      "fase_grados": -0.5225978494806501
+    }
+  ],
+  "fuentes": {
+    "modelos\\analisis\\pr_discreto.py": "d415915473ca193e969b1999b5adc1d944ba238ebe4abea17d5920734df07fb9",
+    "software\\embedded\\control\\parametros.h": "3b45da159002bfec5b2999e6b908e26b4d5e59bc7183fe19df2038f6645b8b92"
+  }
+}

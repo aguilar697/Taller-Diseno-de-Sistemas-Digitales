@@ -1,0 +1,129 @@
+\documentclass[conference]{IEEEtran}
+\input{comun}
+\hypersetup{pdftitle={Evaluación del inversor monofásico: documento de trabajo}}
+\begin{document}
+\title{Implementación y evaluación de un inversor monofásico con control PR de corriente}
+\autores\maketitle\estado
+\begin{abstract}
+Se organiza la evaluación de un inversor monofásico con carga RL y control PR discreto. Se presentan los modelos, el método de medida y los resultados de simulación disponibles, junto con apartados identificados para parámetros reales, registros de laboratorio y comparación cuantitativa. La copia funcional incorpora tiempo muerto, resistencia de conducción y medición nominal cuantizada. Los resultados experimentales aún no están disponibles; no se declara validado el montaje ni la integración con MicroBlaze V.
+\end{abstract}
+\begin{IEEEkeywords}control de corriente, inversor, validación, PWM unipolar.\end{IEEEkeywords}
+
+\section{Introducción}
+El objetivo es seguir referencias sinusoidales de 50 Hz y 0,2, 0,5 y 1 A pico en una carga RL, con bus de 12 a 24 V \cite{enunciado}. El documento de diseño adjunto desarrolla la topología, el dimensionamiento y el candidato PR; este informe concentra implementación, resultados y discrepancias.
+
+Se distinguen cálculos, simulaciones y mediciones. El diseño de Potencia corresponde a los tres autores; la ejecución con MicroBlaze V se coordina con Taller. Si se emplea una plataforma alternativa en la demostración propia, se identificará y se separarán sus resultados de los integrados.
+
+\section{Montaje y parámetros}
+La solución prevista utiliza cuatro IRF540N, dos IR2110 DIP-14 y un ACS712 de 5 A \cite{irf,ir,acs}. Dos resistencias de $3,3\ \Omega$, 5 W, forman la carga nominal. Una tercera permite pasar de 6,6 a 9,9 $\Omega$. El secundario del transformador se usa con el primario abierto y aislado.
+
+\begin{table}[ht]\caption{Configuración y medidas por completar}\centering\small
+\begin{tabular}{@{}lll@{}}\toprule
+Magnitud & Modelo & Montaje\\\midrule
+Bus & 12/24 V & Pendiente\\
+R externa & $6,6\ \Omega$ & Pendiente\\
+R de devanado & $0,6\ \Omega$ aprox. & Confirmar\\
+L constante & 10 mH, supuesta & Verificar\\
+PWM & 10 kHz & Pendiente\\
+Control & 100 $\mu$s & Pendiente\\
+Tiempo muerto & 1 $\mu$s & Pendiente\\
+Límite de modulación & $\pm0,85$ & Confirmar\\\bottomrule
+\end{tabular}\end{table}
+
+
+Se midieron preliminarmente 9,291 mH a 120 Hz y 6,984 mH a 1 kHz. No se ha medido L a 50 Hz ni verificado su invariancia con la corriente.
+
+\pendiente{esquemático completo y fotografía, auxiliares y protección instalados, identificación del devanado, equipos y límites de alimentación}
+
+\section{Control y medición implementados}
+El candidato PR usa $K_p=12$, $K_r=200$, resonancia en 50 Hz y $\omega_c=2\pi2$ rad/s. La estructura de ancho de banda finito y su discretización se sustentan en \cite{pr}. La ecuación conservada es
+\begin{align}
+r[k]={}&0,2509707453602995(e[k]-e[k-2])\nonumber\\
+&+1,996504651666988r[k-1]\nonumber\\
+&-0,9974902925463971r[k-2].
+\end{align}
+Se suma $12e[k]$, se normaliza por 12 V y se aplica una muestra después, limitando la modulación. La implementación final deberá confirmar período, adquisición y actualización efectiva.
+
+La medición funcional usa 185 mV/A, offset de 2,5 V, divisor de 4,7 k$\Omega$/1 k$\Omega$, filtro de evaluación de 10 nF y cuantización de 12 bits \cite{acs,xadc}. Se supone calibración ideal, sin ruido ni deriva. El polo aproximado a 80 kHz no identifica el ancho de banda del módulo adquirido.
+
+\pendiente{plataforma y versión, período y jitter reales, calibración, alineación ADC, retardos y tratamiento de saturación}
+
+\section{Método experimental}
+\subsection{Puesta en marcha}
+Se documentarán instrumentos, sondas, referencias de tensión, escalas, ancho de banda y muestreo. Antes de energizar el puente se comprobarán las compuertas y el tiempo muerto. Se registrarán apagado, limitación de corriente y desconexión. El sensor se calibrará con una medida independiente.
+
+\pendiente{capturas de compuerta, tiempo muerto medido, bootstrap, cero y sensibilidad del sensor e incertidumbre}
+
+\subsection{Amplitud y fase}
+Se ajustará, sobre ciclos completos,
+\begin{equation}
+i(t)\approx a\sin(\omega_0t)+b\cos(\omega_0t)+c.
+\end{equation}
+Así, $I_{1,pk}=\sqrt{a^2+b^2}$ y $\phi_i=\operatorname{atan2}(b,a)$. El desfase se expresará respecto de la fundamental de la referencia sincronizada. Con muestreo uniforme y ciclos completos puede utilizarse proyección seno/coseno; en otro caso se documentará el ajuste apropiado.
+\begin{equation}
+E_A=100\frac{|I_{1,pk}-I_{\mathrm{ref},pk}|}{I_{\mathrm{ref},pk}}.
+\end{equation}
+La ventana mínima es de cinco períodos completos de 50 Hz, equivalentes a 100 ms, después del establecimiento. No se sustituirá la fundamental por el máximo instantáneo ni por el RMS total.
+
+\subsection{Rizado y transitorios}
+El residuo de conmutación se medirá respecto de una componente de baja frecuencia estimada mediante un procedimiento documentado. Se indicarán filtro, banda, resolución y ventana local. Los límites nominales son $E_A\leq10\,\%$ y $\Delta i_{\mathrm{sw},pp}\leq0,20$ A \cite{enunciado}. Se reporta fase sin límite adicional.
+
+Los escalones de amplitud y carga se realizarán por separado, conservando registros de referencia, corriente, tensión y PWM. Se analizarán picos, establecimiento y límites, distinguiendo transitorio y régimen.
+
+\section{Simulación}
+El modelo PR discreto conserva el puente ideal. La copia funcional añade Ron de 44 m$\Omega$ y órdenes con tiempo muerto de 1 $\mu$s \cite{irf,plecs}. No reproduce bootstrap, VGS, parásitos, temperatura, pérdidas de conmutación, caída o recuperación de diodos, saturación magnética ni anti-windup.
+\input{datos_simulacion.tex}
+La ventana nominal es [0,4; 0,5) s con exportación cada 2 $\mu$s. El máximo error nominal de la copia funcional fue aproximadamente 4,36\,\%. Los cambios de referencia se aplicaron a 0,205 s sin reiniciar la fase. La modulación alcanzó aproximadamente 0,836 en el cambio hacia 1 A, cercana al límite de 0,85.
+
+Entre 0,100 y 0,101 s se comprobaron las órdenes cada 100 ns: hubo actividad en las cuatro señales, cero muestras de solapamiento y 40 huecos completos, con mínimo observado de 1 $\mu$s. Esto no verifica las compuertas físicas ni el PWM en RTL.
+
+\section{Resultados experimentales}
+Esta sección se completará con datos originales del montaje. Las celdas pendientes no representan valores nulos ni criterios aprobados.
+
+\begin{table}[ht]\caption{Seguimiento experimental}\centering\small
+\begin{tabular}{@{}cccccc@{}}\toprule
+$V_{dc}$ & $I_{\mathrm{ref},pk}$ & $I_{1,pk}$ & $E_A$ & $\phi$ & $\Delta i_{pp}$\\
+(V) & (A) & (A) & (\%) & ($^\circ$) & (A)\\\midrule
+12 & 0,2 & Pend. & Pend. & Pend. & Pend.\\
+12 & 0,5 & Pend. & Pend. & Pend. & Pend.\\
+12 & 1,0 & Pend. & Pend. & Pend. & Pend.\\
+24 & 0,2 & Pend. & Pend. & Pend. & Pend.\\
+24 & 0,5 & Pend. & Pend. & Pend. & Pend.\\
+24 & 1,0 & Pend. & Pend. & Pend. & Pend.\\\bottomrule
+\end{tabular}\end{table}
+
+\pendiente{registros de las tres referencias a 12 y 24 V, condiciones reales y ventanas de análisis}
+
+
+\begin{table}[ht]\caption{Transitorios experimentales}\centering\small
+\begin{tabular}{@{}lll@{}}\toprule
+Ensayo & Pico de corriente & Establecimiento\\\midrule
+0,2 a 0,5 A & Pendiente & Pendiente\\
+0,5 a 1,0 A & Pendiente & Pendiente\\
+R externa: $+50\,\%$ & Pendiente & Pendiente\\\bottomrule
+\end{tabular}\end{table}
+
+\pendiente{capturas, criterio de establecimiento, modulación y temperatura}
+
+\section{Comparación y discusión}
+Se compararán banco y PLECS en condiciones coincidentes. Una discrepancia de amplitud se puede expresar como
+\begin{equation}
+\delta_I=100\frac{I_{1,pk}^{\mathrm{exp}}-I_{1,pk}^{\mathrm{sim}}}{I_{1,pk}^{\mathrm{sim}}}.
+\end{equation}
+Se discutirán por separado calibración, ruido, cuantización, filtrado, retardo, tiempo muerto, semiconductores y variación de R y L. No se asignará una causa sin evidencia.
+
+\pendiente{comparación cuantitativa, rizado, incertidumbre, pérdidas y explicación de discrepancias}
+
+\section{Integración con Taller}
+Se documentará la cadena ACS712--XADC--MicroBlaze V--PWM--IR2110 y los ensayos conjuntos. Esta integración corresponde a un rubro independiente de los 80 puntos propios de Potencia \cite{enunciado}.
+\pendiente{interfaces y versiones finales, adquisición sincronizada y pruebas integradas; si no se completan, registrar preparativos e intentos}
+
+\section{Conclusiones}
+La simulación predice seguimiento nominal con error de amplitud inferior al 10\,\% bajo las hipótesis evaluadas, y recuperación después de los cambios de referencia y carga. La validación física y la comprobación final de rizado permanecen pendientes.
+\pendiente{conclusiones basadas en mediciones, cumplimiento, limitaciones y mejoras}
+
+\section*{Evidencias adjuntas}
+Se acompañarán los modelos PLECS, scripts, parámetros, registros de simulación y datos experimentales originales, con instrucciones de reproducción. Cada figura deberá corresponder a un archivo y a condiciones identificadas. Los registros experimentales todavía no existen.
+\newpage
+\referencias
+\end{document}
