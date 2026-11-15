@@ -138,7 +138,7 @@ La ventana registrada es `N_BUF · K_REG · Ts`. El enunciado pide al menos 100 
 
 `N_BUF` se ajusta cuando se conozca el tamaño real del programa. Si hay espacio, conviene aumentarlo para cubrir más períodos y mejorar la extracción de la fundamental.
 
-La muestra se toma en el valle de la portadora, que es el instante en que la corriente instantánea coincide con su valor medio en el período. Por eso el registro representa la componente de baja frecuencia, no el rizado de conmutación. Además, con frecuencias de registro de 8 a 10 kHz el rizado a la frecuencia de conmutación tampoco es observable. El rizado pico a pico se mide con el osciloscopio, como pide el enunciado; la PC analiza la fundamental, su error y su desfase.
+La configuración inicial dispara la adquisición a mitad del período PWM (`TRIGGER_PHASE=5000` a 10 kHz). La relación con la ISR y la aplicación de la referencia se detalla en el [contrato de integración](pwm_integracion.md). La fase de disparo no garantiza por sí sola que la corriente leída sea exactamente el valor medio; se debe comprobar el efecto de los bordes y la latencia de adquisición. El rizado pico a pico se mide con el osciloscopio; la PC analiza la fundamental, su error y su desfase, con una adquisición que evite confundir rizado y aliasing.
 
 ## 3. Inicialización y lazo principal
 

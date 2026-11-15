@@ -47,6 +47,8 @@ Cada responsable aporta el análisis y las evidencias de su subsistema. Los resu
 
 ## Análisis disponibles
 
+- [Verificación del periférico PWM](pwm_verificacion.md): pruebas funcionales, error forzado, coordinación digital PWM–ADC y alcance de implementación.
+
 - [Simulación de potencia y control](../../Potencia/02_simulacion_y_resultados.md): modelos ideales de PLECS, configuración guardada y alcance de los ensayos exploratorios.
 - [Análisis numéricos](../../modelos/analisis/README.md): barrido inicial de 144 escenarios de rizado y comprobación lineal del PR. Los datos conservados corresponden a cálculos, no a mediciones físicas.
 

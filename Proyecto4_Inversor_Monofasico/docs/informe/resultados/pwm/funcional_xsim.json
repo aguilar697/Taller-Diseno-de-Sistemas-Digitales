@@ -1,0 +1,67 @@
+[
+  {
+    "top": "tb_pwm_deadtime",
+    "resultado": "PASS",
+    "comprobaciones": 20,
+    "simulador": "xsim",
+    "codigo_salida": 0,
+    "fuentes": {
+      "src\\design\\pwm\\pwm_deadtime.sv": "124d876e947e50f5c54e60c581aa46d860dbe0e5506df3c3e916de1ecb7abc20",
+      "src\\design\\pwm\\pwm_core.sv": "b53956779571893d3b619329629cbcb6f66454d56190bb52b37724f8f6e26c36",
+      "src\\design\\pwm\\pwm_axi_lite.sv": "82744ef6fa432306debf686a87148e19ce86bc78c72757d040005e9e66173f2d",
+      "src\\design\\pwm\\pwm_system_axi.sv": "2b038059bb2b01d804f2f9d6c7c601e4690ab318ed067c5b8fd1afd63e25526f",
+      "src\\testbench\\pwm\\tb_pwm_deadtime.sv": "773f5f6bbe7d36c4da227fd98f272b5ea0b58eabbd5d08bf3022c337e71db7ad",
+      "src\\testbench\\pwm\\pwm_axi_tb.svh": "5529b2c42645cbfa3f596fbe85d31d75c62a6af9ef8d84c4d7cae15f98473c66",
+      "scripts\\verificacion\\pwm\\ejecutar_pruebas_pwm.py": "fb25eb429637b99832518a91b5dc645186da4aad1883a1ce480cf1d19f0d969b"
+    }
+  },
+  {
+    "top": "tb_pwm_core",
+    "resultado": "PASS",
+    "comprobaciones": 1064490,
+    "simulador": "xsim",
+    "codigo_salida": 0,
+    "fuentes": {
+      "src\\design\\pwm\\pwm_deadtime.sv": "124d876e947e50f5c54e60c581aa46d860dbe0e5506df3c3e916de1ecb7abc20",
+      "src\\design\\pwm\\pwm_core.sv": "b53956779571893d3b619329629cbcb6f66454d56190bb52b37724f8f6e26c36",
+      "src\\design\\pwm\\pwm_axi_lite.sv": "82744ef6fa432306debf686a87148e19ce86bc78c72757d040005e9e66173f2d",
+      "src\\design\\pwm\\pwm_system_axi.sv": "2b038059bb2b01d804f2f9d6c7c601e4690ab318ed067c5b8fd1afd63e25526f",
+      "src\\testbench\\pwm\\tb_pwm_core.sv": "c2f6b0906695f2adee51eb45f34857422f62f03b325749e12d2485a747cbd592",
+      "src\\testbench\\pwm\\pwm_axi_tb.svh": "5529b2c42645cbfa3f596fbe85d31d75c62a6af9ef8d84c4d7cae15f98473c66",
+      "scripts\\verificacion\\pwm\\ejecutar_pruebas_pwm.py": "fb25eb429637b99832518a91b5dc645186da4aad1883a1ce480cf1d19f0d969b"
+    }
+  },
+  {
+    "top": "tb_pwm_axi",
+    "resultado": "PASS",
+    "comprobaciones": 1220,
+    "simulador": "xsim",
+    "codigo_salida": 0,
+    "fuentes": {
+      "src\\design\\pwm\\pwm_deadtime.sv": "124d876e947e50f5c54e60c581aa46d860dbe0e5506df3c3e916de1ecb7abc20",
+      "src\\design\\pwm\\pwm_core.sv": "b53956779571893d3b619329629cbcb6f66454d56190bb52b37724f8f6e26c36",
+      "src\\design\\pwm\\pwm_axi_lite.sv": "82744ef6fa432306debf686a87148e19ce86bc78c72757d040005e9e66173f2d",
+      "src\\design\\pwm\\pwm_system_axi.sv": "2b038059bb2b01d804f2f9d6c7c601e4690ab318ed067c5b8fd1afd63e25526f",
+      "src\\testbench\\pwm\\tb_pwm_axi.sv": "230bed65776a301bb0df5cc9886b99f5e6bec6c4b1e73abc199db0136061ffbb",
+      "src\\testbench\\pwm\\pwm_axi_tb.svh": "5529b2c42645cbfa3f596fbe85d31d75c62a6af9ef8d84c4d7cae15f98473c66",
+      "scripts\\verificacion\\pwm\\ejecutar_pruebas_pwm.py": "fb25eb429637b99832518a91b5dc645186da4aad1883a1ce480cf1d19f0d969b"
+    }
+  },
+  {
+    "top": "tb_pwm_adc",
+    "resultado": "PASS",
+    "comprobaciones": 260195,
+    "simulador": "xsim",
+    "codigo_salida": 0,
+    "fuentes": {
+      "src\\design\\pwm\\pwm_deadtime.sv": "124d876e947e50f5c54e60c581aa46d860dbe0e5506df3c3e916de1ecb7abc20",
+      "src\\design\\pwm\\pwm_core.sv": "b53956779571893d3b619329629cbcb6f66454d56190bb52b37724f8f6e26c36",
+      "src\\design\\pwm\\pwm_axi_lite.sv": "82744ef6fa432306debf686a87148e19ce86bc78c72757d040005e9e66173f2d",
+      "src\\design\\pwm\\pwm_system_axi.sv": "2b038059bb2b01d804f2f9d6c7c601e4690ab318ed067c5b8fd1afd63e25526f",
+      "src\\design\\adc\\adc_control.sv": "2057ce7cb094443a525d6f5b50ffd45974d9decbf14fb4d9f54df9bcf65f106d",
+      "src\\testbench\\pwm\\tb_pwm_adc.sv": "44768fe0296f320e69120a9dcdd3d07fa17e98b745d98348a645dbb441b745cd",
+      "src\\testbench\\pwm\\pwm_axi_tb.svh": "5529b2c42645cbfa3f596fbe85d31d75c62a6af9ef8d84c4d7cae15f98473c66",
+      "scripts\\verificacion\\pwm\\ejecutar_pruebas_pwm.py": "fb25eb429637b99832518a91b5dc645186da4aad1883a1ce480cf1d19f0d969b"
+    }
+  }
+]

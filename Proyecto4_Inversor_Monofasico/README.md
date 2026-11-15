@@ -22,8 +22,10 @@ La evaluación se organiza por curso. Taller de Diseño Digital comprende a los 
 - [Diseño e interfaces del sistema](docs/diseno/README.md).
 - [Primer nivel: sistema, entradas y salidas](docs/diseno/nivel_1.md).
 - [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
-- [Tercer nivel del PWM: bloques e interfaz propuesta](docs/diseno/nivel_3_pwm.md).
+- [Tercer nivel del PWM: bloques e interfaz](docs/diseno/nivel_3_pwm.md).
 - [Cuarto nivel del PWM: circuitos y secuencias](docs/diseno/nivel_4_pwm.md).
+- [Integración del PWM con ADC, Timer y software](docs/diseno/pwm_integracion.md).
+- [Verificación independiente del PWM](docs/informe/pwm_verificacion.md).
 - [Potencia: componentes, simulaciones y pendientes](Potencia/README.md).
 - [Registro de laboratorio de potencia y continuidad de pruebas](Potencia/04_registro_laboratorio.md).
 - [Organización del informe y las evidencias](docs/informe/README.md).
