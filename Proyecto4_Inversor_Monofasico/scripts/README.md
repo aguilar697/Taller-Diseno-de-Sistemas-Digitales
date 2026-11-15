@@ -10,4 +10,6 @@ Cada script documenta su herramienta, versión, argumentos, entradas y salidas. 
 
 Los procedimientos de ejecución se incorporan junto con los scripts implementados. Las pruebas terminan con un código de error ante fallos y conservan los registros necesarios para reproducir el resultado.
 
+El [procedimiento PWM](../src/testbench/pwm/README.md) utiliza `verificacion/pwm/ejecutar_pruebas_pwm.py` para simulación funcional y prueba de error forzado, `implementar_pwm.py` y su Tcl para implementación independiente, y `agregar_pwm.tcl` para incorporar las fuentes a un proyecto abierto.
+
 [Descripción del proyecto](../README.md)

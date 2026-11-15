@@ -8,7 +8,7 @@ Convertir la referencia de modulación escrita por MicroBlaze V en cuatro órden
 
 El subsistema comprende la interfaz AXI4-Lite, los registros, la base de tiempo, el modulador, la inserción de tiempo muerto y el disparo de adquisición. El procesador calcula el PR; el PWM utiliza la referencia resultante para generar la actuación.
 
-Este documento especifica una propuesta de interfaz para la integración con plataforma, adquisición y software. Las frecuencias de evaluación RTL se distinguen de los parámetros que deben justificarse con el inversor y su instrumentación.
+Este documento describe la interfaz implementada en `pwm_system_axi`. El [contrato de integración](pwm_integracion.md) reúne los valores iniciales, la conexión con el ADC y la secuencia del control. Los parámetros eléctricos requieren además validación con el inversor y su instrumentación.
 
 ## Diagrama del subsistema
 
@@ -31,6 +31,7 @@ La banda de configuración representa conexiones internas agrupadas, no una segu
 | `pwm_ah`, `pwm_al` | Salidas | Órdenes superior e inferior de la rama A |
 | `pwm_bh`, `pwm_bl` | Salidas | Órdenes superior e inferior de la rama B |
 | `pwm_trigger_o` | Salida | Evento de inicio de adquisición dirigido a la interfaz ADC |
+| `pwm_period_start_o` | Salida | Pulso de diagnóstico de un ciclo al comenzar cada período; permite medir la fase respecto al Timer |
 
 En la interfaz lógica, uno representa una orden de activación y cero una orden inactiva. La adaptación a los drivers, la correspondencia de pines y los niveles eléctricos pertenecen a la conexión de actuación. El periférico permanece deshabilitado después del reset.
 
@@ -92,7 +93,7 @@ Este pulso es un evento de la interfaz digital. La adquisición lo captura y ada
 
 ## Configuración y actualización
 
-| Suceso | Comportamiento propuesto |
+| Suceso | Comportamiento implementado |
 |---|---|
 | Reset | Habilitación y `running` en cero; órdenes y disparo inactivos |
 | Configuración en reposo | Permite cambiar frecuencia, tiempo muerto y posición del disparo; se validan sus límites |
@@ -106,7 +107,7 @@ Este pulso es un evento de la interfaz digital. La adquisición lo captura y ada
 
 ## Frecuencias de evaluación RTL
 
-La propuesta de ensayos digitales utiliza tres frecuencias que pueden representarse con un número entero de ciclos. Si `N` es la duración de medio período, la frecuencia es `100 MHz / (2 · N)`.
+El RTL permite tres frecuencias con un número entero de ciclos. Si `N` es la duración de medio período, la frecuencia es `100 MHz / (2 · N)`.
 
 | `freq_sel` | Frecuencia de portadora | Período | Ciclos por período | `N` |
 |---|---:|---:|---:|---:|
@@ -128,7 +129,7 @@ Estos valores sirven para evaluar la lógica y sus cambios de configuración. La
 - Un disparo por período y coincidencia con la posición configurada.
 - Simulación temporizada del periférico implementado y observación de sus salidas.
 
-Las pruebas se almacenan en `src/testbench/pwm/`. El [cuarto nivel](nivel_4_pwm.md) desarrolla registros, contadores, comparadores, estados y prioridades a partir de estas funciones.
+Las pruebas se almacenan en `src/testbench/pwm/`; sus [resultados y alcance](../informe/pwm_verificacion.md) identifican las verificaciones ejecutadas. El [cuarto nivel](nivel_4_pwm.md) desarrolla registros, contadores, comparadores, estados y prioridades a partir de estas funciones.
 
 ## Referencias
 

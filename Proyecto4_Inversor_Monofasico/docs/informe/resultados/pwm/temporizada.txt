@@ -1,0 +1,34 @@
+#-----------------------------------------------------------
+# xsim v2026.1 (64-bit)
+# SW Build 6511674 on Tue Jun 16 11:02:23 MDT 2026
+# IP Build 6504888 on Tue Jun 09 09:05:25 MDT 2026
+# SharedData Build 6501428 on Mon Jun 08 17:34:18 MDT 2026
+# Start of session at: Sat Nov 14 17:48:16 2026
+# Process ID         : 24012
+# Current directory  : C:/Users/kevin/OneDrive/Kevin/TEC/2026 II SEM/Taller de Diseño Digital/Proyectos/Taller-Diseno-de-Sistemas-Digitales/Proyecto4_Inversor_Monofasico/build/pwm/sdf_entrega_02/tb_pwm_timing
+# Command line       : xsim.exe -log simulate.log -mode tcl -source {xsim.dir/tb_pwm_timing/xsim_script.tcl}
+# Log file           : C:/Users/kevin/OneDrive/Kevin/TEC/2026 II SEM/Taller de Diseño Digital/Proyectos/Taller-Diseno-de-Sistemas-Digitales/Proyecto4_Inversor_Monofasico/build/pwm/sdf_entrega_02/tb_pwm_timing/simulate.log
+# Journal file       : C:/Users/kevin/OneDrive/Kevin/TEC/2026 II SEM/Taller de Diseño Digital/Proyectos/Taller-Diseno-de-Sistemas-Digitales/Proyecto4_Inversor_Monofasico/build/pwm/sdf_entrega_02/tb_pwm_timing\xsim.jou
+# Running On         : Kevin
+# Platform           : Windows 11
+# Operating System   : 26300
+# Processor Detail   : 11th Gen Intel(R) Core(TM) i7-11800H @ 2.30GHz
+# CPU Frequency      : 2304 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 16935 MB
+# Swap memory        : 17179 MB
+# Total Virtual      : 34115 MB
+# Available Virtual  : 14894 MB
+#-----------------------------------------------------------
+source xsim.dir/tb_pwm_timing/xsim_script.tcl
+# xsim {tb_pwm_timing} -autoloadwcfg -runall
+Time resolution is 1 ps
+run -all
+PWM_SDF_MAXIMUM_ENABLED
+TEST PASSED tb_pwm_timing checks=81 periods=3
+$finish called at time : 510926 ns : File "C:/Users/kevin/OneDrive/Kevin/TEC/2026 II SEM/Taller de Diseño Digital/Proyectos/Taller-Diseno-de-Sistemas-Digitales/Proyecto4_Inversor_Monofasico/src/testbench/pwm/tb_pwm_timing.sv" Line 61
+run: Time (s): cpu = 00:00:00 ; elapsed = 00:00:24 . Memory (MB): peak = 239.156 ; gain = 0.000
+exit
+INFO: xsimkernel Simulation Memory Usage: 40768 KB (Peak: 40768 KB), Simulation CPU Usage: 23999 ms
+INFO: [Common 17-206] Exiting xsim at Sat Nov 14 17:48:42 2026...

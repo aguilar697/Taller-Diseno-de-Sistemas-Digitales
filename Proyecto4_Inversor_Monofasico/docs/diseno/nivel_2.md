@@ -64,7 +64,7 @@ El periférico expone habilitación, selección de al menos tres frecuencias, re
 
 Los offsets `0x00` para control/estado y `0x04` para referencia son la propuesta de interfaz del instructivo. El mapa detallado, el formato numérico, la configuración de tiempo muerto y la política de actualización se desarrollan con los responsables de actuación y control. Las direcciones base pertenecen al mapa general del Block Design.
 
-El [tercer nivel del PWM](nivel_3_pwm.md) desarrolla estos bloques y la propuesta de registros, referencia, actualización y disparo de adquisición.
+El [tercer nivel del PWM](nivel_3_pwm.md) desarrolla los bloques y registros implementados. El [contrato de integración](pwm_integracion.md) fija inicialmente PWM y control a 10 kHz, disparo a mitad del período y actualización de referencia en el siguiente inicio de período.
 
 ## Responsabilidades
 

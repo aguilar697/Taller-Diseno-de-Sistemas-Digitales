@@ -4,7 +4,7 @@
 
 Desarrollar los circuitos y las reglas de actualización del [tercer nivel del PWM](nivel_3_pwm.md): recepción AXI4-Lite, banco de registros, contador de fase, cuantización de referencia, comparadores, estados de tiempo muerto y pulso de adquisición.
 
-La arquitectura es una propuesta para implementación RTL. Las ecuaciones y secuencias definen el comportamiento que deben comprobar los testbenches; los parámetros eléctricos se justifican con la etapa de potencia.
+La arquitectura se implementa en `pwm_axi_lite`, `pwm_core` y `pwm_deadtime`, conectados por `pwm_system_axi`. Las ecuaciones y secuencias definen el comportamiento comprobado por los testbenches; los parámetros eléctricos se justifican y ensayan con la etapa de potencia. El [contrato de integración](pwm_integracion.md) establece la configuración inicial.
 
 ## 1. Interfaz AXI y banco de registros
 
@@ -26,7 +26,7 @@ El ancho de dirección local `A` es parametrizable y al menos cuatro bits. El ra
 
 AW y W disponen de un registro de captura y un indicador de ocupación independientes. Se admite una escritura pendiente. El diseño puede recibir primero cualquiera de los dos canales; la escritura interna ocurre una vez cuando ambas capturas están ocupadas y no hay respuesta B pendiente.
 
-Se propone `AWREADY = aresetn && !aw_full && !bvalid` y una expresión equivalente para W. Al ejecutar `wr_req`, se liberan ambas capturas y se registra BVALID junto con BRESP. La respuesta se conserva hasta el handshake BVALID/BREADY. Esta implementación introduce ciclos de espera y prioriza una operación sencilla de verificar sobre el rendimiento del bus.
+Se utiliza `AWREADY = aresetn && !aw_full && !bvalid` y una expresión equivalente para W. Al ejecutar `wr_req`, se liberan ambas capturas y se registra BVALID junto con BRESP. La respuesta se conserva hasta el handshake BVALID/BREADY. Esta implementación introduce ciclos de espera y prioriza una operación sencilla de verificar sobre el rendimiento del bus.
 
 El canal de lectura admite una respuesta pendiente: `ARREADY = aresetn && !rvalid`. Al aceptar AR, se registra el dato seleccionado y su respuesta. Ambos permanecen estables hasta el handshake RVALID/RREADY. Una lectura y una escritura internas coincidentes devuelven en la lectura el contenido anterior al flanco de actualización.
 
@@ -69,7 +69,7 @@ El encendido requiere parámetros coherentes. D=0, valor de reset, no permite ar
 | Contador `p_q` | Recorre 0 a P−1; 14 bits bastan para P máximo de evaluación |
 | Umbrales `h_A`, `h_B` | Enteros entre 0 y N; 13 bits bastan para N máximo |
 | Referencia | 16 bits con signo, Q1.15 |
-| Aritmética intermedia | Al menos 32 bits, con extensiones de signo y conversiones explícitas |
+| Aritmética intermedia | Producto con signo de 29 bits y desplazamiento de 13 bits; configuración AXI de 32 bits |
 
 Los anchos se derivan de los máximos configurables cuando se cambie la tabla de frecuencias. `MOD_LIMIT_Q15` define la magnitud admisible de referencia, entre 1 y 32767; `MIN_ON_CYCLES` define la duración mínima de una orden activa después del tiempo muerto. Son parámetros de integración que requieren justificación con el accionamiento, no constantes físicas deducidas de las frecuencias de ensayo.
 
@@ -107,6 +107,8 @@ Luego, `h_A=N/2+r` y `h_B=N/2−r`. Los N de evaluación son pares. El redondeo 
 
 Las órdenes ideales superiores son `raw_AH = (c_2 < 2*h_A)` y `raw_BH = (c_2 < 2*h_B)`. Las inferiores son sus complementarias. Cada orden superior ocupa exactamente `2*h` ciclos antes de insertar tiempo muerto.
 
+La implementación compara directamente los intervalos equivalentes `p<h` o `p≥P−h`, sin formar primero la resta de la portadora descendente. La secuencia triangular y la duración de los pulsos son las mismas; se reduce la profundidad combinacional hacia las máquinas de tiempo muerto.
+
 | Referencia, N=2500 | `h_A` | `h_B` | Ciclo ideal A | Ciclo ideal B |
 |---|---:|---:|---:|---:|
 | m=0 | 1250 | 1250 | 50 % | 50 % |
@@ -114,6 +116,8 @@ Las órdenes ideales superiores son `raw_AH = (c_2 < 2*h_A)` y `raw_BH = (c_2 < 
 | m=−0,5 | 625 | 1875 | 25 % | 75 % |
 
 La referencia equivalente cuantizada es `m_q=2r/N`; su diferencia respecto a la referencia saturada está acotada por `1/N`. Esta cota corresponde a cuantización temporal ideal, no al error experimental de corriente. El tiempo muerto altera los tiempos de conducción reales.
+
+En RTL se obtiene el mismo desplazamiento mediante el producto con signo `N*m_sat`: se suma 32768 para valores no negativos y 32767 para negativos, y se toma el desplazamiento aritmético de 16 posiciones. Así se conserva el redondeo simétrico sin encadenar un cálculo de valor absoluto. Los dos umbrales se calculan en paralelo como `N/2+r` y `N/2−r`.
 
 ### Validación del conjunto de parámetros
 
@@ -128,7 +132,7 @@ Esta condición mantiene los umbrales dentro del período y deja margen para el 
 
 ### Referencia pendiente y activa
 
-Cada escritura REFERENCE produce una pareja coherente: referencia saturada y umbrales pendientes. Si se modifica la frecuencia en reposo, se recalculan los umbrales pendientes. Al habilitar se usan los parámetros candidatos; durante operación la pareja se transfiere a los registros activos únicamente al retornar la fase a cero.
+Cada escritura REFERENCE conserva una referencia pendiente saturada. El núcleo calcula los dos umbrales con esa referencia y la frecuencia seleccionada, y los registra juntos al habilitar o retornar la fase a cero. No se aplica una referencia distinta a cada rama. Si cambia la frecuencia en reposo, el cálculo de arranque utiliza su nuevo valor.
 
 Si una escritura coincide con `period_start`, se aplica la pareja que ya estaba pendiente antes del flanco. La nueva escritura queda para el período siguiente. Esta prioridad evita usar una referencia nueva con umbrales anteriores. Las escrituras posteriores sustituyen la pareja pendiente completa.
 
@@ -162,6 +166,8 @@ El disparo se registra durante un intervalo cuando la fase del intervalo coincid
 
 Las salidas registradas de cada flanco se calculan a partir de la fase y la referencia que regirán después de ese flanco. En un retorno a cero, primero se selecciona la pareja activa para el nuevo período; con ella se obtienen las órdenes ideales que consumen las máquinas de tiempo muerto. Esto evita un desfase de un ciclo entre contador, comparadores y disparo.
 
+Para todo el rango permitido, ambos umbrales son mayores que cero. Por ello, en el intervalo de fase cero ambas órdenes superiores ideales valen uno, independientemente de la referencia. El RTL utiliza esa identidad en el límite del período y registra en paralelo los nuevos umbrales; en los demás intervalos compara con los umbrales activos. Esto separa el cálculo de cuantización de las entradas de las máquinas de tiempo muerto sin añadir un ciclo de retardo a la aplicación de referencia.
+
 La interfaz ADC síncrona reconoce el pulso en el siguiente flanco receptor. Su adaptación al XADC y la latencia de conversión forman parte de la temporización de adquisición. El PWM continúa su base de tiempo sin esperar el resultado del ADC.
 
 ## 5. Comprobaciones para el RTL
@@ -179,7 +185,7 @@ La interfaz ADC síncrona reconoce el pulso en el siguiente flanco receptor. Su 
 | Tiempo muerto D | Separación de al menos D ciclos entre órdenes complementarias |
 | Fase ADC cero y P−1 | Un pulso de un ciclo por período, identificado con la fase correspondiente |
 
-Las comprobaciones de ecuaciones y secuencias permiten revisar la propuesta. La conformidad del circuito requiere los testbenches RTL, el análisis de implementación y la simulación temporizada. La aceptación eléctrica depende además del ensayo con drivers y etapa de potencia.
+Los [resultados de verificación](../informe/pwm_verificacion.md) identifican los bancos ejecutados y las condiciones de implementación. La aceptación eléctrica depende además del ensayo con drivers y etapa de potencia.
 
 ## Referencias
 

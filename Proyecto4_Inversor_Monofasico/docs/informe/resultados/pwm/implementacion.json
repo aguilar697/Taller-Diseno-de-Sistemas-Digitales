@@ -1,0 +1,11 @@
+{
+  "resultado": "PASS",
+  "codigo_salida": 0,
+  "fuentes": {
+    "src\\design\\pwm\\pwm_deadtime.sv": "124d876e947e50f5c54e60c581aa46d860dbe0e5506df3c3e916de1ecb7abc20",
+    "src\\design\\pwm\\pwm_core.sv": "b53956779571893d3b619329629cbcb6f66454d56190bb52b37724f8f6e26c36",
+    "src\\design\\pwm\\pwm_axi_lite.sv": "82744ef6fa432306debf686a87148e19ce86bc78c72757d040005e9e66173f2d",
+    "src\\design\\pwm\\pwm_system_axi.sv": "2b038059bb2b01d804f2f9d6c7c601e4690ab318ed067c5b8fd1afd63e25526f",
+    "scripts\\verificacion\\pwm\\implementar_pwm.tcl": "514ba1f31e8dd95a1b23dcbc3af62bc41647174b4112469aff52cda41fe6ea23"
+  }
+}

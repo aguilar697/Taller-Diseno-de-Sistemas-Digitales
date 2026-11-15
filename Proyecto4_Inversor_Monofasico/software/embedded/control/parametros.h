@@ -2,7 +2,7 @@
 #ifndef PARAMETROS_H
 #define PARAMETROS_H
 
-/* Frecuencia y período de control (simulación de Aguilar; falta cerrar) */
+/* Configuración inicial de integración: reloj AXI de 100 MHz. */
 #define F_SW_HZ             10000u       /* conmutación */
 #define FREQ_SEL            0u           /* 00/01/10 = 10/20/25 kHz */
 #define N_PWM_POR_CONTROL   1u           /* períodos PWM por período de control */
@@ -13,7 +13,7 @@
 
 /* PWM (tiempo muerto inicial de Aguilar para el IR2110) */
 #define DEADTIME_CICLOS     100u         /* 1 us */
-#define TRIGGER_PHASE       0u           /* PRUEBA: Aguilar y Campos */
+#define TRIGGER_PHASE       5000u        /* mitad de los 10000 ciclos del PWM a 10 kHz */
 #define N_ARRANQUE          5u           /* períodos con m = 0: carga del bootstrap */
 
 /* Controlador PR (Kp = 12, Kr = 200, wc = 2*pi*2; Tustin con pre-warping, Ts = 100 us) */
@@ -24,11 +24,15 @@
 #define PR_A1               (-1.996504651667f)
 #define PR_A2               0.997490292546f
 
-/* Conversión a modulación (si cambia el bus, cambiar VDC_V y no las ganancias) */
+/* Base fija de normalización del modelo inicial. El bus físico puede variar
+ * entre 12 y 24 V; variar la fuente no requiere recompilar esta constante.
+ * Una futura compensación por Vdc medido requiere validación del lazo. */
 #define VDC_V               12.0f
 #define MOD_LIMIT_Q15       27853        /* m = 0,85; mismo límite que el PWM */
 
-/* Medición (divisor 4,7k/1k del ACS712, nominal; falta calibrar) */
+/* Medición nominal de prueba, sin calibración del montaje. La orientación
+ * ensayada del ACS712 tiene pendiente negativa: medir cero y ganancia firmada
+ * antes de habilitar el control físico; no usar estos valores como calibración. */
 #define OFFSET_ADC          1796.5f      /* código para 0 A */
 #define GANANCIA_ADC        0.0075222f   /* A por código */
 #define CODIGO_MIN          16u          /* PRUEBA: Campos */
