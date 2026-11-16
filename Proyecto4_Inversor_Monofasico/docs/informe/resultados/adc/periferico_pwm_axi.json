@@ -1,0 +1,165 @@
+{
+  "date": "2026-11-15",
+  "base_commit": "23e741e273438c957260c6a1ca5000271bff8d16",
+  "tool": "Vivado/XSim 2026.1",
+  "testbench": "tb_adc_pwm_axi",
+  "result": "PASS",
+  "cases": [
+    {
+      "id": 1,
+      "description": "reset y registros del periferico ADC",
+      "result": "PASS"
+    },
+    {
+      "id": 2,
+      "description": "PWM AXI con 100 MHz, D100 y fase 5000",
+      "result": "PASS"
+    },
+    {
+      "id": 3,
+      "description": "cuatro muestras por AXI y referencia aplicada en el periodo siguiente",
+      "result": "PASS"
+    },
+    {
+      "id": 4,
+      "description": "ACK5 atrasado conserva new_data de la muestra6",
+      "result": "PASS"
+    },
+    {
+      "id": 5,
+      "description": "RREADY detenido durante una publicacion XADC",
+      "result": "PASS"
+    },
+    {
+      "id": 6,
+      "description": "ACK valido y duplicado sin consumir publicaciones ajenas",
+      "result": "PASS"
+    },
+    {
+      "id": 7,
+      "description": "apagado PWM sin conversiones adicionales",
+      "result": "PASS"
+    },
+    {
+      "id": 8,
+      "description": "reset del periferico y cancelacion del snapshot",
+      "result": "PASS"
+    }
+  ],
+  "clock_period_ns": 10,
+  "pwm_period_cycles": 10000,
+  "trigger_phase_cycles": 5000,
+  "deadtime_min_cycles": {
+    "a": 100,
+    "b": 100
+  },
+  "triggers": 8,
+  "conversions": 8,
+  "publications": 8,
+  "latencies": [
+    {
+      "id": 1,
+      "convst_sample_cycles": 112,
+      "trigger_sample_cycles": 113
+    },
+    {
+      "id": 2,
+      "convst_sample_cycles": 112,
+      "trigger_sample_cycles": 113
+    },
+    {
+      "id": 3,
+      "convst_sample_cycles": 112,
+      "trigger_sample_cycles": 113
+    },
+    {
+      "id": 4,
+      "convst_sample_cycles": 112,
+      "trigger_sample_cycles": 113
+    },
+    {
+      "id": 5,
+      "convst_sample_cycles": 112,
+      "trigger_sample_cycles": 113
+    },
+    {
+      "id": 6,
+      "convst_sample_cycles": 112,
+      "trigger_sample_cycles": 113
+    },
+    {
+      "id": 7,
+      "convst_sample_cycles": 112,
+      "trigger_sample_cycles": 113
+    },
+    {
+      "id": 8,
+      "convst_sample_cycles": 112,
+      "trigger_sample_cycles": 113
+    }
+  ],
+  "simulation_end_ns": 902950,
+  "compile_elaborate_simulation_exit_codes": [
+    0,
+    0,
+    0
+  ],
+  "warnings": 0,
+  "errors": 0,
+  "late_ack_example": {
+    "time_ns": "601846",
+    "event": "ACK_CMD",
+    "event_id": "5",
+    "event_token": "00000005",
+    "live_id": "6",
+    "live_token": "00000006",
+    "new_data": "1"
+  },
+  "read_snapshot_example": {
+    "time_ns": "701770",
+    "event": "READ_SAMPLE",
+    "event_id": "6",
+    "event_token": "00000006",
+    "live_id": "7",
+    "live_token": "00000007",
+    "new_data": "1"
+  },
+  "negative_ack_test": {
+    "result": "EXPECTED_FAILURE",
+    "reason": "ACK atrasado sin comparar token borra new_data posterior",
+    "compile_exit": 0,
+    "elaborate_exit": 0,
+    "simulation_exit": 0,
+    "source_production_modified": false,
+    "mutant_sha256": "d48864c54dee3f6f2591faf43bb19be1f23df153b388bf4a3903fd2cca6b325d"
+  },
+  "source_sha256": {
+    "src/design/adc/adc_control.sv": "2057ce7cb094443a525d6f5b50ffd45974d9decbf14fb4d9f54df9bcf65f106d",
+    "src/design/adc/adc_top.sv": "556df582813418f4345c577de90ca90a81728993ff21d5b407b77ddcb48f1374",
+    "build/adc/periferico_pwm_axi_entrega_20261115/ip/project/adc_repro.gen/sources_1/ip/xadc_wiz_0/xadc_wiz_0.v": "7aeaf95d8554174bd1c6fdeb81e1f82d1eb8cae18ba33d91aec9ef0e33ac0ad5",
+    "src/design/adc/adc_axi_lite.sv": "b5f43b76211f2f34e864aaefc5908270123ded3f267c2f1dcdb85146c12d297a",
+    "src/design/adc/adc_system_axi.sv": "09b588073995823884b443c2fa9cbecd50299c8eb7a147491499df9e72297448",
+    "src/design/pwm/pwm_deadtime.sv": "124d876e947e50f5c54e60c581aa46d860dbe0e5506df3c3e916de1ecb7abc20",
+    "src/design/pwm/pwm_core.sv": "b53956779571893d3b619329629cbcb6f66454d56190bb52b37724f8f6e26c36",
+    "src/design/pwm/pwm_axi_lite.sv": "82744ef6fa432306debf686a87148e19ce86bc78c72757d040005e9e66173f2d",
+    "src/design/pwm/pwm_system_axi.sv": "2b038059bb2b01d804f2f9d6c7c601e4690ab318ed067c5b8fd1afd63e25526f",
+    "src/testbench/adc/tb_adc_pwm_axi.sv": "924021ad24c66ec87b6ba93fef055ca5c9eb536fced6342f0003e8d8cc8d1665",
+    "scripts/verificacion/adc/ejecutar_pruebas_adc.ps1": "92b002419ffdecccbb1789d37be72a34da9f98c4c0ab5ec7039c8dad9b7fdd04",
+    "scripts/verificacion/adc/preparar_ip.tcl": "c52552083748c6b1f5c8c7f12f903fe740182ed542561755b9845ceac20e11b4",
+    "src/testbench/adc/adc_axi_tb_tasks.svh": "132cd9ef2a31278b389686d7aeabb5a16427b4e3a670111320f195095b32b704",
+    "src/testbench/adc/stimuli/design.txt": "bd31a82e9ae671f8b66c4439fa316078c3e0ab3f79a5bad9f69ce5ab84945563",
+    "src/design/adc/ip/xadc_wiz_0/xadc_wiz_0.xci": "e3b92836d6cee9f8ebd44566d30c12a0a2f3184f6f5a32dc8b5984455b9f8062"
+  },
+  "vendor_source_sha256": {
+    "glbl.v": "6270251cf35e1fce3119fc79f8fb968912f7983027e43cf030409ba68f048936"
+  },
+  "local_run": "build/adc/periferico_pwm_axi_entrega_20261115",
+  "negative_local_run": "build/adc/periferico_pwm_axi_mutacion_entrega_20261115",
+  "trace_file": "tb_adc_pwm_axi/adc_peripheral_trace.csv",
+  "limits": [
+    "Maestro de testbench y selección de dos interfaces AXI; sin SmartConnect, CPU o AXI Timer",
+    "Modelo XADC de Vivado y estímulo de 0,9 V; no medición física",
+    "XDC integrado de Daniel pendiente de compartir",
+    "Vivado/Vitis 2025.1 pendiente de verificación"
+  ]
+}

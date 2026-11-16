@@ -7,7 +7,7 @@ param(
 )
 $ErrorActionPreference = 'Stop'
 if (!$VivadoHome) { throw 'Indique -VivadoHome o defina VIVADO_HOME con la carpeta de Vivado 2026.1.' }
-$allowed = @('tb_adc_control','tb_adc_top','tb_adc_axi_lite','tb_adc_concurrency','tb_adc_system_axi','tb_adc_read_coherence')
+$allowed = @('tb_adc_control','tb_adc_top','tb_adc_axi_lite','tb_adc_concurrency','tb_adc_system_axi','tb_adc_read_coherence','tb_adc_pwm_axi')
 if (!$Tops.Count -or @($Tops | Where-Object { $_ -notin $allowed }).Count) { throw 'Lista de testbenches no valida.' }
 if ($NegativeUnknown -and ($Tops.Count -ne 1 -or $Tops[0] -ne 'tb_adc_axi_lite')) { throw 'NegativeUnknown requiere solo tb_adc_axi_lite.' }
 $projectRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../..'))
@@ -23,7 +23,7 @@ if (Test-Path -LiteralPath $runRoot) { throw "La ejecucion ya existe: $runRoot. 
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
 $ipFile = $null
 # El IP se importa en un proyecto descartable; no se necesitan wrappers versionados.
-if (@($Tops | Where-Object { $_ -in @('tb_adc_top','tb_adc_system_axi','tb_adc_read_coherence') }).Count) {
+if (@($Tops | Where-Object { $_ -in @('tb_adc_top','tb_adc_system_axi','tb_adc_read_coherence','tb_adc_pwm_axi') }).Count) {
     $xciHash = (Get-FileHash -LiteralPath $xci -Algorithm SHA256).Hash
     Push-Location -LiteralPath $runRoot
     try {
@@ -39,18 +39,24 @@ foreach ($top in $Tops) {
     $work = Join-Path $runRoot $top
     New-Item -ItemType Directory -Path $work | Out-Null
     $sources = @()
-    if ($top -in @('tb_adc_control','tb_adc_top','tb_adc_system_axi','tb_adc_concurrency','tb_adc_read_coherence')) { $sources += (Join-Path $sourceDir 'adc_control.sv') }
-    if ($top -in @('tb_adc_top','tb_adc_system_axi','tb_adc_read_coherence')) {
+    if ($top -in @('tb_adc_control','tb_adc_top','tb_adc_system_axi','tb_adc_concurrency','tb_adc_read_coherence','tb_adc_pwm_axi')) { $sources += (Join-Path $sourceDir 'adc_control.sv') }
+    if ($top -in @('tb_adc_top','tb_adc_system_axi','tb_adc_read_coherence','tb_adc_pwm_axi')) {
         Copy-Item -LiteralPath $stimulus -Destination (Join-Path $work 'design.txt')
         if ((Get-FileHash -LiteralPath $stimulus).Hash -ne (Get-FileHash -LiteralPath (Join-Path $work 'design.txt')).Hash) { throw 'Copia analogica diferente.' }
         $sources += (Join-Path $sourceDir 'adc_top.sv'), $ipFile, (Join-Path $VivadoHome 'data/verilog/src/glbl.v')
     }
-    if ($top -in @('tb_adc_axi_lite','tb_adc_system_axi','tb_adc_read_coherence')) { $sources += (Join-Path $sourceDir 'adc_axi_lite.sv') }
-    if ($top -in @('tb_adc_system_axi','tb_adc_read_coherence')) { $sources += (Join-Path $sourceDir 'adc_system_axi.sv') }
+    if ($top -in @('tb_adc_axi_lite','tb_adc_system_axi','tb_adc_read_coherence','tb_adc_pwm_axi')) { $sources += (Join-Path $sourceDir 'adc_axi_lite.sv') }
+    if ($top -in @('tb_adc_system_axi','tb_adc_read_coherence','tb_adc_pwm_axi')) { $sources += (Join-Path $sourceDir 'adc_system_axi.sv') }
+    # La prueba del periferico agrega el PWM como dependencia de solo lectura.
+    if ($top -eq 'tb_adc_pwm_axi') {
+        foreach ($pwmModule in @('pwm_deadtime','pwm_core','pwm_axi_lite','pwm_system_axi')) {
+            $sources += (Join-Path $projectRoot "src/design/pwm/$pwmModule.sv")
+        }
+    }
     $sources += (Join-Path $testDir "$top.sv")
     $hashInputs = @($sources) + @($PSCommandPath, (Join-Path $PSScriptRoot 'preparar_ip.tcl'))
-    if ($top -in @('tb_adc_axi_lite','tb_adc_system_axi','tb_adc_read_coherence')) { $hashInputs += (Join-Path $testDir 'adc_axi_tb_tasks.svh') }
-    if ($top -in @('tb_adc_top','tb_adc_system_axi','tb_adc_read_coherence')) { $hashInputs += $stimulus, $xci }
+    if ($top -in @('tb_adc_axi_lite','tb_adc_system_axi','tb_adc_read_coherence','tb_adc_pwm_axi')) { $hashInputs += (Join-Path $testDir 'adc_axi_tb_tasks.svh') }
+    if ($top -in @('tb_adc_top','tb_adc_system_axi','tb_adc_read_coherence','tb_adc_pwm_axi')) { $hashInputs += $stimulus, $xci }
     $hashInputs | ForEach-Object { Get-FileHash -Algorithm SHA256 -LiteralPath $_ } |
         Select-Object Path,Hash | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $work 'inputs.json') -Encoding UTF8
     $commands = @()
@@ -61,7 +67,7 @@ foreach ($top in $Tops) {
         & (Join-Path $VivadoHome 'bin/xvlog.bat') @argsCompile *> 'compile.stdout.txt'
         if ($LASTEXITCODE -ne 0) { throw "xvlog fallo en $work" }
         $argsElab = @('--debug','typical','-L','unisims_ver','-L','secureip','--snapshot',$top,"work.$top")
-        if ($top -in @('tb_adc_top','tb_adc_system_axi','tb_adc_read_coherence')) { $argsElab += 'work.glbl' }
+        if ($top -in @('tb_adc_top','tb_adc_system_axi','tb_adc_read_coherence','tb_adc_pwm_axi')) { $argsElab += 'work.glbl' }
         $argsElab += @('-log','elaborate.log')
         $commands += ('xelab ' + (($argsElab | ForEach-Object { '"' + $_ + '"' }) -join ' '))
         & (Join-Path $VivadoHome 'bin/xelab.bat') @argsElab *> 'elaborate.stdout.txt'
