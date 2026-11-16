@@ -29,6 +29,10 @@ Durante la simulación se comprueba que los pulsos de disparo PWM, CONVST y DEN 
 
 ## Resultados medidos en simulación
 
+![Consola de Vivado con los ocho casos de la prueba ADC, PWM y AXI aprobados](resultados/adc/simulacion_pwm_xadc.png)
+
+*Figura 1. Resultado de la prueba del periférico ADC con PWM y XADC en Vivado. Los ocho casos finalizaron correctamente.*
+
 | Indicador | Resultado |
 |---|---|
 | Casos completos | 8/8, TEST PASSED |
