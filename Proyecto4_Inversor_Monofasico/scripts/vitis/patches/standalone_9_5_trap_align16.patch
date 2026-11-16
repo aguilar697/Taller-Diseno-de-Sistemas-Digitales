@@ -1,0 +1,6 @@
+--- a/src/riscv/trap_handler.S
++++ b/src/riscv/trap_handler.S
+@@ -47,2 +47,2 @@
+ /* Stack macros */
+-#define HANDLER_STACK_SIZE		(REGSIZE * REGCOUNT + FPREGSIZE * FPREGCOUNT)
++#define HANDLER_STACK_SIZE		(((REGSIZE * REGCOUNT + FPREGSIZE * FPREGCOUNT) + 15) & ~15)
