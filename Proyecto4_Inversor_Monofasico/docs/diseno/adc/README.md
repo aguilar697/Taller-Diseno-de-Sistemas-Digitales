@@ -10,6 +10,7 @@ Implementación digital aislada para Basys 3 (`xc7a35tcpg236-1`), desarrollada y
 - [Scripts reproducibles](../../../scripts/verificacion/adc/): importación del XCI, regresión y síntesis aislada.
 - [Arquitectura e interfaces](arquitectura.md), [registros y ACK](mapa_registros.md), [temporización](temporizacion_y_sincronizacion.md).
 - [Resultados y alcance de las pruebas](verificacion.md), [advertencias](advertencias_sintesis.md), [integración pendiente](integracion_pendiente.md).
+- [Informe del periférico ADC con PWM, AXI y XADC](../../informe/adc_verificacion.md): prueba conjunta y resultados reproducibles.
 
 Los [niveles tercero](../nivel_3_adc.md) y [cuarto](../nivel_4_adc.md) conservan el contexto del sistema; este directorio documenta la implementación entregada. No se modifican PWM, plataforma MicroBlaze, software de control ni potencia.
 
