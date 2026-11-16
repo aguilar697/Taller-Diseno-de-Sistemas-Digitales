@@ -2,7 +2,7 @@
 
 ## Alcance de la revisión
 
-La rama dPuentes incorpora origin/main mediante el merge local 63ebb78, sin conflictos. Los PR 66 (software) y 67 (ADC) están fusionados; el PR 65 de plataforma sigue abierto. El RTL PWM está publicado mediante el PR 71. Esta revisión integra ese PWM real junto con ADC y GPIO; no crea un PWM de prueba ni ejecuta el PR sobre hardware.
+La rama dPuentes incorpora origin/main mediante los merges 63ebb78 y 33c6cbe, sin conflictos. El segundo incluye los PR 72–74 de pruebas y documentación ADC, sin cambios de RTL, XCI ni software. Los PR 66 (software) y 67 (ADC) están fusionados; el PR 65 de plataforma sigue abierto. El RTL PWM está publicado mediante el PR 71. Esta revisión integra ese PWM real junto con ADC y GPIO; no crea un PWM de prueba ni ejecuta el PR sobre hardware.
 
 La construcción utiliza Vivado/Vitis 2026.1. No está comprobada con 2025.1. No hay bitstream, programación de FPGA ni conexión a potencia. Las advertencias del BSP, LUTAR-1 y TIMING-9 no se consideran resueltas.
 

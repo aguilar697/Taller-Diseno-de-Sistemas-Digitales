@@ -106,7 +106,7 @@ Deténgase ante un código de salida distinto de cero. El directorio de creació
 
 `create_project.tcl` crea el diseño, configura IP, fija segmentos, ejecuta validación y comprobaciones, genera productos y wrapper y agrega el XDC. `verify_bd.tcl` comprueba parámetros y conexiones y guarda `reports/bd_configuration.txt`. `synthesize.tcl` ejecuta síntesis y genera reportes en `reports/synthesis/`. La exportación produce `platform_microblaze.xsa` **sin bitstream**.
 
-La implementación es separada. Su ejecución exploratoria está documentada en la [verificación digital integrada](../informe/verificacion_digital_integrada_microblaze.md); no supone aprobación para hardware. Los pines JC son provisionales; faltan la revisión de E/S, metodología y timing antes de generar bitstream:
+La implementación es separada. Su ejecución exploratoria está documentada en la [verificación digital integrada](../informe/verificacion_digital_integrada_microblaze.md); cerró setup/hold a 100 MHz, pero no supone aprobación para hardware. Los pines JC son provisionales; faltan la revisión de E/S, metodología y comprobaciones temporales externas antes de generar bitstream:
 
 ```powershell
 vivado -mode batch -source "$fuentes/scripts/vivado/implement.tcl" -log p4_impl.log -journal p4_impl.jou -tclargs "$salida/microblaze_platform.xpr"
