@@ -1,7 +1,7 @@
 # Topologia C explorada: una BRAM fisica, datos DLMB e instrucciones AXI/cache.
 # Se invoca desde create_project.tcl; sin automatizaciones dependientes de placa.
 create_bd_design platform_microblaze
-foreach {name bus} {UART_0 uart GPIO_0 gpio GPIO2_0 gpio} {
+foreach {name bus} {UART_0 uart BUTTONS gpio SWITCHES gpio LEDS gpio ISR_DIAG gpio} {
     create_bd_intf_port -mode Master -vlnv xilinx.com:interface:${bus}_rtl:1.0 $name
 }
 create_bd_port -dir I -type clk -freq_hz 100000000 clk_i
@@ -44,10 +44,11 @@ foreach {name vlnv} {
     rst_clk_wiz_1_100M proc_sys_reset:5.0
     timer axi_timer:2.0
     uart axi_uartlite:2.0
-    gpio axi_gpio:2.0
+    gpio_inputs axi_gpio:2.0
+    gpio_outputs axi_gpio:2.0
     instruction_bram_ctrl axi_bram_ctrl:4.1
 } {create_bd_cell -type ip -vlnv xilinx.com:ip:$vlnv $name}
-set_property -dict [list CONFIG.NUM_SI 1 CONFIG.NUM_MI 4] [get_bd_cells mbv_axi_periph]
+set_property -dict [list CONFIG.NUM_SI 1 CONFIG.NUM_MI 6] [get_bd_cells mbv_axi_periph]
 set_property -dict [list CONFIG.C_HAS_FAST 0 CONFIG.C_KIND_OF_INTR 0x00000000] [get_bd_cells mbv_axi_intc]
 set_property -dict [list CONFIG.PRIM_IN_FREQ 100.000 CONFIG.CLKOUT1_REQUESTED_OUT_FREQ 100.000 \
     CONFIG.PRIM_SOURCE Single_ended_clock_capable_pin CONFIG.USE_LOCKED true \
@@ -55,8 +56,16 @@ set_property -dict [list CONFIG.PRIM_IN_FREQ 100.000 CONFIG.CLKOUT1_REQUESTED_OU
 # C_EXT_RESET_HIGH se propaga desde POLARITY del puerto y es de solo lectura.
 set_property CONFIG.C_AUX_RESET_HIGH 1 [get_bd_cells rst_clk_wiz_1_100M]
 set_property -dict [list CONFIG.C_BAUDRATE 115200 CONFIG.C_DATA_BITS 8 CONFIG.C_USE_PARITY 0] [get_bd_cells uart]
-set_property -dict [list CONFIG.C_IS_DUAL 1 CONFIG.C_GPIO_WIDTH 1 CONFIG.C_GPIO2_WIDTH 1 \
-    CONFIG.C_ALL_INPUTS 1 CONFIG.C_ALL_OUTPUTS_2 1] [get_bd_cells gpio]
+set_property -dict [list CONFIG.C_IS_DUAL 1 CONFIG.C_GPIO_WIDTH 3 CONFIG.C_GPIO2_WIDTH 2 \
+    CONFIG.C_ALL_INPUTS 1 CONFIG.C_ALL_INPUTS_2 1 CONFIG.C_INTERRUPT_PRESENT 0] [get_bd_cells gpio_inputs]
+set_property -dict [list CONFIG.C_IS_DUAL 1 CONFIG.C_GPIO_WIDTH 4 CONFIG.C_GPIO2_WIDTH 1 \
+    CONFIG.C_ALL_OUTPUTS 1 CONFIG.C_ALL_OUTPUTS_2 1 CONFIG.C_INTERRUPT_PRESENT 0] [get_bd_cells gpio_outputs]
+set_property -dict [list CONFIG.COUNT_WIDTH 32 CONFIG.enable_timer2 1 CONFIG.mode_64bit 0] [get_bd_cells timer]
+# Referencias al RTL real de ADC y PWM, sin modificar sus fuentes.
+create_bd_cell -type module -reference adc_system_axi adc
+# Vivado infiere un bloque minimo de 4 KiB para referencias de modulo.
+# Ampliar el parametro local (no el RTL) evita alias de offsets dentro de esa ventana.
+set_property CONFIG.ADDR_WIDTH 12 [get_bd_cells adc]
 set_property -dict [list CONFIG.DATA_WIDTH 32 CONFIG.SINGLE_PORT_BRAM 1] [get_bd_cells instruction_bram_ctrl]
 create_bd_cell -type inline_hdl -vlnv xilinx.com:inline_hdl:ilconcat:1.0 mbv_xlconcat
 set_property CONFIG.NUM_PORTS 1 [get_bd_cells mbv_xlconcat]
@@ -71,22 +80,31 @@ foreach {a b} {
     mbv_axi_periph/M00_AXI mbv_axi_intc/s_axi
     mbv_axi_periph/M01_AXI timer/S_AXI
     mbv_axi_periph/M02_AXI uart/S_AXI
-    mbv_axi_periph/M03_AXI gpio/S_AXI
+    mbv_axi_periph/M03_AXI gpio_inputs/S_AXI
+    mbv_axi_periph/M04_AXI gpio_outputs/S_AXI
+    mbv_axi_periph/M05_AXI adc/s_axi
     mbv/DEBUG mdm_1/MBDEBUG_0
     mbv_axi_intc/interrupt mbv/INTERRUPT
 } {connect_bd_intf_net [get_bd_intf_pins $a] [get_bd_intf_pins $b]}
-foreach {a b} {UART_0 uart/UART GPIO_0 gpio/GPIO GPIO2_0 gpio/GPIO2} {
+foreach {a b} {UART_0 uart/UART BUTTONS gpio_inputs/GPIO SWITCHES gpio_inputs/GPIO2 \
+    LEDS gpio_outputs/GPIO ISR_DIAG gpio_outputs/GPIO2} {
     connect_bd_intf_net [get_bd_intf_ports $a] [get_bd_intf_pins $b]
 }
+foreach name {vauxp6 vauxn6} {
+    create_bd_port -dir I $name
+    connect_bd_net [get_bd_ports $name] [get_bd_pins adc/$name]
+}
+# Conexion inicial retirada por integrate_pwm_digital al conectar el PWM real.
+connect_bd_net [get_bd_pins zero_inline/dout] [get_bd_pins adc/pwm_trigger_i]
 connect_bd_net [get_bd_ports clk_i] [get_bd_pins clk_wiz_1/clk_in1]
 connect_bd_net [get_bd_ports reset_i] [get_bd_pins clk_wiz_1/reset] [get_bd_pins rst_clk_wiz_1_100M/ext_reset_in]
 foreach sink {mbv/Clk mbv_local_memory/LMB_Clk mbv_axi_periph/aclk mbv_axi_intc/s_axi_aclk \
-    timer/s_axi_aclk uart/s_axi_aclk gpio/s_axi_aclk instruction_bram_ctrl/s_axi_aclk \
+    timer/s_axi_aclk uart/s_axi_aclk gpio_inputs/s_axi_aclk gpio_outputs/s_axi_aclk adc/s_axi_aclk instruction_bram_ctrl/s_axi_aclk \
     rst_clk_wiz_1_100M/slowest_sync_clk} {
     connect_bd_net [get_bd_pins clk_wiz_1/clk_out1] [get_bd_pins $sink]
 }
 foreach sink {mbv_axi_periph/aresetn mbv_axi_intc/s_axi_aresetn timer/s_axi_aresetn \
-    uart/s_axi_aresetn gpio/s_axi_aresetn instruction_bram_ctrl/s_axi_aresetn} {
+    uart/s_axi_aresetn gpio_inputs/s_axi_aresetn gpio_outputs/s_axi_aresetn adc/s_axi_aresetn instruction_bram_ctrl/s_axi_aresetn} {
     connect_bd_net [get_bd_pins rst_clk_wiz_1_100M/peripheral_aresetn] [get_bd_pins $sink]
 }
 foreach {a b} {
@@ -103,13 +121,16 @@ foreach {a b} {
 foreach {space target offset range} {
     Data mbv_local_memory/dlmb_bram_if_cntlr/SLMB/Mem 0x00000000 0x8000
     Instruction instruction_bram_ctrl/S_AXI/Mem0 0x00000000 0x8000
-    Data gpio/S_AXI/Reg 0x40000000 0x10000
+    Data gpio_inputs/S_AXI/Reg 0x40000000 0x10000
+    Data gpio_outputs/S_AXI/Reg 0x40010000 0x10000
     Data uart/S_AXI/Reg 0x40600000 0x10000
     Data mbv_axi_intc/S_AXI/Reg 0x41200000 0x10000
     Data timer/S_AXI/Reg 0x41C00000 0x10000
+    Data adc/s_axi/reg0 0x44A00000 0x1000
 } {
     assign_bd_address -offset $offset -range $range -target_address_space \
         [get_bd_addr_spaces mbv/$space] [get_bd_addr_segs $target]
 }
+integrate_pwm_digital
 validate_bd_design -force
 save_bd_design
