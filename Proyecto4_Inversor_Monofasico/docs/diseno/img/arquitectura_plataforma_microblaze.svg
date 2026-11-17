@@ -1,0 +1,125 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1540" viewBox="0 0 1900 1540" role="img" aria-labelledby="title desc">
+<title id="title">Plataforma digital MicroBlaze V: reloj, memoria y periféricos</title><desc id="desc">Una BRAM física de 32 KiB se comparte entre datos por DLMB e instrucciones por AXI y caché. SmartConnect conecta siete periféricos. Se indican reloj, resets, depuración, interrupción y sincronización PWM hacia ADC. Asignación JC de la plataforma digital independiente.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0 0 L10 4 L0 8 Z" fill="#475569"/></marker></defs>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#0f172a} .edge{fill:none;stroke:#475569;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}</style>
+<rect width="1900" height="1540" fill="white"/>
+<text x="950" y="46" text-anchor="middle" dominant-baseline="middle" font-size="30" font-weight="bold">Plataforma digital MicroBlaze V</text>
+<text x="950" y="85" text-anchor="middle" dominant-baseline="middle" font-size="21" style="fill:#475569">Reloj de 100 MHz · Memoria compartida · Siete periféricos AXI</text>
+<rect x="40" y="120" width="1820" height="290" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<rect x="75" y="170" width="230" height="70" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="190.0" y="199" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="bold">Oscilador</text>
+<text x="190.0" y="230" text-anchor="middle" dominant-baseline="middle" font-size="19">100 MHz</text>
+<rect x="360" y="170" width="275" height="70" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="497.5" y="199" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="bold">Clocking Wizard</text>
+<text x="497.5" y="230" text-anchor="middle" dominant-baseline="middle" font-size="19">Salida: 100 MHz</text>
+<rect x="860" y="155" width="380" height="130" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
+<text x="1050.0" y="184" text-anchor="middle" dominant-baseline="middle" font-size="23" font-weight="bold">Processor System Reset</text>
+<text x="1050.0" y="215" text-anchor="middle" dominant-baseline="middle" font-size="19">mb_reset: activo alto</text>
+<text x="1050.0" y="242" text-anchor="middle" dominant-baseline="middle" font-size="19">peripheral_aresetn: activo bajo</text>
+<rect x="360" y="315" width="275" height="65" rx="10" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+<text x="497.5" y="344" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="bold">Botón de reset</text>
+<polyline class="edge" points="305,205 360,205" marker-end="url(#arrow)"/>
+<polyline class="edge" points="635,190 860,190" marker-end="url(#arrow)"/>
+<text x="745" y="170" text-anchor="middle" dominant-baseline="middle" font-size="18">clk</text>
+<polyline class="edge" points="635,225 860,225" marker-end="url(#arrow)"/>
+<text x="745" y="248" text-anchor="middle" dominant-baseline="middle" font-size="18">locked</text>
+<polyline class="edge" points="635,347 1000,347 1000,285" marker-end="url(#arrow)"/>
+<text x="748" y="374" text-anchor="middle" dominant-baseline="middle" font-size="18">reset_i activo alto</text>
+<circle cx="800" cy="265" r="17" fill="white" stroke="#475569" stroke-width="2"/>
+<text x="800" y="265" text-anchor="middle" dominant-baseline="middle" font-size="19" font-weight="bold">A</text>
+<polyline class="edge" points="817,265 860,265" marker-end="url(#arrow)"/>
+<polyline class="edge" points="400,240 400,280 325,280 325,435 160,435 160,480" marker-end="url(#arrow)"/>
+<text x="205" y="418" text-anchor="middle" dominant-baseline="middle" font-size="18">clk</text>
+<polyline class="edge" points="1130,285 1130,445 345,445 345,480" marker-end="url(#arrow)"/>
+<text x="730" y="429" text-anchor="middle" dominant-baseline="middle" font-size="18">mb_reset</text>
+<text x="1510" y="175" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="bold">DISTRIBUCIÓN COMÚN</text>
+<text x="1510" y="215" text-anchor="middle" dominant-baseline="middle" font-size="19">100 MHz → CPU, LMB, AXI y periféricos</text>
+<text x="1510" y="253" text-anchor="middle" dominant-baseline="middle" font-size="19">bus_struct_reset → LMB</text>
+<text x="1510" y="291" text-anchor="middle" dominant-baseline="middle" font-size="19">peripheral_aresetn → AXI y esclavos</text>
+<text x="1510" y="330" text-anchor="middle" dominant-baseline="middle" font-size="18" style="fill:#475569">Reset del botón también reinicia el reloj</text>
+<rect x="75" y="480" width="360" height="190" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="255.0" y="509" text-anchor="middle" dominant-baseline="middle" font-size="27" font-weight="bold">MicroBlaze V</text>
+<text x="255.0" y="540" text-anchor="middle" dominant-baseline="middle" font-size="19">RV32 + FPU simple</text>
+<text x="255.0" y="567" text-anchor="middle" dominant-baseline="middle" font-size="19">Caché de instrucciones: 8 KiB</text>
+<text x="255.0" y="594" text-anchor="middle" dominant-baseline="middle" font-size="19">Sin caché de datos</text>
+<rect x="75" y="720" width="360" height="90" rx="10" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+<text x="255.0" y="749" text-anchor="middle" dominant-baseline="middle" font-size="23" font-weight="bold">MDM V / JTAG</text>
+<text x="255.0" y="780" text-anchor="middle" dominant-baseline="middle" font-size="19">Depuración y reset de sistema</text>
+<rect x="560" y="460" width="1265" height="350" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1190" y="486" text-anchor="middle" dominant-baseline="middle" font-size="21" font-weight="bold">MEMORIA LOCAL COMPARTIDA</text>
+<rect x="610" y="515" width="410" height="95" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="815.0" y="544" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="bold">LMB + controlador BRAM</text>
+<text x="815.0" y="575" text-anchor="middle" dominant-baseline="middle" font-size="19">Ruta de datos por DLMB</text>
+<rect x="610" y="685" width="410" height="95" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="815.0" y="714" text-anchor="middle" dominant-baseline="middle" font-size="22" font-weight="bold">AXI BRAM Controller</text>
+<text x="815.0" y="745" text-anchor="middle" dominant-baseline="middle" font-size="19">Ruta de instrucciones</text>
+<rect x="1370" y="565" width="400" height="140" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+<text x="1570.0" y="594" text-anchor="middle" dominant-baseline="middle" font-size="25" font-weight="bold">BRAM física única</text>
+<text x="1570.0" y="625" text-anchor="middle" dominant-baseline="middle" font-size="19">32 KiB · True Dual Port</text>
+<text x="1570.0" y="652" text-anchor="middle" dominant-baseline="middle" font-size="19">8192 palabras × 32 bits</text>
+<text x="1570.0" y="679" text-anchor="middle" dominant-baseline="middle" font-size="19">0x00000000–0x00007FFF</text>
+<polyline class="edge" points="435,550 610,550" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="520" y="526" text-anchor="middle" dominant-baseline="middle" font-size="18">DLMB</text>
+<polyline class="edge" points="435,620 530,620 530,733 610,733" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="479" y="596" text-anchor="middle" dominant-baseline="middle" font-size="18">M_AXI_IC</text>
+<polyline class="edge" points="1020,550 1240,550 1240,600 1370,600" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1150" y="527" text-anchor="middle" dominant-baseline="middle" font-size="19">Puerto A</text>
+<polyline class="edge" points="1020,733 1240,733 1240,660 1370,660" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="1150" y="760" text-anchor="middle" dominant-baseline="middle" font-size="19">Puerto B</text>
+<polyline class="edge" points="230,670 230,720" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="284" y="696" text-anchor="middle" dominant-baseline="middle" font-size="18">DEBUG</text>
+<polyline class="edge" points="190,810 190,855" marker-end="url(#arrow)"/>
+<circle cx="190" cy="873" r="17" fill="white" stroke="#475569" stroke-width="2"/>
+<text x="190" y="873" text-anchor="middle" dominant-baseline="middle" font-size="19" font-weight="bold">A</text>
+<text x="298" y="850" text-anchor="middle" dominant-baseline="middle" font-size="18">Debug_SYS_Rst</text>
+<polyline class="edge" points="1805,1217 1845,1217 1845,850 505,850 505,650 435,650" marker-end="url(#arrow)"/>
+<text x="1180" y="832" text-anchor="middle" dominant-baseline="middle" font-size="20">INTERRUPT: AXI INTC → procesador</text>
+<polyline class="edge" points="405,670 405,690 460,690 460,900 365,900 365,920" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="389" y="885" text-anchor="start" dominant-baseline="middle" font-size="19">M_AXI_DP</text>
+<rect x="75" y="920" width="1740" height="110" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
+<text x="945.0" y="949" text-anchor="middle" dominant-baseline="middle" font-size="25" font-weight="bold">SmartConnect · 1 SI / 7 MI</text>
+<text x="945.0" y="980" text-anchor="middle" dominant-baseline="middle" font-size="19">Accesos MMIO de 32 bits · Canales AXI4-Lite de lectura, escritura y respuesta</text>
+<polyline class="edge" points="190,1030 190,1150" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="75" y="1150" width="230" height="135" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="190.0" y="1179" text-anchor="middle" dominant-baseline="middle" font-size="21" font-weight="bold">AXI UART Lite</text>
+<text x="190.0" y="1210" text-anchor="middle" dominant-baseline="middle" font-size="19">USB-UART</text>
+<text x="190.0" y="1237" text-anchor="middle" dominant-baseline="middle" font-size="19">115200 bit/s</text>
+<polyline class="edge" points="440,1030 440,1150" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="325" y="1150" width="230" height="135" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="440.0" y="1179" text-anchor="middle" dominant-baseline="middle" font-size="21" font-weight="bold">AXI GPIO entradas</text>
+<text x="440.0" y="1210" text-anchor="middle" dominant-baseline="middle" font-size="19">3 botones</text>
+<text x="440.0" y="1237" text-anchor="middle" dominant-baseline="middle" font-size="19">2 interruptores</text>
+<polyline class="edge" points="690,1030 690,1150" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="575" y="1150" width="230" height="135" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="690.0" y="1179" text-anchor="middle" dominant-baseline="middle" font-size="21" font-weight="bold">AXI GPIO salidas</text>
+<text x="690.0" y="1210" text-anchor="middle" dominant-baseline="middle" font-size="19">4 LED</text>
+<text x="690.0" y="1237" text-anchor="middle" dominant-baseline="middle" font-size="19">Diagnóstico ISR</text>
+<polyline class="edge" points="940,1030 940,1150" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="825" y="1150" width="230" height="135" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="940.0" y="1179" text-anchor="middle" dominant-baseline="middle" font-size="21" font-weight="bold">pwm_system_axi</text>
+<text x="940.0" y="1210" text-anchor="middle" dominant-baseline="middle" font-size="19">Cuatro órdenes PWM</text>
+<text x="940.0" y="1237" text-anchor="middle" dominant-baseline="middle" font-size="19">+ period_start</text>
+<text x="940.0" y="1264" text-anchor="middle" dominant-baseline="middle" font-size="19">JC1/2/3/4/7</text>
+<polyline class="edge" points="1190,1030 1190,1150" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="1075" y="1150" width="230" height="135" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="1190.0" y="1179" text-anchor="middle" dominant-baseline="middle" font-size="21" font-weight="bold">adc_system_axi</text>
+<text x="1190.0" y="1210" text-anchor="middle" dominant-baseline="middle" font-size="19">XADC Wizard</text>
+<text x="1190.0" y="1237" text-anchor="middle" dominant-baseline="middle" font-size="19">VAUX6 / SAMPLE</text>
+<polyline class="edge" points="1440,1030 1440,1150" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="1325" y="1150" width="230" height="135" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="1440.0" y="1179" text-anchor="middle" dominant-baseline="middle" font-size="21" font-weight="bold">AXI Timer</text>
+<text x="1440.0" y="1210" text-anchor="middle" dominant-baseline="middle" font-size="19">Dos contadores</text>
+<text x="1440.0" y="1237" text-anchor="middle" dominant-baseline="middle" font-size="19">Control y medida ISR</text>
+<polyline class="edge" points="1690,1030 1690,1150" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<rect x="1575" y="1150" width="230" height="135" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="1690.0" y="1179" text-anchor="middle" dominant-baseline="middle" font-size="21" font-weight="bold">AXI INTC</text>
+<text x="1690.0" y="1210" text-anchor="middle" dominant-baseline="middle" font-size="19">Interrupción normal</text>
+<text x="1690.0" y="1237" text-anchor="middle" dominant-baseline="middle" font-size="19">Entrada de nivel</text>
+<polyline class="edge" points="940,1285 940,1370 1150,1370 1150,1285" marker-end="url(#arrow)"/>
+<text x="1045" y="1400" text-anchor="middle" dominant-baseline="middle" font-size="18">pwm_trigger_o → pwm_trigger_i</text>
+<polyline class="edge" points="1250,1420 1250,1285" marker-end="url(#arrow)"/>
+<text x="1250" y="1446" text-anchor="middle" dominant-baseline="middle" font-size="19">VAUX6</text>
+<polyline class="edge" points="1440,1285 1440,1340 1690,1340 1690,1285" marker-end="url(#arrow)"/>
+<text x="1565" y="1370" text-anchor="middle" dominant-baseline="middle" font-size="18">interrupt → concat In0</text>
+<text x="950" y="1494" text-anchor="middle" dominant-baseline="middle" font-size="19" style="fill:#475569">A: misma señal Debug_SYS_Rst. Los pines JC corresponden a la plataforma digital independiente.</text>
+</svg>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1640" height="950" viewBox="0 0 1640 950" role="img" aria-labelledby="title desc">
+<title id="title">Arquitectura ADC/XADC con reconocimiento identificado</title><desc id="desc">La interfaz AXI captura SAMPLE y token de forma coherente. adc_control recibe START y ACK identificado, arbitra los eventos PWM y controla el XADC por CONVST y DRP. Los resultados y el token regresan a AXI; VAUX6 es la entrada analógica.</desc>
+<defs><marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto-start-reverse"><path d="M0 0 L10 4 L0 8 Z" fill="#475569"/></marker></defs>
+<style>text{font-family:Arial,Helvetica,sans-serif;fill:#0f172a} .edge{fill:none;stroke:#475569;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}</style>
+<rect width="1640" height="950" fill="white"/>
+<text x="820" y="46" text-anchor="middle" dominant-baseline="middle" font-size="29" font-weight="bold">ADQUISICIÓN ADC/XADC CON ACK IDENTIFICADO</text>
+<text x="820" y="88" text-anchor="middle" dominant-baseline="middle" font-size="20" style="fill:#475569">Muestra y token coherentes · Reconocimiento de 32 bits · Disparo PWM o software</text>
+<rect x="80" y="180" width="350" height="130" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="255.0" y="209" text-anchor="middle" dominant-baseline="middle" font-size="24" font-weight="bold">Maestro AXI externo</text>
+<text x="255.0" y="240" text-anchor="middle" dominant-baseline="middle" font-size="19">Procesador o testbench</text>
+<text x="255.0" y="267" text-anchor="middle" dominant-baseline="middle" font-size="19">Lectura / escritura de registros</text>
+<rect x="730" y="180" width="370" height="130" rx="10" fill="#f5f3ff" stroke="#8b5cf6" stroke-width="2"/>
+<text x="915.0" y="209" text-anchor="middle" dominant-baseline="middle" font-size="24" font-weight="bold">adc_axi_lite</text>
+<text x="915.0" y="240" text-anchor="middle" dominant-baseline="middle" font-size="19">CONTROL · STATUS · SAMPLE</text>
+<text x="915.0" y="267" text-anchor="middle" dominant-baseline="middle" font-size="19">ERROR · ACK_ID</text>
+<polyline class="edge" points="430,245 730,245" marker-end="url(#arrow)" marker-start="url(#arrow)"/>
+<text x="580" y="204" text-anchor="middle" dominant-baseline="middle" font-size="20">AXI4-Lite · datos [31:0]</text>
+<text x="580" y="277" text-anchor="middle" dominant-baseline="middle" font-size="18">Direcciones y respuestas</text>
+<rect x="620" y="475" width="970" height="350" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="2"/>
+<text x="1105" y="508" text-anchor="middle" dominant-baseline="middle" font-size="24" font-weight="bold">adc_top</text>
+<rect x="680" y="570" width="410" height="145" rx="10" fill="#eff6ff" stroke="#3b82f6" stroke-width="2"/>
+<text x="885.0" y="599" text-anchor="middle" dominant-baseline="middle" font-size="25" font-weight="bold">adc_control</text>
+<text x="885.0" y="630" text-anchor="middle" dominant-baseline="middle" font-size="19">IDLE → WAIT_EOC</text>
+<text x="885.0" y="657" text-anchor="middle" dominant-baseline="middle" font-size="19">SEND_READ → WAIT_DRDY</text>
+<text x="885.0" y="684" text-anchor="middle" dominant-baseline="middle" font-size="19">Resultado: DO[15:4]</text>
+<rect x="1280" y="570" width="260" height="145" rx="10" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+<text x="1410.0" y="599" text-anchor="middle" dominant-baseline="middle" font-size="23" font-weight="bold">xadc_wiz_0</text>
+<text x="1410.0" y="630" text-anchor="middle" dominant-baseline="middle" font-size="19">CONVST y puerto DRP</text>
+<text x="1410.0" y="657" text-anchor="middle" dominant-baseline="middle" font-size="19">Canal VAUX6</text>
+<rect x="80" y="570" width="350" height="110" rx="10" fill="#fff7ed" stroke="#f59e0b" stroke-width="2"/>
+<text x="255.0" y="599" text-anchor="middle" dominant-baseline="middle" font-size="24" font-weight="bold">Evento PWM</text>
+<text x="255.0" y="630" text-anchor="middle" dominant-baseline="middle" font-size="19">pwm_trigger_i</text>
+<polyline class="edge" points="430,625 680,625" marker-end="url(#arrow)"/>
+<text x="550" y="595" text-anchor="middle" dominant-baseline="middle" font-size="19">Pulso de disparo</text>
+<polyline class="edge" points="980,310 980,570" marker-end="url(#arrow)"/>
+<text x="1000" y="390" text-anchor="start" dominant-baseline="middle" font-size="20">START / ACK</text>
+<text x="1000" y="422" text-anchor="start" dominant-baseline="middle" font-size="19">ack_id [31:0]</text>
+<polyline class="edge" points="790,570 790,310" marker-end="url(#arrow)"/>
+<text x="764" y="390" text-anchor="end" dominant-baseline="middle" font-size="20">SAMPLE [31:0]</text>
+<text x="764" y="422" text-anchor="end" dominant-baseline="middle" font-size="19">sample_token [31:0]</text>
+<polyline class="edge" points="1090,603 1280,603" marker-end="url(#arrow)"/>
+<text x="1185" y="558" text-anchor="middle" dominant-baseline="middle" font-size="19">CONVST / DRP</text>
+<polyline class="edge" points="1280,680 1090,680" marker-end="url(#arrow)"/>
+<text x="1185" y="713" text-anchor="middle" dominant-baseline="middle" font-size="18">EOC / DRDY</text>
+<text x="1185" y="740" text-anchor="middle" dominant-baseline="middle" font-size="18">DO [15:0]</text>
+<polyline class="edge" points="1410,867 1410,715" marker-end="url(#arrow)"/>
+<text x="1410" y="898" text-anchor="middle" dominant-baseline="middle" font-size="20">VAUX6: entrada analógica</text>
+<text x="858" y="785" text-anchor="middle" dominant-baseline="middle" font-size="19">SAMPLE = {ID[15:0], 4'b0, código[11:0]}</text>
+<text x="820" y="935" text-anchor="middle" dominant-baseline="middle" font-size="20" style="fill:#475569">Reloj común: 100 MHz · Reset activo bajo · Liberación sincronizada por la plataforma</text>
+</svg>
