@@ -10,34 +10,7 @@ Las fuentes versionadas son scripts Tcl, constraints y fuentes de diagnóstico C
 
 ## Arquitectura y conexiones
 
-```mermaid
-flowchart LR
-    CLK[Oscilador 100 MHz] --> CW[Clocking Wizard 100 MHz]
-    CW --> CPU[MicroBlaze V RV32 + FPU simple]
-    CW --> RST[Processor System Reset]
-    BTN[Reset activo alto] --> RST
-    CW -->|locked| RST
-    RST -->|mb_reset| CPU
-    CPU -->|DLMB| LMB[LMB + controlador BRAM]
-    LMB -->|Puerto A| BRAM[Una BRAM fisica de 32 KiB]
-    CPU -->|I-cache 8 KiB / M_AXI_IC| IBC[AXI BRAM Controller]
-    IBC -->|Puerto B| BRAM
-    CPU -->|M_AXI_DP| AXI[SmartConnect 1 SI / 7 MI]
-    AXI --> UART[AXI UART Lite]
-    AXI --> GI[AXI GPIO entradas: 3 botones + 2 switches]
-    AXI --> GO[AXI GPIO salidas: 4 LED + diagnostico ISR]
-    AXI --> ADC[adc_system_axi + XADC Wizard]
-    VAUX[VAUX6] --> ADC
-    AXI --> PWM[pwm_system_axi]
-    PWM -->|pwm_trigger_o a pwm_trigger_i| ADC
-    PWM --> OUT[Cuatro salidas PWM + period_start: JC1/2/3/4/7]
-    AXI --> TIMER[AXI Timer]
-    AXI --> INTC[AXI Interrupt Controller]
-    TIMER -->|interrupt / concat In0| INTC
-    INTC -->|INTERRUPT| CPU
-    MDM[MDM V / JTAG] <-->|DEBUG| CPU
-    MDM -->|Debug_SYS_Rst| RST
-```
+![Arquitectura de la plataforma MicroBlaze V, memoria compartida y periféricos AXI](img/arquitectura_plataforma_microblaze.svg)
 
 Todas las interfaces de sistema usan 100 MHz. Processor System Reset entrega `mb_reset` activo alto al procesador, `bus_struct_reset` al LMB y `peripheral_aresetn` activo bajo a SmartConnect y los esclavos AXI. `aux_reset_in` se fija en cero porque su polaridad es activa alta. El botón central también reinicia Clocking Wizard. `locked` condiciona la liberación del sistema.
 

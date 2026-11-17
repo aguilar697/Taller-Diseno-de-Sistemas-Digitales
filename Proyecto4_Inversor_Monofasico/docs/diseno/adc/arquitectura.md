@@ -4,16 +4,7 @@
 
 `adc_control` conserva la FSM IDLE→WAIT_EOC→SEND_READ→WAIT_DRDY, el arbitraje PWM/software, los pulsos CONVST/DEN, el canal VAUX6/DRP 0x16, la normalización DO[15:4], los timeouts y los errores persistentes. `adc_top` mantiene la instancia directa de `xadc_wiz_0` y la polaridad de reset. El XCI conserva la configuración verificada. Los scripts importan una copia y regeneran los productos IP en build; no se versionan wrappers generados.
 
-```mermaid
-flowchart LR
-  MMIO[Maestro AXI externo o testbench] --> AXI[adc_axi_lite]
-  AXI -->|START y ACK con token32| TOP[adc_top]
-  TOP -->|SAMPLE y token32| AXI
-  PWM[Evento PWM] --> TOP
-  TOP --> CTRL[adc_control]
-  CTRL -->|CONVST y DRP| IP[xadc_wiz_0]
-  IP -->|EOC DRDY DO| CTRL
-```
+![Arquitectura ADC/XADC con disparo PWM y reconocimiento identificado](../img/arquitectura_adc_ack.svg)
 
 ## Corrección mínima de la carrera
 
