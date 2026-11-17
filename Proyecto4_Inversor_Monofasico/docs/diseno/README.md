@@ -46,6 +46,8 @@ La dirección base de cada periférico se asigna en el Block Design; sus offsets
 
 ## Integración y validación
 
+La [integración física en Basys 3](integracion_basys3.md) reúne el mapa AXI, los pines de laboratorio, la reconstrucción y los ejecutables de diagnóstico y control.
+
 La [documentación de potencia](../../Potencia/README.md) reúne los componentes disponibles, el diseño de la carga, las simulaciones iniciales y las decisiones pendientes de accionamiento y medición. Sus parámetros se coordinan con las interfaces digitales del sistema.
 
 La integración avanza desde la plataforma base y las pruebas individuales hasta el intercambio entre PWM, ADC y software. El modelo de potencia permite evaluar el controlador antes de su puesta en marcha experimental. El plan de cada subsistema incluye casos nominales, límites, reset y fallos identificables.

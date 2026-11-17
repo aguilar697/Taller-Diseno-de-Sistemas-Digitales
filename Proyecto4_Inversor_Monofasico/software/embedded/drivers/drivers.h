@@ -11,6 +11,7 @@ int      pwm_habilitar(uint32_t freq_sel);                                      
 void     pwm_escribir_referencia(int16_t q);
 
 /* Adquisición */
+#define ADC_ESTADO_ERROR   0x70u  /* missed, overrun o timeout; persisten hasta reset */
 #define ADC_ESTADO_VALIDO  0x01u                                                /* ya hay muestra */
 int      adc_configurar(void);
 void     adc_leer(uint16_t *codigo, uint16_t *n, uint32_t *estado);

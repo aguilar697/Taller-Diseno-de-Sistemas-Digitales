@@ -69,10 +69,10 @@ El [procedimiento de ejecución](../../src/testbench/pwm/README.md) utiliza fuen
 Antes de aceptar el sistema integrado se requiere:
 
 - comprobar la versión Vivado/Vitis 2025.1 solicitada por el instructivo; esta verificación se ejecutó en 2026.1;
-- incorporar el módulo a la plataforma, asignar direcciones y pines, y repetir timing del sistema completo;
+- comprobar físicamente el mapa y los pines de la plataforma integrada; la construcción y el timing completos ya se documentan en la [integración Basys 3](../diseno/integracion_basys3.md#resultados-de-la-construcción-integrada);
 - medir la fase Timer–PWM, la disponibilidad ADC y el tiempo de ISR para confirmar el retardo y el plazo de escritura;
-- verificar la ocupación final de BRAM con BSP, pila, programa y buffer;
+- medir el uso máximo de pila y la ejecución de las interrupciones; los ELF integrados ya pasan el control estático de ocupación de los 32 KiB;
 - calibrar cero y ganancia firmada del sensor y definir el permiso de apagado SD;
 - comprobar ambos drivers, bootstrap, VGS y ausencia de solapamiento físico antes de cerrar el lazo con potencia.
 
-La verificación independiente del PWM está completada bajo las condiciones indicadas. La integración con MicroBlaze y la validación eléctrica permanecen pendientes.
+La verificación independiente del PWM está completada bajo las condiciones indicadas. La integración con MicroBlaze dispone de bitstream y ELF construidos; su ejecución conjunta y la validación eléctrica permanecen pendientes.

@@ -49,6 +49,8 @@ static uint16_t adc_codigo = 2048;
 static uint16_t adc_n = 0;
 static int      conversion_pendiente = 0;
 static int      congelar_n = 0;         /* simula muestras repetidas          */
+static uint32_t adc_error = 0;
+static int adc_ack = 0;
 static int      adc_valido = 1;         /* STATUS.valid                       */
 
 static uint32_t entradas = 0;
@@ -68,7 +70,7 @@ static uint32_t n_salida = 0;
 
 void pwm_apagar(void) { pwm_habilitado = 0; }
 int  pwm_configurar(uint32_t f, uint32_t d, uint32_t p) { (void)f; (void)d; (void)p; return sim_config_ok; }
-int  pwm_habilitar(uint32_t f) { (void)f; pwm_habilitado = sim_running_ok; return sim_running_ok; }
+int  pwm_habilitar(uint32_t f) { (void)f; if (!adc_ack) fallas++; pwm_habilitado = sim_running_ok; return sim_running_ok; }
 void pwm_escribir_referencia(int16_t q) { q_escrito = q; escrituras_ref++; }
 
 int  adc_configurar(void) { return 1; }
@@ -76,7 +78,8 @@ void adc_leer(uint16_t *codigo, uint16_t *n, uint32_t *estado)
 {
     *codigo = adc_valido ? adc_codigo : 0u;
     *n = adc_n;
-    *estado = adc_valido ? ADC_ESTADO_VALIDO : 0u;
+    *estado = (adc_valido ? ADC_ESTADO_VALIDO : 0u) | adc_error;
+    adc_ack = 1;
 }
 void adc_iniciar_conversion(void) { conversion_pendiente = 1; }
 
@@ -120,6 +123,7 @@ static void periodo(void)
         conversion_pendiente = 0;
     }
 
+    adc_ack = 0;
     app_isr(&app);
     app_lazo_paso(&app);
 
@@ -201,6 +205,16 @@ int main(void)
     uint32_t k;
     int ok;
 
+    if (!MEDICION_CALIBRADA) {
+        app_iniciar(&app);
+        correr(100u);
+        presionar(BTN_HABILITAR);
+        comprobar(app.estado == ESTADO_FALLA && !pwm_habilitado &&
+                  (app.supervision.causa & FALLA_CONFIGURACION),
+                  "escala sin calibrar: se rechaza el arranque del PR general");
+        return fallas ? 1 : 0;
+    }
+
     /* ---------- Inicialización ---------- */
     app_iniciar(&app);
     comprobar(app.estado == ESTADO_DETENIDO && !pwm_habilitado, "iniciar: DETENIDO con el PWM apagado");
@@ -266,6 +280,24 @@ int main(void)
     ensayo("0,5 A con R externa de 6,6 a 9,9 ohm", NULL);
     r_carga = R_CARGA;
     correr(20000u);
+
+    /* Detener sin esperar el antirrebote y reconocer errores del ADC. */
+    entradas |= BTN_RECONOCER;
+    periodo();
+    comprobar(app.estado == ESTADO_DETENIDO && !pwm_habilitado,
+              "D detiene en una ISR");
+    entradas &= ~BTN_RECONOCER;
+    correr(T_REBOTE_ITER + 100u);
+    presionar(BTN_HABILITAR);
+    adc_error = 0x20u;
+    periodo();
+    comprobar(app.estado == ESTADO_FALLA && !pwm_habilitado &&
+              (app.supervision.causa & FALLA_MUESTRAS),
+              "overrun persistente apaga aunque SAMPLE tenga ID nuevo");
+    adc_error = 0;
+    presionar(BTN_RECONOCER);
+    presionar(BTN_HABILITAR);
+    correr(1000u);
 
     /* ---------- Muestra repetida: REFERENCE se mantiene, theta avanza ---------- */
     {

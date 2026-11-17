@@ -1,0 +1,43 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+-----------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Mon Nov 16 22:42:55 2026
+| Host         : Kevin running 64-bit major release  (build 9200)
+| Command      : report_cdc -details -all_checks_per_endpoint -no_waiver -file P:/revision_20261116/hardware_v2/reports/implementacion/cdc.rpt
+| Design       : inversor_basys3
+| Device       : 7a35t-cpg236
+| Speed File   : -1  PRODUCTION 1.23 2018-06-13
+| Design State : Routed
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+CDC Report
+
+ID     Severity  Count  Description
+-----  --------  -----  -------------------------------------------------------
+CDC-3  Info          9  1-bit synchronized with ASYNC_REG property
+CDC-9  Info          1  Asynchronous reset synchronized with ASYNC_REG property
+
+Source Clock: input port clock
+Destination Clock: clk_out1_platform_microblaze_clk_wiz_1_0
+CDC Type: No Common Primary Clock
+
+Row  ID     Severity  Description                                              Depth  Exception   Source (From)  Destination (To)
+---  -----  --------  -------------------------------------------------------  -----  ----------  -------------  ----------------------------------------------------------------------------------------------------------------
+  1  CDC-9  Info      Asynchronous reset synchronized with ASYNC_REG property      2  False Path  reset_i        permiso_sync_reg[0]/CLR
+  2  CDC-3  Info      1-bit synchronized with ASYNC_REG property                   5  False Path  botones[0]     plataforma/platform_microblaze_i/gpio_inputs/U0/gpio_core_1/Dual.INPUT_DOUBLE_REGS4/syncstages_ff_reg[0][0]/D
+  3  CDC-3  Info      1-bit synchronized with ASYNC_REG property                   5  False Path  botones[1]     plataforma/platform_microblaze_i/gpio_inputs/U0/gpio_core_1/Dual.INPUT_DOUBLE_REGS4/syncstages_ff_reg[0][1]/D
+  4  CDC-3  Info      1-bit synchronized with ASYNC_REG property                   5  False Path  botones[2]     plataforma/platform_microblaze_i/gpio_inputs/U0/gpio_core_1/Dual.INPUT_DOUBLE_REGS4/syncstages_ff_reg[0][2]/D
+  5  CDC-3  Info      1-bit synchronized with ASYNC_REG property                   5  False Path  amplitud[0]    plataforma/platform_microblaze_i/gpio_inputs/U0/gpio_core_1/Dual.INPUT_DOUBLE_REGS5/syncstages_ff_reg[0][0]/D
+  6  CDC-3  Info      1-bit synchronized with ASYNC_REG property                   5  False Path  amplitud[1]    plataforma/platform_microblaze_i/gpio_inputs/U0/gpio_core_1/Dual.INPUT_DOUBLE_REGS5/syncstages_ff_reg[0][1]/D
+  7  CDC-3  Info      1-bit synchronized with ASYNC_REG property                   4  False Path  reset_i        plataforma/platform_microblaze_i/rst_clk_wiz_1_100M/U0/EXT_LPF/ACTIVE_HIGH_EXT.ACT_HI_EXT/syncstages_ff_reg[0]/D
+  8  CDC-3  Info      1-bit synchronized with ASYNC_REG property                   4  False Path  uart_rx        plataforma/platform_microblaze_i/uart/U0/UARTLITE_CORE_I/UARTLITE_RX_I/INPUT_DOUBLE_REGS3/syncstages_ff_reg[0]/D
+
+Source Clock: plataforma/platform_microblaze_i/mdm_1/U0/MDM_Core_I1/JTAG_CONTROL_I/Test_Access_Port.BUFG_UPDATE/Using_FPGA.Native/O
+Destination Clock: clk_out1_platform_microblaze_clk_wiz_1_0
+CDC Type: No Common Primary Clock
+
+Row  ID     Severity  Description                                 Depth  Exception            Source (From)                                                                                   Destination (To)
+---  -----  --------  ------------------------------------------  -----  -------------------  ----------------------------------------------------------------------------------------------  ----------------------------------------------------------------------------------------------------------------
+  1  CDC-3  Info      1-bit synchronized with ASYNC_REG property      3  Asynch Clock Groups  plataforma/platform_microblaze_i/mdm_1/U0/MDM_Core_I1/JTAG_CONTROL_I/dmcontrol_hartreset_reg/C  plataforma/platform_microblaze_i/mbv/U0/<hidden>/<hidden>/<hidden>/<hidden>
+  2  CDC-3  Info      1-bit synchronized with ASYNC_REG property      4  Asynch Clock Groups  plataforma/platform_microblaze_i/mdm_1/U0/MDM_Core_I1/JTAG_CONTROL_I/dmcontrol_ndmreset_reg/C   plataforma/platform_microblaze_i/rst_clk_wiz_1_100M/U0/EXT_LPF/ACTIVE_HIGH_EXT.ACT_HI_EXT/syncstages_ff_reg[0]/D
+

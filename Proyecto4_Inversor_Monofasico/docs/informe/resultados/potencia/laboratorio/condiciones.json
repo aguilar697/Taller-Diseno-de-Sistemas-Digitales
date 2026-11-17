@@ -1,0 +1,13 @@
+{
+  "archivo": "scope_2.csv",
+  "sha256": "ad9fc439236986e4a74a1c6bbe47357ebe072f7c2e5fd914bde3a1b632726ecf",
+  "n": 5000,
+  "dt_s": 1.0000000000003062e-05,
+  "mean_v": -0.00082513574,
+  "ac_rms_v": 0.005098764583049962,
+  "min_v": -0.0192714,
+  "max_v": 0.0160553,
+  "pp_v": 0.0353267,
+  "condiciones": "Captura de la sesión anterior a corregir el retorno VAUX6. El CSV solo identifica canal 1 y unidades V; no registra posición, atenuación o acoplamiento. No permite separar ruido real y error de medida.",
+  "validacion_pr_fisico": false
+}

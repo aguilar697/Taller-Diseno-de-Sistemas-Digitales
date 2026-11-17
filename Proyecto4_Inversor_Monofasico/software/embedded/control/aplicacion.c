@@ -87,6 +87,13 @@ static void aplicar_solicitud(aplicacion_t *app)
 
     /* Habilitar: DETENIDO -> OPERACIÓN */
     if (s == SOLICITUD_HABILITAR && app->estado == ESTADO_DETENIDO) {
+        /* La calibracion fisica se declara al preparar el firmware definitivo.
+         * El modelo de PC aporta su propia escala conocida. */
+        if (!MEDICION_CALIBRADA) {
+            supervision_marcar(&app->supervision, FALLA_CONFIGURACION);
+            ir_a_falla(app);
+            return;
+        }
         pr_reiniciar(&app->pr);
         app->q_ultimo = 0;
         app->arranque = N_ARRANQUE;
@@ -120,9 +127,6 @@ void app_isr(aplicacion_t *app)
     gpio_medicion(1);
     t0 = timer_contador();
 
-    /* Aplicar solicitudes del lazo principal */
-    aplicar_solicitud(app);
-
     /* Leer ADC: código, n y estado */
     adc_leer(&codigo, &n, &estado_adc);
 
@@ -139,6 +143,16 @@ void app_isr(aplicacion_t *app)
     }
 
     /* ¿Condición de falla? */
+    if (estado_adc & ADC_ESTADO_ERROR) {
+        supervision_marcar(&app->supervision, FALLA_MUESTRAS);
+    }
+    /* Parada D atendida por la ISR; el menu conserva el reconocimiento de falla. */
+    if ((gpio_leer_entradas() & BTN_RECONOCER) && app->estado == ESTADO_OPERACION) {
+        app->solicitud = SOLICITUD_APAGAR;
+    }
+    /* Reconocer SAMPLE antes de pasar de conversiones por software a PWM. */
+    if (!supervision_hay_falla(&app->supervision)) aplicar_solicitud(app);
+
     if (supervision_hay_falla(&app->supervision) && app->estado != ESTADO_FALLA) {
         ir_a_falla(app);
     }

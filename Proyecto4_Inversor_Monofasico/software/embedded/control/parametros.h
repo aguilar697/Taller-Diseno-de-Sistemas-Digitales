@@ -33,6 +33,9 @@
 /* Medición nominal de prueba, sin calibración del montaje. La orientación
  * ensayada del ACS712 tiene pendiente negativa: medir cero y ganancia firmada
  * antes de habilitar el control físico; no usar estos valores como calibración. */
+#ifndef MEDICION_CALIBRADA
+#define MEDICION_CALIBRADA   0           /* 1 solo con cero, ganancia y signo medidos */
+#endif
 #define OFFSET_ADC          1796.5f      /* código para 0 A */
 #define GANANCIA_ADC        0.0075222f   /* A por código */
 #define CODIGO_MIN          16u          /* PRUEBA: Campos */
@@ -40,7 +43,9 @@
 #define I_MAX_A             1.5f         /* PRUEBA: PEDP */
 
 /* Software */
+#ifndef K_REG
 #define K_REG               1u           /* 1024 · 100 us = 102,4 ms */
+#endif
 #define N_FALLA_MUESTRAS    3u
 #define MARGEN_ISR_CICLOS   1000u        /* 10 us */
 #define T_REBOTE_ITER       200u         /* 20 ms */

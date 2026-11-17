@@ -1,4 +1,4 @@
-/* Conexión de la interrupción del Timer (PRUEBA: Daniel, según el Block Design) */
+/* Conexion del Timer al controlador AXI INTC de la plataforma. */
 #include "plataforma.h"
 
 #include "xil_exception.h"
@@ -19,8 +19,8 @@ static void atender(void *ref)
 /* Variante con AXI INTC */
 #include "xintc.h"
 
-/* PRUEBA: nombres de xparameters.h */
-#define INTC_BASE         XPAR_XINTC_0_BASEADDR
+#include "direcciones.h"
+#include "xstatus.h"
 #define TIMER_INTR_ID     0u
 
 static XIntc intc;
@@ -28,9 +28,12 @@ static XIntc intc;
 void plataforma_iniciar_interrupciones(void (*rutina)(void))
 {
     rutina_isr = rutina;
-    XIntc_Initialize(&intc, INTC_BASE);
-    XIntc_Connect(&intc, TIMER_INTR_ID, (XInterruptHandler)atender, NULL);
-    XIntc_Start(&intc, XIN_REAL_MODE);
+    if (XIntc_Initialize(&intc, INTC_BASE) != XST_SUCCESS ||
+        XIntc_Connect(&intc, TIMER_INTR_ID, (XInterruptHandler)atender, NULL) != XST_SUCCESS ||
+        XIntc_Start(&intc, XIN_REAL_MODE) != XST_SUCCESS) {
+        /* No iniciar una aplicacion que dependa de una ISR inexistente. */
+        for (;;) { __asm__ volatile ("nop"); }
+    }
     XIntc_Enable(&intc, TIMER_INTR_ID);
 
     Xil_ExceptionInit();

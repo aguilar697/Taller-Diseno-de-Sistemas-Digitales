@@ -26,6 +26,8 @@ BANDERAS = ["-std=c11", "-Wall", "-Wextra", "-Werror",
 APLICACION = ["aplicacion", "lectura", "supervision", "referencia", "control_pr", "modulacion",
               "registro", "antirrebote", "trama", "exportacion"]
 PRUEBAS = [
+    ("lazo_laboratorio", ["lectura", "referencia", "control_pr", "modulacion", "registro"],
+     ["-DREGISTRO_N_BUF=256u", "-DK_REG=4u"]),
     ("referencia",  ["referencia"], []),
     ("control_pr",  ["control_pr"], []),
     ("modulacion",  ["modulacion"], []),
@@ -39,7 +41,8 @@ PRUEBAS = [
     ("drv_plataforma", ["drv_gpio", "drv_uart", "drv_timer"],
      ["-DGPIO_ENTRADAS_BASE=0x40000000u", "-DGPIO_SALIDAS_BASE=0x40010000u",
       "-DUART_BASE=0x40600000u", "-DTIMER_BASE=0x41C00000u"]),
-    ("aplicacion",  APLICACION, []),     # al final: genera la trama para la prueba de PC
+    ("calibracion", APLICACION, ["-DMEDICION_CALIBRADA=0"]),
+    ("aplicacion",  APLICACION, ["-DMEDICION_CALIBRADA=1"]),     # al final: genera la trama para la prueba de PC
 ]
 
 
@@ -56,7 +59,7 @@ def main():
 
     # Pruebas en C
     for nombre, modulos, extra in PRUEBAS:
-        fuentes = [fuente(m) for m in modulos] + [os.path.join(TESTS, f"test_{nombre}.c")]
+        fuentes = [fuente(m) for m in modulos] + [os.path.join(TESTS, "test_aplicacion.c" if nombre == "calibracion" else f"test_{nombre}.c")]
         exe = os.path.join("build", f"test_{nombre}.exe")
         comp = subprocess.run(["gcc", *BANDERAS, *extra, *fuentes, "-o", exe, "-lm"],
                               capture_output=True, text=True, check=False)

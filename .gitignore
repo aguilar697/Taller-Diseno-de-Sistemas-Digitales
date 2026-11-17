@@ -57,3 +57,7 @@ __pycache__/
 /Proyecto4_Inversor_Monofasico/**/*.map
 /Proyecto4_Inversor_Monofasico/**/*.xsa
 /Proyecto4_Inversor_Monofasico/**/compile_commands.json
+
+# Dependencias y uso de pila generados por GCC/CMake
+*.d
+*.su
