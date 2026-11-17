@@ -6,9 +6,4 @@ La interfaz `S_AXI` utiliza datos de 32 bits, dirección local de 6 bits por def
 
 Parámetros: `ADDR_WIDTH=6`, `MOD_LIMIT_Q15=27853` y `MIN_ON_CYCLES=100`. El reset borra la configuración y mantiene las salidas inactivas. Es obligatorio programar DEADTIME antes de habilitar.
 
-- [Diseño de tercer nivel](../../../docs/diseno/nivel_3_pwm.md).
-- [Circuitos y secuencias de cuarto nivel](../../../docs/diseno/nivel_4_pwm.md).
-- [Contrato y procedimiento de integración](../../../docs/diseno/pwm_integracion.md).
-- [Pruebas y resultados](../../../docs/informe/pwm_verificacion.md).
-
 Desde la consola Tcl de un proyecto abierto puede ejecutarse `source scripts/verificacion/pwm/agregar_pwm.tcl`, utilizando la ruta del archivo dentro del proyecto. El script agrega fuentes; la incorporación al Block Design y la asignación de direcciones corresponden a la integración de plataforma. Las referencias de módulo requieren administración automática de fuentes (`source_mgmt_mode=All`). `scripts/verificacion/pwm/verificar_interfaz.tcl` comprueba por separado que Vivado reconoce `S_AXI` y los puertos del módulo.

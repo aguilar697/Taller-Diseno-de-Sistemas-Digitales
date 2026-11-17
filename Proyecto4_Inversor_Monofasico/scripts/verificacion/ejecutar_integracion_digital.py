@@ -27,7 +27,7 @@ def main():
     sources_pwm = [pwm / (name + '.sv') for name in
                    ('pwm_deadtime', 'pwm_core', 'pwm_axi_lite', 'pwm_system_axi')]
     tops = ['tb_pwm_deadtime', 'tb_pwm_core', 'tb_pwm_axi', 'tb_pwm_adc', 'tb_pwm_timing',
-            'tb_pwm_adc_axi']
+            'tb_pwm_adc_axi', 'tb_permiso_basys3']
     if args.solo_integracion:
         tops = ['tb_pwm_adc_axi']
     results = []
@@ -41,6 +41,9 @@ def main():
             sources += [adc / (name + '.sv') for name in
                         ('adc_control', 'adc_top', 'adc_axi_lite', 'adc_system_axi')]
             sources += [tb / 'integration/xadc_digital_model.sv', tb / 'integration/tb_pwm_adc_axi.sv']
+        elif top == 'tb_permiso_basys3':
+            sources = [root / 'src/design/top/inversor_basys3.sv',
+                       tb / 'integration/tb_permiso_basys3.sv']
         else:
             sources.append(tb / 'pwm' / (top + '.sv'))
         binaries = {name: str(args.vivado_home / 'bin' / (name + '.bat'))
@@ -62,7 +65,8 @@ def main():
             logs += content
             if result.returncode or re.search(r'(?im)^\s*(Fatal:|FATAL:|ERROR:)', content):
                 raise RuntimeError(f'{top}: fallo en paso {number}; consultar {target}')
-        if 'TEST PASSED' not in logs:
+        expected = 'PERMISO_BASYS3_PASS' if top == 'tb_permiso_basys3' else 'TEST PASSED'
+        if expected not in logs:
             raise RuntimeError(f'{top}: falta mensaje de exito')
         if top == 'tb_pwm_adc_axi':
             # XSim puede devolver 0 tras $fatal: exigir el diagnostico y ausencia de PASS.

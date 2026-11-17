@@ -15,7 +15,7 @@ Se realizaron simulaciones exploratorias del puente ideal en lazo abierto y con 
 | [Pendientes y validación](03_pendientes_y_validacion.md) | Decisiones por cerrar, secuencia de trabajo y criterios del instructivo |
 | [Registro de laboratorio](04_registro_laboratorio.md) | Alimentaciones, lecturas de drivers y ACS712, diagnóstico pendiente y secuencia para retomar las pruebas |
 
-La salida inferior del driver izquierdo respondió a las órdenes estáticas de activación y apagado. En la posición derecha permanece baja incluso después de intercambiar el integrado y desconectar la salida de la compuerta. El [registro de laboratorio](04_registro_laboratorio.md) conserva las condiciones y mediciones; la siguiente sesión comienza con la verificación de retornos y conexiones de esa posición, manteniendo el bus apagado.
+Las dos salidas inferiores de los drivers respondieron tras sustituir la protoboard. Se verificaron órdenes PWM de 10 kHz y 1 µs de tiempo muerto en la captura disponible. El sensado mejoró al corregir VAUX6 negativo, pero el último sondeo se detuvo antes de ejecutar el PR por respuesta insuficiente. El [registro de laboratorio](04_registro_laboratorio.md) conserva las condiciones y la secuencia para continuar.
 
 ## Configuración eléctrica seleccionada
 

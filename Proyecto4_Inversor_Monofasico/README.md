@@ -24,6 +24,7 @@ La evaluación se organiza por curso. Taller de Diseño Digital comprende a los 
 - [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
 - [Tercer nivel del PWM: bloques e interfaz](docs/diseno/nivel_3_pwm.md).
 - [Cuarto nivel del PWM: circuitos y secuencias](docs/diseno/nivel_4_pwm.md).
+- [Integración física en Basys 3 y reconstrucción](docs/diseno/integracion_basys3.md).
 - [Integración del PWM con ADC, Timer y software](docs/diseno/pwm_integracion.md).
 - [Verificación independiente del PWM](docs/informe/pwm_verificacion.md).
 - [Potencia: componentes, simulaciones y pendientes](Potencia/README.md).
@@ -79,7 +80,7 @@ Proyecto4_Inversor_Monofasico/
     └── plecs/
 ```
 
-Las fuentes, los modelos y la documentación se conservan en estas carpetas. Los proyectos generados, bitstreams, ejecutables y resultados intermedios se producen en `build/`, excluido de Git. Las evidencias utilizadas en el informe se almacenan en `docs/informe/resultados/` con sus condiciones de ensayo.
+Las fuentes, los modelos y la documentación se conservan en estas carpetas. Vivado y Vitis generan proyectos, bitstreams y ejecutables en directorios externos al repositorio. Las pruebas de PC utilizan `build/`, excluido de Git. Las evidencias utilizadas en el informe se almacenan en `docs/informe/resultados/` con sus condiciones de ensayo.
 
 ## Herramientas
 

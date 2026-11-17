@@ -233,3 +233,15 @@ Se propone un montaje con limitación de corriente de la fuente de laboratorio, 
 El desacoplo del bus y de los drivers forma parte del montaje. La necesidad de diodos adicionales o redes de amortiguamiento se decidirá según los caminos de recirculación, el tiempo muerto y los transitorios medidos; no se incorporan como componentes ya seleccionados. Antes de energizar el puente se comprobarán las señales de compuerta y su referencia de tensión.
 
 [Potencia](README.md) · [Simulación](02_simulacion_y_resultados.md) · [Pendientes](03_pendientes_y_validacion.md)
+
+## Acondicionamiento y ruido durante la puesta en marcha
+
+Con 185 mV/A nominales y divisor 4,7 kΩ/1 kΩ, la sensibilidad en VAUX6 es aproximadamente 32,46 mV/A a VCC=5 V. Un LSB ideal de 1/4096 V equivale a unos 7,52 mA: 0,2 A pico representan unos 26,6 códigos de amplitud. Un error de retorno de 47 mV puede aparentar alrededor de 1,45 A. Por ello se corrige la referencia analógica antes de atribuir una falla de corriente al puente.
+
+La salida del ACS712 es ratiométrica: VCC afecta al cero y a la sensibilidad. Se requiere alimentación estable, desacoplo próximo al módulo y calibración con el divisor conectado. El promedio de cero no calibra la pendiente ni compensa variaciones posteriores de VCC. [Hoja de datos ACS712](https://www.allegromicro.com/-/media/files/datasheets/acs712-datasheet.pdf).
+
+Como primer filtro se propone **100 nF cerámicos entre el nodo del divisor y GND**, junto al retorno de VAUX6. Con R equivalente de 825 Ω, fc≈1,93 kHz. A 50 Hz aporta aproximadamente −1,5° de fase; a 10 kHz atenúa unos 14,4 dB. Su instalación y efecto deben comprobarse: no se registra como componente ya verificado. No conectar ese capacitor directamente a OUT saltándose la resistencia serie. El filtro del propio módulo también debe identificarse.
+
+No se propone aumentar indiscriminadamente la capacitancia ni aplicar un promedio largo por software: ambos añaden retardo al control. Un filtro de primer orden tampoco garantiza por sí solo rechazo suficiente de conmutación ni ausencia de alias. Se compararán el ruido analógico y los códigos en las condiciones del registro de laboratorio antes de modificar la sintonización del PR.
+
+Los recorridos de corriente del puente y los de sensor/divisor deben separarse hasta el punto común de GND. Mantener cortos el lazo de compuerta y el de desacoplo de cada driver; alejar el par de señal/retorno analógico de A, B y los cables de compuerta. Si el montaje en protoboard no permite mediciones reproducibles, trasladar primero el accionamiento y potencia a una placa soldada con conexiones cortas. El software no elimina una caída de retorno ni una conmutación deficiente.

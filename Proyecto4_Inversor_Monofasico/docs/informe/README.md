@@ -47,6 +47,8 @@ Cada responsable aporta el análisis y las evidencias de su subsistema. Los resu
 
 ## Análisis disponibles
 
+- [Construcción integrada en Basys 3](../diseno/integracion_basys3.md#resultados-de-la-construcción-integrada): timing del sistema completo, memoria de los ELF, pruebas digitales y límites de validación física.
+
 - [Verificación del periférico PWM](pwm_verificacion.md): pruebas funcionales, error forzado, coordinación digital PWM–ADC y alcance de implementación.
 - [Verificación del periférico ADC/XADC](adc_verificacion.md): prueba con PWM, ambos esclavos AXI y modelo XADC, protocolo ACK y revisión de constraints disponible.
 

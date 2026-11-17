@@ -13,17 +13,17 @@ El alcance se toma de la sección 4.3 y del anexo B del [instructivo](../docs/en
 | Medición | ACS712 disponible, divisor propuesto y evaluación nominal con filtro y ADC cuantizado | Alimentación a 5 V, calibración, signo, ruido, filtro y precisión físicos; verificar dato convertido y retardo |
 | Simulación PLECS | Cuatro originales conservados, PR discreto y copia funcional con tiempo muerto, Ron y medición; nominales y escalones reproducibles | Completar diodos, pérdidas de conmutación, saturación, rizado, tolerancias y contraste con el montaje |
 | Demostración e informe | Plan de ensayos y cálculos exploratorios | Pruebas físicas, exportación de datos, extracción de fundamental, rizado y comparación cuantitativa |
-| Integración con Taller | Diagramas y contratos propuestos | Implementaciones PWM/ADC, plataforma MicroBlaze, software y ensayos conjuntos; registrar latencias y parámetros comunes |
+| Integración con Taller | Diagramas y contratos propuestos | PWM/ADC y plataforma disponibles y con simulaciones integradas; completar ejecución física del PR, calibración y latencias medidas |
 
 El diseño de potencia y su informe corresponden a Kevin Aguilar, Kenneth Campos y Kevin Cortés. La plataforma de Daniel Puentes pertenece a Taller. La sección 8.2 separa los 80 puntos propios de PEDP de los 20 de integración; demostrar los primeros también requiere un controlador discreto funcionando físicamente. La organización de ambos informes se conserva en [docs/informe](../docs/informe/README.md).
 
 ## Trabajo pendiente
 
-La prioridad de laboratorio es resolver la salida inferior de la posición derecha del IR2110. El [registro de pruebas](04_registro_laboratorio.md) contiene las lecturas, las comprobaciones realizadas y el procedimiento de continuidad pendiente. La respuesta estática del izquierdo no acredita todavía el accionamiento completo ni la conmutación del puente.
+La salida inferior derecha respondió al sustituir la protoboard. La prioridad actual es confirmar ganancia, signo y ruido del sensado con el retorno VAUX6 corregido, y explicar la respuesta débil obtenida en el sondeo abierto. El [registro de laboratorio](04_registro_laboratorio.md) distingue estas comprobaciones del cierre del lazo, todavía pendiente.
 
 | Orden | Actividad | Resultado necesario |
 |---|---|---|
-| 1 | Verificar el esquema de accionamiento IR2110 | Resolver la salida inferior de la posición derecha; verificar numeración, retornos y contactos; comprobar después apagado, bootstrap, arranque y tiempo muerto; acordar SD automático y pines con plataforma |
+| 1 | Verificar el esquema de accionamiento IR2110 | Salidas inferiores verificadas; completar VGS superior, caída de bootstrap y tiempo muerto de ambas ramas. Los pines JA y el SD manual están definidos |
 | 2 | Evaluar la adaptación del ACS712 | Probar el divisor de 4,7 kΩ/1 kΩ, calibrar y medir ruido y precisión a 0,2 A; confirmar canal XADC, alineación de dato y filtrado; añadir ganancia si los resultados lo requieren |
 | 3 | Completar la carga y la protección | Identificar devanado, comprobar resistencia y comportamiento con corriente; definir cambio de carga, límite de fuente, fusible y desconexión |
 | 4 | Completar la simulación con los componentes comprados | Contrastar la copia funcional con mediciones del sensor, accionamiento y carga; completar diodos, pérdidas, saturación y rizado; separar ensayos de bus y carga |

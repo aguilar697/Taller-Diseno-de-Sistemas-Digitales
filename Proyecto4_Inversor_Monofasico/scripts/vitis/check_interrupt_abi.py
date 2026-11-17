@@ -11,7 +11,7 @@ from pathlib import Path
 from check_elf import inspect_elf
 
 
-def inspect_interrupt_abi(elf, toolchain):
+def inspect_interrupt_abi(elf, toolchain, *, profile="pr", heap_bytes=2048, stack_bytes=1024):
     def run(tool, *args):
         exe = Path(toolchain) / ("riscv64-unknown-elf-" + tool + ".exe")
         return subprocess.run([str(exe), *args, str(elf)], check=True,
@@ -19,12 +19,19 @@ def inspect_interrupt_abi(elf, toolchain):
     memory = inspect_elf(elf)
     nm = run("nm", "-n")
     symbols = {m[3]: int(m[1], 16) for line in nm.splitlines()
-               if (m := re.match(r"([0-9a-f]+)\s+(\w)\s+(\S+)", line))}
+               if (m := re.match(r"([0-9a-f]+)\s+(\S)\s+(\S+)", line))}
     required = ("_trap_handler", "RISCV_ExceptionVectorTable", "RISCV_InterruptVectorTable",
                 "Xil_RegMtvecInit", "Xil_ExceptionInit", "Xil_ExceptionRegisterHandler",
                 "XIntc_InterruptHandler", "XIntc_DeviceInterruptHandler", "app_isr",
                 "pr_calcular", "pr_actualizar", "adc_leer", "pwm_configurar",
                 "pwm_escribir_referencia", "gpio_medicion", "uart_escribir", "exportacion_paso")
+    if profile == "laboratorio":
+        required = required[:8] + ("pr_calcular", "pr_actualizar", "adc_leer",
+                                  "pwm_configurar", "pwm_escribir_referencia", "uart_escribir")
+    elif profile == "diagnostico":
+        required = required[:8] + ("adc_leer", "pwm_configurar", "uart_escribir")
+    elif profile != "pr":
+        raise ValueError("Perfil ABI desconocido")
     missing = [name for name in required if name not in symbols]
     if missing or run("nm", "-u").strip():
         raise ValueError(f"Simbolos funcionales ausentes/indefinidos: {missing}")
@@ -33,7 +40,7 @@ def inspect_interrupt_abi(elf, toolchain):
         raise ValueError("Atributos RV32IMF/alineacion no comprobados")
     if symbols["_trap_handler"] % 4 or any(symbols[n] % 4 for n in required[1:3]):
         raise ValueError("Trap o tablas desalineados")
-    if symbols["_heap_end"] - symbols["_heap_start"] != 2048 or symbols["_stack"] - symbols["_stack_end"] != 1024:
+    if symbols["_heap_end"] - symbols["_heap_start"] != heap_bytes or symbols["_stack"] - symbols["_stack_end"] != stack_bytes:
         raise ValueError("Las reservas de heap/pila cambiaron")
     asm = run("objdump", "-d")
     try:
@@ -69,7 +76,7 @@ def inspect_interrupt_abi(elf, toolchain):
     if any(int(n) % 16 for n in re.findall(r"\baddi\s+sp,sp,(-?\d+)", runtime)):
         raise ValueError("Ajuste de pila runtime no alineado")
     return {"status": "ABI_ESTATICA_PASS", "memory": memory,
-            "trap_frame_bytes": 272, "fpu_registers_preserved": 32,
+            "profile": profile, "trap_frame_bytes": 272, "fpu_registers_preserved": 32,
             "functional_execution": "NO_REALIZADA", "stack_high_water": "PENDIENTE"}, asm
 
 
@@ -77,6 +84,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("elf", type=Path)
     parser.add_argument("--toolchain", required=True, type=Path)
+    parser.add_argument("--profile", choices=("pr", "laboratorio", "diagnostico"), default="pr")
+    parser.add_argument("--heap-bytes", type=int, default=2048)
+    parser.add_argument("--stack-bytes", type=int, default=1024)
     args = parser.parse_args()
-    report, _ = inspect_interrupt_abi(args.elf, args.toolchain)
+    report, _ = inspect_interrupt_abi(args.elf, args.toolchain, profile=args.profile,
+                                    heap_bytes=args.heap_bytes, stack_bytes=args.stack_bytes)
     print(json.dumps(report, indent=2))
