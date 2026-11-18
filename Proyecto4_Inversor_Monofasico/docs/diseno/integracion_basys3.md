@@ -40,7 +40,7 @@ SW15 bajo bloquea inmediatamente las cuatro órdenes. Para habilitar, el top sin
 
 ## Reconstrucción y programas
 
-Se ha trabajado con Vivado/Vitis 2026.1; la compatibilidad con 2025.1 sigue pendiente. Usar directorios nuevos fuera del repositorio y rutas cortas. Desde la carpeta del Proyecto 4:
+La construcción se verificó con Vivado/Vitis 2026.1. La compatibilidad con 2025.1 sigue pendiente. Usar directorios nuevos fuera del repositorio, con rutas cortas y sin espacios para las salidas. Desde la carpeta del Proyecto 4, ejecutar estos comandos manteniendo la ruta relativa al script de Vitis.
 
 ```text
 vivado -mode batch -source scripts/vivado/integrar_sistema.tcl -tclargs SALIDA_HW
@@ -72,7 +72,7 @@ El banco del permiso sustituye la plataforma por un modelo. La prueba AXI usa PW
 
 ## Resultados de la construcción integrada
 
-La revisión local basada en `main` (`261e991`) generó bitstream, XSA y tres ELF con Vivado/Vitis 2026.1. El [manifiesto de verificación](../informe/resultados/integracion_basys3/verificacion.json) identifica las fuentes y los productos construidos.
+La reconstrucción desde `2b7a183` generó bitstream, XSA y tres ELF con Vivado/Vitis 2026.1. El [manifiesto de verificación](../informe/resultados/integracion_basys3/verificacion.json) identifica las fuentes y los productos construidos.
 
 | Comprobación | Resultado |
 |---|---|
@@ -81,9 +81,9 @@ La revisión local basada en `main` (`261e991`) generó bitstream, XSA y tres EL
 | Software en PC | 201 comprobaciones C sin fallos y receptor UART aprobado |
 | Análisis numérico | 18 pruebas aprobadas |
 | Setup / hold, sistema ruteado | WNS +0,289 ns / WHS +0,042 ns; cero endpoints con fallo |
-| Diagnóstico: memoria reservada / libre | 14 256 / 18 512 bytes |
-| Control general: memoria reservada / libre | 28 576 / 4 192 bytes |
-| Ensayo PR limitado: memoria reservada / libre | 28 224 / 4 544 bytes |
+| Diagnóstico: memoria reservada / libre | 14 208 / 18 560 bytes |
+| Control general: memoria reservada / libre | 28 528 / 4 240 bytes |
+| Ensayo PR limitado: memoria reservada / libre | 28 160 / 4 608 bytes |
 | Interrupciones en los tres ELF | Auditoría estática aprobada; marco de 272 bytes y contexto FPU preservado |
 | Ejecución física de esta construcción | Pendiente |
 

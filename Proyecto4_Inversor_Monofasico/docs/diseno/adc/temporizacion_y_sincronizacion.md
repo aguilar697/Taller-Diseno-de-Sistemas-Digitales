@@ -22,4 +22,4 @@ El ID16 envuelve; el token 32 conserva la generación. Tras agotarse, token 0 bl
 
 La regresión desde el repositorio `repo_final_20261111` midió 111, 113 y 113 ciclos CONVST→SAMPLE. Las tres palabras fueron 00010E66, 00020E66 y 00030E66. Las latencias dependen de la fase del disparo respecto al modelo XADC. No se modificó la FSM ni la configuración IP al trasladar las fuentes.
 
-Estos valores son tres observaciones simuladas, no una cota de jitter ni validación física. El período PWM, fase de disparo, ISR, escalas, latencia hasta actuación y posibles cruces de reloj siguen pendientes del equipo.
+Estos valores corresponden a simulación del ADC. La configuración integrada usa un período PWM de 100 µs, fase 5000 y el mismo reloj para PWM y ADC. El presupuesto hasta la actuación, el jitter de la ISR y el efecto de la conmutación sobre la adquisición se deben medir en tarjeta. [Temporización integrada](../pwm_integracion.md).

@@ -1,0 +1,37 @@
+Simulaci?n funcional RTL en XSim 2026.1
+Fuentes de hardware y testbench de la revisi?n 2b7a183.
+Extractos de los logs de simulaci?n.
+
+[tb_pwm_deadtime]
+TEST PASSED tb_pwm_deadtime checks=20
+
+[tb_pwm_core]
+TEST PASSED tb_pwm_core checks=1064490
+
+[tb_pwm_axi]
+TEST PASSED tb_pwm_axi checks=1220
+
+[tb_pwm_adc]
+TEST PASSED tb_pwm_adc checks=260195
+
+[tb_pwm_timing]
+TEST PASSED tb_pwm_timing checks=81 periods=3
+
+[tb_pwm_adc_axi]
+EVENTO periodo ciclo=28 tiempo=276000
+EVENTO trigger ciclo=5028 fase=5000
+MEDICION trigger_SAMPLE=111 ciclos CONVST_SAMPLE=110 ciclos
+EVENTO escritura_REFERENCE_fin ciclo=5171 fase=5143
+EVENTO REFERENCE_captura ciclo=10028
+EVENTO periodo ciclo=10028 tiempo=100276000
+EVENTO REFERENCE_aplicada ciclo=10029 periodo_inicio=10028
+EVENTO trigger ciclo=15028 fase=5000
+MEDICION trigger_SAMPLE=111 ciclos CONVST_SAMPLE=110 ciclos
+TEST PASSED tb_pwm_adc_axi verificaciones=65602
+
+[tb_permiso_basys3]
+PERMISO_BASYS3_PASS: bloqueo, sincronizacion, frontera y reset
+
+[tb_pwm_adc_axi +INJECT_ERROR]
+Fatal: FALLO: ERROR_INYECTADO_DETECTADO
+Diagn?stico esperado de la prueba negativa.

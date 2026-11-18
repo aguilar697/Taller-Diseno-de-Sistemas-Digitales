@@ -28,6 +28,6 @@ El ID de 16 bits puede envolver sin reutilizar el token de 32 bits dentro de la 
 
 Las seis [pruebas ejecutadas](adc/verificacion.md) comprueban control, modelo XADC, interfaz AXI, concurrencia y coherencia SAMPLE/ACK_ID. La síntesis aislada y sus [advertencias](adc/advertencias_sintesis.md) no sustituyen la implementación y ruteo del sistema.
 
-La base AXI, el empaquetado, MMIO y exclusión de lectores, la política de reset, el disparo PWM definitivo y el presupuesto adquisición–ISR–actuación requieren integración con los responsables. El canal físico, acondicionamiento, escala, signo y calibración requieren validación de instrumentación. El código bruto no representa directamente amperios. Ver [pendientes](adc/integracion_pendiente.md) y [temporización](adc/temporizacion_y_sincronizacion.md).
+La plataforma asigna el periférico a `0x44A00000` y conecta el disparo del PWM y el reset AXI. La lectura de corriente requiere calibrar cero y ganancia con signo en VAUX6. Se debe medir el presupuesto de adquisición, ISR y actuación en tarjeta. [Integración del ADC](adc/integracion_pendiente.md) · [Temporización de la conversión](adc/temporizacion_y_sincronizacion.md).
 
 [Tercer nivel de adquisición](nivel_3_adc.md) · [Fuentes y reproducción](adc/README.md) · [Índice del diseño](README.md)

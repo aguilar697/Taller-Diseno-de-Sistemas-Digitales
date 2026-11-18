@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="490" viewBox="0 0 980 490" role="img" aria-labelledby="titulo detalle">
+  <title id="titulo">Puente H y medición de corriente</title>
+  <desc id="detalle">Dos ramas de dos IRF540N entre el bus y GND. Entre A y B circula corriente por ACS712, el devanado y la resistencia de carga. Dos IR2110 accionan las compuertas. El divisor conecta OUT a VAUX6.</desc>
+  <defs>
+    <marker id="flecha" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0 0 L8 4.5 L0 9 Z" fill="#14635c"/>
+    </marker>
+  </defs>
+  <rect width="980" height="490" rx="16" fill="#fff"/>
+  <g font-family="Arial, sans-serif" fill="#142d40" text-anchor="middle">
+    <text x="490" y="33" font-size="24" font-weight="bold">Puente H y medición de corriente</text>
+    <g fill="none" stroke="#142d40" stroke-width="2.5">
+      <path d="M230 79H750 M230 79v46 M750 79v46 M230 175v100 M750 175v100 M230 325v48H750v-48"/>
+      <path d="M230 225h61m123 0h20m103 0h20m148 0h45"/>
+    </g>
+    <g fill="#f1f6fa" stroke="#54788e" stroke-width="1.5">
+      <rect x="172" y="125" width="116" height="50" rx="6"/>
+      <rect x="172" y="275" width="116" height="50" rx="6"/>
+      <rect x="692" y="125" width="116" height="50" rx="6"/>
+      <rect x="692" y="275" width="116" height="50" rx="6"/>
+      <rect x="291" y="204" width="123" height="42" rx="6"/>
+      <rect x="434" y="204" width="103" height="42" rx="6"/>
+      <rect x="557" y="204" width="148" height="42" rx="6"/>
+      <rect x="30" y="197" width="106" height="57" rx="6"/>
+      <rect x="844" y="197" width="106" height="57" rx="6"/>
+    </g>
+    <g fill="#142d40">
+      <circle cx="230" cy="225" r="4"/><circle cx="750" cy="225" r="4"/>
+    </g>
+    <g fill="none" stroke="#14635c" stroke-width="2">
+      <path d="M136 225h15v-75h21 M151 225v75h21" marker-end="url(#flecha)"/>
+      <path d="M151 150h21" marker-end="url(#flecha)"/>
+      <path d="M844 225h-15v-75h-21 M829 225v75h-21" marker-end="url(#flecha)"/>
+      <path d="M829 150h-21" marker-end="url(#flecha)"/>
+      <path d="M350 246v71h34" marker-end="url(#flecha)"/>
+      <path d="M563 317h52" marker-end="url(#flecha)"/>
+      <path d="M462 183h59" marker-end="url(#flecha)"/>
+    </g>
+    <g fill="#eff8f5" stroke="#14635c" stroke-width="1.5">
+      <rect x="384" y="293" width="179" height="48" rx="6"/>
+      <rect x="615" y="293" width="57" height="48" rx="6"/>
+    </g>
+    <g font-size="16">
+      <text x="490" y="70">+Vbus · 12–24 V DC</text>
+      <text x="230" y="142"><tspan x="230" dy="5">Q_AH</tspan><tspan x="230" dy="19">IRF540N</tspan></text>
+      <text x="750" y="142"><tspan x="750" dy="5">Q_BH</tspan><tspan x="750" dy="19">IRF540N</tspan></text>
+      <text x="230" y="292"><tspan x="230" dy="5">Q_AL</tspan><tspan x="230" dy="19">IRF540N</tspan></text>
+      <text x="750" y="292"><tspan x="750" dy="5">Q_BL</tspan><tspan x="750" dy="19">IRF540N</tspan></text>
+      <text x="215" y="219">A</text><text x="765" y="219">B</text>
+      <text x="352" y="230">ACS712 de 5 A</text>
+      <text x="485" y="230">Devanado</text>
+      <text x="631" y="230">2 × 3,3 Ω / 5 W</text>
+      <text x="83" y="220"><tspan x="83">IR2110 A</tspan><tspan x="83" dy="19">JA1 / JA2</tspan></text>
+      <text x="897" y="220"><tspan x="897">IR2110 B</tspan><tspan x="897" dy="19">JA3 / JA4</tspan></text>
+      <text x="491" y="174">iL</text>
+      <text x="363" y="272" font-size="13">OUT</text>
+      <text x="473" y="313"><tspan x="473">Divisor 4,7 kΩ / 1 kΩ</tspan><tspan x="473" dy="17" font-size="13">Referencia a GND</tspan></text>
+      <text x="644" y="313"><tspan x="644">VAUX6</tspan><tspan x="644" dy="17" font-size="13">P / N</tspan></text>
+      <text x="490" y="397">GND · referencia común en el punto de retorno</text>
+    </g>
+    <text x="490" y="432" font-size="15">Drivers: 12 V de compuerta y 3,3 V de lógica. Sensor: 5 V.</text>
+    <text x="490" y="454" font-size="15">Se omiten del dibujo los desacoplos y los dos circuitos bootstrap, detallados por rama.</text>
+  </g>
+</svg>

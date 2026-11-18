@@ -75,7 +75,7 @@ La fase se guarda en un acumulador entero de 32 bits, `θ`, que da la vuelta sol
 \theta[k] = \theta[k-1] + \Delta\theta \pmod{2^{32}}, \qquad \Delta\theta = \text{round}\left(2^{32} \cdot f_{ref} \cdot T_s\right).
 ```
 
-Con `f_ref = 50 Hz` y `Ts = 50 µs`, `Δθ = 10 737 418`. El error relativo de frecuencia por el redondeo es del orden de 10⁻⁸. Los 8 bits superiores de `θ` seleccionan una de las 256 entradas de la tabla de seno, guardada en Q1.15 (512 B). Usar una tabla escalonada atenúa la fundamental en un factor `sinc(π/256)`, que equivale a 0,0025 %. Esa atenuación es despreciable frente al criterio de 10 %.
+Con `f_ref = 50 Hz` y `Ts = 100 µs`, el incremento nominal `Δθ` es 21 474 836. El error relativo de frecuencia por el redondeo es del orden de 10⁻⁸. Los 8 bits superiores de `θ` seleccionan una de las 256 entradas de la tabla de seno, guardada en Q1.15 (512 B). Usar una tabla escalonada atenúa la fundamental en un factor `sinc(π/256)`, que equivale a 0,0025 %. Esa atenuación es despreciable frente al criterio de 10 %.
 
 ```math
 i_{ref}[k] = A \cdot \frac{\text{tabla}[\theta[k] \gg 24]}{32768}.
@@ -136,7 +136,7 @@ La ventana registrada es `N_BUF · K_REG · Ts`. El enunciado pide al menos 100 
 | 20 kHz | 50 µs | 2 | 102,4 ms | 10 kHz |
 | 25 kHz | 40 µs | 3 | 122,9 ms | 8,33 kHz |
 
-`N_BUF` se ajusta cuando se conozca el tamaño real del programa. Si hay espacio, conviene aumentarlo para cubrir más períodos y mejorar la extracción de la fundamental.
+La construcción de Basys 3 usa `N_BUF = 512` y `K_REG = 2` para el controlador general. El ELF de laboratorio usa 256 y 4. Ambos conservan una ventana nominal de 102,4 ms con `Ts = 100 µs`. Los casos de 20 y 25 kHz de la tabla ilustran el dimensionamiento si se cambia la cadencia del control.
 
 La configuración inicial dispara la adquisición a mitad del período PWM (`TRIGGER_PHASE=5000` a 10 kHz). La relación con la ISR y la aplicación de la referencia se detalla en el [contrato de integración](pwm_integracion.md). La fase de disparo no garantiza por sí sola que la corriente leída sea exactamente el valor medio; se debe comprobar el efecto de los bordes y la latencia de adquisición. El rizado pico a pico se mide con el osciloscopio; la PC analiza la fundamental, su error y su desfase, con una adquisición que evite confundir rizado y aliasing.
 

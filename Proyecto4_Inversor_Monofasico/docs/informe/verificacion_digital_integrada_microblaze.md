@@ -1,5 +1,7 @@
 # Verificación digital integrada PWM–ADC y temporización de plataforma
 
+Este documento registra la plataforma digital independiente. El montaje del inversor utiliza la [integración de laboratorio con asignación JA](../diseno/integracion_basys3.md).
+
 ## Alcance
 
 Revisión del 15 de noviembre de 2026, Vivado/Vitis 2026.1 y Basys 3 xc7a35tcpg236-1. Conserva 100 MHz, FPU simple, BRAM compartida de 32 KiB, I-cache de 8 KiB y las fuentes originales de PWM, ADC y PR. No genera bitstream ni programa la FPGA; tampoco conecta potencia. La compatibilidad con 2025.1 sigue pendiente.
@@ -110,15 +112,15 @@ La metodología de síntesis mantiene DPIR-1 (135) sobre entradas DSP conducidas
 
 report_cdc enumera nueve CDC-3 informativos con ASYNC_REG. check_timing no detecta registros sin reloj ni endpoints internos sin restricciones; sí quedan cinco entradas botones/switches y cinco salidas PWM sin delays, además de la comprobación de ancho de pulso CONVST. El trigger PWM–ADC permanece en el mismo dominio de 100 MHz; ello no resuelve los cruces internos de depuración. Estos reportes son de síntesis, no una auditoría CDC/metodológica post-route.
 
-## Próximo paso y autorizaciones necesarias
+## Limitaciones de la revisión inicial
 
 Para continuar placement/routing debe acordarse con el equipo el conector, PACKAGE_PIN y estándar eléctrico de las cuatro señales PWM y del diagnóstico de período, comprobando conflictos con JA1, VAUX6 y otros puertos. No corresponde aceptar LVCMOS18 por defecto ni copiar pines arbitrarios. Después deben revisarse E/S/OOC, repetir implementación y evaluar si Explore cierra setup/hold; no se garantiza que lo haga.
 
 Cualquier cambio de pipeline/reset en PWM requiere autorización y nuevas pruebas con Kevin. Cambios en adquisición, tiempos o reconocimiento requieren revisión de Kenneth; algoritmos, parámetros o estrategia temporal del PR requieren revisión de su responsable. No se propone editar fuentes AMD para los avisos de depuración ni reducir reservas para ganar memoria.
 
-El bloqueo físico inmediato son las restricciones PWM. También siguen pendientes timing real, metodología de depuración, reloj OOC, advertencias BSP/RWX, pila dinámica, ejecución del PR y medición de fase/ISR. No se autoriza bitstream ni prueba de potencia.
+El bloqueo físico inmediato son las restricciones PWM. También siguen pendientes timing real, metodología de depuración, reloj OOC, advertencias BSP/RWX, pila dinámica, ejecución del PR y medición de fase/ISR. La revisión se detuvo antes de generar el bitstream.
 
-Evidencia adicional: `%TEMP%/p4_digital_create_20261115_a.*`, `p4_digital_synth_20261115_a.*`, `p4_digital_impl_20261115_a.*`; log y DRC de `microblaze_platform.runs/impl_1/`. Vitis conserva `final_checks.json`, reporte ABI, ELF, mapa y logs en su workspace externo. Las fuentes ajenas y el reporte timing_ruteo.rpt se comprobaron por hash y permanecen intactos.
+Evidencia adicional: `%TEMP%/p4_digital_create_20261115_a.*`, `p4_digital_synth_20261115_a.*`, `p4_digital_impl_20261115_a.*`; log y DRC de `microblaze_platform.runs/impl_1/`. Vitis conserva `final_checks.json`, reporte ABI, ELF, mapa y logs en su workspace externo.
 
 ## Asignación provisional de JC — 16 de noviembre de 2026
 

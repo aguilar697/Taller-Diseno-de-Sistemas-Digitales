@@ -30,6 +30,8 @@ La adquisición de los auxiliares se completó para continuar las pruebas. Los v
 
 ### Topología y alimentaciones
 
+![Puente H, carga serie y adquisición de corriente](img/puente_h_y_sensado.svg)
+
 Se utiliza un puente H completo porque la corriente de referencia cambia de signo. Las dos ramas permiten aplicar tensión positiva, negativa o nula a una carga alimentada desde una fuente DC. La modulación unipolar centrada utiliza una portadora común y referencias opuestas para las ramas, con tiempo muerto independiente en cada una.
 
 | Conexión | Elementos conectados |
@@ -132,7 +134,7 @@ El capacitor del bus entrega parte de los pulsos de corriente localmente y reduc
 
 El PWM debe insertar tiempo muerto: el IR2110 no sustituye esa función. Se propone comenzar la evaluación con 1 µs, equivalente a 100 ciclos de 100 MHz, y ajustar según las señales reales de compuerta. Se medirá HO respecto a VS y LO respecto a COM; la pinza de tierra de un osciloscopio convencional no se conectará a VS, pues ese nodo conmuta. El montaje inicial se realizará en protoboard con recorridos cortos de compuerta y retorno, bootstrap y desacoplo junto a cada driver y conexiones de carga firmes. Se comprobarán los transitorios y el calentamiento de contactos; si el montaje limita los ensayos, se trasladará a placa soldada o PCB.
 
-Para las pruebas, SD común se mantiene alto mediante 10 kΩ a VDD; un interruptor entre SD y GND permite las órdenes cuando está cerrado. Se mantiene abierto durante configuración y reset. HIN y LIN llevan 10 kΩ a GND y permanecen bajos en reposo. Este permiso manual no detecta una falla del programa ni constituye protección de sobrecorriente. El control automático de SD y los pines físicos de la Basys quedan pendientes de integración.
+Para las pruebas, SD común se mantiene alto mediante 10 kΩ a VDD; un interruptor entre SD y GND permite las órdenes cuando está cerrado. Se mantiene abierto durante configuración y reset. HIN y LIN llevan 10 kΩ a GND y permanecen bajos en reposo. Este permiso manual no detecta una falla del programa ni constituye protección de sobrecorriente. SD permanece como permiso manual. La Basys bloquea las cuatro órdenes mediante SW15. Los pines JA1–JA4 y el canal VAUX6 se detallan en la [integración en Basys 3](../docs/diseno/integracion_basys3.md).
 
 El arranque se evaluará con referencia de modulación cero y al menos cinco períodos PWM antes de aplicar una referencia de corriente. La secuencia debe dar primero un intervalo inferior que cargue cada bootstrap, conforme a la máquina de arranque del PWM; la simulación RTL y la medición deben confirmarlo. Con 10 kHz, cinco períodos equivalen a 500 µs. La prueba inicial se realiza sin alimentar el bus de potencia, verificando retorno, alimentación de drivers, apagado, carga de bootstrap y ausencia de solapamiento en las compuertas.
 
@@ -200,7 +202,7 @@ El divisor carga la salida con 5,7 kΩ, por encima del mínimo de 4,7 kΩ indica
 
 Esta adaptación solo proporciona unos 133 códigos por amperio con un resultado de 12 bits: a 0,2 A pico, la excursión es de unos 27 códigos respecto al cero. Antes de adoptarla para el lazo se comprobarán ruido, deriva y error de fundamental en ese punto. Si no alcanza la precisión requerida, se diseñará una etapa con ganancia y compensación de offset. No se declara cerrado el acondicionamiento por el solo hecho de respetar el rango de tensión.
 
-La calibración se realizará con corriente nula y una corriente conocida, obteniendo `i_L = (n − n_cero) / K`, con K en códigos por amperio y signo verificado. Adquisición y software deben acordar primero la alineación del dato: una lectura DRP de 16 bits no equivale a un ADC de 16 bits. Se propone evaluar VAUX6, accesible por JXADC1(P) y JXADC7(N), sujeto a confirmación de Kenneth y al archivo de pines final.
+La calibración se realizará con corriente nula y una corriente conocida, obteniendo `i_L = (n − n_cero) / K`, con K en códigos por amperio y signo verificado. El periférico publica el código de 12 bits alineado a la derecha en SAMPLE. El canal usado en laboratorio es VAUX6, con JXADC1(P) y JXADC7(N).
 
 Las magnitudes anteriores son nominales. No debe fijarse el cero en 2,5 V ni utilizarse una sensibilidad positiva sin verificar el módulo y su orientación. Si OUT disminuye con la corriente definida como positiva, K es negativo. La conversión entregada al PR debe conservar la convención `e = i_ref − i_L`; invertir el signo de la realimentación puede convertir el lazo en realimentación positiva. También debe comprobarse que la relación del divisor permanezca constante con la carga y que las medidas se refieran al mismo retorno analógico.
 
@@ -217,7 +219,7 @@ La caracterización del ACS712 puede comenzar antes de construir el puente: alim
 | Frecuencia nominal de evaluación | PWM de 10 kHz y período de control de 100 µs; cambiar el período requiere recalcular y comprobar el PR discreto |
 | Tiempo muerto inicial | 1 µs por rama, equivalente a 100 ciclos de 100 MHz; confirmar con VGS reales |
 | Órdenes físicas | `pwm_ah`/`pwm_al` a HIN/LIN del driver A; `pwm_bh`/`pwm_bl` a HIN/LIN del driver B; todas a 3,3 V |
-| Adquisición | `pwm_trigger_o` sincroniza el ADC; su fase y el retardo hasta aplicar `m` deben acordarse con adquisición y software |
+| Adquisición | `pwm_trigger_o` sincroniza el ADC; el disparo ocurre en la fase 5000 a 10 kHz. Se debe medir el retardo efectivo hasta aplicar `m` |
 | Apagado | SD alto deshabilita ambos drivers; `enable=0` debe mantener las cuatro órdenes bajas |
 
 Con `m=0` y PWM habilitado puede haber conmutación aunque la tensión media diferencial sea cero. Esa condición es distinta del apagado. La alimentación bootstrap exige intervalos de conducción inferior; no permite mantener indefinidamente encendido el MOSFET superior sin recarga.
@@ -232,8 +234,6 @@ Se propone un montaje con limitación de corriente de la fuente de laboratorio, 
 
 El desacoplo del bus y de los drivers forma parte del montaje. La necesidad de diodos adicionales o redes de amortiguamiento se decidirá según los caminos de recirculación, el tiempo muerto y los transitorios medidos; no se incorporan como componentes ya seleccionados. Antes de energizar el puente se comprobarán las señales de compuerta y su referencia de tensión.
 
-[Potencia](README.md) · [Simulación](02_simulacion_y_resultados.md) · [Pendientes](03_pendientes_y_validacion.md)
-
 ## Acondicionamiento y ruido durante la puesta en marcha
 
 Con 185 mV/A nominales y divisor 4,7 kΩ/1 kΩ, la sensibilidad en VAUX6 es aproximadamente 32,46 mV/A a VCC=5 V. Un LSB ideal de 1/4096 V equivale a unos 7,52 mA: 0,2 A pico representan unos 26,6 códigos de amplitud. Un error de retorno de 47 mV puede aparentar alrededor de 1,45 A. Por ello se corrige la referencia analógica antes de atribuir una falla de corriente al puente.
@@ -245,3 +245,5 @@ Como primer filtro se propone **100 nF cerámicos entre el nodo del divisor y GN
 No se propone aumentar indiscriminadamente la capacitancia ni aplicar un promedio largo por software: ambos añaden retardo al control. Un filtro de primer orden tampoco garantiza por sí solo rechazo suficiente de conmutación ni ausencia de alias. Se compararán el ruido analógico y los códigos en las condiciones del registro de laboratorio antes de modificar la sintonización del PR.
 
 Los recorridos de corriente del puente y los de sensor/divisor deben separarse hasta el punto común de GND. Mantener cortos el lazo de compuerta y el de desacoplo de cada driver; alejar el par de señal/retorno analógico de A, B y los cables de compuerta. Si el montaje en protoboard no permite mediciones reproducibles, trasladar primero el accionamiento y potencia a una placa soldada con conexiones cortas. El software no elimina una caída de retorno ni una conmutación deficiente.
+
+[Potencia](README.md) · [Simulación](02_simulacion_y_resultados.md) · [Registro de laboratorio](04_registro_laboratorio.md)

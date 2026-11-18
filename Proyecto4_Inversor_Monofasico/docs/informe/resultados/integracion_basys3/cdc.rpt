@@ -1,14 +1,13 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Mon Nov 16 22:42:55 2026
-| Host         : Kevin running 64-bit major release  (build 9200)
-| Command      : report_cdc -details -all_checks_per_endpoint -no_waiver -file P:/revision_20261116/hardware_v2/reports/implementacion/cdc.rpt
+| Date         : Wed Nov 18 11:59:35 2026
+| Command      : report_cdc -details -all_checks_per_endpoint -no_waiver -file cdc.rpt
 | Design       : inversor_basys3
 | Device       : 7a35t-cpg236
 | Speed File   : -1  PRODUCTION 1.23 2018-06-13
 | Design State : Routed
------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 CDC Report
 

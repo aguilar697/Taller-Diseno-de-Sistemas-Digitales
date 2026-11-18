@@ -1,5 +1,7 @@
 # Implementación reproducible de la plataforma MicroBlaze V
 
+Este documento registra la plataforma digital independiente. El montaje del inversor utiliza la [integración de laboratorio con asignación JA](integracion_basys3.md).
+
 ## Alcance y estado
 
 Esta plataforma concreta la ruta de memoria y los IP de los [niveles 3](nivel_3_microblaze.md) y [4](nivel_4_microblaze.md), sin reemplazar esos documentos de propuesta. La revisión digital incorpora ADC/XADC, GPIO ampliados y el PWM real. El PR se revisa mediante una compilación separada. No tiene conexiones a la etapa de potencia. El estado de esta revisión se registra en [integración digital](integracion_digital_microblaze.md).
@@ -58,7 +60,7 @@ Los rangos son ventanas de decodificación, no cantidades de registros implement
 | `pwm_ah`, `pwm_al`, `pwm_bh`, `pwm_bl` | K17, M18, N17, P18 / JC1, JC2, JC3, JC4 | Salida | PWM digital provisional, no conectar potencia |
 | `pwm_period_start_o` | L17 / JC7 | Salida | Diagnóstico provisional de comienzo de período |
 
-Se utiliza la asignación del [Basys-3-Master.xdc de Digilent](https://github.com/Digilent/digilent-xdc/blob/master/Basys-3-Master.xdc). LVCMOS33 no autoriza aplicar 3,3 V a VAUX6: el rango analógico y el acondicionamiento del XADC se revisan aparte. La revisión del 16 de noviembre verifica JC para la plataforma digital, conservando JA1 y VAUX6. Cualquier conexión física posterior debe respetar este mapa y pasar por validación eléctrica del equipo. No se autoriza conectar potencia.
+Se utiliza la asignación del [Basys-3-Master.xdc de Digilent](https://github.com/Digilent/digilent-xdc/blob/master/Basys-3-Master.xdc). LVCMOS33 no autoriza aplicar 3,3 V a VAUX6: el rango analógico y el acondicionamiento del XADC se revisan aparte. La revisión del 16 de noviembre verifica JC para la plataforma digital, conservando JA1 y VAUX6. Cualquier conexión física posterior debe respetar este mapa y pasar por validación eléctrica del equipo. El montaje del inversor utiliza la asignación JA.
 
 Clocking Wizard aporta el `create_clock` de 10 ns; el XDC propio no lo repite. Síntesis comprueba reloj, pines y estándar. El script conserva soporte para registrar las cinco salidas PWM pendientes en construcciones anteriores, pero con el XDC actual ninguna debe quedar pendiente. No rebaja DRC ni autoriza bitstream. Las excepciones se limitan a reset/RX asíncronos y salidas sin reloj externo (UART TX, LED y diagnóstico). Los nuevos botones/switches no reciben una excepción global: su CDC y los avisos de E/S se revisarán antes de validar hardware. No se heredan excepciones del Proyecto 3 ni se excluyen caminos internos para mejorar WNS. Las excepciones existentes en los IP AMD se mantienen sin editar.
 

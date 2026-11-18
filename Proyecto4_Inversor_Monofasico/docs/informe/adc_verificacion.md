@@ -56,7 +56,7 @@ Para comprobar que la prueba detecta la condición de carrera, se ejecutó tambi
 
 Las seis [pruebas ADC originales](../diseno/adc/verificacion.md) cubren control, AXI, XADC, ACK, desbordamientos y coherencia de lectura. La prueba conjunta añade el PWM completo y las interfaces AXI de ambos periféricos al modelo XADC. El [testbench PWM–ADC previo](../../src/testbench/pwm/tb_pwm_adc.sv) utiliza `adc_control` con respuestas digitales EOC/DRDY, por lo que comprueba otro nivel de conexión.
 
-La síntesis aislada del ADC utilizó 130 LUT, 243 registros y un XADC, sin errores y con 16 advertencias de puertos sin carga. Las [restricciones y advertencias de síntesis](../diseno/adc/advertencias_sintesis.md) explican el alcance de ese resultado. La incorporación del testbench conjunto no cambió los módulos sintetizables ni el XCI. La síntesis y el cierre temporal del sistema integrado, la ejecución del firmware y las mediciones físicas deben verificarse por separado.
+La síntesis aislada del ADC utilizó 130 LUT, 243 registros y un XADC, sin errores y con 16 advertencias de puertos sin carga. Las [restricciones y advertencias de síntesis](../diseno/adc/advertencias_sintesis.md) explican el alcance de ese resultado. La incorporación del testbench conjunto no cambió los módulos sintetizables ni el XCI. La repetición aprobó los siete bancos. La implementación del top integrado con sus resultados de ruteo se documenta en el informe general. [Extractos de simulación](resultados/integracion_basys3/xsim_perifericos.txt) · [Implementación integrada](README.md#verificación-digital-e-implementación).
 
 ## Cómo repetir la prueba en Vivado
 
@@ -71,21 +71,8 @@ Para revisar las ondas, el disparo PWM, la secuencia XADC y las transacciones AX
 
 Las fuentes están en las carpetas [ADC](../../src/design/adc/), [PWM](../../src/design/pwm/) y [testbenches ADC](../../src/testbench/adc/). También se conserva el [script de verificación](../../scripts/verificacion/adc/ejecutar_pruebas_adc.ps1) para ejecutar las pruebas desde el repositorio. La compatibilidad con Vivado/Vitis 2025.1 sigue pendiente de comprobación.
 
-## Revisión del XDC disponible y entrega a plataforma
+## Conexión en el sistema integrado
 
-El XDC de diagnóstico revisado corresponde al commit `bbe7fce` de la rama `dPuentes`. El archivo `basys3_microblaze_diagnostic.xdc` asigna los siguientes puertos, sin repetir pines:
+La construcción `inversor_basys3` asigna `vauxp6` al pin J3 y `vauxn6` al pin K3. Corresponden a JXADC1 y JXADC7 y reciben la señal acondicionada y su retorno. El rango de medición es de 0 a 1 V. El Block Design usa un segmento AXI de 4 KiB en `0x44A00000`, reloj de 100 MHz, reset activo bajo y un disparo directo del PWM. La solicitud de interrupción para el software procede del Timer a través del AXI INTC. [Restricciones del top](../../src/constraints/inversor_integrado_basys3.xdc) · [Mapa y conexiones](../diseno/integracion_basys3.md).
 
-| Función publicada | Pin FPGA |
-|---|---|
-| Reloj de 100 MHz | W5 |
-| Reset externo | U18 |
-| UART RX / TX | B18 / A18 |
-| Botón / LED de diagnóstico | T18 / U16 |
-
-El XDC fija LVCMOS33 y los valores de configuración de banco; el reloj procede de Clocking Wizard. Sus excepciones se limitan a entradas físicas asíncronas y salidas UART/LED. Esta revisión es estática sobre el diseño de diagnóstico publicado. El mensaje de integración más reciente de Daniel describe otra construcción, cuyo XDC y wrapper siguen pendientes de compartir.
-
-El [ejemplo oficial XADC de Digilent](https://github.com/Digilent/Basys-3-XADC/blob/master/src/constraints/Basys3_Master.xdc) asigna VAUX6 a J3 para `vauxp6` y K3 para `vauxn6`. Corresponden al par XA1 del conector JXADC según el [Master XDC](https://github.com/Digilent/digilent-xdc/blob/master/Basys-3-Master.xdc). Esa reserva es compatible con los seis pines del diagnóstico publicado. La revisión definitiva requiere los nombres reales del wrapper integrado, revisión de placa y el conjunto completo de constraints. El rango de señal del ADC se mantiene en 0–1 V conforme al acondicionamiento documentado.
-
-Daniel necesita el periférico `adc_system_axi`, sus cuatro RTL, el XCI regenerado, una ventana AXI que cubra ACK_ID 0x10, reloj común de 100 MHz y reset de periféricos activo bajo. El disparo se conecta directamente desde PWM en ese dominio. ADC no incorpora una IRQ propia; la ISR se coordina con Timer/INTC. Se verificará la inferencia o empaquetado de la interfaz AXI en el proyecto integrado.
-
-Para completar la revisión XDC quedan pendientes el wrapper y XDC integrados, las cinco salidas PWM/diagnóstico acordadas con Kevin Aguilar, los puertos VAUX6, el informe de placement y las restricciones temporales completas. La calibración de cero y ganancia firmada del ACS712 sigue pendiente; este informe acredita funcionamiento digital en simulación.
+En laboratorio se contrastó el código en reposo con la tensión diferencial en ese par después de corregir el retorno. Queda por medir la ganancia con signo de la cadena ACS712–XADC y repetir la prueba de corriente con el puente activo. [Resultados de laboratorio](README.md#laboratorio-y-análisis-de-discrepancias).

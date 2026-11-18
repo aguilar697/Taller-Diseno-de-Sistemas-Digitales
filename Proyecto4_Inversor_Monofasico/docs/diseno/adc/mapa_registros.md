@@ -1,6 +1,6 @@
 # Registros AXI y procedimiento de reconocimiento
 
-Datos 32 bits, direcciones locales en bytes; ADDR_WIDTH predeterminado 6, mínimo 5 para representar 0x10. La dirección base sigue pendiente de Address Editor. No se modifican los cuatro offsets existentes.
+Datos de 32 bits y direcciones locales en bytes. `ADDR_WIDTH` es 6 por defecto y 5 como mínimo para representar `0x10`. El Block Design integrado usa `ADDR_WIDTH=12`, base `0x44A00000` y una ventana de 4 KiB.
 
 | Offset | Registro | Lectura | Escritura |
 |---|---|---|---|
