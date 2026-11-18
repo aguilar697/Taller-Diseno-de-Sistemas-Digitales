@@ -15,26 +15,18 @@ La plataforma integra adquisición ADC/XADC, un periférico PWM unipolar persona
 
 Cada responsable documenta y verifica su subsistema. Las interfaces entre plataforma, PWM, adquisición y control se acuerdan antes de integrar modificaciones que afecten a otros bloques.
 
-La evaluación se organiza por curso. Taller de Diseño Digital comprende a los cuatro integrantes. En Procesamiento Electrónico de Potencia participan Kevin Aguilar, Kenneth Campos y Kevin Cortés. El diseño digital se conserva en `docs/diseno/` y el de potencia en `Potencia/`; los informes de cada curso se preparan por separado conforme al [índice de informes](docs/informe/README.md). Las evidencias de integración se comparten mediante referencias a los mismos archivos.
+El seguimiento se organiza en cuatro incidencias, una por subsistema. Las contribuciones se integran a `main` mediante pull requests desde las ramas de cada integrante. [Incidencias del Proyecto 4](https://github.com/aguilar697/Taller-Diseno-de-Sistemas-Digitales/issues).
+
+Taller de Diseño Digital comprende a los cuatro integrantes. En Procesamiento Electrónico de Potencia participan Kevin Aguilar, Kenneth Campos y Kevin Cortés. Cada curso tiene su propia documentación y ambos comparten las evidencias de integración cuando corresponde.
 
 ## Documentación
 
-- [Diseño e interfaces del sistema](docs/diseno/README.md).
-- [Primer nivel: sistema, entradas y salidas](docs/diseno/nivel_1.md).
-- [Segundo nivel: arquitectura e interconexiones](docs/diseno/nivel_2.md).
-- [Tercer nivel del PWM: bloques e interfaz](docs/diseno/nivel_3_pwm.md).
-- [Cuarto nivel del PWM: circuitos y secuencias](docs/diseno/nivel_4_pwm.md).
-- [Integración física en Basys 3 y reconstrucción](docs/diseno/integracion_basys3.md).
-- [Integración del PWM con ADC, Timer y software](docs/diseno/pwm_integracion.md).
-- [Verificación independiente del PWM](docs/informe/pwm_verificacion.md).
-- [Potencia: componentes, simulaciones y pendientes](Potencia/README.md).
-- [Registro de laboratorio de potencia y continuidad de pruebas](Potencia/04_registro_laboratorio.md).
-- [Organización del informe y las evidencias](docs/informe/README.md).
-- [Módulos de hardware](src/design/README.md).
-- [Verificación por subsistema](src/testbench/README.md).
-- [Software embebido y herramientas de PC](software/README.md).
-- [Scripts de construcción y verificación](scripts/README.md).
-- [Modelado y simulación de potencia](modelos/README.md).
+- [Documento de diseño](docs/diseno/README.md) con objetivos, diagramas, interfaces y estrategia de verificación.
+- [Informe técnico de Taller de Diseño Digital](docs/informe/README.md) con simulaciones, resultados de implementación y análisis de las mediciones.
+- [Reconstrucción y conexiones en Basys 3](docs/diseno/integracion_basys3.md).
+- [Diseño, simulación e informe de Potencia](Potencia/README.md).
+
+La implementación digital generó bitstream y los bancos funcionales del PWM y la integración PWM–ADC pasaron. En el montaje se comprobó la conmutación a 10 kHz y la lectura del XADC en reposo. El ensayo a 3 V se detuvo durante el sondeo previo al PR y el seguimiento físico en lazo cerrado sigue pendiente.
 
 ## Estructura
 
@@ -86,13 +78,20 @@ Las fuentes, los modelos y la documentación se conservan en estas carpetas. Viv
 
 | Herramienta | Uso |
 |---|---|
-| Vivado y Vitis | Plataforma MicroBlaze V, integración de IP, implementación y software embebido; el instructivo especifica la versión 2025.1 |
+| Vivado y Vitis | Reconstrucción, implementación, firmware y simulación con XSim. Se verificó la versión 2026.1. La compatibilidad con 2025.1, solicitada por el instructivo, queda pendiente. |
 | SystemVerilog | Periféricos personalizados y bancos de prueba |
 | C | Drivers y aplicación de control |
 | PLECS | Modelado del inversor, la carga y el controlador |
-| Python | Herramientas de adquisición y análisis de datos en PC |
+| Python 3 y compilador C | Ejecución de los bancos desde consola y de las pruebas del software en PC. La comunicación serie en PC requiere `pyserial`. |
 
-La configuración de tarjeta, dispositivo e IP se documenta junto con los scripts de construcción. Los procedimientos de compilación y ejecución acompañan a las fuentes correspondientes cuando se incorporan al proyecto.
+Para repetir las pruebas desde la carpeta `Proyecto4_Inversor_Monofasico`, usar un directorio nuevo para la salida de XSim y sustituir `RUTA_VIVADO` por el directorio de instalación de Vivado.
+
+```text
+python scripts/verificacion/ejecutar_integracion_digital.py SALIDA_PRUEBAS --vivado-home RUTA_VIVADO
+python software/tests/correr_pruebas.py
+```
+
+Las opciones de los bancos, la generación de ondas y la prueba temporizada se explican en la [guía de verificación RTL](src/testbench/README.md). La compilación para MicroBlaze V y la recepción de datos se describen en la [guía de software](software/README.md).
 
 ## Requisitos generales
 

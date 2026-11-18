@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="683" viewBox="0 0 1200 683" role="img" aria-labelledby="titulo desc">
+<title id="titulo">Verificación PWM–ADC en XSim</title><desc id="desc">Formas de onda exportadas de tb_pwm_adc_axi. Se muestran el tiempo muerto, la publicación de SAMPLE y la actualización de la referencia.</desc>
+<rect width="1200" height="683" fill="white"/><g font-family="Arial, sans-serif" fill="#15253a">
+<text x="21" y="37" font-size="27" font-weight="bold">Interfaz PWM–ADC | Simulación RTL funcional</text>
+<text x="21" y="63" font-size="17" >Señales exportadas de XSim 2026.1 · tb_pwm_adc_axi · reloj de 100 MHz</text>
+<rect x="20" y="84" width="1160" height="165" rx="9" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="40" y="112" font-size="22" font-weight="bold">A. Tiempo muerto de 1 µs en la rama A</text>
+<path d="M462.225 123v84" stroke="#cbd5e1" stroke-dasharray="3 5"/>
+<text x="462.225" y="226" font-size="14" text-anchor="middle">75.275 µs</text>
+<path d="M913.225 123v84" stroke="#cbd5e1" stroke-dasharray="3 5"/>
+<text x="913.225" y="226" font-size="14" text-anchor="middle">76.275 µs</text>
+<text x="40" y="150" font-size="17" >PWM inferior (AL)</text>
+<path d="M248 136H462.23V156H1150.00" fill="none" stroke="#225d9e" stroke-width="2.5"/>
+<text x="40" y="190" font-size="17" >PWM superior (AH)</text>
+<path d="M248 196H913.23V176H1150.00" fill="none" stroke="#107568" stroke-width="2.5"/>
+<rect x="20" y="265" width="1160" height="205" rx="9" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="40" y="293" font-size="22" font-weight="bold">B. Disparo y publicación de la primera muestra</text>
+<path d="M264.10714285714283 304v124" stroke="#cbd5e1" stroke-dasharray="3 5"/>
+<text x="264.10714285714283" y="447" font-size="14" text-anchor="middle">50.275 µs</text>
+<path d="M979.2642857142857 304v124" stroke="#cbd5e1" stroke-dasharray="3 5"/>
+<text x="979.2642857142857" y="447" font-size="14" text-anchor="middle">51.385 µs</text>
+<text x="40" y="331" font-size="17" >Disparo ADC</text>
+<path d="M248 337H264.11V317H270.55V337H1150.00" fill="none" stroke="#225d9e" stroke-width="2.5"/>
+<text x="40" y="371" font-size="17" >CONVST</text>
+<path d="M248 377H270.55V357H276.99V377H1150.00" fill="none" stroke="#107568" stroke-width="2.5"/>
+<text x="40" y="411" font-size="17" >SAMPLE</text>
+<rect x="249" y="393" width="729.2642857142857" height="26" rx="4" fill="#e0ecfb" stroke="#2d659f"/>
+<text x="613.6321428571429" y="412" font-size="15" text-anchor="middle">0x00000000</text>
+<rect x="980.2642857142857" y="393" width="168.73571428571427" height="26" rx="4" fill="#e0ecfb" stroke="#2d659f"/>
+<text x="1064.6321428571428" y="412" font-size="15" text-anchor="middle">0x00010123</text>
+<rect x="20" y="486" width="1160" height="165" rx="9" fill="#f8fafc" stroke="#cbd5e1"/>
+<text x="40" y="514" font-size="22" font-weight="bold">C. La referencia se aplica al inicio del período siguiente</text>
+<path d="M368.26666666666665 525v84" stroke="#cbd5e1" stroke-dasharray="3 5"/>
+<text x="368.26666666666665" y="628" font-size="14" text-anchor="middle">100.25 µs</text>
+<path d="M668.9333333333334 525v84" stroke="#cbd5e1" stroke-dasharray="3 5"/>
+<text x="668.9333333333334" y="628" font-size="14" text-anchor="middle">100.275 µs</text>
+<path d="M969.6 525v84" stroke="#cbd5e1" stroke-dasharray="3 5"/>
+<text x="969.6" y="628" font-size="14" text-anchor="middle">100.3 µs</text>
+<text x="40" y="552" font-size="17" >Inicio de período</text>
+<path d="M248 558H668.93V538H789.20V558H1150.00" fill="none" stroke="#225d9e" stroke-width="2.5"/>
+<text x="40" y="592" font-size="17" >Referencia activa</text>
+<rect x="249" y="574" width="418.9333333333334" height="26" rx="4" fill="#e0ecfb" stroke="#2d659f"/>
+<text x="458.4666666666667" y="593" font-size="15" text-anchor="middle">0</text>
+<rect x="669.9333333333334" y="574" width="479.0666666666666" height="26" rx="4" fill="#e0ecfb" stroke="#2d659f"/>
+<text x="909.4666666666667" y="593" font-size="15" text-anchor="middle">1000</text>
+</g></svg>

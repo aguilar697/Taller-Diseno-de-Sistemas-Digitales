@@ -1,57 +1,51 @@
 # Diseño del sistema
 
-El sistema integra una plataforma MicroBlaze V, un periférico PWM, adquisición de corriente y una aplicación de control PR. El diseño modular relaciona las interfaces digitales con la instrumentación y la etapa de potencia del inversor.
+El sistema regula la corriente de una carga RL mediante un inversor monofásico en puente H. La Basys 3 adquiere la corriente, calcula la ley de control y genera las cuatro órdenes de conmutación. Un botón solicita el histórico por USB-UART para su análisis en PC. El bus de potencia opera nominalmente entre 12 y 24 V DC y las consignas son senoidales de 50 Hz con amplitudes de 0,2, 0,5 y 1,0 A pico.
 
-## Diagramas generales
+## Primer nivel · Límites del sistema
 
-- [Primer nivel: objetivo, entradas, salidas y entorno del sistema digital](nivel_1.md).
-- [Segundo nivel: bloques, interfaces y secuencia de control](nivel_2.md).
+![Primer nivel del sistema digital y su entorno](img/nivel_1.svg)
 
-## Diseño del PWM
+La FPGA recibe reloj, reset, órdenes de usuario y una tensión analógica acondicionada. Entrega las cuatro órdenes PWM, el estado en LED y el histórico por UART. Los drivers, el puente, la carga y el sensor forman el camino externo entre las órdenes de actuación y el dato de corriente. El [detalle de entradas y salidas](nivel_1.md) define el sentido de cada señal.
 
-- [Tercer nivel: bloques funcionales, interfaz y configuración](nivel_3_pwm.md).
-- [Cuarto nivel: registros, contadores, comparadores y tiempo muerto](nivel_4_pwm.md).
-- [Contrato de integración: parámetros, disparo ADC y aplicación de referencias](pwm_integracion.md).
-- [Pruebas ejecutadas y límites de verificación](../informe/pwm_verificacion.md).
+## Segundo nivel · Arquitectura digital
 
-## Diseño de adquisición ADC/XADC
+![Segundo nivel con la plataforma y los periféricos](img/nivel_2.svg)
 
-- [Tercer nivel: arquitectura, interfaces y sincronización](nivel_3_adc.md).
-- [Cuarto nivel: conversión, registros, captura y diagnóstico](nivel_4_adc.md).
-- [Implementación ADC/XADC: fuentes, protocolo ACK y reproducción de pruebas](adc/README.md).
-
-## Documentación por subsistema
-
-| Subsistema | Responsable | Contenido del diseño |
+| Bloque | Entradas o acceso | Función y salidas |
 |---|---|---|
-| Plataforma | Daniel Puentes | Block Design, memoria, reloj, reset, mapa de direcciones, interrupciones y reconstrucción |
-| PWM y actuación | Kevin Aguilar | Modulación, temporización, señales complementarias, tiempo muerto, registros AXI y disparo de adquisición |
-| Adquisición | Kenneth Campos | Medición, acondicionamiento, ADC/XADC, calibración, dato válido y driver |
-| Control y software | Kevin Cortés | Ecuación discreta, ejecución periódica, referencia, estados, almacenamiento y comunicación |
+| MicroBlaze V, memorias y MDM | Reloj de 100 MHz, reset, JTAG y respuesta de periféricos | Ejecuta el software de control con FPU simple, caché de instrucciones de 8 KiB y una BRAM física compartida de 32 KiB. |
+| SmartConnect | Solicitudes de memoria mapeada del procesador | Selecciona uno de los siete esclavos AXI. |
+| AXI Timer e INTC | Reloj, reset y configuración por AXI | Solicitan la ISR periódica y permiten medir su duración con el segundo contador. |
+| PWM personalizado | Referencia Q1.15, configuración por AXI4-Lite y reloj | Genera las cuatro órdenes complementarias con tiempo muerto, el disparo de adquisición y el comienzo de período. |
+| ADC/XADC | VAUX6, disparo PWM u orden de software | Publica un código de 12 bits, estado, diagnóstico y token para reconocer la muestra. |
+| GPIO y UART Lite | Botones, interruptores, registros de estado y datos de transmisión | Exponen comandos, selección de referencia, LED, diagnóstico de ISR y exportación por USB-UART. |
 
-Cada documento describe el objetivo del bloque, sus entradas y salidas, su arquitectura, las decisiones adoptadas y los criterios de verificación. Los diagramas generales muestran el límite del sistema y sus interconexiones; los niveles de detalle desarrollan los circuitos o procedimientos internos. Las figuras se almacenan en `img/`.
+Los periféricos comparten reloj y reset AXI activo bajo. El reset del procesador es activo alto. Los offsets son direcciones locales en bytes y se suman a la base de cada periférico. El [segundo nivel detallado](nivel_2.md) relaciona funciones, señales y unidades. El mapa AXI definitivo, los pines de laboratorio y la reconstrucción se encuentran en [Integración física en Basys 3](integracion_basys3.md).
 
-## Interfaces que requieren acuerdo
+## Tercer y cuarto nivel · Diseño por subsistema
 
-| Interfaz | Definiciones necesarias | Responsables |
+| Subsistema | Tercer nivel | Cuarto nivel |
 |---|---|---|
-| Plataforma–PWM | Reloj, reset, registros, accesos AXI y asignación de dirección base | Puentes y Aguilar |
-| PWM–adquisición | Instante de disparo, duración del pulso, frecuencia y tratamiento de ADC ocupado | Aguilar y Campos |
-| Adquisición–control | Unidades, signo, escala, calibración, validez y antigüedad de la muestra | Campos y Cortés |
-| Control–PWM | Formato y límites de referencia, saturación y momento de aplicación de la actualización | Cortés y Aguilar |
-| Temporización del lazo | Relación entre adquisición, interrupción, cálculo y actuación | Los cuatro integrantes |
-| FPGA–potencia | Señales de accionamiento, polaridad, tiempo muerto, acondicionamiento y comportamiento ante fallos | Responsables de actuación y adquisición, coordinados con PEDP |
+| Plataforma MicroBlaze V | [Procesador, memorias y periféricos](nivel_3_microblaze.md) | [Reloj, reset, interconexión y Timer](nivel_4_microblaze.md) |
+| PWM y actuación | [Arquitectura y registros AXI](nivel_3_pwm.md) | [Portadora, comparadores y estados de tiempo muerto](nivel_4_pwm.md) |
+| ADC/XADC | [Adquisición y coordinación con PWM](nivel_3_adc.md) | [Conversión, registro de muestra y diagnóstico](nivel_4_adc.md) |
+| Control PR y software | [Estados y división de tareas](nivel_3_software.md) | [ISR, ecuación PR, registro y exportación](nivel_4_software.md) |
 
-La dirección base de cada periférico se asigna en el Block Design; sus offsets, permisos, valores de reset y efectos de lectura y escritura se documentan con el periférico. Las frecuencias PWM, el período de control, el tiempo muerto y los componentes se seleccionan mediante el análisis de potencia y temporización.
+El hardware mantiene la temporización de los pulsos independiente de la carga de software. En la configuración nominal de 10 kHz, el período PWM y el período de control son de 100 µs. A mitad del período PWM, la fase 5000 genera un pulso de 10 ns al ADC. La ISR usa la última conversión completa, comprueba el estado, reconoce el token y calcula una nueva referencia. El PWM captura esa referencia al inicio de período. Las frecuencias de 20 y 25 kHz también se verifican en el RTL del periférico. Cambiar la frecuencia de operación del lazo requiere coordinar fase de disparo, temporizador y parámetros del PR. [Contrato de temporización](pwm_integracion.md).
 
-## Integración y validación
+## Integración con potencia
 
-La [integración física en Basys 3](integracion_basys3.md) reúne el mapa AXI, los pines de laboratorio, la reconstrucción y los ejecutables de diagnóstico y control.
+El top de laboratorio `inversor_basys3` conecta las cuatro órdenes al conector JA. SW15 habilita su paso previa sincronización y a partir de una frontera de período. Al bajarlo, el top bloquea las cuatro órdenes. El apagado por SD pertenece al driver IR2110. El ACS712 va en serie con la carga entre los nodos de conmutación y su salida se acondiciona para el rango analógico del XADC. El retorno a VAUX6 negativo se cablea junto a la referencia del divisor. La corriente se reconstruye con una calibración de cero y ganancia con signo. El [diseño de potencia](../../Potencia/01_diseno_y_componentes.md) documenta el circuito, las fuentes y el dimensionamiento.
 
-La [documentación de potencia](../../Potencia/README.md) reúne los componentes disponibles, el diseño de la carga, las simulaciones iniciales y las decisiones pendientes de accionamiento y medición. Sus parámetros se coordinan con las interfaces digitales del sistema.
+## Estrategia de verificación
 
-La integración avanza desde la plataforma base y las pruebas individuales hasta el intercambio entre PWM, ADC y software. El modelo de potencia permite evaluar el controlador antes de su puesta en marcha experimental. El plan de cada subsistema incluye casos nominales, límites, reset y fallos identificables.
+| Nivel de prueba | Estímulo y criterio de aceptación |
+|---|---|
+| RTL de los periféricos | Escrituras y lecturas válidas e inválidas, orden independiente de AW/W, espera del maestro, reset y límites. Para el PWM, medir períodos, separación, saturación y fase de disparo. Para ADC, comprobar dato válido, ACK atrasado, sobreescritura y timeout. |
+| Integración digital | Usar un maestro AXI de prueba con PWM y ADC. Comprobar una publicación por disparo, actualización de referencia en la frontera y deshabilitación. El ensayo negativo debe emitir su diagnóstico. |
+| Implementación | Revisar setup y hold, utilización, DRC y CDC. Ejecutar el banco del PWM sobre la netlist ruteada con SDF y contrastar sus puertos contra los criterios de temporización. |
+| Software | Probar el PR, el buffer, los drivers y la exportación con modelos en PC. En FPGA, verificar acceso MMIO, medir período y jitter extendidos desde JB1 y comprobar que UART entrega el histórico completo por botón durante el control. |
+| FPGA y etapa de potencia | Verificar PWM y VGS con el bus desenergizado. Con tensión y corriente limitadas, comprobar conmutación, polaridad y escala de medición. Medir seguimiento a las tres amplitudes nominales, transitorios de referencia y carga, error de fundamental, fase y rizado. |
 
-Las interfaces compartidas se revisan con sus responsables antes de cambiar puertos, registros o parámetros. El [directorio de testbenches](../../src/testbench/README.md) describe los ámbitos de prueba y el [informe](../informe/README.md) organiza los resultados.
-
-[Descripción del proyecto](../../README.md)
+Los criterios de aceptación y las evidencias disponibles se desarrollan en el [informe técnico](../informe/README.md). La descripción de cada ensayo identifica el modelo utilizado y el alcance de su resultado.

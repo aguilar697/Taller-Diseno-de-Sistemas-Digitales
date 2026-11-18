@@ -1,0 +1,40 @@
+Vivado/XSim 2026.1 — Verificación de periféricos
+Extractos de consola. Fuentes RTL del commit 2b7a183.
+
+PWM, simulación funcional
+  tb_pwm_deadtime
+    TEST PASSED tb_pwm_deadtime checks=20
+  tb_pwm_core
+    TEST PASSED tb_pwm_core checks=1064490
+  tb_pwm_axi
+    TEST PASSED tb_pwm_axi checks=1220
+  tb_pwm_adc
+    TEST PASSED tb_pwm_adc checks=260195
+
+PWM, prueba negativa +INJECT_ERROR
+  tb_pwm_axi
+    Fatal: PWM_OVERLAP_DETECTED
+
+PWM, simulación posterior al ruteo
+  tb_pwm_timing
+    PWM_SDF_MAXIMUM_ENABLED
+    TEST PASSED tb_pwm_timing checks=81 periods=3
+
+ADC, simulación funcional con regeneración del XADC
+  tb_adc_control
+    RESULTADO: TEST PASSED
+  tb_adc_top
+    INTEGRACION XADC: TEST PASSED
+  tb_adc_axi_lite
+    AXI: 24/24 CASOS; TEST PASSED
+  tb_adc_concurrency
+    ACK POR IDENTIFICADOR: 15/15 CASOS; TEST PASSED
+  tb_adc_system_axi
+    AXI + XADC REAL EN SIMULACION: TEST PASSED; 3 conversiones; ACK_ID valido, atrasado y duplicado; timeout1024
+  tb_adc_read_coherence
+    LECTURA COHERENTE AXI: 9/9 CASOS; TEST PASSED
+  tb_adc_pwm_axi
+    PERIFERICO_LATENCIA: id=1 convst_sample=112 ciclos trigger_sample=113 ciclos
+    PERIFERICO_RESUMEN: casos=8 periodos=8 disparos=8 conversiones=8 publicaciones=8 latencia_max=112 ciclos
+    PERIFERICO_TIEMPO_MUERTO: rama_a=100 ciclos rama_b=100 ciclos
+    ADC PWM AXI + XADC: 8/8 CASOS; TEST PASSED

@@ -1,38 +1,14 @@
 # Etapa de potencia
 
-El inversor utiliza un puente H con PWM unipolar para regular una corriente sinusoidal de 50 Hz en una carga RL. Su alimentación de trabajo es de 12 a 24 V DC y las referencias nominales son 0,2; 0,5 y 1 A pico.
+El inversor emplea un puente H con cuatro IRF540N, dos IR2110 y un ACS712 de 5 A. La carga nominal combina 6,6 Ω externos con el secundario de un transformador. El objetivo es regular corriente sinusoidal de 50 Hz con un bus de 12 a 24 V y consignas de 0,2, 0,5 y 1 A pico.
 
-Esta documentación corresponde a EL4201 Procesamiento Electrónico de Potencia. Sus integrantes son Kevin Aguilar, Kenneth Campos y Kevin Cortés. La conexión con la plataforma de Taller de Diseño Digital se coordina también con Daniel Puentes.
-
-## Estado del desarrollo
-
-Se realizaron simulaciones exploratorias del puente ideal en lazo abierto y con un PR continuo. Se añadieron copias con PR discreto y un modelo funcional que incorpora resistencia de conducción, tiempo muerto y medición nominal cuantizada. Se dispone de cuatro IRF540N, dos IR2110 DIP-14, un módulo ACS712 de 5 A, tres resistencias de 3,3 Ω y 5 W y un transformador cuyo secundario se propone como inductancia de carga. El diseño especifica el accionamiento y sus auxiliares; quedan por comprobar experimentalmente el bootstrap, el acondicionamiento para XADC y la protección del conjunto.
+En PLECS se ensayaron las tres consignas y los transitorios de referencia y carga con un PR discreto. En el montaje se verificaron el PWM, las salidas inferiores de los drivers, la conmutación a 3 V y el cero del XADC. La respuesta al sondeo abierto quedó por debajo de la estimación del modelo RL y el programa deshabilitó el PWM antes de ejecutar el PR. Quedan pendientes la calibración de la corriente y la operación en lazo cerrado en el rango nominal.
 
 | Documento | Contenido |
 |---|---|
-| [Diseño y componentes](01_diseno_y_componentes.md) | Configuración, materiales disponibles, mediciones del devanado, carga, margen de tensión e interfaces |
-| [Simulación y resultados](02_simulacion_y_resultados.md) | Ensayos ideales, configuración de los archivos PLECS, controlador inicial y análisis numéricos |
-| [Pendientes y validación](03_pendientes_y_validacion.md) | Decisiones por cerrar, secuencia de trabajo y criterios del instructivo |
-| [Registro de laboratorio](04_registro_laboratorio.md) | Alimentaciones, lecturas de drivers y ACS712, diagnóstico pendiente y secuencia para retomar las pruebas |
+| [Diseño y componentes](01_diseno_y_componentes.md) | Circuito, fuentes, selección de componentes, cálculos e interfaz con Basys 3 |
+| [Simulación y resultados](02_simulacion_y_resultados.md) | Modelos PLECS, condiciones, tolerancias y resultados |
+| [Registro de laboratorio](04_registro_laboratorio.md) | Lecturas del puente, retorno del XADC y diagnóstico del sondeo |
+| [Verificación pendiente](03_pendientes_y_validacion.md) | Ensayos, criterios de aceptación y medidas requeridas |
 
-Las dos salidas inferiores de los drivers respondieron tras sustituir la protoboard. Se verificaron órdenes PWM de 10 kHz y 1 µs de tiempo muerto en la captura disponible. El sensado mejoró al corregir VAUX6 negativo, pero el último sondeo se detuvo antes de ejecutar el PR por respuesta insuficiente. El [registro de laboratorio](04_registro_laboratorio.md) conserva las condiciones y la secuencia para continuar.
-
-## Configuración eléctrica seleccionada
-
-El [documento de diseño y componentes](01_diseno_y_componentes.md) reúne las conexiones completas de las dos ramas, las cantidades totales de auxiliares y las condiciones que debe respetar el control digital. La selección comprende cuatro IRF540N, dos IR2110 DIP-14 con bootstrap SB360, carga externa de 6,6 Ω y secundario de transformador como inductancia. La tercera resistencia de 3,3 Ω permite aumentar la carga a 9,9 Ω.
-
-Se emplean un bus variable de 12–24 V, alimentación auxiliar fija de 12 V para los drivers, 3,3 V externos para su lógica y 5 V para el ACS712. La primera adaptación al XADC utiliza un divisor de 4,7 kΩ/1 kΩ. Las referencias son de 0,2; 0,5 y 1 A pico a 50 Hz. La calibración del sensor, el tiempo muerto y los parámetros de control requieren comprobación experimental antes de adoptar sus valores definitivos.
-
-La inductancia del secundario se midió a 120 Hz y 1 kHz; aún no se ha caracterizado a la corriente de operación. Los modelos actuales utilizan una inductancia lineal y no validan por sí solos su comportamiento físico.
-
-Los archivos PLECS originales se conservan sin editar. Las copias nuevas permiten evaluar algunas no idealidades, pero aún faltan parámetros medidos y efectos físicos, como ruido, bootstrap y comportamiento magnético. La validación del circuito comprado sigue pendiente.
-
-## Archivos del proyecto
-
-- [Modelos de PLECS y herramientas de análisis](../modelos/README.md).
-- [Diseño digital e interfaces](../docs/diseno/README.md).
-- [Organización del informe y evidencias](../docs/informe/README.md).
-- [Borradores de diseño e informe de Potencia](../docs/informe/potencia/README.md).
-- [Instructivo](../docs/enunciado/Proyecto_4_EL3313__Taller_de_Diseño_Digital.pdf).
-
-[Descripción del proyecto](../README.md)
+[Documentos de EL4201 en PDF y archivos de reproducción](../docs/informe/potencia/README.md). El diseño de Potencia corresponde a Kevin Aguilar, Kenneth Campos y Kevin Cortés. Daniel Puentes participa en la integración de Taller de Diseño Digital.

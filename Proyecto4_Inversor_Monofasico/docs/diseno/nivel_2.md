@@ -32,7 +32,7 @@ MicroBlaze V se configura a 100 MHz, con caché de instrucciones de 8 KB, memori
 
 El PR, la generación de referencia, la rutina de interrupción, el buffer circular y la exportación son procedimientos en C. Se ejecutan en el procesador y utilizan la memoria local. El PWM realiza la temporización de las salidas; el software calcula la referencia que se escribe en sus registros.
 
-La memoria de 32 KB contiene programa y datos. El tamaño del histórico se determina junto con el consumo del programa, los estados del controlador y la pila. La caché de instrucciones de 8 KB es un recurso adicional del procesador y no se contabiliza como espacio disponible para muestras.
+La memoria de 32 KiB contiene programa, datos y pila. El controlador general integrado reserva 512 muestras de 8 bytes y registra una de cada dos iteraciones de 100 µs, para una ventana nominal de 102,4 ms. La caché de instrucciones de 8 KiB es un recurso adicional del procesador.
 
 ## Conexiones principales
 
@@ -54,17 +54,13 @@ La interconexión AXI no transporta la corriente analógica ni sustituye el disp
 
 La temporización relaciona cuatro sucesos: el evento PWM que inicia adquisición, la disponibilidad del resultado, la interrupción que ejecuta el PR y la aplicación de la nueva referencia de modulación.
 
-El temporizador proporciona la interrupción periódica exigida por la aplicación. Su período y su relación con la adquisición deben permitir que la rutina identifique la muestra que utiliza. La aplicación puede iniciar o capturar una conversión según el modo acordado; la disponibilidad del resultado se comprueba antes del cálculo. El disparo no implica que el dato convertido esté disponible en ese mismo instante.
-
-El diseño detallado establece la fase relativa de esos sucesos y el tratamiento de conversiones pendientes, muestras antiguas y actualizaciones tardías. La verificación mide el período efectivo, el jitter y la latencia entre medición y actuación. La exportación UART se atiende preservando los plazos del control.
+En operación nominal, el Timer solicita una interrupción cada 100 µs a través del AXI INTC. El PWM dispara el ADC a los 50 µs de su propio período. La rutina usa la última conversión completa, comprueba su identificador y reconoce su token. El PWM toma la referencia pendiente en la frontera de período. La exportación UART se atiende desde el lazo principal. El desfase real entre el Timer y el PWM y el jitter de la ISR se comprueban mediante las salidas de diagnóstico disponibles en tarjeta.
 
 ## Configuración del PWM
 
 El periférico expone habilitación, selección de al menos tres frecuencias, referencia de modulación y estado `running`. La referencia se satura al rango admitido. El tiempo muerto es configurable y las órdenes complementarias de cada rama se generan con la separación temporal especificada.
 
-Los offsets `0x00` para control/estado y `0x04` para referencia son la propuesta de interfaz del instructivo. El mapa detallado, el formato numérico, la configuración de tiempo muerto y la política de actualización se desarrollan con los responsables de actuación y control. Las direcciones base pertenecen al mapa general del Block Design.
-
-El [tercer nivel del PWM](nivel_3_pwm.md) desarrolla los bloques y registros implementados. El [contrato de integración](pwm_integracion.md) fija inicialmente PWM y control a 10 kHz, disparo a mitad del período y actualización de referencia en el siguiente inicio de período.
+El PWM se encuentra en `0x44000000`. Expone control/estado en `0x00`, referencia Q1.15 en `0x04`, tiempo muerto en `0x08` y fase de disparo en `0x0C`. En la configuración nominal se usan 100 ciclos de tiempo muerto y fase 5000. El [tercer nivel del PWM](nivel_3_pwm.md) desarrolla la semántica de los registros.
 
 ## Responsabilidades
 

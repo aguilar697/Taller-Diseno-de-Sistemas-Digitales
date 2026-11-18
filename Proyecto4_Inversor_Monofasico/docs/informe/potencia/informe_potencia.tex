@@ -1,39 +1,39 @@
 \documentclass[conference]{IEEEtran}
 \input{comun}
-\hypersetup{pdftitle={Evaluación del inversor monofásico: documento de trabajo}}
+\hypersetup{pdftitle={Implementación y evaluación del inversor monofásico}}
 \begin{document}
 \title{Implementación y evaluación de un inversor monofásico con control PR de corriente}
 \autores\maketitle\estado
 \begin{abstract}
-Se organiza la evaluación de un inversor monofásico con carga RL y control PR discreto. Se presentan los modelos, el método de medida y los resultados de simulación disponibles, junto con apartados identificados para parámetros reales, registros de laboratorio y comparación cuantitativa. La copia funcional incorpora tiempo muerto, resistencia de conducción y medición nominal cuantizada. Los resultados experimentales aún no están disponibles; no se declara validado el montaje ni la integración con MicroBlaze V.
+Se evalúa un inversor monofásico con carga RL y control PR discreto en PLECS y durante la puesta en marcha. La simulación funcional incorpora tiempo muerto, resistencia de conducción y medición cuantizada. En el banco se observó conmutación con un bus reducido de 3,012 V y se verificó el cero del XADC. El sondeo de corriente previo a habilitar el PR produjo 1,61 códigos de amplitud frente a 10,3 estimados con el modelo ideal, por lo que el arranque se detuvo.
 \end{abstract}
 \begin{IEEEkeywords}control de corriente, inversor, validación, PWM unipolar.\end{IEEEkeywords}
 
 \section{Introducción}
 El objetivo es seguir referencias sinusoidales de 50 Hz y 0,2, 0,5 y 1 A pico en una carga RL, con bus de 12 a 24 V \cite{enunciado}. El documento de diseño adjunto desarrolla la topología, el dimensionamiento y el candidato PR; este informe concentra implementación, resultados y discrepancias.
 
-Se distinguen cálculos, simulaciones y mediciones. El diseño de Potencia corresponde a los tres autores; la ejecución con MicroBlaze V se coordina con Taller. Si se emplea una plataforma alternativa en la demostración propia, se identificará y se separarán sus resultados de los integrados.
+Las pruebas en PLECS cubren el régimen nominal y tres transitorios. Las lecturas de banco corresponden a la puesta en marcha con MicroBlaze V y a un sondeo de corriente en lazo abierto.
 
 \section{Montaje y parámetros}
 La solución prevista utiliza cuatro IRF540N, dos IR2110 DIP-14 y un ACS712 de 5 A \cite{irf,ir,acs}. Dos resistencias de $3,3\ \Omega$, 5 W, forman la carga nominal. Una tercera permite pasar de 6,6 a 9,9 $\Omega$. El secundario del transformador se usa con el primario abierto y aislado.
 
-\begin{table}[ht]\caption{Configuración y medidas por completar}\centering\small
-\begin{tabular}{@{}lll@{}}\toprule
+\begin{table}[ht]\caption{Condiciones nominales y de puesta en marcha}\centering\small
+\begin{tabular}{@{}p{0.28\columnwidth}@{\hspace{0.5em}}p{0.22\columnwidth}@{\hspace{0.5em}}p{0.42\columnwidth}@{}}\toprule
 Magnitud & Modelo & Montaje\\\midrule
-Bus & 12/24 V & Pendiente\\
-R externa & $6,6\ \Omega$ & Pendiente\\
-R de devanado & $0,6\ \Omega$ aprox. & Confirmar\\
-L constante & 10 mH, supuesta & Verificar\\
-PWM & 10 kHz & Pendiente\\
-Control & 100 $\mu$s & Pendiente\\
-Tiempo muerto & 1 $\mu$s & Pendiente\\
-Límite de modulación & $\pm0,85$ & Confirmar\\\bottomrule
+Bus & 12/24 V & 3,012 V en el sondeo\\
+R externa & $6,6\ \Omega$ & Dos resistencias de 3,3 $\Omega$\\
+R de devanado & $0,6\ \Omega$ aprox. & Lectura DC aproximada\\
+L constante & 10 mH, supuesta & Medidas LCR abajo\\
+PWM & 10 kHz & 10 kHz en la Basys 3\\
+Control & 100 $\mu$s & PR sin ejecutar\\
+Tiempo muerto & 1 $\mu$s & 1 $\mu$s lógico\\
+Límite de modulación & $\pm0,85$ & 0,20 pico en sondeo\\\bottomrule
 \end{tabular}\end{table}
 
 
 Se midieron preliminarmente 9,291 mH a 120 Hz y 6,984 mH a 1 kHz. No se ha medido L a 50 Hz ni verificado su invariancia con la corriente.
 
-\pendiente{esquemático completo y fotografía, auxiliares y protección instalados, identificación del devanado, equipos y límites de alimentación}
+Los IR2110 se alimentan con una fuente auxiliar de 12 V y una de 3,3 V para lógica. El ACS712 utiliza una fuente de 5 V. El límite de corriente de la fuente del bus fue de 100 mA durante el sondeo.
 
 \section{Control y medición implementados}
 El candidato PR usa $K_p=12$, $K_r=200$, resonancia en 50 Hz y $\omega_c=2\pi2$ rad/s. La estructura de ancho de banda finito y su discretización se sustentan en \cite{pr}. La ecuación conservada es
@@ -46,13 +46,13 @@ Se suma $12e[k]$, se normaliza por 12 V y se aplica una muestra después, limita
 
 La medición funcional usa 185 mV/A, offset de 2,5 V, divisor de 4,7 k$\Omega$/1 k$\Omega$, filtro de evaluación de 10 nF y cuantización de 12 bits \cite{acs,xadc}. Se supone calibración ideal, sin ruido ni deriva. El polo aproximado a 80 kHz no identifica el ancho de banda del módulo adquirido.
 
-\pendiente{plataforma y versión, período y jitter reales, calibración, alineación ADC, retardos y tratamiento de saturación}
+La prueba digital integrada utilizó Vivado y Vitis 2026.1. La calibración del cero se realizó en la FPGA. La ganancia en ambos sentidos y el retardo de extremo a extremo se evaluarán con una referencia de corriente independiente.
 
 \section{Método experimental}
 \subsection{Puesta en marcha}
 Se documentarán instrumentos, sondas, referencias de tensión, escalas, ancho de banda y muestreo. Antes de energizar el puente se comprobarán las compuertas y el tiempo muerto. Se registrarán apagado, limitación de corriente y desconexión. El sensor se calibrará con una medida independiente.
 
-\pendiente{capturas de compuerta, tiempo muerto medido, bootstrap, cero y sensibilidad del sensor e incertidumbre}
+La Tabla~\ref{tab:banco} reúne las lecturas disponibles. Para validar todo el accionamiento se necesitan mediciones diferenciales de las compuertas altas y captura de los cuatro canales de compuerta.
 
 \subsection{Amplitud y fase}
 Se ajustará, sobre ciclos completos,
@@ -78,52 +78,37 @@ La ventana nominal es [0,4; 0,5) s con exportación cada 2 $\mu$s. El máximo er
 Entre 0,100 y 0,101 s se comprobaron las órdenes cada 100 ns: hubo actividad en las cuatro señales, cero muestras de solapamiento y 40 huecos completos, con mínimo observado de 1 $\mu$s. Esto no verifica las compuertas físicas ni el PWM en RTL.
 
 \section{Resultados experimentales}
-Esta sección se completará con datos originales del montaje. Las celdas pendientes no representan valores nulos ni criterios aprobados.
+\begin{table}[ht]
+\caption{Lecturas de puesta en marcha}\centering\small
+\begin{tabular}{@{}p{0.56\columnwidth}p{0.36\columnwidth}@{}}\toprule
+Magnitud & Resultado\\\midrule
+LO--COM, rama izquierda & 11,926 V con LIN alto\\
+Bootstrap VB--VS, medida estática & 11,95 V aprox.\\
+Órdenes de la Basys 3 & 10 kHz, hueco de 1 $\mu$s\\
+Bus de potencia y límite & 3,012 V, 100 mA\\
+Niveles altos de los nodos A y B & 2,91 V y 2,95 V\\
+JXADC1--JXADC7, sin corriente & 0,426 V\\
+Cero promedio del XADC & 1748,16 códigos\\\bottomrule
+\end{tabular}
+\label{tab:banco}
+\end{table}
 
-\begin{table}[ht]\caption{Seguimiento experimental}\centering\small
-\begin{tabular}{@{}cccccc@{}}\toprule
-$V_{dc}$ & $I_{\mathrm{ref},pk}$ & $I_{1,pk}$ & $E_A$ & $\phi$ & $\Delta i_{pp}$\\
-(V) & (A) & (A) & (\%) & ($^\circ$) & (A)\\\midrule
-12 & 0,2 & Pend. & Pend. & Pend. & Pend.\\
-12 & 0,5 & Pend. & Pend. & Pend. & Pend.\\
-12 & 1,0 & Pend. & Pend. & Pend. & Pend.\\
-24 & 0,2 & Pend. & Pend. & Pend. & Pend.\\
-24 & 0,5 & Pend. & Pend. & Pend. & Pend.\\
-24 & 1,0 & Pend. & Pend. & Pend. & Pend.\\\bottomrule
-\end{tabular}\end{table}
+La salida inferior derecha respondió tras cambiar de protoboard. Las primeras capturas mostraban picos incluso al conectar punta y retorno al mismo nodo. Se cambió de osciloscopio y se acortaron las conexiones de medida. La indicación de base de $-100$ mV corresponde al nivel bajo estimado y no cuantifica el mínimo de conmutación. En la prueba con bus reducido, la tensión diferencial repitió un ciclo cada 20 ms. La fuente no permaneció en limitación.
 
-\pendiente{registros de las tres referencias a 12 y 24 V, condiciones reales y ventanas de análisis}
+En las lecturas iniciales de corriente continua, la salida del ACS712 pasó de 2,426 V en vacío a 2,385 V con 0,2 A y 2,328 V con 0,5 A. La pendiente preliminar fue de aproximadamente $-196$ mV/A en el sentido ensayado. Quedó por verificar su correspondencia con A$\to$B. Se corrigió el retorno de VAUX6 después de observar una diferencia de 0,473 V entre JXADC1 y JXADC7. El cero corregido de 1748,16 códigos equivale a 0,4268 V con la escala nominal del XADC y concuerda con la medida de 0,426 V.
 
+\section{Contraste de la respuesta del sondeo}
+El programa de laboratorio inició una excitación abierta de 50 Hz y modulación pico de 0,20 antes de habilitar el PR. Con $V_{dc}=3,012$ V, $R=7,2\ \Omega$ y $L=9,3$ mH, el modelo ideal estima una amplitud de corriente de 0,0775 A. La sensibilidad nominal de 133 códigos/A daría aproximadamente 10,3 códigos de amplitud, o 9,5 códigos en fase con la excitación al incluir el desfase de la planta.
 
-\begin{table}[ht]\caption{Transitorios experimentales}\centering\small
-\begin{tabular}{@{}lll@{}}\toprule
-Ensayo & Pico de corriente & Establecimiento\\\midrule
-0,2 a 0,5 A & Pendiente & Pendiente\\
-0,5 a 1,0 A & Pendiente & Pendiente\\
-R externa: $+50\,\%$ & Pendiente & Pendiente\\\bottomrule
-\end{tabular}\end{table}
-
-\pendiente{capturas, criterio de establecimiento, modulación y temperatura}
-
-\section{Comparación y discusión}
-Se compararán banco y PLECS en condiciones coincidentes. Una discrepancia de amplitud se puede expresar como
-\begin{equation}
-\delta_I=100\frac{I_{1,pk}^{\mathrm{exp}}-I_{1,pk}^{\mathrm{sim}}}{I_{1,pk}^{\mathrm{sim}}}.
-\end{equation}
-Se discutirán por separado calibración, ruido, cuantización, filtrado, retardo, tiempo muerto, semiconductores y variación de R y L. No se asignará una causa sin evidencia.
-
-\pendiente{comparación cuantitativa, rizado, incertidumbre, pérdidas y explicación de discrepancias}
+El sondeo registró 1,57 códigos en fase y $-0,34$ en cuadratura, una amplitud de 1,61 códigos. La prueba terminó con \texttt{ERROR=5} antes de ejecutar el PR. Esta diferencia puede deberse a la tensión efectiva en la carga, a la respuesta del sensor o a un problema en el recorrido de corriente. Se requiere una medida independiente de $i_L$ simultánea con $v_{AB}$, la salida analógica y los códigos del XADC para distinguir esas causas. El registro de laboratorio conserva también un CSV anterior a la corrección del retorno cuya configuración de medida quedó incompleta. Ese registro no sustenta un valor de rizado de corriente.
 
 \section{Integración con Taller}
-Se documentará la cadena ACS712--XADC--MicroBlaze V--PWM--IR2110 y los ensayos conjuntos. Esta integración corresponde a un rubro independiente de los 80 puntos propios de Potencia \cite{enunciado}.
-\pendiente{interfaces y versiones finales, adquisición sincronizada y pruebas integradas; si no se completan, registrar preparativos e intentos}
+La Basys 3 genera cuatro órdenes PWM para los IR2110 y adquiere la salida acondicionada del ACS712 por VAUX6. El disparo del PWM y la entrega de la muestra a través de AXI se comprobaron en simulación digital. El sondeo de laboratorio se ejecutó con MicroBlaze V y permitió observar el apagado por respuesta insuficiente. El seguimiento cerrado y la temporización de la ISR requieren verificación experimental.
 
 \section{Conclusiones}
-La simulación predice seguimiento nominal con error de amplitud inferior al 10\,\% bajo las hipótesis evaluadas, y recuperación después de los cambios de referencia y carga. La validación física y la comprobación final de rizado permanecen pendientes.
-\pendiente{conclusiones basadas en mediciones, cumplimiento, limitaciones y mejoras}
+La copia funcional de PLECS anticipa error de amplitud inferior al 10\,\% en las condiciones nominales evaluadas. En el banco se verificaron señales de accionamiento, conmutación a bus reducido y el cero del XADC. La amplitud registrada por el XADC durante el sondeo quedó por debajo de la prevista y el programa bloqueó el arranque. Una medida independiente determinará la corriente real en la carga. Permanecen pendientes los ensayos nominales de seguimiento, fase y rizado y los cambios de consigna y carga en el montaje.
 
-\section*{Evidencias adjuntas}
-Se acompañarán los modelos PLECS, scripts, parámetros, registros de simulación y datos experimentales originales, con instrucciones de reproducción. Cada figura deberá corresponder a un archivo y a condiciones identificadas. Los registros experimentales todavía no existen.
-\newpage
+\section*{Evidencias}
+Los modelos de PLECS y sus condiciones de ensayo se conservan en el directorio \texttt{modelos}. Los valores medidos, la configuración del ensayo y el diagnóstico figuran en el registro de puesta en marcha de \texttt{Potencia}. Los resultados de la simulación funcional se generan a partir de \texttt{lazo\_funcional.json}.
 \referencias
 \end{document}

@@ -1,5 +1,7 @@
 # Consolidación de software MicroBlaze V e integración PWM
 
+Este documento registra la plataforma digital independiente. El montaje del inversor utiliza la [integración de laboratorio con asignación JA](integracion_basys3.md).
+
 ## Alcance y reconstrucción
 
 La revisión del 15 de noviembre de 2026 conserva 100 MHz, RV32IMF/ilp32f, FPU simple, BRAM compartida de 32 KiB e I-cache de 8 KiB. No modifica las fuentes de control PR, ADC o PWM. La plataforma actual integra PWM real; los resultados de software anteriores a esa integración se identifican por separado. No se ejecuta el programa sobre hardware, no se genera bitstream ni se conecta potencia. Vivado/Vitis 2025.1 sigue sin comprobarse.
@@ -88,4 +90,4 @@ El flujo Vitis actual exige las macros reales `XPAR_PWM_SYSTEM_AXI_0_BASEADDR/HI
 
 La reconstrucción del 15 de noviembre con PWM terminó síntesis (6843 LUT, 4424 registros, 11 RAMB36 y 9 DSP), exportación XSA y enlace PR correctamente. El workspace `%TEMP%/p4_pwm_vitis_20261115_a/` registra ABI_ESTATICA_PASS, marco de 272 bytes y los mismos 32032 bytes reservados / 736 libres. En aquella revisión la síntesis estimaba WNS −0,129 ns y TNS −7,364 ns, y NSTD-1/UCIO-1 señalaban las salidas PWM sin asignar. La implementación posterior con JC completó routing y cerró setup/hold, según el [informe integrado](../informe/verificacion_digital_integrada_microblaze.md#implementación-nueva-con-pines-jc). No es una aprobación física; se conservan los avisos BSP/RWX y metodología, sin waivers.
 
-Las asignaciones verificadas para validación digital son pwm_ah/JC1/K17, pwm_al/JC2/M18, pwm_bh/JC3/N17, pwm_bl/JC4/P18 y pwm_period_start_o/JC7/L17, todas LVCMOS33. Se conservan JA1 y VAUX6. Cualquier conexión física posterior debe respetar este mapa y pasar por validación eléctrica del equipo. Faltan permiso externo de actuación y medición de fase PWM–ADC–Timer: compartir reloj no fija la fase de habilitaciones por AXI. No se autoriza conexión a drivers ni potencia.
+Las asignaciones verificadas para validación digital son pwm_ah/JC1/K17, pwm_al/JC2/M18, pwm_bh/JC3/N17, pwm_bl/JC4/P18 y pwm_period_start_o/JC7/L17, todas LVCMOS33. Se conservan JA1 y VAUX6. Cualquier conexión física posterior debe respetar este mapa y pasar por validación eléctrica del equipo. Faltan permiso externo de actuación y medición de fase PWM–ADC–Timer: compartir reloj no fija la fase de habilitaciones por AXI. Esta asignación JC se usó para la verificación digital independiente.

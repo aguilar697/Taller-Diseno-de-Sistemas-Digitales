@@ -1,6 +1,6 @@
 # Subsistema ADC/XADC
 
-Implementación digital aislada para Basys 3 (`xc7a35tcpg236-1`), desarrollada y comprobada en **Vivado 2026.1**. La compatibilidad con **2025.1**, versión solicitada para el sistema compartido, sigue pendiente. No se ha verificado la integración con MicroBlaze V ni el hardware físico.
+Periférico ADC/XADC para Basys 3 (`xc7a35tcpg236-1`). Las pruebas aisladas y la construcción digital integrada se hicieron en **Vivado 2026.1**. La compatibilidad con **2025.1**, versión solicitada, sigue pendiente. En laboratorio se comprobó la lectura del XADC en reposo. La calibración de la cadena de corriente en operación se mantiene abierta.
 
 ## Fuentes y contrato
 
@@ -9,10 +9,10 @@ Implementación digital aislada para Basys 3 (`xc7a35tcpg236-1`), desarrollada y
 - [Contrato C](../../../software/embedded/drivers/adc/adc_regs.h): offsets, máscaras y procedimiento; no es un driver BSP completo.
 - [Scripts reproducibles](../../../scripts/verificacion/adc/): importación del XCI, regresión y síntesis aislada.
 - [Arquitectura e interfaces](arquitectura.md), [registros y ACK](mapa_registros.md), [temporización](temporizacion_y_sincronizacion.md).
-- [Resultados y alcance de las pruebas](verificacion.md), [advertencias](advertencias_sintesis.md), [integración pendiente](integracion_pendiente.md).
+- [Resultados y alcance de las pruebas](verificacion.md), [advertencias](advertencias_sintesis.md), [integración y validación pendiente](integracion_pendiente.md).
 - [Informe del periférico ADC con PWM, AXI y XADC](../../informe/adc_verificacion.md): prueba conjunta y resultados reproducibles.
 
-Los [niveles tercero](../nivel_3_adc.md) y [cuarto](../nivel_4_adc.md) conservan el contexto del sistema; este directorio documenta la implementación entregada. No se modifican PWM, plataforma MicroBlaze, software de control ni potencia.
+Los [niveles tercero](../nivel_3_adc.md) y [cuarto](../nivel_4_adc.md) describen la relación del ADC con el sistema. Este directorio detalla su funcionamiento y las pruebas del periférico.
 
 ## Reproducir en Windows
 
@@ -38,4 +38,4 @@ New-Item -ItemType Directory -Force .\Proyecto4_Inversor_Monofasico\build\adc | 
 
 El flujo valida la versión 2026.1 y se detiene con otras versiones: no migra ni actualiza el IP automáticamente. El XCI conserva su configuración original, incluidos metadatos de rutas del desarrollo; **se debe importar una copia con `preparar_ip.tcl`**, como hacen ambos scripts, en lugar de generar productos directamente sobre el XCI versionado. Los wrappers y bibliotecas Xilinx se obtienen de Vivado y no se duplican en Git.
 
-Para integrar en otro proyecto, añadir los cuatro RTL y una copia importada del XCI, seleccionar `adc_system_axi` como periférico, y acordar los contratos de [integración](integracion_pendiente.md). El periférico no está empaquetado todavía como IP AXI de usuario y no se entrega un Block Design ni restricciones físicas.
+La construcción del sistema usa `adc_system_axi` como referencia de módulo e importa el XCI en el proyecto generado. El mapa y las restricciones están en la [guía de Basys 3](../integracion_basys3.md).

@@ -1,5 +1,7 @@
 # Verificación de reconstrucción MicroBlaze V
 
+Este documento registra la plataforma digital independiente. El montaje del inversor utiliza la [integración de laboratorio con asignación JA](../diseno/integracion_basys3.md).
+
 ## Alcance
 
 Se reconstruyó la plataforma desde los scripts nuevos de `scripts/vivado/`, partiendo de una carpeta externa nueva, sin importar el XPR, BD o checkpoints exploratorios. Herramienta: Vivado 2026.1, dispositivo `xc7a35tcpg236-1`. La [guía de implementación](../diseno/implementacion_microblaze.md) describe arquitectura, comandos y limitaciones.
@@ -164,7 +166,7 @@ SmartConnect tiene un maestro y siete destinos. M06_AXI llega al PWM en 0x440000
 | ABI / memoria | ABI_ESTATICA_PASS; 32032 bytes reservados y 736 libres |
 | Implementación, bitstream, ejecución y potencia | No realizados |
 
-NSTD-1 y UCIO-1 corresponden exclusivamente a `pwm_ah`, `pwm_al`, `pwm_bh`, `pwm_bl` y `pwm_period_start_o`: faltan PACKAGE_PIN, IOSTANDARD y contrato temporal externo. No se asignaron pines candidatos, no se rebajaron severidades y no se autoriza generar bitstream. Los 24 avisos de pipeline se distribuyen en DPIP-1 (6), DPOP-1 (12) y DPOP-2 (6). DPIR-1 señala registros con reset asíncrono que no pueden integrarse en registros DSP. Se conserva el RTL de Kevin; estas observaciones requieren revisión antes de optimizarlo.
+NSTD-1 y UCIO-1 corresponden exclusivamente a `pwm_ah`, `pwm_al`, `pwm_bh`, `pwm_bl` y `pwm_period_start_o`: faltan PACKAGE_PIN, IOSTANDARD y contrato temporal externo. En esa construcción la ausencia de asignaciones impidió generar bitstream. Los 24 avisos de pipeline se distribuyen en DPIP-1 (6), DPOP-1 (12) y DPOP-2 (6). DPIR-1 señala registros con reset asíncrono que no pueden integrarse en registros DSP. Estas advertencias corresponden a la configuración DSP de esa síntesis.
 
 `check_timing` no encuentra registros sin reloj, endpoints internos sin restricciones ni bucles combinacionales. Quedan cinco botones/switches sin input delay y cinco salidas PWM sin output delay; explican los diez TIMING-18. Las excepciones existentes de reset/UART y salidas de diagnóstico permanecen visibles. También queda la comprobación de ancho de pulso CONVST del XADC. `report_cdc` enumera nueve cruces CDC-3 con ASYNC_REG, incluidos los GPIO; no demuestra que LUTAR-1 o TIMING-9 estén resueltos. Ambos permanecen no concluyentes.
 
@@ -188,6 +190,6 @@ Timer 0 mantiene la configuración de software TLR0=9998 para 10000 ciclos (100 
 
 Hardware: `reports/bd_configuration.txt`, `reports/synthesis/` (utilización, timing, DRC, metodología, CDC, I/O, clocks, excepciones, `pending_pwm_pins.txt` y `platform_synth.dcp`) y `platform_microblaze.xsa` en la carpeta externa indicada. Logs/journals: `%TEMP%/p4_pwm_create_20261115_a.*`, `p4_pwm_synth_20261115_a.*` y `p4_pwm_export_20261115_a.*`.
 
-Software: `pr_build_inputs.json`, `pr_elf_validation.json`, `interrupt_abi.json`, `pr_disassembly.txt`, logs de plataforma/aplicación, ELF y mapa en el workspace externo. Los hashes conservan los C/H importados y originales. `timing_ruteo.rpt` continúa idéntico byte por byte aunque Git lo señala por atributos LF/CRLF. No se modificaron fuentes de compañeros, fuentes instaladas AMD ni el XDC previo en esta etapa. Todo queda sin staging ni publicación.
+Software: `pr_build_inputs.json`, `pr_elf_validation.json`, `interrupt_abi.json`, `pr_disassembly.txt`, logs de plataforma/aplicación, ELF y mapa en el workspace externo. Los hashes conservan los C/H importados y originales.
 
 Antes de prueba física faltan pines y requisitos eléctricos PWM, metodología/CDC pendiente, restricciones OOC/E/S, implementación y timing post-routing, carga del ELF, prueba dinámica de pila y medición de ISR/fase. Vivado/Vitis 2025.1 continúa sin comprobarse. No se conecta hardware de potencia.

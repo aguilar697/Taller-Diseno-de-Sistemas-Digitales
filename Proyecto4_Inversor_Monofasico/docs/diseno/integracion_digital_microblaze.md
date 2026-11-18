@@ -1,5 +1,7 @@
 # Integración digital MicroBlaze V, ADC y PWM
 
+Este documento registra la plataforma digital independiente. El montaje del inversor utiliza la [integración de laboratorio con asignación JA](integracion_basys3.md).
+
 ## Alcance de la revisión
 
 La rama dPuentes incorpora origin/main mediante los merges 63ebb78 y 33c6cbe, sin conflictos. El segundo incluye los PR 72–74 de pruebas y documentación ADC, sin cambios de RTL, XCI ni software. Los PR 66 (software) y 67 (ADC) están fusionados; el PR 65 de plataforma sigue abierto. El RTL PWM está publicado mediante el PR 71. Esta revisión integra ese PWM real junto con ADC y GPIO; no crea un PWM de prueba ni ejecuta el PR sobre hardware.
@@ -32,7 +34,7 @@ Las ventanas pasan las comprobaciones del BD, incluida la ausencia de solapamien
 
 GPIO entradas tiene canales de 3 y 2 bits: BTN U/L/R para habilitar, reconocer y exportar, y SW0/SW1 para amplitud. GPIO salidas tiene canales de 4 y 1 bits: LED0–3 para operación/falla/exportación/latido y JA1 para diagnóstico ISR. BTN C conserva reset. Ver la tabla de pines en la guía de plataforma.
 
-Fuente física: [XDC oficial de Digilent](https://github.com/Digilent/digilent-xdc/blob/master/Basys-3-Master.xdc). VAUX6 reserva J3/K3, JXADC1/JXADC7; consultar también el [manual Basys 3](https://digilent.com/reference/_media/basys3%3Abasys3_rm.pdf). El estándar del pin no amplía el rango de entrada analógica permitido. El mapa digital verificado utiliza pwm_ah/JC1/K17, pwm_al/JC2/M18, pwm_bh/JC3/N17, pwm_bl/JC4/P18 y pwm_period_start_o/JC7/L17, todos LVCMOS33. Cualquier conexión física posterior debe respetarlo y pasar por validación eléctrica del equipo; no se autoriza conectar drivers ni potencia.
+Fuente física: [XDC oficial de Digilent](https://github.com/Digilent/digilent-xdc/blob/master/Basys-3-Master.xdc). VAUX6 reserva J3/K3, JXADC1/JXADC7; consultar también el [manual Basys 3](https://digilent.com/reference/_media/basys3%3Abasys3_rm.pdf). El estándar del pin no amplía el rango de entrada analógica permitido. El mapa digital verificado utiliza pwm_ah/JC1/K17, pwm_al/JC2/M18, pwm_bh/JC3/N17, pwm_bl/JC4/P18 y pwm_period_start_o/JC7/L17, todos LVCMOS33. La integración de laboratorio utiliza un archivo de constraints distinto.
 
 ## Timer, interrupciones y sincronización pendiente
 
@@ -73,6 +75,5 @@ try {
 
 Las comprobaciones ejecutables revisan CPU, memoria, mapa, canales GPIO, dos Timer, AXI ADC, reloj y reset compartidos e interrupción. La síntesis revisa pins y un solo reloj de entrada. Se mantienen visibles los avisos de E/S/CDC; no se añaden excepciones internas para cerrar timing ni se ejecuta implementación en esta etapa.
 
-El merge mostró `timing_ruteo.rpt` de Kevin como modificado por atributos LF frente a un blob CRLF: su contenido local es idéntico byte por byte a HEAD. No se normaliza ni se agrega ese informe en esta tarea. Tampoco se modifica su .gitattributes.
 
 Los [resultados de la revisión parcial](../informe/microblaze_reconstruccion.md#revisión-digital-con-adc-y-gpio--15-de-noviembre-de-2026) conservan el enlace fallido con -O0: 39088 bytes requeridos frente a 32768, exceso de 6320. Ese resultado histórico fue superado mediante -Os y ALIGN(16), sin modificar algoritmo, buffer ni memoria; no debe confundirse con una aprobación del lazo. El lanzador Vitis puede devolver cero ante una excepción Python; comprobar el resultado APP_BUILD y el reporte ELF, no solo el código externo.

@@ -1,6 +1,6 @@
 \documentclass[conference]{IEEEtran}
 \input{comun}
-\hypersetup{pdftitle={Diseño del inversor monofásico: documento de trabajo}}
+\hypersetup{pdftitle={Diseño del inversor monofásico con control PR de corriente}}
 \begin{document}
 \title{Diseño de un inversor monofásico con control proporcional resonante de corriente}
 \autores\maketitle\estado
@@ -50,10 +50,10 @@ Con dos canales conduciendo, $P_{\mathrm{cond}}\approx2R_{\mathrm{DS(on)}}I_{\ma
 P_{\mathrm{sw}}\approx\sum_j \tfrac12 V_{\mathrm{DS},j}|I_j|
 (t_{r,j}+t_{f,j})f_{\mathrm{sw}}.
 \end{equation}
-\pendiente{tiempos efectivos con las resistencias de compuerta elegidas, pérdidas de diodos, temperatura y margen térmico final}
+Para cerrar el presupuesto térmico se requieren tiempos de transición con el driver y la carga conectados, caída de diodos, temperatura y pérdidas del devanado.
 
 \subsection{Accionamiento y frecuencia}
-Se propone un IR2110 por rama, con VDD de 3,3 V y VCC fijo de 12 V, separado del bus variable \cite{ir}. El capacitor bootstrap se conecta entre VB y VS; HO se mide respecto a VS y LO respecto a COM. El esquema de una rama y su tabla de terminales se conservan en la documentación de componentes.
+Se propone un IR2110 por rama, con VDD de 3,3 V y VCC fijo de 12 V, separado del bus variable \cite{ir}. El capacitor bootstrap se conecta entre VB y VS; HO se mide respecto a VS y LO respecto a COM. El esquema del puente y la tabla de terminales de cada rama acompañan el diseño en los archivos \texttt{puente\_h\_y\_sensado.svg} y \texttt{accionamiento\_ir2110.svg}.
 
 Se evalúan resistencias de compuerta de $22\ \Omega$, resistencias compuerta--fuente de 10 k$\Omega$, desacoplos locales y tiempo muerto de 1 $\mu$s. Se verificarán apagado y ausencia de conducción simultánea antes de energizar el bus.
 
@@ -93,7 +93,7 @@ Para la planta con retención, $A=e^{-RT_s/L}$ y $B=(1-A)/R$. Con $q=z^{-1}$ y $
 \end{equation}
 La recursión de Schur confirma estabilidad en doce combinaciones de R total de 7,2/10,5 $\Omega$, L de 6,984/9,291/10 mH y bus de 12/24 V. Esta comprobación lineal excluye medición, tiempo muerto y saturación.
 
-\pendiente{procedimiento y justificación de sintonización final, márgenes, retardos medidos, saturación y anti-windup}
+La sintonización parte del modelo RL: $K_p$ aporta la corrección de banda ancha, $K_r$ aumenta la ganancia en 50 Hz y $\omega_c$ fija el ancho de banda de la rama resonante. Se conserva el candidato cuando las raíces del modelo discreto permanecen dentro del círculo unitario y las simulaciones conservan margen de modulación. En la plataforma digital, el disparo ocurre a mitad del período PWM y la transferencia de la referencia se realiza en el límite del período. Para comprobar la sintonización en la FPGA se requieren la latencia real, la calibración y la respuesta ante saturación.
 
 \section{Plan de validación}
 Primero se comprobarán auxiliares, apagado, bootstrap, compuertas y tiempo muerto; se documentarán límite de corriente, fusible y desconexión. Se calibrará el ACS712 con una medida independiente y se comprobará la carga.
@@ -101,6 +101,6 @@ Primero se comprobarán auxiliares, apagado, bootstrap, compuertas y tiempo muer
 Se realizarán por separado: (i) las tres referencias nominales; (ii) cambios de 0,2 a 0,5 A y de 0,5 a 1 A pico; (iii) cambio resistivo de al menos 25\,\% a 0,5 A pico. Cada registro identificará referencia, corriente, tensión de carga, PWM y parámetros reales. La fundamental se extraerá en al menos cinco períodos completos. El rizado local se separará de la componente de baja frecuencia.
 
 \section{Estado del diseño}
-Se dispone de componentes principales, mediciones preliminares y modelos reproducibles. Falta completar el esquema del montaje, caracterizar la medición, cerrar pérdidas y controlador y verificar físicamente los criterios. Los datos experimentales permitirán actualizar el documento de diseño y sustentar el informe final.
+La puesta en marcha comprobó el PWM de 10 kHz, el tiempo muerto lógico de 1 $\mu$s y los niveles de ambas ramas con el bus limitado a 3 V. La caracterización de la cadena de corriente, el margen térmico y la regulación en el rango nominal requieren mediciones adicionales. El informe técnico recoge las condiciones de la prueba y el diagnóstico del sondeo.
 \referencias
 \end{document}

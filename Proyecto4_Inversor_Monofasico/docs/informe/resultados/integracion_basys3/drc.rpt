@@ -1,9 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Mon Nov 16 22:42:52 2026
-| Host         : Kevin running 64-bit major release  (build 9200)
-| Command      : report_drc -file P:/revision_20261116/hardware_v2/reports/implementacion/drc.rpt
+| Date         : Wed Nov 18 11:59:32 2026
+| Command      : report_drc -file drc.rpt
 | Design       : inversor_basys3
 | Device       : xc7a35tcpg236-1
 | Speed File   : -1
