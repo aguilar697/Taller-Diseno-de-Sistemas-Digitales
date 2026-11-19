@@ -11,13 +11,13 @@
         <mxCell id="p1" value="Salida de medición = 1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="150" y="100" width="300" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="p2" value="Aplicar solicitudes del lazo principal&lt;br&gt;(habilitar o apagar el PWM)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="p2" value="Leer ADC: código, n y estado" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="150" y="180" width="300" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="p3" value="Leer ADC: código, n y estado" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="p3" value="Convertir a A y supervisar:&lt;br&gt;|i_med|, rango del código, Δn" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="150" y="260" width="300" height="50" as="geometry"/>
         </mxCell>
-        <mxCell id="p4" value="Convertir a A y supervisar:&lt;br&gt;|i_med|, rango del código, Δn" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
+        <mxCell id="p4" value="Aplicar solicitudes si no hay falla&lt;br&gt;(habilitar, apagar; BTND apaga)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontSize=12;" vertex="1" parent="1">
           <mxGeometry x="150" y="340" width="300" height="50" as="geometry"/>
         </mxCell>
 

@@ -1,6 +1,6 @@
 # Cuarto nivel — Rutina de control, registro y exportación
 
-Este documento desarrolla los bloques del [tercer nivel del software](nivel_3_software.md): el flujo de la rutina periódica, la inicialización y el lazo principal, los cálculos de cada bloque, la estructura del registro de muestras, el formato de la trama UART y las funciones de los drivers. Los valores que dependen de PEDP, del ADC o de la plataforma se tratan como parámetros con nombre; su valor se fija en el archivo de configuración cuando se acuerden.
+Este documento desarrolla los bloques del [tercer nivel del software](nivel_3_software.md): el flujo de la rutina periódica, la inicialización y el lazo principal, los cálculos de cada bloque, la estructura del registro de muestras, el formato de la trama UART y las funciones de los drivers. Los valores que dependen de PEDP, del ADC o de la plataforma se tratan como parámetros con nombre; sus valores están en `software/embedded/control/parametros.h`.
 
 ## 1. Rutina periódica de control
 
@@ -13,21 +13,22 @@ Este documento desarrolla los bloques del [tercer nivel del software](nivel_3_so
 | Paso | Operación | Observaciones |
 |---|---|---|
 | 1 | Activar la salida GPIO de medición | Marca el inicio de la iteración para el osciloscopio |
-| 2 | Aplicar las solicitudes del lazo principal | Habilitar o apagar el PWM. Se hace aquí para que el PWM arranque siempre a la misma distancia de la interrupción |
-| 3 | Leer el ADC | Código, número de muestra `n` y estado, en una lectura coherente |
-| 4 | Convertir y supervisar | Corriente en amperios, rango del código, continuidad de `n` y sobrecorriente |
-| 5 | Decidir el estado | Una falla apaga el PWM y salta al paso 11. Fuera de OPERACIÓN no hay control: los estados del PR se ponen en cero y se salta al paso 11. En los primeros `N_ARRANQUE` períodos después de habilitar se escribe REFERENCE = 0 para cargar el bootstrap de los drivers y se salta al paso 11; al terminar, `θ` arranca en cero con la amplitud pedida |
-| 6 | Referencia | En OPERACIÓN, avanzar la fase en cada iteración y aplicar el cambio de amplitud en el cruce por cero, aunque la muestra no sea nueva |
-| 7 | PR | Solo con muestra nueva: calcular la parte resonante y `v_PR` sin actualizar todavía los estados. Con una muestra repetida se mantiene REFERENCE y se salta al paso 11 |
-| 8 | Modulación | `m = sat(v_PR/Vdc)` y conversión a Q1.15 |
-| 9 | Escribir REFERENCE | Una escritura de 32 bits |
-| 10 | Actualizar los estados del PR | Según la regla de anti-windup |
-| 11 | Registrar y preparar la siguiente muestra | Una de cada `K_REG` iteraciones, si el buffer no está congelado. Fuera de OPERACIÓN, iniciar la conversión por software que se leerá en la siguiente iteración |
-| 12 | Medir la duración | Contador del Timer; actualizar el máximo |
-| 13 | Reconocer la interrupción | Limpiar el pendiente del Timer y del controlador de interrupciones |
-| 14 | Desactivar la salida GPIO de medición | El ancho del pulso es la duración de la ISR |
+| 2 | Leer el ADC | Código, número de muestra `n` y estado, en una lectura coherente |
+| 3 | Convertir y supervisar | Con muestra válida: corriente en amperios, rango del código, continuidad de `n` y sobrecorriente. Sin muestra válida solo se evalúa la continuidad de `n` y se usa `i_med = 0`. Un bit de error del ADC marca falla de muestras |
+| 4 | Atender la parada | Si BTND está presionado en OPERACIÓN, se solicita apagar el PWM |
+| 5 | Aplicar las solicitudes del lazo principal | Solo si no hay falla. Habilitar (desde DETENIDO) exige `MEDICION_CALIBRADA = 1`; si no, la causa es una falla de configuración. Al habilitar se ponen en cero los estados del PR y se escribe REFERENCE = 0 antes de `enable = 1`. Apagar (desde OPERACIÓN) vuelve a DETENIDO. Se hace después de leer la muestra para que la conversión por software ya esté reconocida cuando el PWM empieza a disparar conversiones |
+| 6 | Decidir el estado | Una falla apaga el PWM y salta al paso 12. Fuera de OPERACIÓN no hay control: los estados del PR se ponen en cero y se salta al paso 12. En los primeros `N_ARRANQUE` períodos después de habilitar se escribe REFERENCE = 0 para cargar el bootstrap de los drivers y se salta al paso 12; al terminar, `θ` arranca en cero con la amplitud pedida |
+| 7 | Referencia | En OPERACIÓN, avanzar la fase en cada iteración y aplicar el cambio de amplitud en el cruce por cero, aunque la muestra no sea nueva |
+| 8 | PR | Solo con muestra nueva: calcular la parte resonante y `v_PR` sin actualizar todavía los estados. Con una muestra repetida se mantiene REFERENCE y se salta al paso 12 |
+| 9 | Modulación | `m = sat(v_PR/Vdc)` y conversión a Q1.15 |
+| 10 | Escribir REFERENCE | Una escritura de 32 bits |
+| 11 | Actualizar los estados del PR | Según la regla de anti-windup |
+| 12 | Registrar y preparar la siguiente muestra | Una de cada `K_REG` iteraciones, si el buffer no está congelado. Fuera de OPERACIÓN, iniciar la conversión por software que se leerá en la siguiente iteración |
+| 13 | Medir la duración | Contador del Timer; actualizar el máximo. Si supera el límite, se pasa a FALLA |
+| 14 | Reconocer la interrupción | Limpiar el pendiente del Timer y del controlador de interrupciones |
+| 15 | Desactivar la salida GPIO de medición | El ancho del pulso es la duración de la ISR |
 
-El paso 9 ocurre antes que el registro y la medición para que la referencia llegue al PWM lo antes posible dentro del período. El paso 13 es el único que depende de la configuración del controlador de interrupciones, que define la plataforma. La fase de la referencia avanza en cada iteración de OPERACIÓN y no solo cuando llega una muestra nueva, porque los 50 Hz son una magnitud del tiempo y no del número de muestras recibidas; de lo contrario, cada muestra repetida atrasaría la referencia 0,9° a 20 kHz.
+Las solicitudes de habilitar y apagar vienen del lazo principal, pero solo la ISR las aplica, de modo que el cambio de estado nunca ocurre a mitad de una iteración. El paso 10 ocurre antes que el registro y la medición para que la referencia llegue al PWM lo antes posible dentro del período. El paso 14 es el único que depende de la configuración del controlador de interrupciones, que define la plataforma. La fase de la referencia avanza en cada iteración de OPERACIÓN y no solo cuando llega una muestra nueva, porque los 50 Hz son una magnitud del tiempo y no del número de muestras recibidas; de lo contrario, cada muestra repetida atrasaría la referencia 0,9° a 20 kHz.
 
 ### Lectura y validación de la muestra
 
@@ -51,7 +52,7 @@ El número de muestra es un contador de 16 bits que avanza con cada conversión.
 
 `N_PWM_POR_CONTROL` es el número de períodos PWM por período de control: vale 1 si ambos coinciden. Una muestra repetida o con pérdidas incrementa un contador de iteraciones anómalas consecutivas. Si llega a `N_FALLA_MUESTRAS`, la supervisión declara falla. El contador vuelve a cero con cada muestra correcta.
 
-En DETENIDO y FALLA el PWM está apagado y no hay disparos. Para seguir midiendo, en esos estados la ISR inicia una conversión por software en el paso 11 y la lee en la siguiente iteración; el `Δn` esperado es entonces 1. El paso 11 está después del punto donde se reúnen todos los caminos del flujo, de modo que la siguiente conversión se inicia aunque la muestra actual no haya sido nueva. Al habilitar el PWM cambia el origen de las conversiones y la primera iteración puede ver un `Δn` distinto; el umbral de `N_FALLA_MUESTRAS` iteraciones consecutivas tolera ese caso. El enunciado exige que la adquisición admita los dos inicios de conversión; el registro exacto lo define la adquisición.
+En DETENIDO y FALLA el PWM está apagado y no hay disparos. Para seguir midiendo, en esos estados la ISR inicia una conversión por software en el paso 12 y la lee en la siguiente iteración; el `Δn` esperado es entonces 1. El paso 12 está después del punto donde se reúnen todos los caminos del flujo, de modo que la siguiente conversión se inicia aunque la muestra actual no haya sido nueva. Al habilitar el PWM cambia el origen de las conversiones y la primera iteración puede ver un `Δn` distinto; el umbral de `N_FALLA_MUESTRAS` iteraciones consecutivas tolera ese caso. El enunciado exige que la adquisición admita los dos inicios de conversión; el registro exacto lo define la adquisición.
 
 ### Supervisión
 
@@ -59,11 +60,11 @@ En DETENIDO y FALLA el PWM está apagado y no hay disparos. Para seguir midiendo
 |---|---|---|
 | Sobrecorriente | `|i_med| > I_MAX` en una sola muestra | `I_MAX`, de PEDP |
 | Código fuera de rango | `código < CODIGO_MIN` o `código > CODIGO_MAX`: sensor saturado o desconectado | Límites de la adquisición |
-| Muestras anómalas | `N_FALLA_MUESTRAS` iteraciones consecutivas con `Δn` incorrecto | Propuesto: 3 |
-| Exceso de tiempo | La duración medida en el paso 12 supera el período de control menos un margen | `MARGEN_ISR` |
-| Error de configuración | La lectura de comprobación del PWM no coincide o `running` no sube | — |
+| Muestras anómalas | `N_FALLA_MUESTRAS` iteraciones consecutivas con `Δn` incorrecto, o un bit de error en el estado del ADC | `N_FALLA_MUESTRAS = 3` |
+| Exceso de tiempo | La duración medida en el paso 13 supera el período de control menos un margen | `MARGEN_ISR` = 10 µs |
+| Error de configuración | La lectura de comprobación del PWM no coincide, `running` no sube, o se pide habilitar con `MEDICION_CALIBRADA = 0` | `MEDICION_CALIBRADA` |
 
-Las condiciones se evalúan en cada iteración, en DETENIDO y en OPERACIÓN, de modo que un sensor desconectado o un ADC que no responde se detecta antes de habilitar la potencia. La comprobación de `running` ocurre solo al habilitar.
+Las condiciones se evalúan en cada iteración, en DETENIDO y en OPERACIÓN, de modo que un sensor desconectado o un ADC que no responde se detecta antes de habilitar la potencia. La comprobación de `running` y la de calibración ocurren solo al habilitar.
 
 Ante una falla, la ISR escribe `CONTROL = 0` en la misma iteración. El contrato del PWM garantiza que esa escritura siempre se acepta y que las órdenes se apagan en el siguiente ciclo de reloj. La causa queda guardada en un registro de bits que se exporta en la trama y no se borra hasta el reconocimiento.
 
@@ -161,12 +162,12 @@ El contrato del PWM responde SLVERR ante un acceso inválido. Desde C, esa respu
 
 | Paso | Operación |
 |---|---|
-| Leer entradas | Botones e interruptores por GPIO. Un cambio se acepta si se mantiene durante `T_REBOTE` (propuesto: 20 ms), contado con el número de iteraciones de la ISR, sin funciones de espera |
-| Procesar eventos | Habilitar o apagar: deja una solicitud para la ISR. Reconocer falla: pasa de FALLA a DETENIDO y borra la causa. Interruptores de amplitud: actualizan la amplitud pendiente. Exportar: inicia la exportación si no hay una en curso |
+| Leer entradas | Botones e interruptores por GPIO. Un cambio se acepta si se mantiene durante `T_REBOTE` (20 ms), contado con el número de iteraciones de la ISR, sin funciones de espera |
+| Procesar eventos | Habilitar o apagar (BTNU, alterna según el estado): deja una solicitud para la ISR. Reconocer falla (BTND en FALLA): pasa de FALLA a DETENIDO y borra la causa. Interruptores de amplitud: actualizan la amplitud pendiente. Exportar: inicia la exportación si no hay una en curso |
 | Actualizar LED | Operación, falla, exportación en curso y latido (alternado cada 0,5 s con el mismo contador) |
 | Atender la exportación | Ejecuta un paso de la máquina de exportación |
 
-Las solicitudes y la amplitud pendiente son variables `volatile` de 32 bits que escribe solo el lazo principal y lee solo la ISR. El estado de la aplicación y la causa de falla los escribe solo la ISR, salvo el reconocimiento de falla, que el lazo principal hace únicamente cuando el estado ya es FALLA y el PWM está apagado.
+Las solicitudes y la amplitud pendiente son variables `volatile` de 32 bits que escribe el lazo principal y lee la ISR. La ISR borra la solicitud al aplicarla y, en OPERACIÓN, ella misma lee BTND sin esperar el antirrebote para solicitar el apagado (paso 4 de la secuencia). El estado de la aplicación y la causa de falla los escribe solo la ISR, salvo el reconocimiento de falla, que el lazo principal hace únicamente cuando el estado ya es FALLA y el PWM está apagado.
 
 ### Máquina de exportación
 
