@@ -33,4 +33,6 @@ La lectura SAMPLE captura muestra y token simultáneamente al aceptar AR. ACK_ID
 
 ## Dominio y alcance
 
-Reloj común 100 MHz, reset activo bajo; liberación sincronizada a cargo de la plataforma. No se añadió IRQ ni CDC. La base AXI, empaquetado, política de reset y manejo MMIO deben acordarse con Daniel/Cortés. Los testbenches representan el maestro y el evento PWM; no implementan MicroBlaze ni PWM reales.
+El Block Design instancia `adc_system_axi` como referencia de módulo. SmartConnect lo conecta a MicroBlaze V en `0x44A00000` con una ventana de 4 KiB. ADC y PWM comparten el reloj de 100 MHz y `peripheral_aresetn`, con liberación sincronizada por Processor System Reset. El disparo conecta `pwm_trigger_o` con `pwm_trigger_i` dentro de ese dominio. La ISR se solicita desde el Timer por AXI INTC. [Integración en Basys 3](../integracion_basys3.md).
+
+Los bancos individuales estimulan la interfaz ADC. `tb_adc_pwm_axi` prueba también el RTL PWM con un maestro AXI de prueba y el modelo XADC de Vivado. La validación de las conexiones con MicroBlaze V se registra por separado. [Verificación del periférico](../../informe/adc_verificacion.md) · [Verificación digital integrada](../../informe/verificacion_digital_integrada_microblaze.md).

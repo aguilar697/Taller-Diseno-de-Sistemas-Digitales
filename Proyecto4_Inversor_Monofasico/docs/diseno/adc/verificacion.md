@@ -46,4 +46,4 @@ El estímulo [design.txt](../../../src/testbench/adc/stimuli/design.txt) conserv
 
 ## Síntesis
 
-La síntesis aislada se reproduce con `sintetizar_adc.tcl`; sus resultados y restricciones incompletas se detallan en [advertencias de síntesis](advertencias_sintesis.md). No se declara cierre temporal del sistema ni compatibilidad con Vivado 2025.1. Los pendientes de MicroBlaze V, PWM y hardware se mantienen en [integración](integracion_pendiente.md).
+La síntesis aislada se reproduce con `sintetizar_adc.tcl`. Sus resultados se refieren al periférico fuera de contexto. El ruteo de `inversor_basys3` y la generación del bitstream se registran en la evidencia de la plataforma. La compatibilidad con Vivado/Vitis 2025.1 sigue pendiente. [Síntesis aislada](advertencias_sintesis.md) · [Implementación integrada](../integracion_basys3.md#resultados-de-la-construcción-integrada).
