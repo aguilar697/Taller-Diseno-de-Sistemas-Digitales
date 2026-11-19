@@ -37,15 +37,11 @@ Después de 2^32−1 publicaciones reconocibles, el token pasa a 0 y queda bloqu
 
 ## Procedimiento para MicroBlaze V
 
-El [header adc_regs.h](../../../software/embedded/drivers/adc/adc_regs.h) contiene offsets/máscaras y comentarios del protocolo. No se implementó ni validó un BSP. Las primitivas siguientes representan accesos IO de 32 bits ordenados que debe proporcionar la plataforma:
+El firmware integrado toma la base ADC de `xparameters.h` y realiza accesos de 32 bits mediante `Xil_In32` y `Xil_Out32`. `adc_leer` lee STATUS, SAMPLE y ACK_ID, en ese orden, y escribe de vuelta el token completo si es distinto de cero. Los offsets y las máscaras están en el encabezado del ADC. [Driver](../../../software/embedded/drivers/adc/drv_adc.c) · [Encabezado](../../../software/embedded/drivers/adc/adc_regs.h).
 
-El pseudoflujo definitivo con exclusión y sesión se encuentra al final de este documento.
-
-Las funciones de exclusión, sesión, MMIO y consumo son contratos por implementar en la plataforma. El procesador debe aplicar el orden y las barreras de E/S necesarios; no basta una lectura cacheada. Tras capturar ambos valores puede procesarlos después y devolver exactamente ese token: si llegó una muestra nueva, el ACK antiguo se ignora y esa nueva notificación permanece.
+La pareja SAMPLE → ACK_ID requiere accesos de E/S ordenados y sin caché. Si llega una muestra nueva tras la captura de la pareja, el controlador ignora el ACK antiguo y conserva la notificación nueva. Al final del documento se detalla el contrato de exclusión entre lectores y coordinación con reset.
 
 Volver a consultar STATUS y SAMPLE permite consumir la publicación pendiente; no inferir entrega sin pérdidas a partir de BRESP. La pérdida por sobrescritura sigue indicada en overrun. Las diferencias de ID16 se interpretan modularmente para diagnóstico, pero jamás sustituyen el token 32 al reconocer.
-
-No se implementa conversión a corriente, PR, ISR, PWM ni UART. La base, las primitivas BSP, el bloqueo entre consumidores y la política de reset deben aprobarse en integración.
 
 ## Lecturas separadas por una publicación: garantía comprobada
 
@@ -66,7 +62,7 @@ No se sustituye este contrato por “token, muestra, token”. En este mapa ACK_
 
 La plataforma debe serializar SAMPLE→ACK_ID entre todos los lectores, incluidos ISR, tareas y maestros de depuración que accedan a SAMPLE. Una lectura SAMPLE intercalada sí cambia el snapshot. Comparar solo ID16 no reemplaza esa exclusión, especialmente al envolver el identificador.
 
-El driver también necesita un identificador de sesión de software y coordinación con reset. Debe capturarlo bajo la misma exclusión que la pareja y comprobarlo de nuevo antes de escribir ACK, sin permitir un reset coordinado entre la comprobación y el acceso MMIO. La rutina que reinicie el periférico incrementará esa sesión e invalidará las operaciones pendientes. Es un requisito de integración; estas funciones aún no forman parte de un BSP probado.
+El pseudocódigo muestra la protección requerida si se incorporan lectores concurrentes o resets del periférico durante el consumo. Para ese caso, el driver debe capturar el identificador de sesión bajo la misma exclusión que la pareja y comprobarlo antes de escribir ACK. La rutina de reset debe invalidar las operaciones de la sesión anterior. Los bloqueos y el identificador de sesión siguen pendientes en el driver actual.
 
 ```c
 /* Pseudoflujo, con accesos de 32 bits ordenados proporcionados por el BSP. */
