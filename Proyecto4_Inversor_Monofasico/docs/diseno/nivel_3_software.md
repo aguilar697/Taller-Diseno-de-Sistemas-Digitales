@@ -141,7 +141,7 @@ El análisis exige al menos cinco períodos de 50 Hz (100 ms). Si el control cor
 N_{buf} \cdot k \cdot T_s \geq 100\ \text{ms}.
 ```
 
-`N_buf` y `k` se fijan cuando se conozca el tamaño del programa; la tabla de la sección de pendientes resume esa dependencia. Al solicitar una exportación, el buffer se congela: la ISR sigue controlando, pero deja de escribir en él hasta terminar el envío.
+La construcción para la Basys 3 usa `N_buf = 512` y `k = 2`: con `Ts = 100 µs` la ventana es de 102,4 ms. Con esos valores el ELF del controlador ocupa 28 528 de los 32 768 bytes, incluida la pila de 2 KiB. Al solicitar una exportación, el buffer se congela: la ISR sigue controlando, pero deja de escribir en él hasta terminar el envío.
 
 ### Exportación UART y aplicación de PC
 
@@ -202,10 +202,10 @@ Una iteración relaciona cinco instantes:
 
 El Timer y el PWM comparten el reloj de 100 MHz. Si el período de control es igual a un número entero de períodos PWM, la fase entre ambos se mantiene constante, pero depende del instante de arranque.
 
-La propuesta es:
+La implementación:
 
-- configurar TRIGGER_PHASE para que la conversión termine antes de la interrupción;
-- que la ISR lea siempre la última muestra disponible y compruebe con su número que sea nueva.
+- `TRIGGER_PHASE = 5000` ciclos, la mitad del período PWM de 10 kHz, para que la conversión termine antes de la interrupción;
+- la ISR lee siempre la última muestra disponible y comprueba con su número que sea nueva.
 
 Con disparo a mitad del período, lectura en la siguiente ISR y aplicación al siguiente límite PWM, el retardo nominal de muestreo a actuación es cercano a 1,5 Ts. La fase efectiva de Timer respecto al PWM, las latencias AXI y la duración de ISR deben comprobarse en integración; no se deduce un retardo exacto únicamente por habilitar el PWM dentro de la ISR.
 
@@ -213,12 +213,12 @@ El presupuesto de la ISR (atención, lectura, cálculo, escritura, registro y re
 
 ## Interfaces con los demás subsistemas
 
-| Interfaz | Acordado | Pendiente |
+| Interfaz | Acordado | Valores implementados |
 |---|---|---|
-| Software–PWM (Aguilar) | Registros CONTROL, REFERENCE, DEADTIME y TRIGGER_PHASE; `m` en Q1.15; aplicación de la referencia al inicio del período; SLVERR ante configuraciones inválidas; reconfiguración solo con el PWM apagado | Valor de `MOD_LIMIT_Q15` y frecuencias definitivas |
-| Software–adquisición (Campos) | Muestra disparada por `pwm_trigger_o` y leída por AXI | Registros, lectura coherente de muestra y número, bits de dato nuevo y sobrescritura, escala a amperios y latencia de conversión |
-| Software–plataforma (Puentes) | 100 MHz, 32 KB de memoria local, AXI Timer con recarga e interrupción, UART Lite y GPIO | FPU, controlador de interrupciones, direcciones base, velocidad de UART, asignación de botones, interruptores y LED, y salida de medición |
-| Software–PEDP | El PR se ejecuta en MicroBlaze V | Coeficientes, período de control, Vdc, I_max y retardo admisible |
+| Software–PWM (Aguilar) | Registros CONTROL, REFERENCE, DEADTIME y TRIGGER_PHASE; `m` en Q1.15; aplicación de la referencia al inicio del período; SLVERR ante configuraciones inválidas; reconfiguración solo con el PWM apagado | Base 0x4400_0000 (4 KiB); 10 kHz (`FREQ_SEL = 0`); DEADTIME = 100 ciclos (1 µs); TRIGGER_PHASE = 5000; `MOD_LIMIT_Q15 = 27853` (m = 0,85), el mismo límite que aplica el PWM |
+| Software–adquisición (Campos) | Muestra disparada por `pwm_trigger_o` y leída por AXI | Base 0x44A0_0000 (4 KiB); registros CONTROL, STATUS, SAMPLE, ERROR y ACK_ID; SAMPLE entrega número (16 bits) y código (12 bits) en una sola lectura y la muestra se reconoce escribiendo el token en ACK_ID; STATUS indica dato válido, dato nuevo, pérdida, sobrescritura y timeout; conversión por software con CONTROL.START fuera de OPERACIÓN. Escala nominal `OFFSET_ADC = 1796,5` y `GANANCIA_ADC = 0,0075222 A/código` |
+| Software–plataforma (Puentes) | 100 MHz, 32 KB de memoria local, AXI Timer con recarga e interrupción, UART Lite y GPIO | FPU simple (RV32, ABI ILP32F); AXI INTC en 0x4120_0000; Timer en 0x41C0_0000; GPIO de entradas en 0x4000_0000 y de salidas en 0x4001_0000; UART Lite en 0x4060_0000 a 115200 bit/s 8N1. Las direcciones se toman de `xparameters.h`. BTNC reinicia, BTNU habilita o apaga, BTND detiene o reconoce la falla y BTNL exporta (canal 1 de entradas); SW1–SW0 eligen la amplitud (canal 2 de entradas); SW15 da el permiso de PWM en hardware; LD0–LD3 muestran operación, falla, exportación y latido (canal 1 de salidas); la salida de medición sale por JB1 (canal 2 de salidas) |
+| Software–PEDP | El PR se ejecuta en MicroBlaze V | `Kp = 12`, `Kr = 200`, `ωc = 2π·2 rad/s`, Tustin con pre-warping a 50 Hz; `Ts = 100 µs`; `Vdc = 12 V`; `I_MAX = 1,5 A`; retardo nominal de muestreo a actuación cercano a 1,5 Ts |
 
 La secuencia de arranque del PWM que usa el software respeta su contrato:
 
@@ -262,15 +262,15 @@ Las pruebas de PC terminan con un código de error ante cualquier falla y guarda
 
 ## Pendientes
 
-| Decisión | Depende de | Afecta a |
+Las decisiones de configuración están cerradas y sus valores están en `software/embedded/control/parametros.h` y en la tabla de interfaces. Queda la validación física:
+
+| Pendiente | Qué falta | Afecta a |
 |---|---|---|
-| Activar la FPU | Puentes | Aritmética del PR |
-| Período de control y fase de TRIGGER_PHASE | Los cuatro y PEDP | ISR, referencia, coeficientes y retardo |
-| Registros y escala del ADC | Campos | Lectura de la muestra y supervisión |
-| `MOD_LIMIT_Q15` | Aguilar y PEDP | Saturación y anti-windup |
-| Coeficientes del PR, Vdc e I_max | PEDP | Controlador, conversión a modulación y fallas |
-| Direcciones, interrupción, UART y GPIO | Puentes | Drivers y lazo principal |
-| `N_buf` y `k` | Tamaño del programa | Registro y exportación |
+| Calibración de la medición | Medir el cero y la ganancia con signo del ACS712 en el montaje y compilar con `MEDICION_CALIBRADA = 1`; mientras valga 0, la solicitud de habilitar lleva a FALLA | Conversión a amperios y habilitación del control |
+| Temporización en la tarjeta | Medir con la salida de medición el período, el jitter y la duración máxima de la ISR, también durante la exportación | Margen de `MARGEN_ISR` |
+| Seguimiento con la carga | Ensayos de 0,2, 0,5 y 1,0 A en el inversor físico, con el criterio de 10 % | Validación del PR |
+| Exportación durante el control | Exportar en OPERACIÓN y comprobar que los números de muestra no muestran pérdidas | Registro y exportación |
+| Uso de pila | Medir el uso real frente a los 2 KiB reservados | Memoria |
 
 
 [Segundo nivel: arquitectura del sistema](nivel_2.md) · [Índice del diseño](README.md)
