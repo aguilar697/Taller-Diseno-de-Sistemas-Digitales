@@ -1,6 +1,6 @@
 # Registro de puesta en marcha
 
-Las observaciones corresponden al montaje con IRF540N, IR2110 DIP-14, ACS712 de 5 A, divisor de 4,7 kΩ/1 kΩ y carga RL. Son lecturas puntuales y capturas de la sesión; todavía no constituyen validación del control de corriente en los puntos nominales.
+Las observaciones corresponden al montaje con IRF540N, IR2110 DIP-14, ACS712 de 5 A, divisor de 4,7 kΩ/1 kΩ y carga RL. Cada entrada recoge las condiciones del ensayo, las mediciones y las comprobaciones pendientes. La validación del control de corriente en los puntos nominales sigue pendiente.
 
 ## Accionamiento y puente
 
@@ -41,6 +41,25 @@ La [captura scope_2.csv](../docs/informe/resultados/potencia/laboratorio/scope_2
 El ensayo limitado utilizó bus de 3 V, referencia prevista de 0,10 A pico y sondeo previo de 50 Hz con modulación 0,20. Tras ajustar el cero, el sondeo obtuvo correlaciones de aproximadamente 1,57 códigos en fase y −0,34 en cuadratura. El programa detectó respuesta insuficiente (ERROR=5) y apagó el PWM **antes de entrar al PR**.
 
 Con 3,012 V de bus y una modulación de 0,20, el modelo lineal de 7,2 Ω y 9,3 mH predice 0,0775 A pico. Con una sensibilidad nominal de 133 códigos/A, se esperarían 10,3 códigos de amplitud, unos 9,5 códigos en fase con la excitación. La respuesta observada fue menor. Falta determinar si la diferencia corresponde al accionamiento, al recorrido de corriente, al sensado u otra condición. No se redujo el umbral para forzar el arranque.
+
+## Sesión de lazo abierto con el bus reducido
+
+Se habilitó el PWM con SW15 y se inició con BTNU el diagnóstico de 50 Hz, modulación de 0,10 y duración máxima de cinco segundos. La fuente del puente se mantuvo alrededor de 3 V con límite de 100 mA. En la resta matemática A−B del osciloscopio se observaron pulsos de ambas polaridades, con nivel superior de 2,95 V y repetición a 50,03 Hz. Esta lectura verifica la alternancia de polaridad en el ensayo reducido. La portadora es de 10 kHz y la repetición a 50 Hz corresponde a la modulación.
+
+Con el bus apagado se comprobó que JXADC7 estaba flotante. Tras unirlo al retorno común, JXADC7 midió 0 V y JXADC1 midió 0,430 V. Ocho lecturas en reposo quedaron entre 1763 y 1768 códigos, con promedio de 1765,5 (0,431 V nominales). Esto verifica la concordancia de la conversión en el punto de reposo.
+
+| Punto de medida | Resultado | Interpretación |
+|---|---|---|
+| OUT del ACS712 antes del divisor | Aproximadamente 410 mV pico a pico en acoplamiento AC. Con punta y retorno en el mismo GND se observaron aproximadamente 370 mV pico a pico. | La prueba de referencia muestra captación de perturbaciones en la medición. Los picos de ambas capturas no se pueden restar para obtener la salida del sensor. |
+| Entrada del XADC después del divisor | Registro en DC con promedio cercano a 0,420 V y 16,1 mV pico a pico. El registro en AC alcanzó 51,1 mV pico a pico, con indicios de recorte. | Los extremos incluyen picos y efectos de adquisición. La componente a 50 Hz quedó por debajo de 0,4 mV pico a pico en ambos registros. |
+| Caída diferencial en una resistencia de 3,3 Ω | La exportación de la resta de canales presenta valores alternados y muestras repetidas en un extremo. | La captura no permite cuantificar de forma fiable la corriente independiente. |
+
+Para esta excitación, el modelo de 7,2 Ω y 9,3 mH da cerca de 39 mA pico a 50 Hz. Con la ganancia nominal del divisor y el ACS712, la componente esperada a la entrada del XADC es de unos 2,5 mV pico a pico. La señal registrada quedó por debajo de esa estimación. El devanado puede contribuir por su inductancia dependiente de la frecuencia, sus pérdidas o su acoplamiento magnético. La captación observada en GND y la falta de una medida independiente de corriente dejan abierta la causa de la discrepancia. El seguimiento de corriente en lazo cerrado continúa pendiente.
+
+### Comparaciones pendientes
+
+1. Repetir el ensayo a 3 V con límite de 100 mA y con el transformador actual. Usar ramales separados para el retorno de potencia y el de la Basys, unidos en el negativo del capacitor del bus. Conservar JXADC7 en el retorno del divisor y comparar la captura en GND y la señal del sensor con las anteriores.
+2. Si se consigue un inductor de potencia cercano a 10 mH, registrar su inductancia, resistencia DC y corriente de saturación. Repetir el mismo ensayo con el cableado de la primera comparación y las dos resistencias de 3,3 Ω. Contrastar VAB, la lectura del ACS712 y una medición independiente de corriente.
 
 ## Continuación de las pruebas
 
