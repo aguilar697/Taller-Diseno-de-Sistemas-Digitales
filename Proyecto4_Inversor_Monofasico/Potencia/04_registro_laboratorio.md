@@ -61,6 +61,55 @@ Para esta excitación, el modelo de 7,2 Ω y 9,3 mH da cerca de 39 mA pico a 50 
 1. Repetir el ensayo a 3 V con límite de 100 mA y con el transformador actual. Usar ramales separados para el retorno de potencia y el de la Basys, unidos en el negativo del capacitor del bus. Conservar JXADC7 en el retorno del divisor y comparar la captura en GND y la señal del sensor con las anteriores.
 2. Si se consigue un inductor de potencia cercano a 10 mH, registrar su inductancia, resistencia DC y corriente de saturación. Repetir el mismo ensayo con el cableado de la primera comparación y las dos resistencias de 3,3 Ω. Contrastar VAB, la lectura del ACS712 y una medición independiente de corriente.
 
+## Comparación en lazo abierto con carga resistiva
+
+Para el ensayo a 3 V con límite de 100 mA se retiró el transformador y se dejaron únicamente las resistencias entre A y B. Se utilizó el diagnóstico en lazo abierto, con referencia de 50 Hz y modulación de 0,10, sin realimentación de corriente. El osciloscopio se conectó directamente a los nodos A y B con ambos canales en DC y factor 1:1. La captura de la resta CH1 − CH2 se obtuvo a 5 ms/div y 1 V/div.
+
+La resta muestra grupos de pulsos positivos y negativos que se repiten cada 20 ms aproximadamente. El instrumento indicó 49,885 Hz, 4,42 V pico a pico, 2,29 V de máximo y 1,86 V como nivel superior. Para un bus de 3 V se esperan pulsos con niveles cercanos a −3 V, 0 V y +3 V. Queda por medir el bus durante el ensayo y revisar las mesetas a 20 µs/div para identificar si la diferencia aparece durante los pulsos o en sus flancos.
+
+La captura previa con el transformador usaba un ajuste de 10:1. Para determinar cuánto aporta el devanado a las perturbaciones, la comparación debe repetirse con el mismo ajuste 1:1, puntos de masa, cableado de medición y condiciones de alimentación en ambas cargas.
+
+## Lazo abierto con el transformador de reemplazo
+
+Se sustituyó el transformador y se capturó la caída en una resistencia de carga (`03.png`, `04.csv`) y la tensión entre A y B (`05.csv`, `06.png`). Los dos CSV contienen 25 000 muestras a 250 kSa/s, equivalentes a cinco períodos de 50 Hz. Se calculó la amplitud pico a 50 Hz proyectando la resta de canales sobre seno y coseno en toda la ventana.
+
+| Medición | Componente de 50 Hz (pico) | Pico a pico de la señal capturada |
+|---|---:|---:|
+| Caída en una resistencia de carga | 55,7 mV | 0,924 V |
+| Tensión diferencial A−B | 0,260 V | 11,01 V |
+
+Si la resistencia medida es de 3,3 Ω, la componente de corriente a 50 Hz es de aproximadamente 16,9 mA pico (11,9 mA RMS). Su amplitud fue consistente a lo largo de los cinco ciclos. En A−B se observan niveles alrededor de ±3 V y picos breves de mayor amplitud. La fundamental de 0,260 V pico se aproxima a los 0,30 V pico del modelo ideal con bus de 3 V y modulación de 0,10. El ensayo confirma la presencia de corriente alterna con el devanado de reemplazo. Queda por caracterizar el devanado y comprobar cuánto de los picos proviene de la conmutación y cuánto de la medición.
+
+### Segundo transformador de reemplazo
+
+Tras sustituir nuevamente el transformador, se registró A−B (`02.png`, `03.csv`) y la caída en una resistencia (`04.png`, `05.csv`). Se aplicó el mismo cálculo sobre cinco ciclos de 50 Hz. El nombre `05.csv` se reutilizó en esta sesión para la captura de la resistencia.
+
+| Medición | Componente de 50 Hz (pico) | Pico a pico de la señal capturada |
+|---|---:|---:|
+| Caída en una resistencia de carga | 88,8 mV | 1,246 V |
+| Tensión diferencial A−B | 0,221 V | 11,37 V |
+
+Con 3,3 Ω, la caída equivale a 26,9 mA pico de corriente a 50 Hz (19,0 mA RMS), frente a 16,9 mA pico en el ensayo anterior. Las amplitudes por ciclo en la resistencia quedaron entre 88 y 89 mV. En A−B se mantuvieron los niveles próximos a 0 y ±3 V, con extremos registrados de −5,49 V y +5,89 V. Los picos persistieron con el sensor retirado. La mejora de la señal de corriente se observó en estas condiciones de lazo abierto. Queda por medir la respuesta del ACS712 y del XADC con este devanado.
+
+### Señal del sensor antes y durante la conmutación
+
+Se reinstaló el ACS712 y se registró el canal 2 en el nodo del divisor con la señal de la FPGA deshabilitada (`06.csv`) y habilitada (`07.csv`). Cada captura contiene 50 000 muestras en 50 ms. La amplitud de 50 Hz se estimó mediante un ajuste de seno, coseno y constante a la ventana completa.
+
+| Condición | Amplitud a 50 Hz | RMS de la componente AC capturada |
+|---|---:|---:|
+| FPGA con PWM deshabilitado | 0,058 mV pico | 2,44 mV |
+| FPGA con PWM habilitado | 0,936 mV pico | 7,73 mV |
+
+Con PWM se identificó una componente de 50 Hz del orden de los 0,87 mV pico esperados a partir de los 26,9 mA pico medidos anteriormente en la resistencia. También aumentó el contenido en torno a 10 kHz y 20 kHz. En la captura con PWM, el 5,6 % de las muestras se acumuló cerca de los límites de ±25,5 mV, lo que indica recorte en la adquisición del osciloscopio. El RMS de esa captura describe el registro recortado y sus extremos no caracterizan los picos reales. Falta repetir con mayor rango vertical, confirmar la presencia del capacitor de 100 nF y comparar con las muestras del XADC a la fase de adquisición del control.
+
+## Primer ensayo completo del PR a 3 V
+
+Con el transformador de reemplazo y el ACS712, se ejecutó el firmware de laboratorio para un bus de 3 V con límite de fuente de 100 mA. La UART indicó `ESTADO=4 ERROR=0`. El sondeo previo obtuvo 6,66 códigos en fase y −3,74 en cuadratura y seleccionó el signo positivo. El cero registrado fue de 1775,05 códigos. El máximo informado para la ISR fue de 2763 ciclos (27,63 µs con reloj de 100 MHz) frente al período de control de 100 µs. La secuencia programada dura unos 6 s después del arranque, con 1 s de sondeo y 5 s de control.
+
+La [traza UART](../docs/informe/resultados/potencia/laboratorio/pr_3v_transformador_reemplazo.csv) contiene las últimas 256 muestras, separadas por 400 µs y con un incremento de cuatro en cada identificador consecutivo. El ajuste a 50 Hz dio 93,6 mA pico de corriente estimada frente a 100,0 mA pico de referencia, con un atraso de 5,7°. El error RMS entre las señales registradas fue de 22,8 mA. La orden de modulación alcanzó el límite de 0,45 en 13 de las 256 muestras. La corriente se convirtió con la ganancia nominal del sensor. Queda pendiente contrastarla con una medida independiente y verificar el lazo en el rango nominal de 12–24 V.
+
+La repetición del ensayo tras recargar el firmware también terminó en `ESTADO=4 ERROR=0`. El cero del sensor fue de 1776,91 códigos, con correlaciones de 6,71 códigos en fase y −3,74 en cuadratura. Se mantuvo el signo positivo y la duración máxima de la ISR fue de 27,62 µs.
+
 ## Continuación de las pruebas
 
 1. Usar el bitstream y ELF del mismo XSA, con el mapa y pines de la [integración física](../docs/diseno/integracion_basys3.md). No combinar el proyecto JA con los constraints JC.
