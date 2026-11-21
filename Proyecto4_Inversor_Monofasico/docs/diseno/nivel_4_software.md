@@ -58,8 +58,8 @@ En DETENIDO y FALLA el PWM está apagado y no hay disparos. Para seguir midiendo
 
 | Condición | Detección | Parámetro |
 |---|---|---|
-| Sobrecorriente | `|i_med| > I_MAX` en una sola muestra | `I_MAX`, de PEDP |
-| Código fuera de rango | `código < CODIGO_MIN` o `código > CODIGO_MAX`: sensor saturado o desconectado | Límites de la adquisición |
+| Sobrecorriente | `|i_med| > I_MAX` en `N_SOBRECORRIENTE` muestras seguidas; una muestra normal reinicia la cuenta | `I_MAX`, de PEDP; `N_SOBRECORRIENTE = 3` |
+| Código fuera de rango | `código < CODIGO_MIN` o `código > CODIGO_MAX` en `N_CODIGO_FUERA` muestras seguidas: sensor saturado o desconectado. Una muestra aislada fuera de rango no entra al PR, que usa la última muestra válida | Límites de la adquisición; `N_CODIGO_FUERA = 3` |
 | Muestras anómalas | `N_FALLA_MUESTRAS` iteraciones consecutivas con `Δn` incorrecto, o un bit de error en el estado del ADC | `N_FALLA_MUESTRAS = 3` |
 | Exceso de tiempo | La duración medida en el paso 13 supera el período de control menos un margen | `MARGEN_ISR` = 10 µs |
 | Error de configuración | La lectura de comprobación del PWM no coincide, `running` no sube, o se pide habilitar con `MEDICION_CALIBRADA = 0` | `MEDICION_CALIBRADA` |
@@ -260,7 +260,7 @@ Las direcciones base se toman de `xparameters.h`, que genera Vitis a partir del 
 | Anti-windup | Con una referencia imposible de alcanzar, `r` no crece mientras dure la saturación y no hay sobreimpulso al liberarla |
 | Q1.15 | `m = ±M`, `0`, `±1/32768` y valores fuera de rango |
 | Validación de `n` | Secuencias con repeticiones, saltos y vuelta del contador de 16 bits; con una repetición, la fase de la referencia avanza igual |
-| Supervisión | Cada condición produce su bit de causa y escribe `CONTROL = 0` en la misma iteración |
+| Supervisión | Cada condición confirmada produce su bit de causa y escribe `CONTROL = 0` en esa iteración. Sobrecorriente y código fuera de rango en dos muestras seguidas no producen falla; en tres, sí |
 | Registro | Submuestreo `K_REG`, vuelta del índice y ninguna escritura mientras está congelado |
 | Trama | CRC conocido para una trama de referencia; la PC rechaza un byte alterado y una trama cortada |
 | Exportación | La máquina nunca espera: con la FIFO llena, vuelve al lazo principal sin escribir |

@@ -178,8 +178,8 @@ La adquisición se dispara en la fase configurada del PWM: inicialmente a los 50
 
 Condiciones de falla:
 
-- sobrecorriente `|i_med| > I_max`;
-- código del ADC fuera de rango;
+- sobrecorriente `|i_med| > I_max` en tres muestras seguidas;
+- código del ADC fuera de rango en tres muestras seguidas;
 - varias muestras seguidas perdidas o repetidas, según el número de muestra;
 - una iteración de la ISR que no termina antes de la siguiente interrupción;
 - `running` que no sube después de habilitar el PWM.

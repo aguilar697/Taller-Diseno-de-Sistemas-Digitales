@@ -35,16 +35,32 @@ int main(void)
 
     /* Cada condición por separado */
     bits = supervision_muestra(&sup, 1.6f, 2048u, 0);
-    comprobar(bits == FALLA_SOBRECORRIENTE, "+1,6 A: sobrecorriente");
+    bits |= supervision_muestra(&sup, 1.6f, 2048u, 0);
+    comprobar(bits == 0, "+1,6 A en dos muestras seguidas: sin falla (muestra aislada)");
+    bits = supervision_muestra(&sup, 1.6f, 2048u, 0);
+    comprobar(bits == FALLA_SOBRECORRIENTE, "+1,6 A en tres muestras seguidas: sobrecorriente");
     supervision_reconocer(&sup);
     bits = supervision_muestra(&sup, -1.6f, 2048u, 0);
-    comprobar(bits == FALLA_SOBRECORRIENTE, "-1,6 A: sobrecorriente (ambos signos)");
+    bits |= supervision_muestra(&sup, 0.0f, 2048u, 0);
+    bits |= supervision_muestra(&sup, -1.6f, 2048u, 0);
+    bits |= supervision_muestra(&sup, -1.6f, 2048u, 0);
+    comprobar(bits == 0, "una muestra normal reinicia la cuenta");
+    bits = supervision_muestra(&sup, -1.6f, 2048u, 0);
+    comprobar(bits == FALLA_SOBRECORRIENTE, "-1,6 A en tres muestras seguidas: sobrecorriente (ambos signos)");
     supervision_reconocer(&sup);
     bits = supervision_muestra(&sup, 0.0f, 15u, 0);
-    comprobar(bits == FALLA_CODIGO, "código 15: fuera de rango por abajo");
+    bits |= supervision_muestra(&sup, 0.0f, 15u, 0);
+    comprobar(bits == 0, "código 15 en dos muestras: sin falla (muestra aislada)");
+    bits = supervision_muestra(&sup, 0.0f, 15u, 0);
+    comprobar(bits == FALLA_CODIGO, "código 15 en tres muestras seguidas: fuera de rango por abajo");
     supervision_reconocer(&sup);
     bits = supervision_muestra(&sup, 0.0f, 4080u, 0);
-    comprobar(bits == FALLA_CODIGO, "código 4080: fuera de rango por arriba");
+    bits |= supervision_muestra(&sup, 0.0f, 2048u, 0);
+    bits |= supervision_muestra(&sup, 0.0f, 4080u, 0);
+    bits |= supervision_muestra(&sup, 0.0f, 4080u, 0);
+    comprobar(bits == 0, "código 4080: una muestra válida reinicia la cuenta");
+    bits = supervision_muestra(&sup, 0.0f, 4080u, 0);
+    comprobar(bits == FALLA_CODIGO, "código 4080 en tres muestras seguidas: fuera de rango por arriba");
     supervision_reconocer(&sup);
     bits = supervision_muestra(&sup, 0.0f, 2048u, 1);
     comprobar(bits == FALLA_MUESTRAS, "muestras anómalas seguidas: falla de muestras");
@@ -61,6 +77,8 @@ int main(void)
     supervision_reconocer(&sup);
 
     /* Varias a la vez y causa guardada */
+    supervision_muestra(&sup, 2.0f, 4095u, 0);
+    supervision_muestra(&sup, 2.0f, 4095u, 0);
     bits = supervision_muestra(&sup, 2.0f, 4095u, 1);
     comprobar(bits == (FALLA_SOBRECORRIENTE | FALLA_CODIGO | FALLA_MUESTRAS),
               "tres condiciones a la vez: tres bits");
