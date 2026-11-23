@@ -239,6 +239,63 @@ El condensador reduce la impedancia, por lo que no explica la saturación de la 
 6. Incorporar la captura de osciloscopio del arranque directo a 0,5 A.
 7. Revisar en equipo la calibración y el cambio de supervisión de esta rama antes de llevarlos a `main`.
 
+## Sesión del 23/11: rango nominal con la carga sin capacitor
+
+Se retiraron los capacitores colocados sobre la carga, que queda como RL en serie. Se cargó `control_inversor` de esta rama (d2d60c6) con el bitstream de `da2b7c3`. El bus se alimentó a 12 y 24 V, con límite de fuente de 1 A (1,5 A para 1 A pico). La evidencia está en [`laboratorio/2026-11-23`](../docs/informe/resultados/potencia/laboratorio/2026-11-23/resultados.md).
+
+| Punto | Resultado |
+|---|---|
+| 0,2 A pico | **Cumple** a 12 V (−5,05 %) y a 24 V (−3,62 %) |
+| 0,5 A pico | **Cumple a 24 V** (−5,91 %). A 12 V la modulación satura (−36,4 %) |
+| 1 A pico | **No cumple**: −26,4 % a 24 V y −67,1 % a 12 V, con la modulación saturada. Lo limita la carga |
+| Protección | Ninguna falla en toda la sesión, ni siquiera a 1 A |
+
+### Reposo y cero
+
+Los dos reposos se registraron con la variante de registro de falla, que guarda el código bruto del ADC y STATUS.
+
+| Condición | Código medio | Corriente aparente | Ruido | Errores, inválidas, saltos |
+|---|---:|---:|---:|---|
+| Bus apagado | 1785,8 | +75 mA | 19,9 mA RMS | 0 |
+| Bus a 24 V, PWM detenido | 1787,7 | +89 mA | 21,0 mA RMS | 0 |
+
+El cero quedó unos 10 códigos por encima del cargado (1776,0) después de los cambios de cableado. Encender el bus solo lo movió 1,8 códigos, frente a los 4–5 del 21/11. La diferencia aparece como una componente continua de +6 a +33 mA en la corriente medida en operación, que no afecta la fundamental.
+
+### Tramas en operación
+
+| N.º | Bus | Ref. | Fundamental | Error | Desfase | m en ±0,85 | 3.er armónico | Z aparente | Modelo con esa Z |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| [03](../docs/informe/resultados/potencia/laboratorio/2026-11-23/03_pr_12v_0a2.png) | 12 V | 0,2 A | 0,1899 A | −5,05 % | −3,05° | 0 | 3,8 % | 15,5 Ω | −5,31 % |
+| [04](../docs/informe/resultados/potencia/laboratorio/2026-11-23/04_pr_24v_0a2.png) | 24 V | 0,2 A | 0,1928 A | −3,62 % | −1,87° | 0 | 3,0 % | 20,7 Ω | −3,68 % |
+| [05](../docs/informe/resultados/potencia/laboratorio/2026-11-23/05_pr_12v_0a5.png) | 12 V | 0,5 A | 0,3178 A | −36,43 % | −43,47° | 27 % | 22 % | 34,7 Ω | satura |
+| [06](../docs/informe/resultados/potencia/laboratorio/2026-11-23/06_pr_24v_0a5.png) | 24 V | 0,5 A | 0,4705 A | −5,91 % | −3,87° | 1 % | 24,5 % | 34,3 Ω | −5,74 % |
+| [07](../docs/informe/resultados/potencia/laboratorio/2026-11-23/07_pr_12v_1a.png) | 12 V | 1 A | 0,3291 A | −67,09 % | −43,53° | 47 % | 27 % | 36,0 Ω | satura |
+| [08](../docs/informe/resultados/potencia/laboratorio/2026-11-23/08_pr_24v_1a.png) | 24 V | 1 A | 0,7358 A | −26,42 % | −26,37° | 33 % | 29 % | 26,4 Ω | satura |
+
+En todas: ISR máxima de 8,57 µs, sin conversiones perdidas ni saltos en el número de muestra. La impedancia aparente es la fundamental de `m·Vdc`, corregida por la muestra de retardo, dividida por la fundamental de la corriente. Incluye la caída por tiempo muerto. La última columna es el error que da `modelos/analisis/pr_discreto.py` con esa impedancia.
+
+### Análisis
+
+- **El control se comporta como el modelo.** Donde la modulación no satura, el modelo discreto con la impedancia medida reproduce el error con 0,3 puntos o menos. La diferencia con PLECS (−3,2 y −1,6 %) se debe a la carga.
+- **La carga limita el rango.** La impedancia aparente del devanado sube de 16–21 Ω a 0,2 A a unos 34 Ω a 0,5 A. A 1 A baja a 26 Ω, con un 29 % de tercer armónico y picos agudos: el núcleo se satura en los picos de corriente.
+  - Con 34 Ω, 0,5 A pide unos 17 V de fundamental. No alcanza a 12 V (unos 10 V disponibles); a 24 V cabe con m de 0,67 a 0,8.
+  - 1 A pediría más de 26 V, y el máximo a 24 V es 0,85·24 ≈ 20 V. Con este devanado el punto de 1 A no es alcanzable; hace falta un inductor de menor inductancia que no se sature.
+- **El −36 % del 21/11** a 0,5 A coincide con el de hoy a 12 V (0,318 A, modulación saturada): corresponde a falta de tensión para esa impedancia.
+- **Persisten perturbaciones en la medición.** La trama 06 tiene una ráfaga de unos 5 ms con lecturas de hasta 1,2 A dentro del rango del ADC, y la 04 una menor. El PR reacciona a ellas. No hubo tres muestras seguidas por encima de 1,5 A, pero es el mecanismo probable de los cortes del 21/11: la sustitución actual solo cubre códigos fuera de rango.
+
+### Herramientas
+
+En [`scripts/laboratorio`](../scripts/laboratorio/README.md) quedan los parches de registro de falla y de captura de transitorio, su script de compilación y los analizadores de cada tipo de trama.
+
+### Pendientes de esta sesión
+
+1. Rizado y piso de error de la resta del osciloscopio a 0,5 A y 24 V.
+2. Contraste de la ganancia: amplitud en la resistencia de 3,3 Ω frente a la trama.
+3. Escalón de 0,2 a 0,5 A y cambio de carga a 0,5 A con la captura de transitorio.
+4. Medir R y L del devanado actual, identificar el otro inductor y, si sirve, repetir 0,5 y 1 A y el escalón de 0,5 a 1 A.
+5. Medir en JB1 la duración de la ISR y el jitter del período.
+6. Revisar en equipo el tratamiento de las muestras erróneas dentro del rango y la cuenta por ID de conversión.
+
 ## Continuación de las pruebas
 
 1. Usar el bitstream y ELF del mismo XSA, con el mapa y pines de la [integración física](../docs/diseno/integracion_basys3.md). No combinar el proyecto JA con los constraints JC.
