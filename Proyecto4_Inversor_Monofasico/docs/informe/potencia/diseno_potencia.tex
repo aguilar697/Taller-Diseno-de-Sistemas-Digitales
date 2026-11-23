@@ -5,7 +5,7 @@
 \title{Diseño de un inversor monofásico con control proporcional resonante de corriente}
 \autores\maketitle
 \begin{abstract}
-Se diseña un puente H con modulación unipolar de 10 kHz para regular una corriente sinusoidal de 50 Hz en una carga RL, con bus de 12 a 24 V y referencias de 0,2, 0,5 y 1 A pico. Se justifican la topología, los MOSFET IRF540N, los accionamientos IR2110, el tiempo muerto, la frecuencia de conmutación y la medición con ACS712 y XADC. El controlador PR no ideal ($K_p=12$, $K_r=200$, $\omega_c=2\pi\cdot2$ rad/s) se sintoniza sobre el modelo RL y se discretiza con Tustin preajustado a 50 Hz para $T_s=100\ \mu$s. El análisis discreto con retención y una muestra de retardo da raíces dentro del círculo unitario, márgenes de fase de al menos $71^\circ$ y de ganancia de al menos 9,6 dB en el barrido de parámetros, y un error de amplitud previsto de 3,2\,\% a 12 V. Las pérdidas estimadas del puente a 1 A pico son inferiores a 0,1 W y el rizado máximo previsto es de 0,043 A pico a pico. Se incluye la carga identificada en el banco y el plan de validación.
+Se diseña un puente H con modulación unipolar de 10 kHz para regular una corriente sinusoidal de 50 Hz en una carga RL, con bus de 12 a 24 V y referencias de 0,2, 0,5 y 1 A pico. Se justifican la topología, los MOSFET IRF540N, los accionamientos IR2110, el tiempo muerto, la frecuencia de conmutación y la medición con ACS712 y XADC. El controlador PR no ideal ($K_p=12$, $K_r=200$, $\omega_c=2\pi\cdot2$ rad/s) se sintoniza sobre el modelo RL y se discretiza con Tustin preajustado a 50 Hz para $T_s=100\ \mu$s. El análisis discreto con retención y una muestra de retardo da raíces dentro del círculo unitario, márgenes de fase de al menos $71^\circ$ y de ganancia de al menos 9,6 dB en el barrido de parámetros, y un error de amplitud previsto de 3,2\,\% a 12 V. Las pérdidas estimadas del puente a 1 A pico son inferiores a 0,1 W y el rizado máximo previsto es de 0,043 A pico a pico. Se incluyen la carga identificada en el banco, que limita el punto de 1 A, y el plan de validación.
 \end{abstract}
 \begin{IEEEkeywords}inversor monofásico, PWM unipolar, control PR, discretización, corriente.\end{IEEEkeywords}
 
@@ -119,29 +119,32 @@ Las tres frecuencias cumplen el límite de 0,20 A pico a pico con margen; a 10 k
 \label{sec:carga}
 Dos resistencias de 3,3 $\Omega$ forman $R_{\mathrm{ext}}=6{,}6\ \Omega$; la tercera, conmutada por $S$, eleva la resistencia externa a 9,9 $\Omega$ (+50\,\%) para el ensayo de carga a 0,5 A pico. La inductancia la aporta el secundario de un transformador con el primario abierto y aislado. El modelo nominal usa $R=6{,}6+0{,}6=7{,}2\ \Omega$ y $L=10$ mH, a partir de las medidas LCR del primer devanado: 9,291 mH a 120 Hz y 6,984 mH a 1 kHz.
 
-Ese devanado se sustituyó durante la puesta en marcha. Del reemplazo se dispone de su impedancia a 50 Hz identificada en el banco (Tabla~\ref{tab:carga}), obtenida de la fundamental de la tensión aplicada y de la corriente. Los detalles están en el informe técnico.
+Ese devanado se sustituyó durante la puesta en marcha. Del reemplazo se dispone de su impedancia a 50 Hz identificada en el banco en cada punto de ensayo (Tabla~\ref{tab:carga}), obtenida de la fundamental de la tensión aplicada y de la corriente. Los detalles están en el informe técnico.
 
 \begin{table}[ht]\caption{Carga nominal e identificada a 50 Hz}\centering\small
 \begin{tabular}{@{}lcccc@{}}\toprule
 Condición & $I_{1,pk}$ (A) & $R$ ($\Omega$) & $L$ (mH) & $|Z|$ ($\Omega$)\\\midrule
 Modelo nominal & -- & 7,2 & 10 & 7,86\\
 Lazo abierto, 3 V & 0,027 & -- & -- & 8,2\\
-PR, 12 V & 0,186 & 14,5 & 38,5 & 18,8\\
-PR, 24 V & 0,192 & 13,6 & 38,5 & 18,2\\\bottomrule
+PR, 12 V & 0,190 & 10,5 & 30,8 & 14,3\\
+PR, 24 V & 0,193 & 13,5 & 39,0 & 18,2\\
+PR, 24 V & 0,471 & 25,0 & 70,2 & 33,3\\
+PR, 24 V$^{*}$ & 0,736 & 17,1 & 61,7 & 25,9\\\bottomrule
+\multicolumn{5}{@{}l}{\footnotesize $^{*}$ Con la modulación saturada en parte del registro.}
 \end{tabular}\label{tab:carga}\end{table}
 
-La impedancia crece con la corriente: es la conducta de un núcleo de hierro en la región de baja inducción, donde la permeabilidad aumenta con el campo, y la resistencia equivalente incluye las pérdidas del núcleo. La tensión fundamental requiere $V_{1,pk}=I_{pk}|Z|$ más la caída por tiempo muerto. La Tabla~\ref{tab:modulacion} compara la modulación necesaria con el modelo nominal y con la carga identificada.
+La impedancia crece con la corriente hasta 0,5 A: es la conducta de un núcleo de hierro en la región de baja inducción, donde la permeabilidad aumenta con el campo, y la resistencia equivalente incluye las pérdidas del núcleo. A 0,74 A la inductancia disminuye porque el núcleo satura en los picos de corriente. La tensión fundamental requiere $V_{1,pk}=I_{pk}|Z|$ más la caída por tiempo muerto. La Tabla~\ref{tab:modulacion} compara la modulación necesaria con el modelo nominal y con la impedancia aparente medida en cada punto, que ya incluye el tiempo muerto.
 
-\begin{table}[ht]\caption{Modulación pico necesaria con la carga nominal (7,86 $\Omega$) y la identificada (18,5 $\Omega$)}\centering\small
+\begin{table}[ht]\caption{Modulación fundamental necesaria con la carga nominal y con la impedancia aparente medida}\centering\small
 \begin{tabular}{@{}ccccc@{}}\toprule
-$I_{pk}$ & \multicolumn{2}{c}{Nominal} & \multicolumn{2}{c}{Identificada}\\
+$I_{pk}$ & \multicolumn{2}{c}{Nominal} & \multicolumn{2}{c}{Medida}\\
 (A) & 12 V & 24 V & 12 V & 24 V\\\midrule
-0,2 & 0,16 & 0,09 & 0,33 & 0,17\\
-0,5 & 0,35 & 0,19 & 0,79 & 0,40\\
-1,0 & 0,68 & 0,35 & $>1$ & 0,79\\\bottomrule
+0,2 & 0,16 & 0,09 & 0,26 & 0,17\\
+0,5 & 0,35 & 0,19 & $>1$ & 0,71\\
+1,0 & 0,68 & 0,35 & $>1$ & 1,10\\\bottomrule
 \end{tabular}\label{tab:modulacion}\end{table}
 
-Con la carga identificada, 1 A pico solo es alcanzable con el bus de 24 V y deja poco margen respecto al límite de 0,85; si la impedancia sigue creciendo con la corriente, ese punto requiere reducir la resistencia externa o sustituir el devanado. La medición de $|Z|$ frente a la corriente forma parte del plan de validación. Las pérdidas en el devanado se estiman en $(R-6{,}6)I_{\mathrm{rms}}^2\approx3{,}7$ W a 1 A pico con $R=14\ \Omega$, por lo que su temperatura se vigila durante los ensayos.
+Con la carga medida, 0,5 A pico solo es alcanzable con el bus de 24 V, y 1 A no es alcanzable en el rango de bus: requiere un inductor de menor inductancia que no sature en ese rango de corriente. Las pérdidas en el devanado se estiman en $(R-6{,}6)I_{\mathrm{rms}}^2\approx2{,}3$ W a 0,5 A pico con $R=25\ \Omega$, por lo que su temperatura se vigila durante los ensayos.
 
 \section{Medición}
 El ACS712 de 5 A se conecta en serie con la carga y se alimenta con 5 V regulados; su salida nominal es $v_s=V_{CC}/2+0{,}185\,(V_{CC}/5)\,i_L$ \cite{acs}. Un divisor de 4,7 k$\Omega$/1 k$\Omega$ lleva la señal al rango unipolar de 0 a 1 V del XADC (canal VAUX6, 12 bits) \cite{xadc}:
@@ -234,6 +237,6 @@ Comparación & Cada punto frente a PLECS con los mismos $V_{dc}$ y referencia\\\
 Con el bus apagado se comprueban las alimentaciones auxiliares, el apagado con SD alto, la carga del bootstrap, las órdenes de compuerta y el tiempo muerto. Después se registra el reposo con el bus encendido y el PWM detenido para verificar el cero. El bus se energiza con límite de corriente de la fuente, de 1 A para 0,5 A pico y 1,5 A para 1 A pico, y se arranca con SW15 y BTNU. Ante una falla se apaga el bus, se baja SW15 y se abre SD antes de reconocerla con BTND.
 
 \section{Estado del diseño}
-El puente, el accionamiento, la medición calibrada y el PR discreto sobre MicroBlaze V se probaron en el banco: a 0,2 A pico, el error fue de $-7{,}07$\,\% a 12 V y $-3{,}81$\,\% a 24 V. La diferencia con la predicción nominal se explica con la carga identificada. Quedan por validar los puntos de 0,5 y 1 A pico, los cambios de consigna y de carga y el rizado, que se reportan en el informe técnico.
+El puente, el accionamiento, la medición calibrada y el PR discreto sobre MicroBlaze V se probaron en el banco. El error fue de $-5{,}05$\,\% y $-3{,}62$\,\% a 0,2 A pico con 12 y 24 V, y de $-5{,}91$\,\% a 0,5 A pico con 24 V. Los escalones de 0,2 a 0,5 A se establecieron en el primer ciclo y el aumento resistivo del 50\,\% a 0,5 A mantuvo el error dentro del criterio. La diferencia con la predicción nominal se explica con la carga identificada, que también impide alcanzar 1 A pico. Queda pendiente la medición del rizado, cuya estimación está muy por debajo del límite. Los resultados completos están en el informe técnico.
 \referencias
 \end{document}

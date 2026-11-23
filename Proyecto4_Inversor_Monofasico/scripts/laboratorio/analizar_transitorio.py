@@ -39,17 +39,18 @@ def main():
     tr = t[1] - t[0]
     n = int(round(1 / 50.0 / tr))
     e_i, e_r = envolvente(t, i, n), envolvente(t, ref, n)
-    pico_ref = np.max(np.abs(ref))
-    inicio = np.max(np.abs(ref[: n]))
-    cambio = np.nonzero(np.abs(ref) > 1.05 * inicio)[0]
-    if len(cambio):
-        k0 = int(cambio[0])
-        while k0 > 0 and np.sign(ref[k0 - 1]) == np.sign(ref[k0]):
-            k0 -= 1
-    else:
+    cruces = np.nonzero(np.sign(ref[1:]) != np.sign(ref[:-1]))[0] + 1
+    semiciclos = list(zip(cruces[:-1], cruces[1:]))
+    picos = [np.max(np.abs(ref[a:b])) for a, b in semiciclos]
+    k0 = None
+    for (a, _), p in zip(semiciclos, picos):
+        if abs(p - picos[0]) > 0.05 * max(p, picos[0]):
+            k0 = int(a)
+            break
+    escalon = k0 is not None
+    if not escalon:
         k0 = len(t) // 2
-    escalon = len(cambio) > 0
-    final = pico_ref if escalon else np.nanmax(e_r)
+    final = picos[-1] if escalon else np.nanmax(e_r)
     fuera = [k for k in range(k0, len(t) - n // 2) if abs(e_i[k] - final) > 0.10 * final]
     t_est = (fuera[-1] + 1 - k0) * tr * 1e3 if fuera else 0.0
     pico = np.max(np.abs(i[k0:]))

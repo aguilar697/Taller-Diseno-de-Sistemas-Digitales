@@ -11,7 +11,11 @@ Análisis de las tramas que exporta `control_inversor` por UART (botón BTNL) y 
 | `aplicar_captura_falla.py` | Parche de registro de falla: una muestra cada 100 µs (51,2 ms), la columna `i_ref` lleva el código bruto del ADC y los errores de STATUS, y tras una falla se graban 20 muestras más y se congela el registro. Exportar con BTNL antes de reconocer con BTND |
 | `analizar_falla.py` | Decodifica una trama del registro de falla: código, corriente, m, errores y validez alrededor de la primera muestra anormal, con gráfica |
 | `aplicar_captura_transitorio.py` | Parche de captura centrada: BTNL o un cambio de amplitud en marcha exportan la trama 51,2 ms después, con la mitad antes y la mitad después del evento |
-| `analizar_transitorio.py` | Envolvente de un ciclo, instante del evento, pico posterior y tiempo hasta quedar dentro de ±10 % |
+| `aplicar_captura_larga.py` | La misma captura con ventana de 409,6 ms (`K_REG = 8`): la trama sale 204,8 ms después del evento |
+| `aplicar_captura_carga.py` | Captura para el cambio de carga: ventana de 819,2 ms (`K_REG = 16`); con BTNL la trama sale 50 ms después y guarda ~0,77 s anteriores. Primero se retira el puente y enseguida se pulsa BTNL |
+| `analizar_transitorio.py` | Escalones en los dos sentidos: instante del cambio (primer semiciclo con otra amplitud de referencia), pico posterior y tiempo hasta que la envolvente de un ciclo queda dentro de ±10 % |
+| `analizar_cambio_carga.py` | Cambio de carga: lo ubica por el salto de la amplitud de m, mide la caída de la corriente y el error antes y después |
+| `analizar_osciloscopio.py` | Amplitud de 50 Hz de la resta CH1−CH2 del osciloscopio, descartando las muestras en 0 de los canales saturados |
 | `figuras_informe_potencia.py` | Figuras de los [informes de Potencia](../../docs/informe/potencia/README.md) a partir de las tramas, e impedancia de la carga a 50 Hz: fundamental de `m·Vdc`, menos la caída por tiempo muerto, dividida por la fundamental de la corriente |
 
 Las dos herramientas de Python usan el decodificador y el análisis de [`receptor.py`](../../software/pc/receptor.py), así que dan los mismos números que el receptor.
@@ -41,4 +45,4 @@ Ninguna de las dos variantes se ensayó en la tarjeta.
 
 Los parches modifican solo `control/aplicacion.c`; el control y la supervisión no cambian. Con el registro de falla, las pruebas de PC que leen `i_ref` del registro fallan por diseño, porque esa columna ya no es la referencia. Con la captura de transitorio pasan si la prueba de exportación espera a que empiece la trama.
 
-El registro de falla se usó el 23/11 para los dos reposos de [`laboratorio/2026-11-23`](../../docs/informe/resultados/potencia/laboratorio/2026-11-23/resultados.md). La captura de transitorio no se ha ensayado en la tarjeta.
+El 23/11 en la tarjeta ([`laboratorio/2026-11-23`](../../docs/informe/resultados/potencia/laboratorio/2026-11-23/resultados.md)): el registro de falla se usó en los dos reposos (01–02), la captura de 102 ms en los escalones 24–28 y la de 410 ms en los escalones 31–36 y en el cambio de carga (37). La captura para cambio de carga se compiló pero no se usó. Con 102 ms, sincronizar a mano BTNL con el retiro del puente no resultó; con 410 ms sí.

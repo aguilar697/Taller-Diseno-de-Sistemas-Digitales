@@ -8,5 +8,40 @@
 | 06_pr_24v_0a5 | OPERACIÓN | ninguna | 0.500 A | 0.4705 A | -5.91 % | sí | -3.87° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.57 µs | 0 |
 | 07_pr_12v_1a | OPERACIÓN | ninguna | 1.000 A | 0.3291 A | -67.09 % | no | -43.53° | 0.9677 A / -0.90° | 0.9836 A / -0.45° | 8.57 µs | 0 |
 | 08_pr_24v_1a | OPERACIÓN | ninguna | 1.000 A | 0.7358 A | -26.42 % | no | -26.37° | 0.9677 A / -0.90° | 0.9836 A / -0.45° | 8.57 µs | 0 |
+| 09_falla_semiciclo_positivo_0a2 | OPERACIÓN | ninguna | 0.200 A | 0.1628 A | -18.62 % | no | -1.72° | 0.1935 A / -0.90° | 0.1967 A / -0.45° | 8.57 µs | 0 |
+| 10_pr_12v_0a2_rep | OPERACIÓN | ninguna | 0.200 A | 0.1892 A | -5.43 % | sí | -2.80° | 0.1935 A / -0.90° | 0.1967 A / -0.45° | 8.57 µs | 0 |
+| 11_pr_12v_0a2_9v9 | OPERACIÓN | ninguna | 0.200 A | 0.1850 A | -7.49 % | sí | -2.79° | 0.1935 A / -0.90° | 0.1967 A / -0.45° | 8.57 µs | 0 |
+| 12_pr_24v_0a2_9v9 | OPERACIÓN | ninguna | 0.200 A | 0.1915 A | -4.25 % | sí | -1.70° | 0.1935 A / -0.90° | 0.1967 A / -0.45° | 8.57 µs | 0 |
+| 13_falla_12v_0a5_9v9 | FALLA | sobrecorriente | 0.199 A | 0.4414 A | +122.05 % | no | -52.30° | 0.1935 A / -0.90° | 0.1967 A / -0.45° | 8.57 µs | 0 |
+| 14_pr_12v_0a5_9v9 | OPERACIÓN | ninguna | 0.500 A | 0.3202 A | -35.97 % | no | -42.38° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.57 µs | 0 |
+| 15_pr_24v_0a5_9v9 | OPERACIÓN | ninguna | 0.500 A | 0.4738 A | -5.23 % | sí | -4.97° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.57 µs | 0 |
+| 16_pr_12v_1a_9v9 | OPERACIÓN | ninguna | 1.000 A | 0.3176 A | -68.24 % | no | -42.50° | 0.9677 A / -0.90° | 0.9836 A / -0.45° | 8.57 µs | 0 |
+| 17_pr_24v_1a_9v9 | OPERACIÓN | ninguna | 1.000 A | 0.6958 A | -30.42 % | no | -27.99° | 0.9677 A / -0.90° | 0.9836 A / -0.45° | 8.57 µs | 0 |
+| 18_pr_12v_0a2_rep2 | OPERACIÓN | ninguna | 0.200 A | 0.1867 A | -6.66 % | sí | -3.97° | 0.1935 A / -0.90° | 0.1967 A / -0.45° | 8.57 µs | 0 |
+| 19_pr_24v_0a2_rep2 | OPERACIÓN | ninguna | 0.200 A | 0.1919 A | -4.06 % | sí | -2.06° | 0.1935 A / -0.90° | 0.1967 A / -0.45° | 8.57 µs | 0 |
+| 20_pr_12v_0a5_rep2 | OPERACIÓN | ninguna | 0.500 A | 0.3257 A | -34.86 % | no | -43.12° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.57 µs | 0 |
+| 21_pr_24v_0a5_rep2 | OPERACIÓN | ninguna | 0.500 A | 0.4707 A | -5.88 % | sí | -2.94° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.57 µs | 0 |
+| 22_pr_12v_1a_rep2 | OPERACIÓN | ninguna | 1.000 A | 0.3376 A | -66.24 % | no | -43.26° | 0.9677 A / -0.90° | 0.9836 A / -0.45° | 8.57 µs | 0 |
+| 23_pr_24v_1a_rep2 | OPERACIÓN | ninguna | 1.000 A | 0.7604 A | -23.96 % | no | -25.22° | 0.9677 A / -0.90° | 0.9836 A / -0.45° | 8.57 µs | 0 |
+| 24_escalon_0a2_0a5_c102 | OPERACIÓN | ninguna | 0.351 A | 0.3175 A | -9.42 % | sí | -4.43° | — | — | 7.55 µs | 0 |
+| 25_escalon_0a2_0a5_c102_rep | OPERACIÓN | ninguna | 0.351 A | 0.3158 A | -9.89 % | sí | -4.39° | — | — | 7.55 µs | 0 |
+| 26_pr_24v_0a5_9v9_c102 | OPERACIÓN | ninguna | 0.500 A | 0.4755 A | -4.90 % | sí | -5.73° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 7.55 µs | 0 |
+| 27_escalon_0a2_0a5_c102_rep2 | OPERACIÓN | ninguna | 0.351 A | 0.3181 A | -9.25 % | sí | -4.58° | — | — | 7.55 µs | 0 |
+| 28_escalon_0a2_0a5_c102_rep3 | OPERACIÓN | ninguna | 0.350 A | 0.3168 A | -9.58 % | sí | -4.62° | — | — | 7.55 µs | 0 |
+| 29_circuito_abierto_inicio | OPERACIÓN | ninguna | 0.500 A | 0.3938 A | -21.26 % | no | -3.92° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 7.55 µs | 0 |
+| 30_circuito_abierto | OPERACIÓN | ninguna | 0.500 A | 0.0012 A | -99.75 % | no | +42.93° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 7.55 µs | 0 |
+| 31_escalon_0a5_0a2_c410 | OPERACIÓN | ninguna | 0.346 A | 0.3326 A | -4.00 % | sí | -2.32° | — | — | 8.40 µs | 0 |
+| 32_escalon_0a2_0a5_c410 | OPERACIÓN | ninguna | 0.354 A | 0.3304 A | -6.65 % | sí | -3.51° | — | — | 8.40 µs | 0 |
+| 33_pr_24v_0a5_9v9_c410 | OPERACIÓN | ninguna | 0.500 A | 0.4725 A | -5.47 % | sí | -4.98° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.40 µs | 0 |
+| 34_pr_24v_0a5_9v9_c410_rep | OPERACIÓN | ninguna | 0.500 A | 0.4729 A | -5.49 % | sí | -4.88° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.40 µs | 0 |
+| 35_escalon_0a5_0a2_c410_rep | OPERACIÓN | ninguna | 0.346 A | 0.3337 A | -3.69 % | sí | -2.10° | — | — | 8.40 µs | 0 |
+| 36_escalon_0a2_0a5_c410_rep | OPERACIÓN | ninguna | 0.354 A | 0.3306 A | -6.59 % | sí | -2.94° | — | — | 8.40 µs | 0 |
+| 37_cambio_carga_6v6_9v9_c410 | OPERACIÓN | ninguna | 0.500 A | 0.4723 A | -5.51 % | sí | -3.22° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.40 µs | 0 |
+| 38_pr_24v_0a5_9v9_c410_final | OPERACIÓN | ninguna | 0.500 A | 0.4729 A | -5.49 % | sí | -4.89° | 0.4839 A / -0.90° | 0.4918 A / -0.45° | 8.40 µs | 0 |
 
-Las tramas 01 y 02 se tomaron con la variante de registro de falla (`scripts/laboratorio/aplicar_captura_falla.py`): una muestra cada 100 µs y la columna `i_ref` con el código bruto del ADC. Sus gráficas se generaron con `analizar_falla.py`. Las tramas 03 a 08 son de `control_inversor` de la rama `kCortes` (d2d60c6).
+## Notas
+
+- **Programas.** 01–02: registro de falla (`aplicar_captura_falla.py`), con el código bruto del ADC en la columna `i_ref`; sus gráficas salen de `analizar_falla.py`. 03–23: `control_inversor` de la rama `kCortes`. 24–30: captura de transitorio con ventana de 102,4 ms (`aplicar_captura_transitorio.py`). 31–38: captura con ventana de 409,6 ms (`aplicar_captura_larga.py`).
+- **Carga.** 03–10 y 18–23 con 6,6 Ω externos; 11–17 con 9,9 Ω. En 24–38 la carga se cambia con un puente sobre R3.
+- **Tramas de transitorio** (24, 25, 27, 28, 31, 32, 35, 36 y 37): el error de la tabla mezcla el antes y el después y no se usa. Se analizan con `analizar_transitorio.py` (`*_transitorio.png`) y la 37 con `analizar_cambio_carga.py` (`*_cambio_carga.png`).
+- **09:** el semiciclo positivo no conduce; la trama siguiente (10), sin cambios de configuración registrados, vuelve a la normalidad. **13:** falla por una lectura imposible del ADC (−12,6 A) con la modulación saturada. **29–30:** al retirar el puente se abrió el circuito de la carga; la corriente cae a cero y la modulación satura.
