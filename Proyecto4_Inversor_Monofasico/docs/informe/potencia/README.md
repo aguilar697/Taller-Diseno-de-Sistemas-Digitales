@@ -4,8 +4,8 @@ Kevin Aguilar, Kenneth Campos y Kevin Cortés.
 
 | Documento | Contenido | PDF | Fuente editable |
 |---|---|---|---|
-| Diseño e investigación | Puente H, dimensionamiento de carga RL, accionamiento, medición, PR discreto, estabilidad y plan de ensayos | [Diseño](diseno_potencia.pdf) | [LaTeX](diseno_potencia.tex) |
-| Informe técnico | Simulación, lecturas de banco, métodos de medida y análisis del sondeo de corriente | [Informe](informe_potencia.pdf) | [LaTeX](informe_potencia.tex) |
+| Diseño e investigación | Fundamentos del PR, puente H, pérdidas, frecuencia de conmutación, carga nominal e identificada, medición, sintonización, discretización, estabilidad y plan de ensayos | [Diseño](diseno_potencia.pdf) | [LaTeX](diseno_potencia.tex) |
+| Informe técnico | Parámetros medidos, simulación, registros del 20/11 y 21/11, identificación de la carga, comparación con PLECS y discusión; campos en rojo pendientes de los ensayos del 23/11 | [Informe](informe_potencia.pdf) | [LaTeX](informe_potencia.tex) |
 
 Los dos documentos usan el formato IEEE. La sección 8.2 y el anexo B describen la evaluación de Potencia. La demostración propia requiere un inversor con PR discreto en funcionamiento y admite una plataforma digital alternativa. La integración con MicroBlaze V se evalúa por separado. [Instructivo del proyecto](../../enunciado/Proyecto_4_EL3313__Taller_de_Diseño_Digital.pdf).
 
@@ -16,7 +16,10 @@ Los dos documentos usan el formato IEEE. La sección 8.2 y el anexo B describen 
 - [Resultados de la simulación funcional](../resultados/potencia/lazo_funcional.json) con seis condiciones nominales y tres transitorios.
 - [Registro de puesta en marcha](../../../Potencia/04_registro_laboratorio.md) y [CSV exploratorio del osciloscopio](../resultados/potencia/laboratorio/scope_2.csv).
 
-La entrega de EL4201 puede acompañarse con estos archivos fuera de Git. El ensayo físico disponible se detuvo en el sondeo de corriente. Quedan por registrar el seguimiento del PR, el desfase, el rizado, los transitorios y la integración física en el rango nominal.
+- [Tramas del 21/11](../resultados/potencia/laboratorio/2026-11-21/resultados.md): seguimiento a 0,2 A pico con 12 y 24 V e intentos a 0,5 A.
+- [Figuras de los informes](figuras/), regeneradas con [`figuras_informe_potencia.py`](../../../scripts/laboratorio/figuras_informe_potencia.py), que también imprime la impedancia identificada de la carga.
+
+El seguimiento a 0,2 A pico cumple con ambos buses. Quedan por registrar 0,5 y 1 A pico, los cambios de consigna y de carga y el rizado.
 
 ## Regeneración
 

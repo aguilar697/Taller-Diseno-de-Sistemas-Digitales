@@ -98,6 +98,8 @@ def main() -> None:
     # Compilar copias mantiene los archivos auxiliares fuera de la documentación.
     for fuente in FUENTES.glob("*.tex"):
         shutil.copy2(fuente, BUILD / fuente.name)
+    if (FUENTES / "figuras").is_dir():
+        shutil.copytree(FUENTES / "figuras", BUILD / "figuras", dirs_exist_ok=True)
     for nombre in ("diseno_potencia", "informe_potencia"):
         for _ in range(2):
             ejecucion = subprocess.run(

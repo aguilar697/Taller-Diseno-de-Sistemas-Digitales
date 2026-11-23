@@ -2,22 +2,33 @@
 \usepackage[T1]{fontenc}
 \usepackage[spanish,es-tabla]{babel}
 \spanishplainpercent
-\usepackage{amsmath,amssymb,booktabs,url}
+\usepackage{amsmath,amssymb,booktabs,array,url,graphicx,xcolor}
+\usepackage[siunitx]{circuitikz}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage[hidelinks]{hyperref}
+\graphicspath{{figuras/}}
 \hypersetup{pdfauthor={Kevin Aguilar, Kenneth Campos y Kevin Cortés}}
 \renewcommand{\IEEEkeywordsname}{Palabras clave}
 \pagestyle{plain}
 \raggedbottom
-\newcommand{\estado}{\noindent\textbf{Validación experimental del lazo cerrado pendiente.}\par\medskip}
+\newcommand{\estado}[1]{\noindent\textbf{#1}\par\medskip}
+\newcommand{\pend}[1]{\textcolor{red}{\textbf{[#1]}}}
 \newcommand{\autores}{\author{\IEEEauthorblockN{Kevin Aguilar, Kenneth Campos y Kevin Cortés}
 \IEEEauthorblockA{Escuela de Ingeniería Electrónica\\Instituto Tecnológico de Costa Rica\\
 EL4201 Procesamiento Electrónico de Potencia}}}
-\newcommand{\referencias}{\begin{thebibliography}{9}\raggedright
+\newcommand{\referencias}{\begin{thebibliography}{99}\raggedright
 \bibitem{enunciado} EL3313 y EL4201, \textit{Proyecto 4: instructivo y rúbricas}, secc. 4.3, 8.2 y anexo B, II semestre, 2026.
+\bibitem{zmood} D. N. Zmood y D. G. Holmes, ``Stationary frame current regulation of PWM inverters with zero steady-state error,'' \textit{IEEE Trans. Power Electron.}, vol. 18, no. 3, pp. 814--822, 2003.
+\bibitem{teodorescu} R. Teodorescu, F. Blaabjerg, M. Liserre y P. C. Loh, ``Proportional-resonant controllers and filters for grid-connected voltage-source converters,'' \textit{IEE Proc. Electr. Power Appl.}, vol. 153, no. 5, pp. 750--762, 2006.
+\bibitem{yepes} A. G. Yepes, F. D. Freijedo, J. Doval-Gandoy, Ó. López, J. Malvar y P. Fernández-Comesaña, ``Effects of discretization methods on the performance of resonant controllers,'' \textit{IEEE Trans. Power Electron.}, vol. 25, no. 7, pp. 1692--1712, 2010.
+\bibitem{buso} S. Buso y P. Mattavelli, \textit{Digital Control in Power Electronics}. San Rafael, CA, EE.~UU.: Morgan \& Claypool, 2006.
+\bibitem{holmes} D. G. Holmes y T. A. Lipo, \textit{Pulse Width Modulation for Power Converters: Principles and Practice}. Piscataway, NJ, EE.~UU.: IEEE Press, 2003.
+\bibitem{mohan} N. Mohan, T. M. Undeland y W. P. Robbins, \textit{Power Electronics: Converters, Applications, and Design}, 3.ª ed. Hoboken, NJ, EE.~UU.: Wiley, 2003.
+\bibitem{pr} Imperix, \textit{Proportional resonant controller}, TN110, 2024. [En línea]. \url{https://imperix.com/doc/implementation/proportional-resonant-controller}.
 \bibitem{irf} Infineon, \textit{IRF540NPbF}, hoja de datos. [En línea]. \url{https://www.infineon.com/assets/row/public/documents/24/49/infineon-irf540n-datasheet-en.pdf}.
 \bibitem{ir} Infineon, \textit{IR2110/IR2113: High and Low Side Driver}, hoja de datos. [En línea]. \url{https://www.infineon.com/assets/row/public/documents/24/49/infineon-ir2110-datasheet-en.pdf}.
+\bibitem{an978} International Rectifier, \textit{HV Floating MOS-Gate Driver ICs}, nota de aplicación AN-978.
 \bibitem{acs} Allegro MicroSystems, \textit{ACS712}, hoja de datos, rev. 22. [En línea]. \url{https://www.allegromicro.com/-/media/Files/Datasheets/ACS712-Datasheet.ashx}.
-\bibitem{pr} Imperix, \textit{Proportional resonant controller}, TN110, 2024. [En línea]. \url{https://imperix.com/doc/implementation/proportional-resonant-controller}.
 \bibitem{plecs} Plexim, \textit{PLECS 5.0 User Manual}. [En línea]. \url{https://www.plexim.com/sites/default/files/plecsmanual-5-0.pdf}.
 \bibitem{xadc} AMD, \textit{7 Series FPGAs and Zynq-7000 SoC XADC User Guide}, UG480, v1.11, 2022, cap. 2. [En línea]. \url{https://www.amd.com/content/dam/xilinx/support/documents/user_guides/ug480_7Series_XADC.pdf}.
 \end{thebibliography}}
