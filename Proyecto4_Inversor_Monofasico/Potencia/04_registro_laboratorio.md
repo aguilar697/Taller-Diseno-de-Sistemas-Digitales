@@ -1,6 +1,6 @@
 # Registro de puesta en marcha
 
-Las observaciones corresponden al montaje con IRF540N, IR2110 DIP-14, ACS712 de 5 A, divisor de 4,7 kΩ/1 kΩ y carga RL. Cada entrada recoge las condiciones del ensayo, las mediciones y las comprobaciones pendientes. La validación del control de corriente en los puntos nominales sigue pendiente.
+Las observaciones corresponden al montaje con IRF540N, IR2110 DIP-14, ACS712 de 5 A, divisor de 4,7 kΩ/1 kΩ y carga RL. Cada entrada recoge las condiciones del ensayo, las mediciones y las comprobaciones de esa etapa. La bitácora conserva el orden de las pruebas, desde la puesta en marcha hasta los ensayos en lazo cerrado a 12 y 24 V. El [informe técnico](../docs/informe/README.md#operación-a-12-y-24-v) reúne los resultados vigentes por consigna.
 
 ## Accionamiento y puente
 

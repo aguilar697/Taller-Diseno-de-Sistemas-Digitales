@@ -56,6 +56,7 @@ def main():
     os.chdir(RAIZ)
     os.makedirs("build", exist_ok=True)
     resultados = []
+    malas = []
 
     # Pruebas en C
     for nombre, modulos, extra in PRUEBAS:
@@ -66,17 +67,20 @@ def main():
         if comp.returncode != 0:
             print(comp.stderr)
             resultados.append((nombre, "NO COMPILA"))
+            malas.append(nombre)
             continue
         corr = subprocess.run([exe], capture_output=True, encoding="utf-8",
                               errors="replace", check=False)
         pasan = corr.stdout.count("[PASA]")
         fallan = corr.stdout.count("[FALLA]")
-        if corr.returncode != 0:
+        if corr.returncode != 0 or fallan or pasan == 0:
             print(corr.stdout)
-        if corr.returncode == 0 or fallan:
+            print(corr.stderr)
+            malas.append(nombre)
+        if pasan or fallan:
             resultados.append((nombre, f"{pasan} pasan, {fallan} fallan"))
         else:
-            resultados.append((nombre, "terminó con error"))
+            resultados.append((nombre, "sin comprobaciones válidas"))
 
     # Prueba de la aplicación de PC
     py = subprocess.run([sys.executable, os.path.join("software", "pc", "test_receptor.py")],
@@ -84,12 +88,12 @@ def main():
     resultados.append(("receptor (PC)", "ok" if py.returncode == 0 else "FALLA"))
     if py.returncode != 0:
         print(py.stderr)
+        malas.append("receptor (PC)")
 
     # Resumen
     print()
     for nombre, estado in resultados:
         print(f"  {nombre:<15} {estado}")
-    malas = [r for r in resultados if "0 fallan" not in r[1] and r[1] != "ok"]
     print("\nRESULTADO:", "POSITIVO" if not malas else f"NEGATIVO ({len(malas)} con problemas)")
     return 1 if malas else 0
 

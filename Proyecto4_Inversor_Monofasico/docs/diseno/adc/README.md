@@ -1,11 +1,11 @@
 # Subsistema ADC/XADC
 
-Periférico ADC/XADC para Basys 3 (`xc7a35tcpg236-1`). Las pruebas aisladas y la construcción digital integrada se hicieron en **Vivado 2026.1**. La compatibilidad con **2025.1**, versión solicitada, sigue pendiente. En laboratorio se comprobó la lectura del XADC en reposo. La calibración de la cadena de corriente en operación se mantiene abierta.
+Periférico ADC/XADC para Basys 3 (`xc7a35tcpg236-1`). Las pruebas aisladas y la construcción digital integrada se hicieron en **Vivado 2026.1**. La compatibilidad con **2025.1**, versión solicitada, sigue pendiente. En laboratorio se comprobó la lectura en reposo y la adquisición durante el control PR y la exportación UART. El montaje usa el cero y el signo obtenidos en la puesta en marcha; la ganancia conserva el valor nominal del sensor y del divisor. Los [resultados integrados](../../informe/README.md#operación-a-12-y-24-v) distinguen el seguimiento registrado del contraste independiente de esa escala.
 
 ## Fuentes y contrato
 
 - [RTL e IP](../../../src/design/adc/): cuatro módulos SystemVerilog y configuración `xadc_wiz_0.xci`.
-- [Testbenches](../../../src/testbench/adc/): seis pruebas, tareas AXI compartidas y estímulo analógico.
+- [Testbenches](../../../src/testbench/adc/): siete pruebas, tareas AXI compartidas y estímulo analógico.
 - [Contrato C](../../../software/embedded/drivers/adc/adc_regs.h): offsets, máscaras y procedimiento; no es un driver BSP completo.
 - [Scripts reproducibles](../../../scripts/verificacion/adc/): importación del XCI, regresión y síntesis aislada.
 - [Arquitectura e interfaces](arquitectura.md), [registros y ACK](mapa_registros.md), [temporización](temporizacion_y_sincronizacion.md).
@@ -17,6 +17,8 @@ Los [niveles tercero](../nivel_3_adc.md) y [cuarto](../nivel_4_adc.md) describen
 ## Reproducir en Windows
 
 Ejecutar desde la raíz del clon, con Vivado 2026.1 instalado. Adaptar únicamente `VIVADO_HOME` a la instalación:
+
+En Windows, ubicar el clon en una ruta corta, por ejemplo `C:\proyectos\taller`. Vivado puede fallar al generar el IP si las rutas de sus productos superan el límite de 260 caracteres, aunque las fuentes estén presentes.
 
 ```powershell
 $env:VIVADO_HOME = 'C:\AMDDesignTools\2026.1\Vivado'

@@ -6,7 +6,7 @@ La plataforma proporciona los recursos de procesamiento, memoria y comunicación
 
 El subsistema comprende la plataforma MicroBlaze V, memoria local, interconexión AXI, AXI Timer, reloj/reset, depuración y configuración de UART/GPIO. Su integración se desarrolla en Vivado y el entorno de ejecución en Vitis. El PWM pertenece al subsistema de actuación; el ADC/XADC, al de adquisición; el PR y su rutina de atención, al software de control. Aquí se describen sus conexiones, no sus implementaciones internas.
 
-El Block Design ya fue construido y validado con Vivado/Vitis 2026.1: MicroBlaze V tiene reloj diseñado de 100 MHz, FPU simple, caché de instrucciones de 8 KiB y una BRAM física compartida de 32 KiB. SmartConnect conecta siete destinos: INTC, Timer, UART, dos GPIO, ADC y PWM. Hay evidencia de síntesis, implementación y timing en la [integración Basys 3](integracion_basys3.md#resultados-de-la-construcción-integrada). La compatibilidad con 2025.1 y la ejecución física completa del controlador PR siguen pendientes.
+El Block Design fue construido y validado con Vivado/Vitis 2026.1: MicroBlaze V tiene reloj diseñado de 100 MHz, FPU simple, caché de instrucciones de 8 KiB y una BRAM física compartida de 32 KiB. SmartConnect conecta siete destinos: INTC, Timer, UART, dos GPIO, ADC y PWM. Hay evidencia de síntesis, implementación y timing en la [integración Basys 3](integracion_basys3.md#resultados-de-la-construcción-integrada). El PR, la adquisición y la exportación UART operaron juntos en laboratorio; el informe presenta el seguimiento obtenido para cada consigna. La compatibilidad con 2025.1 no se comprobó.
 
 ## Diagrama funcional
 
@@ -68,9 +68,9 @@ SmartConnect recibe las operaciones de `M_AXI_DP` y las dirige a los siete perif
 
 El [PWM implementado](nivel_3_pwm.md) utiliza CONTROL, REFERENCE, DEADTIME y TRIGGER_PHASE. El software escribe la referencia Q1.15 y consulta/configura la actuación por AXI4-Lite. La generación de órdenes complementarias, el tiempo muerto y el pulso de adquisición siguen dentro del PWM; no se reproducen en la plataforma.
 
-El ADC real recibe directamente `pwm_trigger_o` y publica el dato por registros. Disparo y disponibilidad son sucesos distintos. El [contrato ADC](adc/mapa_registros.md) define SAMPLE y el token de ACK_ID; el PWM no espera una respuesta de ADC ocupado. La calibración definitiva del offset y la ganancia firmada del sensor sigue pendiente: el código bruto no representa directamente amperios.
+El ADC real recibe directamente `pwm_trigger_o` y publica el dato por registros. Disparo y disponibilidad son sucesos distintos. El [contrato ADC](adc/mapa_registros.md) define SAMPLE y el token de ACK_ID; el PWM no espera una respuesta de ADC ocupado. El montaje usa un cero de 1776 códigos y el signo comprobado durante la puesta en marcha. La escala de 7,64 mA por código se calculó con la sensibilidad nominal del sensor y el divisor; su contraste con una corriente independiente sigue abierto. El código bruto no representa directamente amperios.
 
-UART Lite y GPIO completan el intercambio con el usuario. El botón solicita exportar el histórico y los LED presentan el estado de la aplicación. UART trabaja a 115200, 8N1; la [trama de exportación](nivel_4_software.md#4-trama-de-exportación) incluye muestras y CRC. No se hereda el protocolo de los proyectos anteriores. La exportación durante el control aún requiere comprobación física.
+UART Lite y GPIO completan el intercambio con el usuario. El botón solicita exportar el histórico y los LED presentan el estado de la aplicación. UART trabaja a 115200, 8N1; la [trama de exportación](nivel_4_software.md#4-trama-de-exportación) incluye muestras y CRC. No se hereda el protocolo de los proyectos anteriores. Las capturas de laboratorio incluyen exportación durante el control y verificación del CRC de las tramas conservadas.
 
 ## AXI Timer y funcionamiento conjunto
 
@@ -86,6 +86,6 @@ Separar la temporización hardware de la aplicación evita que los tiempos de ej
 
 El [cuarto nivel de la plataforma](nivel_4_microblaze.md) desarrolla cuatro vistas de este mismo sistema: interconexión y mapa; procesamiento, memoria y depuración; reloj/reset; y Timer/interrupciones. El detalle interno del PWM se conserva en su [documentación propia](nivel_4_pwm.md).
 
-El Block Design, el mapa y las conexiones de memoria, depuración, reloj, reset e interrupción ya pasaron las verificaciones digitales. La [evidencia integrada](../informe/README.md#verificación-digital-e-implementación) distingue síntesis, routing, simulación y enlace del software. Permanecen las advertencias de BSP y metodología documentadas, la compatibilidad con 2025.1, la calibración, la medición temporal y el seguimiento físico del PR. Los diagramas por sí solos no demuestran esos resultados.
+El Block Design, el mapa y las conexiones de memoria, depuración, reloj, reset e interrupción pasaron las verificaciones digitales. La [evidencia integrada](../informe/README.md#verificación-digital-e-implementación) distingue síntesis, routing, simulación y enlace del software. Los ensayos físicos añaden resultados de seguimiento, cambios de carga y exportación. El análisis conserva el alcance de la escala nominal de corriente, la medición temporal instrumentada y los avisos de metodología; la compatibilidad con 2025.1 no se comprobó. Los diagramas describen la arquitectura y las evidencias sustentan sus resultados.
 
 [Cuarto nivel: desarrollo de la plataforma](nivel_4_microblaze.md) · [Segundo nivel](nivel_2.md) · [Índice del diseño](README.md)
