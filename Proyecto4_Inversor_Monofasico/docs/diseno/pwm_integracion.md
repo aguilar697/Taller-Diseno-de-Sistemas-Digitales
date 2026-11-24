@@ -80,7 +80,7 @@ La fase central es la elección inicial de integración. Su conveniencia frente 
 
 `VDC_V=12` es la base fija de normalización del modelo inicial. El bus físico sigue siendo variable entre 12 y 24 V; la regulación debe responder a esa perturbación sin recompilar al mover la fuente. Si se incorpora compensación por tensión medida, se debe validar explícitamente el nuevo lazo.
 
-La calibración del ACS712 está pendiente. Las pruebas de banco mostraron pendiente negativa para la orientación ensayada. Cero y ganancia firmada deben medirse después del acondicionamiento y con el XADC antes de habilitar realimentación. Los valores nominales positivos del software sirven para las pruebas de modelo; no describen la calibración física. El umbral provisional I_MAX=1,5 A tampoco reemplaza la limitación de corriente de la fuente ni la protección eléctrica.
+En la prueba inicial se observó una pendiente negativa para la orientación usada entonces. En el montaje con control PR se confirmó el signo positivo y se empleó una escala nominal de 7,6383 mA por código. Queda por contrastar esa escala con una medición independiente. El umbral provisional I_MAX=1,5 A tampoco reemplaza la limitación de corriente de la fuente ni la protección eléctrica.
 
 El buffer de 1024 entradas de 8 bytes ocupa 8 KB y cubre 102,4 ms con K_REG=1. Si la compilación con BSP, pila y datos no cabe en 32 KB, 512 entradas requieren K_REG=2 para conservar esa ventana. La ocupación final se confirma con el mapa del ejecutable integrado.
 
@@ -90,4 +90,4 @@ Las cuatro señales PWM son órdenes lógicas HIN/LIN, no tensiones de compuerta
 
 El permiso manual conserva prioridad. Si se agrega apagado por GPIO, debe combinarse con ese permiso mediante una interfaz definida; no conectar una salida GPIO que conduce a alto contra un interruptor que fuerza masa. La asignación de GPIO y la lógica final de SD deben acordarse antes de conectar la FPGA a los drivers.
 
-Para cerrar la integración se requieren: direcciones y pines de plataforma; comprobación en Vivado/Vitis 2025.1; medición Timer–PWM–ADC y duración de ISR; compilación final en BRAM; calibración firmada de corriente; verificación de ambos drivers y de VGS/tiempo muerto con el bus inicialmente desconectado. Los resultados independientes se reúnen en [verificación del PWM](../informe/pwm_verificacion.md).
+Los pines y las direcciones AXI de laboratorio constan en la [integración Basys 3](integracion_basys3.md). La serie física verificó el funcionamiento conjunto del PWM y del lazo PR. Faltan la comprobación en Vivado/Vitis 2025.1, la medición del jitter, el contraste independiente de la escala del ADC y la caracterización de las compuertas en conmutación. Los resultados independientes se reúnen en [verificación del PWM](../informe/pwm_verificacion.md).

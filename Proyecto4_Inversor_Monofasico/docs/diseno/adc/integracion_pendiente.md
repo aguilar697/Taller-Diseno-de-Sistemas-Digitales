@@ -2,11 +2,13 @@
 
 `adc_system_axi` está conectado al Block Design de MicroBlaze V, con base `0x44A00000`, reloj de 100 MHz y reset AXI activo bajo. El PWM envía un pulso de un ciclo en fase 5000 a 10 kHz. La ISR del Timer consulta la muestra y reconoce su token por AXI. El periférico ADC opera sin IRQ dedicada.
 
+La operación con el ACS712 y el registro por UART se verificaron en el montaje. El cero y el signo se comprobaron en banco y se utilizó la ganancia nominal del acondicionamiento. [Resultados de integración física](../../informe/README.md#operación-a-12-y-24-v).
+
 | Área | Verificación pendiente |
 |---|---|
 | Plataforma | Comprobar reconstrucción y compatibilidad del XADC con Vivado/Vitis 2025.1. |
 | Temporización y software | Medir el presupuesto de adquisición, ISR y actuación en FPGA. Comprobar la recuperación tras fallas y reset coordinado durante la prueba integrada. |
-| Instrumentación | Calibrar cero y ganancia con signo en VAUX6. Verificar el escalamiento, el ruido y la corriente medida bajo conmutación. |
+| Instrumentación | Contrastar la ganancia con una referencia independiente. Cuantificar el ruido durante la conmutación y verificar el cero con cada montaje. |
 
 ## Límites explícitos
 

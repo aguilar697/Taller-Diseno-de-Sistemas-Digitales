@@ -54,7 +54,7 @@ Con el bus apagado se comprobó que JXADC7 estaba flotante. Tras unirlo al retor
 | Entrada del XADC después del divisor | Registro en DC con promedio cercano a 0,420 V y 16,1 mV pico a pico. El registro en AC alcanzó 51,1 mV pico a pico, con indicios de recorte. | Los extremos incluyen picos y efectos de adquisición. La componente a 50 Hz quedó por debajo de 0,4 mV pico a pico en ambos registros. |
 | Caída diferencial en una resistencia de 3,3 Ω | La exportación de la resta de canales presenta valores alternados y muestras repetidas en un extremo. | La captura no permite cuantificar de forma fiable la corriente independiente. |
 
-Para esta excitación, el modelo de 7,2 Ω y 9,3 mH da cerca de 39 mA pico a 50 Hz. Con la ganancia nominal del divisor y el ACS712, la componente esperada a la entrada del XADC es de unos 2,5 mV pico a pico. La señal registrada quedó por debajo de esa estimación. El devanado puede contribuir por su inductancia dependiente de la frecuencia, sus pérdidas o su acoplamiento magnético. La captación observada en GND y la falta de una medida independiente de corriente dejan abierta la causa de la discrepancia. El seguimiento de corriente en lazo cerrado continúa pendiente.
+Para esta excitación, el modelo de 7,2 Ω y 9,3 mH da cerca de 39 mA pico a 50 Hz. Con la ganancia nominal del divisor y el ACS712, la componente esperada a la entrada del XADC es de unos 2,5 mV pico a pico. La señal registrada quedó por debajo de esa estimación. El devanado puede contribuir por su inductancia dependiente de la frecuencia, sus pérdidas o su acoplamiento magnético. La captación observada en GND y la falta de una medida independiente de corriente dejan abierta la causa de la discrepancia. En esa etapa todavía no se había comprobado el seguimiento en lazo cerrado.
 
 ### Comparaciones pendientes
 
@@ -110,6 +110,266 @@ La [traza UART](../docs/informe/resultados/potencia/laboratorio/pr_3v_transforma
 
 La repetición del ensayo tras recargar el firmware también terminó en `ESTADO=4 ERROR=0`. El cero del sensor fue de 1776,91 códigos, con correlaciones de 6,71 códigos en fase y −3,74 en cuadratura. Se mantuvo el signo positivo y la duración máxima de la ISR fue de 27,62 µs.
 
+## Sesión del 21/11: aplicación general en la tarjeta
+
+Se cargó `control_inversor` en la Basys 3 y se ensayó con la etapa de potencia. Las tramas se exportaron por UART con BTNL y se analizaron con `receptor.py`. La evidencia está en [`laboratorio/2026-11-21`](../docs/informe/resultados/potencia/laboratorio/2026-11-21/resultados.md).
+
+| Punto | Resultado |
+|---|---|
+| 0,2 A pico | **Cumple** a 12 V (−7,07 %) y a 24 V (−3,81 %), sin conversiones perdidas y con la ISR en 8,3 µs |
+| 0,5 A pico | **Sin resultado válido.** El firmware original cortó por muestras imposibles del ADC. Con la supervisión modificada no corta, pero ese ensayo tenía la carga alterada |
+| 1 A pico | No se ensayó |
+
+### Firmware y cambios en esta rama
+
+**Construcción.** El sistema integrado se reconstruyó desde `main` con el flujo de la [integración física](../docs/diseno/integracion_basys3.md), con Vivado y Vitis 2026.1. El RTL y el firmware coinciden con `b5ed7fd`. El timing dio WNS +0,289 ns y WHS +0,042 ns, iguales a los de la construcción verificada. Se repitieron las simulaciones del PWM:
+
+- funcional: cuatro bancos, PASS;
+- error forzado: `EXPECTED_FAILURE`;
+- implementación del periférico: holgura de +0,507 ns;
+- temporizada post-implementación con SDF: PASS, 81 comprobaciones.
+
+La simulación temporizada falla si se ejecuta dentro de OneDrive, porque la sincronización bloquea archivos de xsim, así que se corrió desde una copia local. En la PC usada, la instalación de Vitis no tenía el enlace `Vitis\gnu` hacia `..\gnu` ni `Vivado\bin` en el PATH. Por eso `vitis -s` no registraba el BSP local ni encontraba `riscv64-unknown-elf-gcc`. Se corrigieron ambos y el comando documentado funcionó sin cambios.
+
+**Calibración** (`software/embedded/control/parametros.h`):
+
+| Constante | Valor | Origen |
+|---|---|---|
+| `MEDICION_CALIBRADA` | 1 | — |
+| `OFFSET_ADC` | 1776,0 | Promedio de los ceros del 20/11 |
+| `GANANCIA_ADC` | +0,0076383 A/código | Ganancia nominal con VCC = 4,924 V y signo positivo del sondeo |
+
+La ganancia no se contrastó todavía con una medición independiente.
+
+**Supervisión.** Al subir a 0,5 A aparecieron muestras con códigos imposibles, y el firmware original cortaba con una sola de ellas. Se cambió así:
+
+- La **sobrecorriente** y el **código fuera de rango** exigen ahora **tres muestras seguidas** (`N_SOBRECORRIENTE = 3` y `N_CODIGO_FUERA = 3`). Una muestra normal reinicia la cuenta, y el reconocimiento de la falla también.
+- Una muestra con código fuera de rango **no entra al PR**: se usa la última muestra válida.
+- El umbral de software detecta excedencias persistentes. A 10 kHz, tres evaluaciones corresponden a tres iteraciones de 100 µs. El tiempo de respuesta depende del instante de muestreo y de la validez del dato.
+
+Archivos modificados:
+
+| Archivo | Cambio |
+|---|---|
+| `supervision.h` y `supervision.c` | Contadores de muestras seguidas |
+| `aplicacion.c` | Sustitución de la muestra imposible |
+| `test_supervision.c` y `test_aplicacion.c` | Comprobaciones nuevas: dos muestras no producen falla, tres sí, y una normal reinicia la cuenta |
+| [`nivel_3_software.md`](../docs/diseno/nivel_3_software.md) y [`nivel_4_software.md`](../docs/diseno/nivel_4_software.md) | Criterio actualizado |
+
+La batería de PC aprueba sus 206 comprobaciones; antes eran 201. El ELF compilado desde esta rama coincide con el que se ensayó: `.text`, `.text.init` y `.data` son idénticas. `.rodata` difiere solo en la ruta del espacio de trabajo que el BSP guarda en dos mensajes de aserción.
+
+**Variantes usadas durante la sesión:**
+
+| Variante | Qué tenía | Estado |
+|---|---|---|
+| A | Solo el cambio de sobrecorriente | Intermedia, ensayada (trama 08) |
+| B | La supervisión completa descrita arriba | Es la que queda en esta rama |
+| Diagnóstico | Congelaba el registro tras una falla y registraba cada muestra | Se compiló, pero no se usó |
+
+**Herramientas.** En [`scripts/laboratorio`](../scripts/laboratorio/README.md) quedan las que se usaron para las gráficas y la tabla de resultados, y una para compilar variantes de 20 y 25 kHz, que no se ensayaron en la tarjeta.
+
+### Tramas de la sesión
+
+Cada trama tiene su `.csv`, su `.bin` (se puede reanalizar con `receptor.py --archivo`) y su gráfica `.png`. [`resultados.md`](../docs/informe/resultados/potencia/laboratorio/2026-11-21/resultados.md) las reúne con la predicción de PLECS.
+
+| N.º | Firmware | Condición | Resultado |
+|---|---|---|---|
+| [01](../docs/informe/resultados/potencia/laboratorio/2026-11-21/01_reposo_auxiliares_apagadas.png) | Calibrado | Reposo, alimentaciones auxiliares apagadas | Falla por sobrecorriente y código fuera de rango: sensor sin alimentación |
+| [02](../docs/informe/resultados/potencia/laboratorio/2026-11-21/02_reposo_bus_apagado.png) | Calibrado | Reposo, bus apagado | `DETENIDO`; cero de 1779,8 códigos y 21 mA RMS de ruido |
+| [03](../docs/informe/resultados/potencia/laboratorio/2026-11-21/03_pr_12v_0a2.png) | Calibrado | 12 V, 0,2 A | 0,1859 A; −7,07 %; −2,53° |
+| [04](../docs/informe/resultados/potencia/laboratorio/2026-11-21/04_pr_24v_0a2.png) | Calibrado | 24 V, 0,2 A | 0,1924 A; −3,81 %; −1,61° |
+| [05](../docs/informe/resultados/potencia/laboratorio/2026-11-21/05_falla_24v_cambio_0a2_a_0a5.png) | Calibrado | 24 V, cambio de 0,2 a 0,5 A en marcha | Falla por sobrecorriente |
+| [06](../docs/informe/resultados/potencia/laboratorio/2026-11-21/06_falla_24v_arranque_0a5.png) | Calibrado | 24 V, arranque directo a 0,5 A | Falla por sobrecorriente |
+| [07](../docs/informe/resultados/potencia/laboratorio/2026-11-21/07_falla_24v_0a5_repeticion.png) | Calibrado | 24 V, 0,5 A, repetición | Falla por sobrecorriente |
+| [08](../docs/informe/resultados/potencia/laboratorio/2026-11-21/08_falla_24v_0a5_variante_a.png) | Variante A | 24 V, 0,5 A | Falla por sobrecorriente y código fuera de rango |
+| [09](../docs/informe/resultados/potencia/laboratorio/2026-11-21/09_variante_b_24v_0a5.png) | Variante B | 24 V, 0,5 A, condensador de 2200 µF conectado | Sin falla; 0,3194 A; −36,12 %; −41,83°; m en ±0,85 en 135 de 512 muestras. No representativo |
+| [10](../docs/informe/resultados/potencia/laboratorio/2026-11-21/10_variante_b_0a2.png) | Variante B | 0,2 A, bus no registrado, condensador conectado | 0,1829 A; −8,56 %; −3,67°; m máxima 0,47 |
+
+Las tramas de falla se exportaron después del corte, por lo que muestran el PWM apagado y no el instante del disparo. El límite de fuente fue de 0,5 A en todos los ensayos con bus. En una de las repeticiones a 0,5 A (tramas 05 a 07) se usó un segundo inductor que no quedó identificado.
+
+### Reposo y cero
+
+Con las alimentaciones auxiliares apagadas, el XADC leyó unos 7 códigos y la aplicación entró en falla, como corresponde a un sensor sin alimentación. Con las auxiliares encendidas y el bus apagado, el cero medido fue de 1779,8 códigos: +29 mA respecto a los 1776,0 cargados. El ruido fue de 21 mA RMS, unos 2,8 códigos. Con el bus a 24 V y el PWM apagado, después de una falla, la media subió a +57–68 mA, de 4 a 5 códigos más que con el bus apagado. La diferencia de cero solo agrega una componente continua. El PR no tiene ganancia resonante en continua, así que no afecta la fundamental de 50 Hz que evalúa el criterio.
+
+### Seguimiento a 0,2 A pico
+
+| Bus | Fundamental medida | Error de amplitud | Desfase | m máxima | ISR máxima | PLECS |
+|---|---:|---:|---:|---:|---:|---|
+| 12 V | 0,1859 A | −7,07 % | −2,53° | 0,39 | 8,34 µs | 0,1935 A; −3,23 %; −0,90° |
+| 24 V | 0,1924 A | −3,81 % | −1,61° | 0,27 | 8,34 µs | 0,1967 A; −1,64 %; −0,45° |
+
+El criterio del 10 % se cumple con los dos buses, sin conversiones perdidas ni saltos en el número de muestra. La fundamental de la modulación fue 0,311 a 12 V y 0,166 a 24 V, lo que confirma el cambio de bus.
+
+Con esos valores, la carga presenta unos 20 Ω aparentes a 0,19 A, incluido el efecto del tiempo muerto. El modelo usaba 7,77 Ω. Esto concuerda con el aumento de impedancia con la corriente observado el 20/11, y explica un error mayor que en PLECS: la ganancia del PR a 50 Hz se reparte contra una carga mayor. A 24 V, con `VDC_V` fijo en 12 V, la ganancia del lazo se duplica y el error disminuyó.
+
+La corriente medida contiene un tercer armónico del 6,6 % a 12 V y del 4,2 % a 24 V. El contraste con la caída en una resistencia de 3,3 Ω en la misma corrida no quedó registrado.
+
+### Intentos a 0,5 A pico con bus de 24 V
+
+**Con el firmware original.** El cambio de 0,2 a 0,5 A en marcha, el arranque directo a 0,5 A y una repetición terminaron en falla por sobrecorriente. Hubo además una captura de osciloscopio en una resistencia de 3,3 Ω durante el arranque directo, con resta de canales y una muestra cada 50 µs; todavía no está en el repositorio. Mostró:
+
+- lóbulos de unos 0,5–0,6 A durante algo más de un ciclo;
+- el disparo a los ~25 ms;
+- al cortar, los nodos subieron a ~25 V mientras la corriente del devanado se descargaba al bus en ~1 ms.
+
+Las excursiones de la resta coinciden con tramos en los que el muestreo cae cerca de las conmutaciones, así que no permiten afirmar picos reales de corriente.
+
+**Con la variante A.** La falla incluyó código fuera de rango. Un código fuera de 16–4079 equivale a −13 A o +17 A, corrientes imposibles con 24 V y la carga montada. La medición en VAUX6 se corrompe al aumentar la corriente.
+
+**Con la variante B.** No hubo falla, pero la modulación quedó en ±0,85 en el 26 % de las muestras y la corriente medida fue asimétrica: crecía lentamente y tenía un pico al final del semiciclo positivo. En ese ensayo había un condensador de 2200 µF en paralelo con una de las resistencias de 3,3 Ω:
+
+- a 50 Hz esa rama queda en unos 1,3 Ω, mayormente capacitiva;
+- solo el 40 % de la corriente circula por la resistencia, así que la carga deja de ser RL serie y la caída en esa resistencia no representa la corriente;
+- si es electrolítico, queda polarizado en sentido inverso en cada semiciclo.
+
+El condensador reduce la impedancia, por lo que no explica la saturación de la modulación. La hipótesis es que el límite de fuente de 0,5 A redujo el bus: con unos 20 Ω aparentes, 0,5 A pico requiere unos 10 W instantáneos, y los 100 µF del bus no cubren la pulsación de 100 Hz. Queda por comprobar con la tensión del bus y el modo de la fuente durante el ensayo. El resultado no se considera representativo.
+
+### Pendientes de esta sesión
+
+1. Retirar el condensador de 2200 µF de la resistencia de carga y conservar únicamente los 100 nF previstos entre el nodo del divisor y su retorno.
+2. Revisar la medición:
+   - JXADC7 directo al retorno del divisor;
+   - conductores de JXADC trenzados y alejados de la potencia;
+   - retornos de potencia y de señal separados hasta el punto común.
+
+   Repetir después el reposo con el bus a 24 V para comprobar el corrimiento del cero.
+3. Repetir 0,5 A y luego 1 A a 24 V, con límite de fuente de 1 A y 1,5 A respectivamente. Registrar la tensión del bus, el modo de la fuente y, en la misma corrida, la caída en una resistencia de 3,3 Ω.
+4. Registrar VGS, el tiempo muerto e `isr_debug` (JB1).
+5. Identificar el segundo inductor: inductancia, resistencia y corriente nominal.
+6. Incorporar la captura de osciloscopio del arranque directo a 0,5 A.
+7. Revisar en equipo la calibración y el cambio de supervisión de esta rama antes de llevarlos a `main`.
+
+## Sesión del 23/11: rango nominal con la carga sin capacitor
+
+Se retiraron los capacitores colocados sobre la carga, que queda como RL en serie. Se cargó `control_inversor` de esta rama (d2d60c6) con el bitstream de `da2b7c3`. El bus se alimentó a 12 y 24 V, con límite de fuente de 1 A (1,5 A para 1 A pico). La evidencia está en [`laboratorio/2026-11-23`](../docs/informe/resultados/potencia/laboratorio/2026-11-23/resultados.md).
+
+| Punto | Resultado |
+|---|---|
+| 0,2 A pico | **Cumple** a 12 V (−5,05 %) y a 24 V (−3,62 %); también con 9,9 Ω |
+| 0,5 A pico | **Cumple a 24 V** (−5,91 %; repetición −5,88 %; con 9,9 Ω −5,23 %). A 12 V la modulación satura (−36,4 %) |
+| 1 A pico | **No cumple**: −26,4 % a 24 V y −67,1 % a 12 V, con la modulación saturada. Lo limita la carga |
+| Escalón 0,2 → 0,5 A | **Seis capturas**: la corriente alcanza 0,5 A en el primer semiciclo, sin saturar la modulación |
+| Cambio de carga 6,6 → 9,9 Ω a 0,5 A | **Registrado en marcha**: −5,56 % antes y −3,29 % después |
+| Rizado | No medido: las capturas del osciloscopio quedaron saturadas. Estimación ≤ 0,043 A pico a pico |
+| Protección | Una parada con indicador de sobrecorriente (trama 13) y una lectura aparente de −12,6 A. La corriente real de ese pico quedó sin medir |
+
+### Reposo y cero
+
+Los dos reposos se registraron con la variante de registro de falla, que guarda el código bruto del ADC y STATUS.
+
+| Condición | Código medio | Corriente aparente | Ruido | Errores, inválidas, saltos |
+|---|---:|---:|---:|---|
+| Bus apagado | 1785,8 | +75 mA | 19,9 mA RMS | 0 |
+| Bus a 24 V, PWM detenido | 1787,7 | +89 mA | 21,0 mA RMS | 0 |
+
+El cero quedó unos 10 códigos por encima del cargado (1776,0) después de los cambios de cableado. Encender el bus solo lo movió 1,8 códigos, frente a los 4–5 del 21/11. La diferencia aparece como una componente continua de +6 a +33 mA en la corriente medida en operación, que no afecta la fundamental.
+
+### Primera serie con 6,6 Ω
+
+| N.º | Bus | Ref. | Fundamental | Error | Desfase | m en ±0,85 | 3.er armónico | Z aparente | Modelo con esa Z |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|
+| [03](../docs/informe/resultados/potencia/laboratorio/2026-11-23/03_pr_12v_0a2.png) | 12 V | 0,2 A | 0,1899 A | −5,05 % | −3,05° | 0 | 3,8 % | 15,5 Ω | −5,31 % |
+| [04](../docs/informe/resultados/potencia/laboratorio/2026-11-23/04_pr_24v_0a2.png) | 24 V | 0,2 A | 0,1928 A | −3,62 % | −1,87° | 0 | 3,0 % | 20,7 Ω | −3,68 % |
+| [05](../docs/informe/resultados/potencia/laboratorio/2026-11-23/05_pr_12v_0a5.png) | 12 V | 0,5 A | 0,3178 A | −36,43 % | −43,47° | 27 % | 22 % | 34,7 Ω | satura |
+| [06](../docs/informe/resultados/potencia/laboratorio/2026-11-23/06_pr_24v_0a5.png) | 24 V | 0,5 A | 0,4705 A | −5,91 % | −3,87° | 1 % | 24,5 % | 34,3 Ω | −5,74 % |
+| [07](../docs/informe/resultados/potencia/laboratorio/2026-11-23/07_pr_12v_1a.png) | 12 V | 1 A | 0,3291 A | −67,09 % | −43,53° | 47 % | 27 % | 36,0 Ω | satura |
+| [08](../docs/informe/resultados/potencia/laboratorio/2026-11-23/08_pr_24v_1a.png) | 24 V | 1 A | 0,7358 A | −26,42 % | −26,37° | 33 % | 29 % | 26,4 Ω | satura |
+
+En todas: ISR máxima de 8,57 µs, sin conversiones perdidas ni saltos en el número de muestra. La impedancia aparente es la fundamental de `m·Vdc`, corregida por la muestra de retardo, dividida por la fundamental de la corriente. Incluye la caída por tiempo muerto. La última columna es el error que da `modelos/analisis/pr_discreto.py` con esa impedancia.
+
+### Análisis
+
+- **Comparación con el modelo.** En los tres casos de la tabla con 6,6 Ω externos y modulación sin saturación, el modelo discreto con la impedancia aparente estimada reproduce el error de amplitud con una diferencia de hasta 0,3 puntos porcentuales. La estimación usa los mismos registros de modulación y corriente que la comparación.
+- **La modulación limita el seguimiento en los puntos altos.** Con 6,6 Ω externos, la impedancia aparente del circuito pasa de unos 16–21 Ω a 0,2 A a unos 34 Ω a 0,5 A. En el ensayo con referencia de 1 A se estimaron unos 26 Ω cerca de 0,736 A medidos. Los picos y el 29 % de tercer armónico son compatibles con saturación del núcleo. Falta caracterizar el devanado a 50 Hz en función de la corriente.
+  - Con 34 Ω, 0,5 A pide unos 17 V de fundamental. No alcanza a 12 V (unos 10 V disponibles); a 24 V cabe con m de 0,67 a 0,8.
+  - Si se mantuvieran esos 26 Ω hasta 1 A, harían falta unos 26 V de fundamental frente a los aproximadamente 20 V disponibles con el límite de modulación. Conviene evaluar un inductor de menor impedancia y repetir la prueba.
+- **Comparación con el 21/11.** El error de −36 % a 0,5 A es parecido al del 23/11 con 12 V. Los registros se tomaron en condiciones distintas y se conserva el diagnóstico de cada sesión.
+- **Persisten perturbaciones en la medición.** La trama 06 contiene una ráfaga de unos 5 ms, con lecturas de hasta 1,2 A dentro del rango del ADC. Las tramas 04 y 08 contienen picos aislados. En la segunda parte se registró una parada con el indicador de sobrecorriente y una lectura aparente de −12,6 A (trama 13).
+
+### Segunda parte: semiciclo positivo incompleto (tramas 09 y 10)
+
+En la trama 09, a 0,2 A, la corriente del semiciclo positivo permanece cerca de cero mientras la modulación llega a +0,8 y el negativo alcanza −0,36 A. Unos ocho minutos después (trama 10, 12 V, 0,2 A) la conducción es normal (−5,43 %). El estado activo de tensión positiva se ordena con `S1` y `S2`. Un contacto intermitente en ese camino de corriente es una hipótesis pendiente de comprobación. El bus de la trama 09 no quedó anotado.
+
+### Serie con 9,9 Ω (tramas 11–17)
+
+| N.º | Bus | Ref. | Error | Desfase | m en ±0,85 | Z aparente | Modelo con esa Z |
+|---|---|---|---:|---:|---:|---:|---:|
+| [11](../docs/informe/resultados/potencia/laboratorio/2026-11-23/11_pr_12v_0a2_9v9.png) | 12 V | 0,2 A | −7,49 % | −2,79° | 0 | 20,8 Ω | −7,39 % |
+| [12](../docs/informe/resultados/potencia/laboratorio/2026-11-23/12_pr_24v_0a2_9v9.png) | 24 V | 0,2 A | −4,25 % | −1,70° | 0 | 22,9 Ω | −4,21 % |
+| [14](../docs/informe/resultados/potencia/laboratorio/2026-11-23/14_pr_12v_0a5_9v9.png) | 12 V | 0,5 A | −35,97 % | −42,38° | 24 % | 33,9 Ω | satura |
+| [15](../docs/informe/resultados/potencia/laboratorio/2026-11-23/15_pr_24v_0a5_9v9.png) | 24 V | 0,5 A | **−5,23 %** | −4,97° | 3 % | 35,8 Ω | −6,22 % |
+| [16](../docs/informe/resultados/potencia/laboratorio/2026-11-23/16_pr_12v_1a_9v9.png) | 12 V | 1 A | −68,24 % | −42,50° | 45 % | 37,3 Ω | satura |
+| [17](../docs/informe/resultados/potencia/laboratorio/2026-11-23/17_pr_24v_1a_9v9.png) | 24 V | 1 A | −30,42 % | −27,99° | 33 % | 29,1 Ω | satura |
+
+Los dos puntos que pide el cambio de carga a 0,5 A cumplen con 24 V: −5,91 % con 6,6 Ω y −5,23 % con 9,9 Ω. La resistencia aparente sube entre 2,3 y 5 Ω respecto de 6,6 Ω.
+
+### Falla capturada (trama 13)
+
+12 V, 0,5 A y 9,9 Ω, con la modulación saturada. A los 42 ms la corriente medida desciende hasta −12,6 A en 1,6 ms, una corriente imposible con 12 V y esta carga. El PR invierte la modulación de −0,85 a +0,85 en respuesta, la protección corta tras tres muestras por encima de 1,5 A y, al detenerse el PWM, la lectura vuelve a cero de inmediato. La lectura resulta incompatible con la corriente esperada para el ensayo. Quedó pendiente contrastarla con una medición independiente. La trama se exportó unos 60 ms después del evento.
+
+Las cuatro perturbaciones del día (tramas 04, 06, 08 y 13) ocurren en los 60 ms previos a la exportación, mientras se manipulaba la placa para pulsar BTNL. Ninguna trama de régimen posterior las muestra. Es una coincidencia que conviene comprobar: tocar la placa o los cables de JXADC podría acoplar ruido a la medición.
+
+### Repetición con 6,6 Ω (tramas 18–23)
+
+| Bus, ref. | Primera serie | Repetición | Z aparente (repetición) |
+|---|---:|---:|---:|
+| 12 V, 0,2 A | −5,05 % | −6,66 % | 20,1 Ω |
+| 24 V, 0,2 A | −3,62 % | −4,06 % | 21,9 Ω |
+| 12 V, 0,5 A | −36,43 % | −34,86 % | 33,7 Ω |
+| 24 V, 0,5 A | −5,91 % | **−5,88 %** | 33,9 Ω |
+| 12 V, 1 A | −67,09 % | −66,24 % | 35,1 Ω |
+| 24 V, 1 A | −26,42 % | −23,96 % | 25,4 Ω |
+
+A 0,5 A la carga identificada es la misma que en la primera serie (26,3 Ω de resistencia aparente en ambas). A 0,2 A la impedancia aparente quedó más alta (20,1 frente a 15,5 Ω a 12 V): el devanado es más sensible al punto de operación con poca corriente. En la serie de 6,6 Ω, el modelo con la impedancia estimada a partir del mismo ensayo reproduce la amplitud dentro de 0,3 puntos porcentuales en los puntos comparados sin saturación. La comparación con 9,9 Ω en la trama 15 difiere 0,99 puntos.
+
+### Escalones de referencia (tramas 24–28 y 31–36)
+
+Con 24 V y 6,6 Ω, usando la captura de transitorio: la trama sale sola medio registro después de que la referencia cambia. Ventana de 102,4 ms en 24–28 y de 409,6 ms en 31–36.
+
+| Escalón | Capturas | Envolvente en ±10 % | Pico de \|i\| | Máx. \|m\| |
+|---|---|---:|---:|---:|
+| 0,2 → 0,5 A | 24, 25, 27, 28, 32, 36 | 16,4–16,8 ms | 0,66–0,70 A | 0,82–0,84 |
+| 0,5 → 0,2 A | 31, 35 | 14,4 ms (35) | 0,27–0,29 A | 0,44–0,46 |
+
+El cambio se aplica en el cruce por cero. Los tiempos provienen de un ajuste centrado de un ciclo y dependen de esa ventana. En la trama 31 no se observó establecimiento sostenido en ±10 % dentro de la ventana evaluable. Se observaron picos similares a los del transitorio en régimen a 0,5 A. Después de la primera captura (24) el control entró en falla; esa falla no quedó registrada y las repeticiones no la tuvieron. El escalón de 0,5 a 1 A no se registró.
+
+### Cambio de carga (tramas 26 y 29–38)
+
+El ensayo a 0,5 A compara R3 puenteada (6,6 Ω externos) con R3 en serie (9,9 Ω). El cable de prueba corresponde a `S_R3` en el esquemático. La trama se arma con BTNL.
+
+| Intento | Resultado |
+|---|---|
+| 26 (ventana de 102 ms) | El puente se retiró fuera de la ventana: toda la trama con 9,9 Ω (−4,90 %) |
+| 29–30 | **Se abrió el circuito de la carga** al retirar el puente: la corriente cae a cero y la modulación satura. El puente estaba en serie y no en paralelo con R3. Se corrigió la conexión |
+| 33 (ventana de 410 ms) | El puente se retiró antes de la ventana: toda la trama con 9,9 Ω |
+| **37** (ventana de 410 ms) | **Cambio registrado** a unos 297 ms, estimados a partir de la modulación |
+| 34 y 38 | Estado final con 9,9 Ω: −5,49 % en ambas tramas |
+
+En la [trama 37](../docs/informe/resultados/potencia/laboratorio/2026-11-23/37_cambio_carga_6v6_9v9_c410_cambio_carga.png), al retirar el puente, la amplitud de m pasa de 0,666 a 0,715 y la envolvente estimada de la corriente baja a 0,454 A, un 3,7 % por debajo de la amplitud previa. La fundamental es de 0,472 A (−5,56 %) antes y de 0,483 A (−3,29 %) después. La impedancia aparente estimada a partir de la modulación y la corriente pasa de 34 a 36 Ω. La contribución del devanado queda por medir de forma independiente.
+
+### Capturas del osciloscopio
+
+Las capturas de la resta CH1−CH2 sobre una resistencia de 3,3 Ω están en [`mediciones_lab_osciloscopio`](mediciones_lab_osciloscopio/README.md), ordenadas por carga, corriente y bus. Los canales se pusieron en una escala para la caída de la resistencia, de alrededor de 1 V/div. Cuando los extremos de la resistencia suben a +Vbus, los dos saturan en el mismo valor y la resta exporta 0: la mitad de las muestras de cada CSV es 0. Además, el CSV tiene un punto cada 50 µs. No sirven para el rizado, y la amplitud que se obtiene con las muestras válidas no es consistente con la del XADC (de −27 % a +85 %), por lo que tampoco contrastan la ganancia del sensor.
+
+Para repetirlo: los dos canales a 5 V/div con el cero 2–3 divisiones arriba del fondo, Math F1 = 1 − 2, longitud máxima del CSV, 5 ms/div para la amplitud y 20 µs/div para el rizado, y una captura con las dos puntas en el mismo extremo como piso de error. La estimación del rizado con la inductancia identificada es de 4–10 mA pico a pico a 24 V, y de 43 mA con 7 mH.
+
+### Herramientas
+
+En [`scripts/laboratorio`](../scripts/laboratorio/README.md):
+
+- los parches de registro de falla, captura de transitorio con ventana de 102 ms, captura con ventana de 410 ms y captura para cambio de carga, compilables con `compilar_variante_parche.ps1`;
+- los analizadores de falla, de escalón, de cambio de carga y de capturas del osciloscopio;
+- el generador de figuras de los informes.
+
+### Pendientes de esta sesión
+
+1. Medir el rizado con la configuración descrita arriba y el piso de error del método.
+2. Contraste de la ganancia del sensor con la resistencia, en la misma corrida.
+3. Medir R y L del devanado con multímetro y LCR, y un inductor de menor inductancia para el punto de 1 A y el escalón de 0,5 a 1 A.
+4. Medir en JB1 la duración de la ISR y el jitter del período.
+5. Revisar las conexiones de la diagonal `S1`–`S2` (trama 09).
+6. Revisar en equipo el tratamiento de las lecturas erróneas dentro del rango, con la cuenta por ID de conversión, y comprobar si manipular la placa produce las perturbaciones.
+
 ## Continuación de las pruebas
 
 1. Usar el bitstream y ELF del mismo XSA, con el mapa y pines de la [integración física](../docs/diseno/integracion_basys3.md). No combinar el proyecto JA con los constraints JC.
@@ -117,7 +377,7 @@ La repetición del ensayo tras recargar el firmware también terminó en `ESTADO
 3. Comparar ruido con SD alto, luego con drivers habilitados y bus apagado, y finalmente con bus de 3 V limitado. Cambiar una condición por vez permite distinguir ruido propio, acoplamiento de compuertas y acoplamiento de potencia.
 4. Con ensayo abierto finito, medir VAB y corriente mediante una referencia independiente. Confirmar que ACS712, devanado y resistencias estén en un único camino en serie entre A y B, sin derivaciones a GND. Contrastar tensión analógica y código ADC.
 5. Repetir el [ensayo PR de 3 V](../software/embedded/integration/lazo_laboratorio.md) cuando la respuesta sea medible y el signo esté definido. Conservar la traza aunque se detenga en el sondeo.
-6. Pasar después a 12–24 V y referencias de 0,2; 0,5 y 1 A, ajustando el límite de fuente al ensayo y registrando fundamental, fase, rizado y transitorios. Estos resultados siguen pendientes.
+6. Repetir las condiciones de la [serie a 12 y 24 V](#sesión-del-2311-rango-nominal-con-la-carga-sin-capacitor) que requieren datos adicionales. Priorizar el contraste de la escala, el rizado y la verificación del punto de 1 A con una carga adecuada.
 
 No detener el procesador para inspeccionar variables mientras el PWM esté activo: el ADC sigue adquiriendo y puede generar errores persistentes. Ante una falla, conservar el diagnóstico y apagar el bus, bajar SW15 y dejar SD altos antes de reiniciar.
 

@@ -21,8 +21,10 @@ El PWM opera a 10 kHz, con 100 ciclos de tiempo muerto (1 µs) y disparo ADC en 
 
 | Basys 3 | Destino |
 |---|---|
-| JA1 / JA2 | HIN (10) / LIN (12) del IR2110 izquierdo |
-| JA3 / JA4 | HIN (10) / LIN (12) del IR2110 derecho |
+| JA1 (J1) | `pwm_ah` → HIN (10) del IR2110 A → S1 (superior A) |
+| JA2 (L2) | `pwm_al` → LIN (12) del IR2110 A → S4 (inferior A) |
+| JA3 (J2) | `pwm_bh` → HIN (10) del IR2110 B → S3 (superior B) |
+| JA4 (G2) | `pwm_bl` → LIN (12) del IR2110 B → S2 (inferior B) |
 | JA7 | Inicio de período PWM, pulso de 10 ns |
 | JB1 | Diagnóstico de ejecución de la ISR |
 | JXADC1 | VAUX6 positivo: salida del divisor del ACS712 |
@@ -33,6 +35,8 @@ El PWM opera a 10 kHz, con 100 ciclos de tiempo muerto (1 µs) y disparo ADC en 
 | SW0–SW1 | Amplitud del controlador general: 0,2; 0,5 o 1 A pico |
 | SW15 | Permiso de las cuatro órdenes PWM |
 | USB-UART | 115200 bit/s, 8N1 |
+
+Las cuatro órdenes y sus pines de encapsulado se definen en `pwm_basys3_ja.xdc`. El circuito completo y los estados de conmutación se detallan en los [criterios de diseño](criterios_de_diseno.md#puente-carga-y-accionamiento).
 
 **JXADC7 es una entrada analógica, no un pin GND interno.** OUT del ACS712 pasa primero por 4,7 kΩ; el nodo medido tiene 1 kΩ a GND. No conectar OUT directamente a la FPGA. La fuente externa de 3,3 V no se une en paralelo con la salida de alimentación de la Basys.
 
@@ -85,8 +89,9 @@ La reconstrucción desde `2b7a183` generó bitstream, XSA y tres ELF con Vivado/
 | Control general: memoria reservada / libre | 28 528 / 4 240 bytes |
 | Ensayo PR limitado: memoria reservada / libre | 28 160 / 4 608 bytes |
 | Interrupciones en los tres ELF | Auditoría estática aprobada; marco de 272 bytes y contexto FPU preservado |
-| Ejecución física de esta construcción | Pendiente |
 
 Las reservas incluyen la pila de 2 KiB; el espacio libre no es una medida de uso máximo de pila. Los [reportes de timing](../informe/resultados/integracion_basys3/timing.rpt), [CDC](../informe/resultados/integracion_basys3/cdc.rpt) y [DRC](../informe/resultados/integracion_basys3/drc.rpt) conservan el alcance del análisis. Los puertos externos asíncronos tienen excepciones temporales; el cierre interno a 100 MHz no demuestra los retardos de los cables ni el tiempo muerto entre compuertas reales.
 
-DRC conserva doce advertencias sobre registros internos de DSP. Metodología informa advertencias de reset asíncrono, dos de LUT en resets y una `TIMING-9`; el análisis CDC detallado no presenta cruces críticos. No se han ocultado mediante waivers. La liberación del permiso externo se sincroniza antes de habilitar por período. La validación del reset, de la ISR y de los transitorios analógicos en la tarjeta sigue pendiente.
+DRC conserva doce advertencias sobre registros internos de DSP. Metodología informa advertencias de reset asíncrono, dos de LUT en resets y una `TIMING-9`. El análisis CDC detallado no presenta cruces críticos. La liberación del permiso externo se sincroniza antes de habilitar por período.
+
+La serie física a 12 y 24 V utilizó el bitstream de `da2b7c3` y el ELF de `d2d60c6`. Esa serie verificó control PR, adquisición y exportación UART en operación. El firmware registró hasta 8,57 µs de ISR en operación. Siguen pendientes la medición extendida del período y el jitter en JB1 y el ensayo de recuperación tras reset. [Evidencia de laboratorio](../informe/README.md#operación-a-12-y-24-v).

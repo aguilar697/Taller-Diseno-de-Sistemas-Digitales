@@ -16,6 +16,8 @@ La [descripción de las simulaciones](../Potencia/02_simulacion_y_resultados.md)
 
 La copia funcional representa el acondicionamiento nominal y las órdenes con tiempo muerto. No reproduce el circuito eléctrico del IR2110, el ruido real del sensor ni el transformador no lineal. Los candidatos PR aún no incluyen anti-windup. La incorporación de datos físicos y los ensayos del montaje forman parte del [plan de validación](../Potencia/03_pendientes_y_validacion.md).
 
+En los seis modelos PLECS, los MOSFET `FETD`, `FETD1`, `FETD2` y `FETD3` corresponden a S1, S4, S3 y S2, respectivamente. Cuando aparece un bloque `S1` en PLECS, es el puente `S_R3` del ensayo de cambio de carga. [Esquemático de interconexión](../Potencia/img/esquematico_inversor.svg).
+
 Los resultados temporales se generan en `build/`, excluido de Git. Los datos utilizados en el informe se conservan en `docs/informe/resultados/` con sus condiciones de ensayo.
 
 [Descripción del proyecto](../README.md)

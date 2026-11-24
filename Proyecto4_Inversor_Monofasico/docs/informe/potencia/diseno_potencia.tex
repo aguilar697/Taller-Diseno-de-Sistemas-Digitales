@@ -3,104 +3,247 @@
 \hypersetup{pdftitle={Diseño del inversor monofásico con control PR de corriente}}
 \begin{document}
 \title{Diseño de un inversor monofásico con control proporcional resonante de corriente}
-\autores\maketitle\estado
+\autores\maketitle
 \begin{abstract}
-Se propone un puente H para regular corriente sinusoidal de 50 Hz en una carga RL con alimentación de 12 a 24 V y referencias de 0,2, 0,5 y 1 A pico. Se documentan la topología, los componentes disponibles, el dimensionamiento, el modelo promediado, un candidato PR discreto y el plan de validación. Las simulaciones respaldan la evaluación inicial bajo hipótesis identificadas. El accionamiento, la medición y los parámetros finales deberán contrastarse experimentalmente.
+Se diseña un puente H con modulación unipolar de 10 kHz para regular una corriente sinusoidal de 50 Hz en una carga RL, con bus de 12 a 24 V y referencias de 0,2, 0,5 y 1 A pico. Se justifican la topología, los MOSFET IRF540N, los accionamientos IR2110, el tiempo muerto, la frecuencia de conmutación y la medición con ACS712 y XADC. El controlador PR no ideal ($K_p=12$, $K_r=200$, $\omega_c=2\pi\cdot2$ rad/s) se sintoniza sobre el modelo RL y se discretiza con Tustin preajustado a 50 Hz para $T_s=100\ \mu$s. El análisis discreto con retención y una muestra de retardo da raíces dentro del círculo unitario, márgenes de fase de al menos $71^\circ$ y de ganancia de al menos 9,6 dB en el barrido de parámetros, y un error de amplitud previsto de 3,2\,\% a 12 V. Las pérdidas estimadas del puente a 1 A pico son inferiores a 100 mW y el rizado máximo previsto es de 43 mA pico a pico. Se incluyen la carga identificada en el banco, que limita el punto de 1 A, y el plan de validación.
 \end{abstract}
-\begin{IEEEkeywords}inversor monofásico, PWM unipolar, control PR, corriente.\end{IEEEkeywords}
+\begin{IEEEkeywords}inversor monofásico, PWM unipolar, control PR, discretización, corriente.\end{IEEEkeywords}
 
 \section{Objetivos y alcance}
-El objetivo es diseñar y comprobar un lazo de corriente sinusoidal. El instructivo exige error de amplitud fundamental no mayor del 10\,\% y rizado de conmutación no mayor de 0,20 A pico a pico en los puntos nominales \cite{enunciado}. El desfase se mide y reporta, sin límite adicional. La ejecución sobre MicroBlaze V se coordina con Taller; la evaluación propia de Potencia requiere igualmente una demostración física con PR discreto.
+El objetivo es diseñar y comprobar un lazo de corriente sinusoidal de 50 Hz. El instructivo exige un error de amplitud de la fundamental no mayor del 10\,\% y un rizado de conmutación no mayor de 200 mA pico a pico en los puntos nominales de 0,2, 0,5 y 1 A pico, además de ensayos de cambio de consigna y de un aumento resistivo de al menos 25\,\% \cite{enunciado}. El desfase se mide y reporta sin límite adicional. El controlador se ejecuta sobre MicroBlaze V en una Basys 3, coordinado con Taller de Diseño Digital.
 
-\section{Topología, carga y selección}
-El puente H utiliza cuatro MOSFET de canal N. En PWM unipolar, las ramas comparan referencias de signos opuestos con una portadora común y producen niveles diferenciales $+V_{dc}$, 0 y $-V_{dc}$. Se distinguen la frecuencia por transistor y las componentes predominantes en la tensión diferencial.
+Las magnitudes calculadas se presentan, en general, con tres cifras significativas y prefijos SI. Los valores nominales conservan su especificación. Los coeficientes del PR se muestran con ocho cifras significativas para permitir su reproducción; el firmware conserva la precisión de cálculo. El redondeo de presentación no representa una incertidumbre medida.
 
-\begin{table}[ht]\caption{Componentes principales disponibles}\centering\small
-\begin{tabular}{@{}cll@{}}\toprule
+\section{Investigación y fundamentos}
+\subsection{Control de corriente en marco estacionario}
+Un PI en marco estacionario tiene ganancia finita a 50 Hz y deja error de amplitud y de fase que crece con la frecuencia de la referencia. Zmood y Holmes demostraron que el término resonante $2K_rs/(s^2+\omega_0^2)$ equivale a un PI en el marco síncrono y da error nulo en régimen a $\omega_0$ \cite{zmood}. El resonante ideal tiene ganancia infinita en una banda nula; Teodorescu \emph{et al.} proponen la forma no ideal
+\begin{equation}
+C(s)=K_p+\frac{2K_r\omega_cs}{s^2+2\omega_cs+\omega_0^2},
+\label{eq:pr}
+\end{equation}
+cuya ganancia en $\omega_0$ es finita, $K_p+K_r$, con un ancho de banda de $\pm\omega_c$ rad/s alrededor de la resonancia \cite{teodorescu,pr}. En aplicaciones conectadas a red, $\omega_c$ se elige para tolerar variaciones de la frecuencia de la red. En este proyecto la referencia se sintetiza en la misma FPGA a partir de una tabla y del temporizador del control, por lo que su frecuencia no se desvía. Aquí $\omega_c$ se justifica por otros motivos: coeficientes bien condicionados en coma flotante de 32 bits y un error de régimen acotado y predecible, que se calcula en la Sección~\ref{sec:control}.
+
+\subsection{Discretización y retardo}
+Yepes \emph{et al.} comparan métodos de discretización de resonadores y muestran que Tustin sin preajuste desplaza la resonancia, mientras que el preajuste en $\omega_0$ la conserva \cite{yepes}. Con $f_s/f_0=200$, el desplazamiento sin preajuste sería relativo a $(\omega_0T_s)^2/12\approx80\times10^{-6}$, unos 4 mHz, despreciable frente a la banda de $\pm2$ Hz. Se aplica igualmente el preajuste porque no tiene costo. El efecto que sí condiciona el diseño es el retardo de cálculo: la modulación calculada con la muestra $k$ se aplica en el período siguiente, y la retención añade medio período. El retardo efectivo de $1{,}5T_s$ resta $540\,fT_s$ grados de fase a la frecuencia $f$, que se incluyen en el análisis de estabilidad \cite{buso}.
+
+\subsection{Modulación, muestreo y accionamiento}
+En la modulación unipolar, las dos ramas comparan referencias opuestas con una portadora común. La tensión diferencial toma los niveles $+V_{dc}$, 0 y $-V_{dc}$, y su componente de conmutación dominante aparece a $2f_{sw}$, lo que reduce a la mitad el rizado de corriente respecto a la bipolar \cite{holmes}. El tiempo muerto $t_d$ introduce en cada rama un error medio de $t_df_{sw}V_{dc}$ con el signo de la corriente; en la tensión diferencial equivale a una onda cuadrada de amplitud $2t_df_{sw}V_{dc}$, cuya fundamental es $(4/\pi)\,2t_df_{sw}V_{dc}$ en fase con la corriente \cite{mohan}. El muestreo en una fase fija de la portadora busca representar la corriente media del período bajo condiciones de rizado simétrico \cite{buso}; por eso el disparo del ADC se programa a mitad del período PWM. El MOSFET superior requiere una alimentación flotante, que el IR2110 obtiene por bootstrap y cuyo capacitor se dimensiona según la carga de compuerta, las fugas y el tiempo máximo de conducción \cite{ir,an978}.
+
+\section{Etapa de potencia y carga}
+\subsection{Topología y componentes}
+La Fig.~\ref{fig:puente} muestra el puente H con cuatro MOSFET de canal N y la carga en serie entre los nodos A y B. Ningún extremo de la carga va a GND. Para $v_{AB}=v_A-v_B$, la diagonal $S_1$--$S_2$ aplica $+V_{dc}$ y la diagonal $S_3$--$S_4$ aplica $-V_{dc}$. Los estados con ambos interruptores superiores ($S_1$, $S_3$) o ambos inferiores ($S_2$, $S_4$) aplican 0 V y permiten la recirculación de la corriente inductiva. Durante el tiempo muerto conducen los diodos internos de los MOSFET.
+
+\begin{strip}\begin{minipage}{\textwidth}\centering
+\resizebox{0.92\textwidth}{!}{%
+\begin{circuitikz}[font=\small]
+\draw (-0.8,5) to[american voltage source, l_={$V_{dc}$: 12--24 V}] (-0.8,0);
+\draw (-0.8,5) -- (12.4,5);
+\draw (-0.8,0) -- (12.4,0);
+\draw (0.8,5) to[C, l={100 $\mu$F}] (0.8,0);
+\node[nmos, bodydiode] (S1) at (3,3.75) {};
+\node[nmos, bodydiode] (S4) at (3,1.25) {};
+\node[nmos, bodydiode, xscale=-1] (S3) at (12.4,3.75) {};
+\node[nmos, bodydiode, xscale=-1] (S2) at (12.4,1.25) {};
+\draw (S1.D) -- (3,5) (S4.S) -- (3,0) (S1.S) -- (S4.D);
+\draw (S3.D) -- (12.4,5) (S2.S) -- (12.4,0) (S3.S) -- (S2.D);
+\node[left] at (S1.G) {$S_1$};
+\node[left] at (S4.G) {$S_4$};
+\node[right] at (S3.G) {$S_3$};
+\node[right] at (S2.G) {$S_2$};
+\draw (3,2.5) node[below left] {A} to[short, *-] (3.6,2.5)
+  to[generic, l={ACS712}, -] (5.4,2.5)
+  to[L, l={$L$ (devanado)}] (7.2,2.5)
+  to[R, l={3{,}3 $\Omega$}] (8.6,2.5)
+  to[R, l={3{,}3 $\Omega$}] (10.0,2.5)
+  to[R, l_=$R_3$, -*] (11.6,2.5);
+\draw (10.0,2.5) -- (10.0,3.3) to[nos, l=$S_{R3}$] (11.6,3.3) -- (11.6,2.5);
+\draw (11.6,2.5) node[above right] {B} -- (12.4,2.5);
+\draw[-{Latex}] (4.3,1.9) -- (5.0,1.9) node[right, font=\scriptsize] {$i_L$};
+\end{circuitikz}}
+\captionof{figure}{Puente H y carga serie; el bus lleva además 100 nF cerámicos junto al puente. Cada rama se acciona con un IR2110. Las salidas JA1--JA4 ordenan $S_1$, $S_4$, $S_3$ y $S_2$, respectivamente. $S_{R3}$ cerrado deja 6,6 $\Omega$ externos; abierto inserta $R_3$ y lleva la carga a 9,9 $\Omega$ sin interrumpir el camino inductivo.}
+\label{fig:puente}
+\end{minipage}\end{strip}
+
+La Tabla~\ref{tab:componentes} resume los componentes seleccionados y la función de cada uno en el puente, el accionamiento y la medición.
+
+\begin{table}[H]\caption{Componentes principales}\centering\small
+\begin{tabular}{@{}c@{\hspace{5pt}}>{\raggedright\arraybackslash}p{0.42\columnwidth}@{\hspace{5pt}}>{\raggedright\arraybackslash}p{0.42\columnwidth}@{}}\toprule
 Cant. & Elemento & Función\\\midrule
-4 & IRF540N & Interruptores\\
+4 & IRF540N & Interruptores del puente\\
 2 & IR2110 DIP-14 & Accionamiento por rama\\
+2 & SB360, 2,2 $\Omega$, 1 $\mu$F + 100 nF & Bootstrap por rama\\
+4 & 22 $\Omega$ y 10 k$\Omega$ & Compuerta serie y compuerta--fuente\\
+1 & 100 $\mu$F + 100 nF & Desacoplo del bus\\
 1 & ACS712 de 5 A & Medición de corriente\\
-3 & $3,3\ \Omega$, 5 W & Carga resistiva\\
+1 & 4,7 k$\Omega$/1 k$\Omega$ + 100 nF & Divisor y filtro hacia el XADC\\
+3 & 3,3 $\Omega$, 5 W & Carga resistiva\\
 1 & Secundario de transformador & Carga inductiva\\\bottomrule
-\end{tabular}\end{table}
-
-Dos resistencias forman $R_{\mathrm{ext}}=6,6\ \Omega$; la tercera permite llegar a $9,9\ \Omega$, un aumento del 50\,\%. La inserción debe conservar un camino para la corriente inductiva.
-
-Se midieron 9,291 mH a 120 Hz y 6,984 mH a 1 kHz en el secundario, con el primario abierto. La resistencia observada del devanado es aproximadamente $0,6\ \Omega$. El modelo usa 10 mH constantes como hipótesis; no es una medición a 50 Hz ni una extrapolación validada. El primario permanecerá abierto y con terminales aislados. La corriente nominal del transformador no demuestra linealidad como inductor.
-
-\section{Modelo y dimensionamiento}
-Para $R=6,6+0,6=7,2\ \Omega$:
-\begin{equation}
-L\frac{di_L}{dt}+Ri_L=v_{AB},\qquad G_{vi}(s)=\frac{1}{Ls+R}.
-\end{equation}
-En promedio ideal, $\overline v_{AB}=mV_{dc}$. Se adopta inicialmente $|m|\leq0,85$. La amplitud necesaria para una senoide es
-\begin{equation}
-V_{1,pk}=I_{pk}\sqrt{R^2+(2\pi f_0L)^2}.
-\end{equation}
-Con L de 10 mH y 50 Hz, $|Z|\approx7,856\ \Omega$. A 1 A pico se requieren aproximadamente 7,856 V pico: $m_{pk}\approx0,655$ a 12 V y 0,327 a 24 V, antes de caídas y tiempo muerto.
-
-Para una senoide, $I_{\mathrm{rms}}=I_{pk}/\sqrt2$. A 1 A pico, cada resistencia disipa 1,65 W y el devanado pierde aproximadamente 0,30 W por resistencia de cobre. Las resistencias de 5 W ofrecen margen nominal, sujeto a temperatura y montaje. No se incluyen pérdidas magnéticas.
+\end{tabular}\label{tab:componentes}\end{table}
 
 \subsection{Semiconductores y pérdidas}
-El IRF540N tiene tensión nominal de 100 V y Ron máxima de 44 m$\Omega$ especificada a $V_{GS}=10$ V y 25 $^\circ$C \cite{irf}. El umbral de compuerta no equivale a una tensión suficiente de accionamiento; se requieren drivers.
+El IRF540N tiene $V_{DSS}=100$ V, $R_{DS(on)}\leq44$ m$\Omega$ a $V_{GS}=10$ V y 25 $^\circ$C, $Q_g\leq71$ nC y $R_{\theta JA}=62\ ^\circ$C/W sin disipador \cite{irf}. El valor nominal de 100 V da margen de diseño respecto al bus de 24 V. La amplitud de los transitorios se debe comprobar en $V_{DS}$. Su umbral de compuerta no equivale a una tensión de accionamiento suficiente, por lo que las salidas de 3,3 V de la FPGA pasan por los IR2110 alimentados con 12 V.
 
-Con dos canales conduciendo, $P_{\mathrm{cond}}\approx2R_{\mathrm{DS(on)}}I_{\mathrm{rms}}^2$, equivalente a 0,044 W para 1 A pico y 44 m$\Omega$, sin pérdidas de diodos ni variación térmica. La estimación de conmutación se completará con
-\begin{equation}
-P_{\mathrm{sw}}\approx\sum_j \tfrac12 V_{\mathrm{DS},j}|I_j|
-(t_{r,j}+t_{f,j})f_{\mathrm{sw}}.
-\end{equation}
-Para cerrar el presupuesto térmico se requieren tiempos de transición con el driver y la carga conectados, caída de diodos, temperatura y pérdidas del devanado.
+La Tabla~\ref{tab:perdidas} resume las pérdidas a 1 A pico, 24 V y 10 kHz. La conducción usa $P=2R_{DS(on)}I_{\mathrm{rms}}^2$, con dos canales en serie. La conmutación usa $P_{sw}=\tfrac12V_{dc}\bar{|i|}(t_r+t_f)f_{sw}$ por rama, con $\bar{|i|}=2I_{pk}/\pi$ y 100 ns por transición; este valor es conservador frente a los 35 ns típicos con 5,1 $\Omega$ de la hoja de datos, porque aquí la resistencia de compuerta es de 22 $\Omega$. El diodo interno conduce durante el tiempo muerto con $V_{SD}\leq1{,}2$ V.
 
-\subsection{Accionamiento y frecuencia}
-Se propone un IR2110 por rama, con VDD de 3,3 V y VCC fijo de 12 V, separado del bus variable \cite{ir}. El capacitor bootstrap se conecta entre VB y VS; HO se mide respecto a VS y LO respecto a COM. El esquema del puente y la tabla de terminales de cada rama acompañan el diseño en los archivos \texttt{puente\_h\_y\_sensado.svg} y \texttt{accionamiento\_ir2110.svg}.
+\begin{table}[H]\caption{Pérdidas estimadas a 1 A pico, 24 V y 10 kHz}\centering\small
+\begin{tabular}{@{}lr@{}}\toprule
+Componente & Pérdida (mW)\\\midrule
+Conducción, $2R_{DS(on)}I_{\mathrm{rms}}^2$ & 44\\
+Conmutación, dos ramas & 31\\
+Diodos durante el tiempo muerto & 15\\
+Total del puente & 90\\
+Compuertas, fuente auxiliar, $4Q_gV_{CC}f_{sw}$ & 34\\\bottomrule
+\end{tabular}\label{tab:perdidas}\end{table}
 
-Se evalúan resistencias de compuerta de $22\ \Omega$, resistencias compuerta--fuente de 10 k$\Omega$, desacoplos locales y tiempo muerto de 1 $\mu$s. Se verificarán apagado y ausencia de conducción simultánea antes de energizar el bus.
+Con unos 23 mW por MOSFET, el aumento de temperatura estimado es de 1,4 $^\circ$C según la resistencia térmica indicada sin disipador. La disipación real depende de los transitorios y del montaje. Cada resistencia de 3,3 $\Omega$ disipa 1,65 W a 1 A pico ($I_{\mathrm{rms}}=0{,}707$ A), un tercio de su potencia nominal.
 
-Se toma 10 kHz como frecuencia inicial, con control cada 100 $\mu$s y 200 actualizaciones por ciclo de 50 Hz. La selección final debe contrastar rizado, pérdidas, resolución y ejecución. Las frecuencias digitales adicionales de 20 y 25 kHz aún requieren validación de potencia.
+\subsection{Accionamiento y tiempo muerto}
+Cada IR2110 acciona una rama con $V_{DD}=3{,}3$ V para la lógica y $V_{CC}=12$ V regulados, separados del bus variable \cite{ir}. La resistencia de 22 $\Omega$ en serie con cada compuerta limita la corriente pico y amortigua oscilaciones; la de 10 k$\Omega$ compuerta--fuente mantiene apagado el MOSFET sin accionamiento. SD común queda alto por defecto y un interruptor lo lleva a GND para habilitar.
+
+El bootstrap usa SB360, 2,2 $\Omega$ y 1 $\mu$F de película en paralelo con 100 nF. A 10 kHz con $|m|=0{,}85$, la orden superior dura hasta 92,5 $\mu$s. Con 100 nC de compuerta, 230 $\mu$A del driver, 0,5 mA de fuga y 1,2 mA de la resistencia compuerta--fuente, la carga consumida es de unos 279 nC y la caída del capacitor de unos 0,28 V \cite{an978}. El software ordena cinco iteraciones de control con $m=0$ al arrancar para permitir la recarga de ambos capacitores.
+
+El tiempo muerto se fija en 1 $\mu$s (100 ciclos de 100 MHz) en el periférico PWM. Con 22 $\Omega$ y la carga de compuerta del IRF540N, el apagado completo se estima por debajo de 0,3 $\mu$s, de modo que 1 $\mu$s deja margen frente a la conducción simultánea. Su costo es un error de tensión de $2t_df_{sw}V_{dc}$, el 2\,\% del bus a 10 kHz: 0,31 V de fundamental a 12 V y 0,61 V a 24 V. El lazo puede compensar parte de ese error mientras conserve margen de modulación.
+
+\subsection{Frecuencia de conmutación}
+\label{sec:fsw}
+En PWM unipolar, el rizado pico a pico es $\Delta i=V_{dc}m(1-m)/(2f_{sw}L)$ y su máximo, en $m=0{,}5$, vale $V_{dc}/(8f_{sw}L)$. La Tabla~\ref{tab:fsw} compara las tres frecuencias que admite el periférico.
+
+\begin{table}[H]\caption{Criterios para elegir la frecuencia de conmutación, bus de 24 V}\centering\small
+\begin{tabular}{@{}lccc@{}}\toprule
+ & 10 kHz & 20 kHz & 25 kHz\\\midrule
+$\Delta i_{pp,\max}$, $L=10$ mH (mA) & 30 & 15 & 12\\
+$\Delta i_{pp,\max}$, $L=6{,}98$ mH (mA) & 43 & 22 & 17\\
+Error de tiempo muerto, $\%V_{dc}$ & 2 & 4 & 5\\
+Conmutación a 1 A pico (mW) & 31 & 61 & 77\\
+Períodos PWM por $T_s$ & 1 & 2 & 2,5\\\bottomrule
+\end{tabular}\label{tab:fsw}\end{table}
+
+El modelo estima un rizado menor que 200 mA pico a pico para las tres frecuencias. En la misma aproximación, con 10 kHz y 24 V se alcanzaría el límite para $L=1{,}5$ mH. Aumentar la frecuencia incrementa el error de tiempo muerto y la tasa de conmutaciones. El rizado del montaje requiere medición. A 10 kHz coinciden el período PWM y el período de control de 100 $\mu$s, con una muestra por período en el centro de la portadora; a 25 kHz no cabe un número entero de períodos PWM en $T_s$. En la carga, la componente dominante queda en 20 kHz, en el límite superior de la banda audible. Se elige 10 kHz. La variante de 20 kHz se conserva con $T_s=100\ \mu$s y dos períodos PWM por período de control, para no recalcular el PR.
+
+\subsection{Carga RL}
+\label{sec:carga}
+Dos resistencias de 3,3 $\Omega$ forman $R_{\mathrm{ext}}=6{,}6\ \Omega$; la tercera, conmutada por $S_{R3}$, eleva la resistencia externa a 9,9 $\Omega$ (+50\,\%) para el ensayo de carga a 0,5 A pico. La inductancia la aporta el secundario de un transformador con el primario abierto y aislado. El modelo nominal usa $R=6{,}6+0{,}6=7{,}2\ \Omega$ y $L=10$ mH, a partir de las medidas LCR del primer devanado: 9,29 mH a 120 Hz y 6,98 mH a 1 kHz.
+
+Ese devanado se sustituyó durante la puesta en marcha. La Tabla~\ref{tab:carga} recoge las estimaciones a 50 Hz para el reemplazo, obtenidas con la corriente del XADC y la tensión reconstruida a partir de la modulación, el bus y un modelo de tiempo muerto. El informe técnico detalla el método.
+
+\begin{table}[H]\caption{Carga nominal e identificada a 50 Hz}\centering\small
+\begin{tabular}{@{}lcccc@{}}\toprule
+Condición & $I_{1,pk}$ (mA) & $R$ ($\Omega$) & $L$ (mH) & $|Z|$ ($\Omega$)\\\midrule
+Modelo nominal & -- & 7,2 & 10 & 7,86\\
+Lazo abierto, 3 V & 27,0 & -- & -- & 8,2\\
+PR, 12 V & 190 & 10,5 & 30,8 & 14,3\\
+PR, 24 V & 193 & 13,5 & 39,0 & 18,2\\
+PR, 24 V & 471 & 25,0 & 70,2 & 33,3\\
+PR, 24 V$^{*}$ & 736 & 17,1 & 61,7 & 25,9\\\bottomrule
+\multicolumn{5}{@{}l}{\footnotesize $^{*}$ Con la modulación saturada en parte del registro.}
+\end{tabular}\label{tab:carga}\end{table}
+
+La impedancia equivalente aumenta hasta el ensayo de 0,5 A y disminuye en el de 1 A, cuya fundamental alcanza 736 mA. El cambio y la distorsión son compatibles con un núcleo de comportamiento no lineal. La tensión fundamental de la carga se estima como $V_{1,pk}=I_{pk}|Z|$, más la contribución en fase con la corriente asociada al tiempo muerto. La Tabla~\ref{tab:modulacion} compara el modelo nominal y la impedancia aparente estimada, que incorpora el efecto del tiempo muerto.
+
+\begin{table}[H]\caption{Modulación necesaria con la carga nominal y la impedancia aparente estimada}\centering\small
+\begin{tabular}{@{}ccccc@{}}\toprule
+$I_{pk}$ & \multicolumn{2}{c}{Nominal} & \multicolumn{2}{c}{Estimada}\\
+(A) & 12 V & 24 V & 12 V & 24 V\\\midrule
+0,2 & 0,16 & 0,09 & 0,26 & 0,17\\
+0,5 & 0,35 & 0,19 & $>1$ & 0,71\\
+1,0 & 0,68 & 0,35 & $>1$ & 1,10\\\bottomrule
+\end{tabular}\label{tab:modulacion}\end{table}
+
+Con el devanado de reemplazo, las pruebas alcanzaron el criterio a 0,5 A pico con 24 V. A 1 A pico la modulación saturó con ambos buses. Con $R=25\ \Omega$ a 0,5 A pico, el equivalente serie asigna aproximadamente $(R-6{,}6)I_{\mathrm{rms}}^2=2{,}3$ W al devanado. Es una estimación a partir de la impedancia ajustada y conviene contrastarla con la temperatura y la potencia durante los ensayos.
 
 \section{Medición}
-El ACS712 de 5 A se conecta en serie con la carga y se alimenta a 5 V regulados. Nominalmente, $v_s=2,5+0,185i_L$ \cite{acs}. El divisor propuesto de 4,7 k$\Omega$/1 k$\Omega$ produce
+El ACS712 de 5 A se conecta en serie con la carga y se alimenta con 5 V regulados; su salida nominal es $v_s=V_{CC}/2+0{,}185\,(V_{CC}/5)\,i_L$ \cite{acs}. Un divisor de 4,7 k$\Omega$/1 k$\Omega$ lleva la señal al rango unipolar de 0 a 1 V del XADC (canal VAUX6, 12 bits) \cite{xadc}:
 \begin{equation}
-v_{\mathrm{ADC}}=v_s/5,7\approx0,4386+0,03246i_L.
+v_{\mathrm{ADC}}=\frac{v_s}{5{,}7}\approx439\ \mathrm{mV}+(32{,}5\ \mathrm{mV/A})\,i_L .
 \end{equation}
-A $\pm1$ A, resulta aproximadamente 0,406--0,471 V. El XADC se usa en el rango unipolar de 0 a 1 V y 12 bits \cite{xadc}: la resolución ideal equivale a unos 7,52 mA por código. A 0,2 A pico la excursión es de unos 27 códigos respecto al cero.
+La sensibilidad es de unos 133 códigos por amperio: a 0,2 A pico, la excursión es de unos 27 códigos. Un capacitor de 100 nF en el nodo del divisor, con resistencia equivalente de 825 $\Omega$, forma un polo en 1,93 kHz: atenúa 14,4 dB a 10 kHz y retrasa 1,5$^\circ$ a 50 Hz.
 
-La copia funcional evalúa 10 nF en el nodo ADC, con $\tau\approx8,25\ \mu$s. No es un filtro final validado. Se medirán cero, sensibilidad, signo, ruido, precisión y retardo; si el rango útil es insuficiente, se revisará la ganancia analógica.
+La conversión del firmware es $i=(n-n_0)G$. Con el cero medido $n_0=1776$ códigos y $V_{CC}=4{,}92$ V, la ganancia es $G\approx+7{,}64$ mA/código, con el signo comprobado por el sondeo del lazo. La supervisión detiene el puente si $|i|>1{,}5$ A o si el código sale de 16--4079 durante tres muestras seguidas; una muestra con código imposible se reemplaza por la última válida antes de entrar al PR.
 
-\section{Control PR y discretización}
-Se estudia la estructura de ancho de banda finito \cite{pr}:
+\section{Modelado y control}
+\label{sec:control}
+\subsection{Modelo de la planta}
+En valores medios por período de conmutación, con el puente ideal y $\bar v_{AB}=mV_{dc}$,
 \begin{equation}
-C(s)=K_p+\frac{2K_r\omega_cs}{s^2+2\omega_cs+\omega_0^2}.
+L\frac{di_L}{dt}+Ri_L=mV_{dc}-v_{td},\qquad G_{vi}(s)=\frac{1}{Ls+R},
 \end{equation}
-El candidato usa $K_p=12$ V/A, $K_r=200$ V/A, $\omega_0=2\pi50$ rad/s y $\omega_c=2\pi2$ rad/s. La estructura concentra ganancia alrededor de la referencia. Estos parámetros son un candidato evaluado, no una sintonización final demostrada.
-
-Se aplica Tustin preajustado a 50 Hz:
+donde $v_{td}$ es la caída por tiempo muerto. El software calcula una tensión $v_{PR}$ y la convierte en modulación con una normalización fija, $m=\mathrm{sat}_{0{,}85}(v_{PR}/12)$. A 24 V la ganancia de la planta vista por el controlador se duplica; este caso forma parte del análisis. Con retención de orden cero, la planta discreta es
 \begin{equation}
-s=\kappa\frac{1-z^{-1}}{1+z^{-1}},\qquad
-\kappa=\frac{\omega_0}{\tan(\omega_0T_s/2)}.
+G(z)=\frac{V_{dc}}{12}\frac{B\,z^{-1}}{1-Az^{-1}},\quad A=e^{-RT_s/L},\quad B=\frac{1-A}{R}.
 \end{equation}
-Con $T_s=100\ \mu$s, la rama resonante cumple
+
+\subsection{Procedimiento de sintonización}
+\begin{enumerate}
+\item \emph{Ganancia proporcional.} Por encima de la resonancia, el lazo se comporta como $K_p(V_{dc}/12)/(Ls)$ y cruza la unidad en $f_c\approx K_p(V_{dc}/12)/(2\pi L)$. Se busca $f_c$ cerca de 200 Hz a 12 V, unas 50 veces menor que $f_s$, para que el retardo de $1{,}5T_s$ reste solo unos $10^\circ$. Con $L=10$ mH resulta $K_p=12$ V/A, con $f_c\approx190$ Hz a 12 V y 380 Hz a 24 V.
+\item \emph{Ganancia resonante.} En $\omega_0$ el controlador vale $K_p+K_r$ y el error de amplitud es $|T(j\omega_0)|-1$, con $T=\mathcal{L}/(1+\mathcal{L})$ y $\mathcal{L}=(V_{dc}/12)(K_p+K_r)e^{-j1{,}5\omega_0T_s}/Z(j\omega_0)$. Con $K_r=200$ V/A y la carga nominal, el error previsto es de 3,2\,\% a 12 V y 1,6\,\% a 24 V. El criterio del 10\,\% se mantiene hasta $|Z|\approx26\ \Omega$ a 12 V y 52 $\Omega$ a 24 V; el cálculo corresponde a un modelo lineal y a los parámetros simulados. La operación a corriente nominal depende de la impedancia efectiva del devanado.
+\item \emph{Ancho de banda resonante.} Con $\omega_c=2\pi\cdot2$ rad/s, $1-a_2=2{,}5\times10^{-3}$, muy por encima de la resolución relativa de un \texttt{float} ($60\times10^{-9}$), y los polos del resonador quedan en radio $\sqrt{a_2}=0{,}99874$.
+\item \emph{Discretización.} Tustin preajustado en $\omega_0$:
+\begin{equation}
+s=\kappa\frac{1-z^{-1}}{1+z^{-1}},\qquad \kappa=\frac{\omega_0}{\tan(\omega_0T_s/2)}.
+\end{equation}
+\item \emph{Verificación.} Raíces del polinomio de lazo cerrado por la recursión de Schur, márgenes del lazo discreto y simulación conmutada en PLECS. El procedimiento se reproduce con \url{modelos/analisis/pr_discreto.py}.
+\end{enumerate}
+
+\subsection{Ecuación discreta}
+Con $T_s=100\ \mu$s, la rama resonante es
 \begin{align}
-r[k]={}&b_0(e[k]-e[k-2])\nonumber\\
-&-a_1r[k-1]-a_2r[k-2],
+r[k]={}&b_0(e[k]-e[k-2])-a_1r[k-1]-a_2r[k-2],
 \end{align}
-con $b_0=0,2509707453602995$, $a_1=-1,996504651666988$ y $a_2=0,9974902925463971$. Se calcula $v_{\mathrm{PR}}=12e+r$ y se aplica $m[k]=\mathrm{sat}_{0,85}(v_{\mathrm{PR}}[k-1]/12)$, con normalización fija y una muestra de retardo.
+con los coeficientes redondeados $b_0=0{,}25097075$, $a_1=-1{,}9965047$ y $a_2=0{,}99749029$. La salida es $v_{PR}[k]=12e[k]+r[k]$ y se aplica $m[k+1]=\mathrm{sat}_{0{,}85}(v_{PR}[k]/12)$. Como anti-windup se usa integración condicional: si la modulación satura y el error empuja en el mismo sentido que la salida, los estados no se actualizan.
 
-Para la planta con retención, $A=e^{-RT_s/L}$ y $B=(1-A)/R$. Con $q=z^{-1}$ y $C(q)=N_C(q)/D(q)$, el polinomio cerrado es
+\subsection{Estabilidad}
+El polinomio característico en $q=z^{-1}$ es
 \begin{equation}
-(1-Aq)D(q)+(V_{dc}/12)Bq^2N_C(q).
+(1-Aq)D(q)+\frac{V_{dc}}{12}Bq^2N_C(q),
 \end{equation}
-La recursión de Schur confirma estabilidad en doce combinaciones de R total de 7,2/10,5 $\Omega$, L de 6,984/9,291/10 mH y bus de 12/24 V. Esta comprobación lineal excluye medición, tiempo muerto y saturación.
+con $C(q)=N_C(q)/D(q)$ y una muestra de retardo. La Tabla~\ref{tab:estabilidad} recoge el radio máximo de las raíces y los márgenes en el cruce de alta frecuencia para el barrido de $R$, $L$ y bus, y para la carga identificada.
 
-La sintonización parte del modelo RL: $K_p$ aporta la corrección de banda ancha, $K_r$ aumenta la ganancia en 50 Hz y $\omega_c$ fija el ancho de banda de la rama resonante. Se conserva el candidato cuando las raíces del modelo discreto permanecen dentro del círculo unitario y las simulaciones conservan margen de modulación. En la plataforma digital, el disparo ocurre a mitad del período PWM y la transferencia de la referencia se realiza en el límite del período. Para comprobar la sintonización en la FPGA se requieren la latencia real, la calibración y la respuesta ante saturación.
+\begin{table}[H]\caption{Estabilidad del lazo discreto}\centering\small
+\begin{tabular}{@{}cc@{\hspace{4pt}}c@{\hspace{4pt}}c@{\hspace{4pt}}c@{\hspace{4pt}}c@{}}\toprule
+$R$ & $L$ & $V_{dc}$ & $\max|z|$ & $f_c$ / MF & MG\\
+($\Omega$) & (mH) & (V) & & (Hz / $^\circ$) & (dB)\\\midrule
+7,2 & 6,98 & 12 / 24 & 0,984 / 0,981 & 235 / 96; 529 / 71 & 15,6 / 9,6\\
+7,2 & 9,29 & 12 / 24 & 0,984 / 0,981 & 185 / 93; 400 / 76 & 17,9 / 11,9\\
+7,2 & 10 & 12 / 24 & 0,983 / 0,981 & 175 / 92; 373 / 77 & 18,6 / 12,5\\
+10,5 & 6,98 & 12 / 24 & 0,987 / 0,983 & 178 / 112; 500 / 81 & 15,8 / 9,8\\
+10,5 & 9,29 & 12 / 24 & 0,986 / 0,983 & 149 / 106; 379 / 85 & 18,1 / 12,1\\
+10,5 & 10 & 12 / 24 & 0,986 / 0,983 & 142 / 104; 353 / 85 & 18,7 / 12,7\\
+14 & 38,5 & 12 / 24 & 0,989 / 0,981 & --; 113 / 75 & 30,1 / 24,1\\\bottomrule
+\end{tabular}\label{tab:estabilidad}\end{table}
+
+Todos los casos son estables, con margen de fase de al menos $71^\circ$ y de ganancia de al menos 9,6 dB; el peor caso es la inductancia baja con bus de 24 V. Con la carga identificada a 12 V, la ganancia proporcional no alcanza la unidad fuera de la banda resonante y no hay cruce de alta frecuencia. La raíz más lenta, con radio 0,983--0,989, tiene una constante de tiempo de 5 a 9 ms, por lo que un cambio de consigna se establece en unos dos ciclos de 50 Hz. El análisis es lineal: excluye la saturación, la cuantización y la no linealidad del devanado, que se evalúan en simulación y en el banco.
 
 \section{Plan de validación}
-Primero se comprobarán auxiliares, apagado, bootstrap, compuertas y tiempo muerto; se documentarán límite de corriente, fusible y desconexión. Se calibrará el ACS712 con una medida independiente y se comprobará la carga.
+\subsection{Instrumentación}
+La corriente se registra de dos formas. El firmware guarda 512 muestras de $i$, $i_{\mathrm{ref}}$ y $m$, una cada 200 $\mu$s (102,4 ms), y las exporta por UART al pulsar BTNL; \texttt{receptor.py} valida la trama y calcula la fundamental. Como medida independiente, el osciloscopio registra la caída en una resistencia de 3,3 $\Omega$ como resta de dos canales en DC con sonda 1:1 y masas en GND; se mide también el bus durante el ensayo.
 
-Se realizarán por separado: (i) las tres referencias nominales; (ii) cambios de 0,2 a 0,5 A y de 0,5 a 1 A pico; (iii) cambio resistivo de al menos 25\,\% a 0,5 A pico. Cada registro identificará referencia, corriente, tensión de carga, PWM y parámetros reales. La fundamental se extraerá en al menos cinco períodos completos. El rizado local se separará de la componente de baja frecuencia.
+\subsection{Método de medición del error}
+La fundamental se obtiene por proyección seno--coseno sobre los últimos cinco períodos completos de 50 Hz (500 muestras):
+\begin{equation}
+I_1=\frac{2}{N}\sum_{k}i[k]e^{-j\omega_0kT_r},\quad E_A=100\frac{|I_1|-I_{\mathrm{ref},pk}}{I_{\mathrm{ref},pk}},
+\end{equation}
+y el desfase es $\arg(I_1/I_{\mathrm{ref},1})$. El rizado se mide en el osciloscopio a 20 $\mu$s/div como el máximo pico a pico local, dentro de un período PWM, de la caída en la resistencia: el límite de 200 mA pico a pico equivale a 660 mV pico a pico. La ganancia del sensor se contrasta con la fundamental de la caída en la resistencia en la misma corrida.
+
+\subsection{Verificación de la carga}
+Se miden la resistencia DC de cada elemento y la inductancia del devanado con LCR. La impedancia a 50 Hz se identifica en lazo abierto con modulación fija de 0,10, 0,30 y 0,50 a 24 V, a partir de las fundamentales de $v_{AB}$ y de la corriente, para conocer $|Z|$ frente a la corriente antes de los puntos de 0,5 y 1 A.
+
+\subsection{Ensayos}
+La Tabla~\ref{tab:ensayos} organiza los puntos de operación y las perturbaciones previstas para verificar el seguimiento y la respuesta del lazo.
+
+\begin{table}[H]\caption{Ensayos previstos}\centering\small
+\begin{tabular}{@{}p{0.42\columnwidth}p{0.5\columnwidth}@{}}\toprule
+Ensayo & Condición\\\midrule
+Seguimiento nominal & 0,2, 0,5 y 1 A pico; 24 V y, donde la modulación lo permita, 12 V\\
+Cambio de consigna & 0,2$\to$0,5 y 0,5$\to$1 A pico con SW1--SW0; el firmware aplica el cambio en el cruce por cero\\
+Cambio de carga & 0,5 A pico; abrir $S_{R3}$: 6,6$\to$9,9 $\Omega$\\
+Rizado & Osciloscopio en la resistencia en cada punto nominal\\
+Comparación & Cada punto frente a PLECS con los mismos $V_{dc}$ y referencia\\\bottomrule
+\end{tabular}\label{tab:ensayos}\end{table}
+
+\subsection{Puesta en marcha}
+Con el bus apagado se comprueban las alimentaciones auxiliares, el apagado con SD alto, la carga del bootstrap, las órdenes de compuerta y el tiempo muerto. Después se registra el reposo con el bus encendido y el PWM detenido para verificar el cero. El bus se energiza con límite de corriente de la fuente, de 1 A para 0,5 A pico y 1,5 A para 1 A pico, y se arranca con SW15 y BTNU. Ante una falla se apaga el bus, se baja SW15 y se abre SD antes de reconocerla con BTND.
 
 \section{Estado del diseño}
-La puesta en marcha comprobó el PWM de 10 kHz, el tiempo muerto lógico de 1 $\mu$s y los niveles de ambas ramas con el bus limitado a 3 V. La caracterización de la cadena de corriente, el margen térmico y la regulación en el rango nominal requieren mediciones adicionales. El informe técnico recoge las condiciones de la prueba y el diagnóstico del sondeo.
+El puente, el accionamiento, el sensado y el PR discreto sobre MicroBlaze V se probaron en el banco. El error fue de $-5{,}05$\,\% y $-3{,}62$\,\% a 0,2 A pico con 12 y 24 V, y de $-5{,}91$\,\% a 0,5 A pico con 24 V. El ajuste de la fundamental situó el establecimiento de los escalones de 0,2 a 0,5 A en 16,4--16,8 ms. El aumento resistivo del 50\,\% a 0,5 A mantuvo el error de amplitud dentro del criterio antes y después del cambio. El punto de 1 A quedó limitado por la saturación de la modulación. El informe técnico reúne los resultados y explica la medición pendiente del rizado.
 \referencias
 \end{document}

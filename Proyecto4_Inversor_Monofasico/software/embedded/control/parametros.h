@@ -30,14 +30,14 @@
 #define VDC_V               12.0f
 #define MOD_LIMIT_Q15       27853        /* m = 0,85; mismo límite que el PWM */
 
-/* Medición nominal de prueba, sin calibración del montaje. La orientación
- * ensayada del ACS712 tiene pendiente negativa: medir cero y ganancia firmada
- * antes de habilitar el control físico; no usar estos valores como calibración. */
+/* Montaje del 20/11 (Potencia/04_registro_laboratorio.md): cero de las dos
+ * corridas del PR a 3 V (1775,05 y 1776,91 códigos), signo positivo del sondeo
+ * y ganancia nominal con VCC = 4,924 V. */
 #ifndef MEDICION_CALIBRADA
-#define MEDICION_CALIBRADA   0           /* 1 solo con cero, ganancia y signo medidos */
+#define MEDICION_CALIBRADA   1           /* 1 solo con cero, ganancia y signo medidos */
 #endif
-#define OFFSET_ADC          1796.5f      /* código para 0 A */
-#define GANANCIA_ADC        0.0075222f   /* A por código */
+#define OFFSET_ADC          1776.0f      /* código para 0 A */
+#define GANANCIA_ADC        0.0076383f   /* A por código */
 #define CODIGO_MIN          16u          /* PRUEBA: Campos */
 #define CODIGO_MAX          4079u        /* PRUEBA: Campos */
 #define I_MAX_A             1.5f         /* PRUEBA: PEDP */

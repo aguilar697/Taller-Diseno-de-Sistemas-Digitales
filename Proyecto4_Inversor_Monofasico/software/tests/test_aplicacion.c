@@ -336,8 +336,13 @@ int main(void)
     correr(5000u);
     i_carga = 1.8;
     periodo();
+    i_carga = 1.8;
+    periodo();
+    comprobar(app.estado == ESTADO_OPERACION, "1,8 A en dos muestras: sigue en OPERACIÓN");
+    i_carga = 1.8;
+    periodo();
     comprobar(app.estado == ESTADO_FALLA && !pwm_habilitado &&
-              (app.supervision.causa & FALLA_SOBRECORRIENTE), "1,8 A: FALLA en la misma iteración");
+              (app.supervision.causa & FALLA_SOBRECORRIENTE), "1,8 A en tres muestras seguidas: FALLA");
     presionar(BTN_RECONOCER);
 
     /* ---------- Exportación durante el control ---------- */

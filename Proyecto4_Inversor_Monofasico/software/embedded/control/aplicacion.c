@@ -133,7 +133,14 @@ void app_isr(aplicacion_t *app)
     /* Convertir a A y supervisar (sin muestra válida solo cuenta Δn) */
     clase = lectura_clasificar(&app->lectura, n);
     if (estado_adc & ADC_ESTADO_VALIDO) {
+        static float i_valida;
         i_med = lectura_a_amperios(&app->lectura, codigo);
+        /* Código imposible (acople en la medición): el PR usa la última muestra válida */
+        if (codigo < CODIGO_MIN || codigo > CODIGO_MAX) {
+            i_med = i_valida;
+        } else {
+            i_valida = i_med;
+        }
         supervision_muestra(&app->supervision, i_med, codigo, lectura_falla(&app->lectura));
     } else {
         i_med = 0.0f;

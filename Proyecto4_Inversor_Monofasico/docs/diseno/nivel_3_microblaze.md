@@ -76,9 +76,9 @@ UART Lite y GPIO completan el intercambio con el usuario. El botón solicita exp
 
 AXI Timer dispone de dos contadores independientes de 32 bits. El contador 0 proporciona la base nominal de 100 µs; el contador 1 se reserva para mediciones. La solicitud sigue Timer → In0 de AXI INTC → MicroBlaze V, con entrada de nivel y modo normal. El software instala, habilita y reconoce la interrupción; su compilación con el BSP local y la auditoría ABI no sustituyen una prueba de ejecución física.
 
-El Timer no ejecuta el PR ni garantiza que haya una conversión terminada al interrumpir. La configuración nominal usa PWM y control a 10 kHz, con disparo en fase 5000; la fase efectiva Timer–PWM, la disponibilidad ADC y el presupuesto completo de ISR siguen pendientes de medición. Los 100 MHz del reloj, los 50 Hz de referencia y la frecuencia PWM son magnitudes distintas.
+El Timer no ejecuta el PR ni garantiza que haya una conversión terminada al interrumpir. La configuración nominal usa PWM y control a 10 kHz, con disparo en fase 5000; la disponibilidad ADC se comprobó durante los ensayos registrados. La fase efectiva Timer–PWM y el jitter siguen pendientes de medición. Los 100 MHz del reloj, los 50 Hz de referencia y la frecuencia PWM son magnitudes distintas.
 
-La aplicación compilada inicializa memoria y drivers con el PWM deshabilitado. En cada atención lee y reconoce la muestra antes de procesar las solicitudes de arranque o parada; después ejecuta el control cuando corresponde, escribe la referencia pendiente y registra. El PWM la aplica al comienzo de período. El software organiza la exportación sin esperas bloqueantes; el cumplimiento de plazos y el lazo PR completo aún no están validados físicamente.
+La aplicación compilada inicializa memoria y drivers con el PWM deshabilitado. En cada atención lee y reconoce la muestra antes de procesar las solicitudes de arranque o parada; después ejecuta el control cuando corresponde, escribe la referencia pendiente y registra. El PWM la aplica al comienzo de período. El software organiza la exportación sin esperas bloqueantes; el lazo PR y la exportación se verificaron en el [montaje de laboratorio](../informe/README.md#operación-a-12-y-24-v).
 
 ## Justificación y relación con el cuarto nivel
 
