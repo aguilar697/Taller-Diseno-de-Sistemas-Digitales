@@ -12,9 +12,9 @@ La Basys 3 regula la corriente de un inversor monofásico en lazo cerrado y expo
 
 **Temporización.** El AXI Timer solicita una interrupción por AXI INTC cada 100 µs nominales. El PWM genera el disparo de adquisición a los 50 µs de su propio período, sin depender del tiempo de ejecución del código. La ISR consume una muestra completa, actualiza el PR y escribe una referencia pendiente. El PWM captura esa referencia al inicio del siguiente período, evitando truncar pulsos a mitad de ciclo. El firmware registró la duración máxima instrumentada de la ISR. El desfase efectivo Timer–PWM y el jitter requieren medir los flancos en tarjeta.
 
-**Puente H y control.** La modulación unipolar usa referencias opuestas para las dos ramas. La tensión diferencial toma los niveles +Vdc, 0 y −Vdc. En el modelo promediado vale aproximadamente m·Vdc. Con carga serie, L·di/dt + R·i = VAB. Se seleccionaron cuatro IRF540N, dos IR2110, 6,6 Ω de resistencia externa y un devanado con aproximadamente 0,6 Ω de resistencia. Se midieron 9,291 mH a 120 Hz y 6,984 mH a 1 kHz. Los 10 mH a 50 Hz son un valor de modelado. El tiempo muerto separa el apagado de una orden del encendido de su complementaria. Se eligieron 10 kHz para coordinar el muestreo y limitar el rizado, con 20 y 25 kHz disponibles en el periférico. [Dimensionamiento y selección de componentes](../../Potencia/01_diseno_y_componentes.md).
+**Puente H y control.** La modulación unipolar usa referencias opuestas para las dos ramas. La tensión diferencial toma los niveles +Vdc, 0 y −Vdc. En el modelo promediado vale aproximadamente m·Vdc. Con carga serie, L·di/dt + R·i = VAB. Se seleccionaron cuatro IRF540N, dos IR2110, 6,6 Ω de resistencia externa y un devanado con aproximadamente 0,6 Ω de resistencia. Se midieron 9,29 mH a 120 Hz y 6,98 mH a 1 kHz. Los 10 mH a 50 Hz son un valor de modelado. El tiempo muerto separa el apagado de una orden del encendido de su complementaria. Se eligieron 10 kHz para coordinar el muestreo y limitar el rizado, con 20 y 25 kHz disponibles en el periférico. [Dimensionamiento y selección de componentes](../../Potencia/01_diseno_y_componentes.md).
 
-**Realimentación y registro.** El ACS712 de 5 A entrega una tensión con offset, reducida por un divisor de 4,7 kΩ/1 kΩ hacia VAUX6. El firmware de laboratorio usa un cero de 1776 códigos, signo positivo para la orientación ensayada y una escala nominal de 7,6383 mA por código. Falta contrastar esa escala con una medición independiente. El PR suma una acción proporcional y una rama resonante centrada en 50 Hz, discretizada con Tustin preajustado. La acción se limita a ±0,85 y se convierte a Q1.15 para el PWM. La aplicación de laboratorio registra 512 muestras cada 200 µs y las transmite por UART Lite en tramas con CRC-16. En caso de falla, deshabilita el PWM. [Diseño del software](../diseno/nivel_4_software.md).
+**Realimentación y registro.** El ACS712 de 5 A entrega una tensión con offset, reducida por un divisor de 4,7 kΩ/1 kΩ hacia VAUX6. El firmware de laboratorio usa un cero de 1776 códigos, signo positivo para la orientación ensayada y una escala nominal de 7,64 mA por código. Falta contrastar esa escala con una medición independiente. El PR suma una acción proporcional y una rama resonante centrada en 50 Hz, discretizada con Tustin preajustado. La acción se limita a ±0,85 y se convierte a Q1.15 para el PWM. La aplicación de laboratorio registra 512 muestras cada 200 µs y las transmite por UART Lite en tramas con CRC-16. En caso de falla, deshabilita el PWM. [Diseño del software](../diseno/nivel_4_software.md).
 
 ## Interfaz implementada y estados
 
@@ -83,15 +83,17 @@ La construcción documentada desde `2b7a183` aprobó 201 comprobaciones en C. La
 
 ## Laboratorio y análisis de discrepancias
 
+Los resultados calculados se presentan, en general, con tres cifras significativas y prefijos SI. Las cuentas digitales y los parámetros de configuración conservan sus valores exactos; los archivos de medición mantienen su precisión.
+
 ### Puesta en marcha
 
 | Magnitud | Referencia o cálculo | Observación | Interpretación |
 |---|---|---|---|
-| Frecuencia y tiempo muerto en la orden de la FPGA | 10 kHz y 1 µs | 9,99969 kHz y 1,00 µs por cursores | Concuerdan con el contador. Queda medir ambas parejas de VGS en condiciones de potencia. |
-| Salida inferior del IR2110 | Cercana a 12 V con LIN activo y SD bajo | 11,926 V entre pines 1 y 2 en prueba estática del izquierdo. El derecho respondió tras cambiar de protoboard. | La falla se mantuvo al intercambiar integrados antes del cambio de placa, lo que apunta a un problema de conexión o contacto. |
-| Nodos conmutados con bus reducido | Escalones cercanos al bus de 3,012 V | Niveles altos de 2,91 V y 2,95 V. En una captura diferencial se observó un ciclo de 20 ms. | Hubo conmutación del puente en el ensayo reducido. Se requiere una medición independiente de corriente para cuantificar lo entregado a la carga. |
-| Entrada XADC en reposo | 0,426 V equivalen aproximadamente a 1 745 códigos en escala de 1 V y 12 bits | Tras corregir el retorno, 0,426 V diferenciales y 1 748,16 códigos en promedio (0,4268 V nominales). | La diferencia es de aproximadamente 0,8 mV. Antes de corregir el retorno negativo, −47 mV en JXADC7 elevaron la lectura diferencial a 0,473 V. |
-| Sondeo de 50 Hz con 3 V y modulación 0,20 | Con 7,2 Ω y 9,3 mH, 0,60 V pico promediados dan aproximadamente 0,077 A pico. El escalamiento nominal y la fase RL dan alrededor de 9,5 códigos en fase. | Correlación de 1,57 códigos en fase y −0,34 en cuadratura. El software indicó ERROR=5 y apagó el PWM. | El resultado quedó por debajo de lo esperado para el modelo y la ganancia nominal. El sondeo abortó antes de ejecutar el PR. |
+| Frecuencia y tiempo muerto en la orden de la FPGA | 10 kHz y 1 µs | 10,0 kHz y 1,00 µs por cursores | Concuerdan con el contador. Queda medir ambas parejas de VGS en condiciones de potencia. |
+| Salida inferior del IR2110 | Cercana a 12 V con LIN activo y SD bajo | 11,9 V entre pines 1 y 2 en prueba estática del izquierdo. El derecho respondió tras cambiar de protoboard. | La falla se mantuvo al intercambiar integrados antes del cambio de placa, lo que apunta a un problema de conexión o contacto. |
+| Nodos conmutados con bus reducido | Escalones cercanos al bus de 3,01 V | Niveles altos de 2,91 V y 2,95 V. En una captura diferencial se observó un ciclo de 20 ms. | Hubo conmutación del puente en el ensayo reducido. Se requiere una medición independiente de corriente para cuantificar lo entregado a la carga. |
+| Entrada XADC en reposo | 426 mV equivalen aproximadamente a 1 745 códigos en escala de 1 V y 12 bits | Tras corregir el retorno, 426 mV diferenciales y 1 748,2 códigos en promedio (426,8 mV nominales). | La diferencia es de aproximadamente 0,8 mV. Antes de corregir el retorno negativo, −47 mV en JXADC7 elevaron la lectura diferencial a 473 mV. |
+| Sondeo de 50 Hz con 3 V y modulación 0,20 | Con 7,2 Ω y 9,3 mH, 600 mV pico promediados dan aproximadamente 77 mA pico. El escalamiento nominal y la fase RL dan alrededor de 9,5 códigos en fase. | Correlación de 1,57 códigos en fase y −0,34 en cuadratura. El software indicó ERROR=5 y apagó el PWM. | El resultado quedó por debajo de lo esperado para el modelo y la ganancia nominal. El sondeo abortó antes de ejecutar el PR. |
 
 La primera instrumentación mostró picos incluso al conectar punta y retorno al mismo punto. Se cambió de osciloscopio y se acortó el retorno para revisar la repetibilidad. La [captura temprana del osciloscopio](resultados/potencia/laboratorio/scope_2.csv) tiene 5,10 mV RMS de componente AC y 35,3 mV pico a pico en 50 ms. El CSV no identifica el punto ni el acoplamiento y es anterior a corregir VAUX6. Esos valores no permiten estimar el rizado de corriente ni atribuir todos los picos al puente.
 
@@ -103,24 +105,24 @@ La serie principal utilizó el bitstream de `da2b7c3` y el firmware `control_inv
 
 | Bus | Referencia pico | Fundamental pico | Error de amplitud | Desfase | Amplitud dentro de ±10 % |
 |---|---:|---:|---:|---:|---|
-| 12 V | 0,2 A | 0,1899 A | −5,05 % | −3,05° | Sí |
-| 24 V | 0,2 A | 0,1928 A | −3,62 % | −1,87° | Sí |
-| 12 V | 0,5 A | 0,3178 A | −36,43 % | −43,47° | No |
-| 24 V | 0,5 A | 0,4705 A | −5,91 % | −3,87° | Sí |
-| 12 V | 1,0 A | 0,3291 A | −67,09 % | −43,53° | No |
-| 24 V | 1,0 A | 0,7358 A | −26,42 % | −26,37° | No |
+| 12 V | 0,2 A | 190 mA | −5,05 % | −3,05° | Sí |
+| 24 V | 0,2 A | 193 mA | −3,62 % | −1,87° | Sí |
+| 12 V | 0,5 A | 318 mA | −36,4 % | −43,5° | No |
+| 24 V | 0,5 A | 471 mA | −5,91 % | −3,87° | Sí |
+| 12 V | 1,0 A | 329 mA | −67,1 % | −43,5° | No |
+| 24 V | 1,0 A | 736 mA | −26,4 % | −26,4° | No |
 
 **UART y ejecución del control.** Se verificó el CRC de las 38 tramas conservadas. Las 36 tramas de ensayo del 23 de noviembre, excluyendo los dos registros de reposo, reportaron cero conversiones perdidas y se conservaron los identificadores sucesivos. En operación, el máximo instrumentado de la ISR fue 8,57 µs. Las capturas incluyen exportación manual por BTNL durante la operación y exportaciones activadas por las variantes de diagnóstico. [Tramas y condiciones](resultados/potencia/laboratorio/2026-11-23/resultados.md).
 
-**Cambios de referencia y de carga.** Se repitió seis veces el escalón de 0,2 a 0,5 A a 24 V y 6,6 Ω. Durante el cambio de 6,6 a 9,9 Ω (+50 %) con la misma inductancia y referencia de 0,5 A, se obtuvo una fundamental de 0,472 A antes del evento y 0,483 A en la ventana posterior de la trama 37. Con 9,9 Ω en régimen, la trama 38 dio 0,4729 A (−5,49 %). El escalón de 0,5 a 1 A queda pendiente.
+**Cambios de referencia y de carga.** Se repitió seis veces el escalón de 0,2 a 0,5 A a 24 V y 6,6 Ω. Durante el cambio de 6,6 a 9,9 Ω (+50 %) con la misma inductancia y referencia de 0,5 A, se obtuvo una fundamental de 472 mA antes del evento y 483 mA en la ventana posterior de la trama 37. Con 9,9 Ω en régimen, la trama 38 dio 473 mA (−5,49 %). El escalón de 0,5 a 1 A queda pendiente.
 
 ![Corriente y modulación durante el aumento de resistencia externa a 24 V](resultados/potencia/laboratorio/2026-11-23/37_cambio_carga_6v6_9v9_c410_cambio_carga.png)
 
 *Figura 4. Trama 37. El instante se estima a partir del cambio de amplitud de la modulación.*
 
-**Contraste con PLECS y diagnóstico.** A 0,5 A pico, el PR simulado con la carga nominal de 7,2 Ω y 10 mH dio 0,48385 A a 12 V y 0,49180 A a 24 V. En el montaje, la modulación alcanza ±0,85 en los puntos con mayor error. La impedancia aparente inferida a partir de la corriente y de la modulación es consistente con falta de margen de tensión. La contribución del devanado requiere una medición independiente. En la trama 13 el firmware deshabilitó el PWM por sobrecorriente tras registrar una lectura aparente de −12,6 A. El valor es incompatible con la corriente esperada para ese ensayo y se conserva como anomalía de sensado. [Informe de Potencia](potencia/informe_potencia.pdf).
+**Contraste con PLECS y diagnóstico.** A 0,5 A pico, el PR simulado con la carga nominal de 7,2 Ω y 10 mH dio 484 mA a 12 V y 492 mA a 24 V. En el montaje, la modulación alcanza ±0,85 en los puntos con mayor error. La impedancia aparente inferida a partir de la corriente y de la modulación es consistente con falta de margen de tensión. La contribución del devanado requiere una medición independiente. En la trama 13 el firmware deshabilitó el PWM por sobrecorriente tras registrar una lectura aparente de −12,6 A. El valor es incompatible con la corriente esperada para ese ensayo y se conserva como anomalía de sensado. [Informe de Potencia](potencia/informe_potencia.pdf).
 
-**Alcance de la medición.** Las capturas de osciloscopio muestran la conmutación y la caída en la resistencia. El recorte de los canales y el intervalo de 50 µs en los CSV impiden usar esas trazas para verificar el límite de 0,20 A pico a pico o validar la escala del ACS712. Para completar la evidencia se necesitan capturas asociadas a cada ensayo con corriente independiente, tensión de carga y PWM, además de una medición específica del rizado. [Capturas del osciloscopio](../../Potencia/mediciones_lab_osciloscopio/README.md) · [Estado de validación](../../Potencia/03_pendientes_y_validacion.md).
+**Alcance de la medición.** Las capturas de osciloscopio muestran la conmutación y la caída en la resistencia. El recorte de los canales y el intervalo de 50 µs en los CSV impiden usar esas trazas para verificar el límite de 200 mA pico a pico o validar la escala del ACS712. Para completar la evidencia se necesitan capturas asociadas a cada ensayo con corriente independiente, tensión de carga y PWM, además de una medición específica del rizado. [Capturas del osciloscopio](../../Potencia/mediciones_lab_osciloscopio/README.md) · [Estado de validación](../../Potencia/03_pendientes_y_validacion.md).
 
 Para medir la precisión temporal se registrarán flancos sucesivos de `isr_debug` en JB1. La diferencia entre flancos de subida da el período efectivo y el ancho del pulso da la duración de la rutina instrumentada. Se reportarán mínimo, máximo, promedio y jitter pico a pico como diferencia entre el máximo y el mínimo del período. La medición se repetirá durante la exportación UART para comprobar si afecta la periodicidad. La frecuencia PWM medida en JA sirve como referencia de hardware y la latencia del ADC permanece disponible por separado en simulación.
 

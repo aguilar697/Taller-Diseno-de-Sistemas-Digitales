@@ -15,8 +15,12 @@ BUILD = PROYECTO / "build/informes_potencia"
 RESULTADOS = PROYECTO / "docs/informe/resultados/potencia/lazo_funcional.json"
 
 
-def numero(valor: float, decimales: int = 3) -> str:
-    return f"{valor:.{decimales}f}".replace(".", "{,}")
+def numero(valor: float, cifras: int = 3) -> str:
+    """Redondea para presentación sin reducir la precisión de los resultados fuente."""
+    from decimal import Decimal
+
+    redondeado = format(Decimal(format(valor, f".{cifras}g")), "f")
+    return redondeado.replace(".", "{,}")
 
 
 def tablas(datos: dict) -> str:
@@ -29,7 +33,7 @@ def tablas(datos: dict) -> str:
         r"\label{tab:nominal}\centering\small",
         r"\begin{tabular}{@{}ccccc@{}}\toprule",
         r"$V_{dc}$ & $I_{\mathrm{ref},pk}$ & $I_{1,pk}$ & $|E_A|$ & $\phi$\\",
-        r"(V) & (A) & (A) & (\%) & ($^\circ$)\\\midrule",
+        r"(V) & (A) & (mA) & (\%) & ($^\circ$)\\\midrule",
     ]
     nominales = [
         c for c in datos["casos"]
@@ -42,10 +46,10 @@ def tablas(datos: dict) -> str:
         v = caso["variables"]
         valores = [
             str(v["Vbus"]),
-            numero(v["Iref"], 1),
-            numero(caso["fundamental_a_pico"], 4),
-            numero(abs(caso["error_amplitud_porcentaje"]), 2),
-            numero(caso["fase_grados"], 2),
+            numero(v["Iref"], 3),
+            numero(1000 * caso["fundamental_a_pico"]),
+            numero(abs(caso["error_amplitud_porcentaje"])),
+            numero(caso["fase_grados"]),
         ]
         lineas.append(" & ".join(valores) + r"\\")
     lineas += [
@@ -58,7 +62,7 @@ def tablas(datos: dict) -> str:
         r"\label{tab:transitorios}\centering\small",
         r"\begin{tabular}{@{}lccc@{}}\toprule",
         r"Ensayo & $I_{1,pk}$ final & $|E_A|$ final & $\max |m|$\\",
-        r" & (A) & (\%) & \\\midrule",
+        r" & (mA) & (\%) & \\\midrule",
     ]
     nombres = {
         "referencia_02_05": r"$0{,}2\to0{,}5$ A",
@@ -72,14 +76,14 @@ def tablas(datos: dict) -> str:
             continue
         valores = [
             nombres[caso["ensayo"]],
-            numero(caso["fundamental_a_pico"], 4),
-            numero(abs(caso["error_amplitud_porcentaje"]), 2),
+            numero(1000 * caso["fundamental_a_pico"]),
+            numero(abs(caso["error_amplitud_porcentaje"])),
             numero(caso["modulacion_max_abs"], 3),
         ]
         lineas.append(" & ".join(valores) + r"\\")
     lineas += [
         r"\bottomrule\end{tabular}\end{table}\par",
-        "La fundamental final se calcula entre 0,4 y 0,5 s. "
+        "La fundamental final se calcula entre 400 y 500 ms. "
         "El máximo de modulación corresponde al registro completo; "
         "no es una medida del tiempo de establecimiento.",
     ]

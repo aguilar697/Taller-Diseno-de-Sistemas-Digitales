@@ -83,10 +83,10 @@ def ventana(d, ciclos=3):
 def corrientes(ax, d, titulo, s=None, t=None):
     if s is None:
         s, t = ventana(d)
-    ax.plot(t, d["i_ref_A"][s], color=NARANJA, lw=1.1, ls="--", label="Referencia")
-    ax.plot(t, d["i_med_A"][s], color=AZUL, lw=1.1, label="Medida (XADC)")
+    ax.plot(t, 1000 * d["i_ref_A"][s], color=NARANJA, lw=1.1, ls="--", label="Referencia")
+    ax.plot(t, 1000 * d["i_med_A"][s], color=AZUL, lw=1.1, label="Medida (XADC)")
     ax.set_title(titulo, fontsize=8, color=TINTA, loc="left")
-    ax.set_ylabel("Corriente (A)", fontsize=7, color=TINTA)
+    ax.set_ylabel("Corriente (mA)", fontsize=7, color=TINTA)
     estilo(ax)
 
 
@@ -121,7 +121,7 @@ def main():
         fig, ejes = plt.subplots(2, 1, figsize=(3.5, 2.8), sharex=True,
                                  gridspec_kw={"height_ratios": [2, 1]})
         corrientes(ejes[0], d, titulo)
-        ejes[0].set_ylim(*limites)
+        ejes[0].set_ylim(*(1000 * v for v in limites))
         ejes[0].legend(fontsize=6.5, frameon=False, loc="upper right", ncol=2)
         modulacion(ejes[1], d)
         fig.tight_layout(pad=0.4)
@@ -131,7 +131,7 @@ def main():
     c = leer(tramas / "08_pr_24v_1a.csv")
     fig, ejes = plt.subplots(2, 1, figsize=(3.5, 3.2), sharex=True, gridspec_kw={"height_ratios": [2, 1]})
     corrientes(ejes[0], c, "24 V, 1 A pico")
-    ejes[0].set_ylim(-1.3, 1.6)
+    ejes[0].set_ylim(-1300, 1600)
     ejes[0].legend(fontsize=6.5, frameon=False, loc="upper left", ncol=2)
     modulacion(ejes[1], c)
     fig.tight_layout(pad=0.4)
@@ -145,7 +145,7 @@ def main():
     todo = slice(None)
     corrientes(ejes[0], e, "Escalón 0,2 a 0,5 A, 24 V", todo, te)
     modulacion(ejes[1], e, todo, te)
-    ejes[0].set_ylim(-0.8, 0.8)
+    ejes[0].set_ylim(-800, 800)
     ejes[0].legend(fontsize=6.5, frameon=False, loc="upper left", ncol=2)
     for ax in ejes:
         ax.axvline(51.0, color=GRIS, lw=0.8, ls="--")
@@ -158,11 +158,11 @@ def main():
                              gridspec_kw={"height_ratios": [2, 1]})
     tg = (g["t_s"] - g["t_s"][0]) * 1e3
     ei, em = envolvente(g["t_s"], g["i_med_A"]), envolvente(g["t_s"], g["m"])
-    ejes[0].plot(tg, ei, color=AZUL, lw=1.3, label="Amplitud de la corriente")
-    ejes[0].axhline(0.5, color=NARANJA, ls="--", lw=1.0, label="Referencia")
-    ejes[0].set_ylim(0.40, 0.52)
+    ejes[0].plot(tg, 1000 * ei, color=AZUL, lw=1.3, label="Amplitud de la corriente")
+    ejes[0].axhline(500, color=NARANJA, ls="--", lw=1.0, label="Referencia")
+    ejes[0].set_ylim(400, 520)
     ejes[0].set_title("Cambio de carga 6,6 a 9,9 Ω, 0,5 A, 24 V", fontsize=8, color=TINTA, loc="left")
-    ejes[0].set_ylabel("Amplitud (A)", fontsize=7, color=TINTA)
+    ejes[0].set_ylabel("Amplitud (mA)", fontsize=7, color=TINTA)
     ejes[0].legend(fontsize=6.5, frameon=False, loc="lower left")
     estilo(ejes[0])
     ejes[1].plot(tg, em, color=TINTA, lw=1.3)
