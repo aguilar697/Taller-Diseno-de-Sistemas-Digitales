@@ -23,7 +23,7 @@ Los archivos indican formato PLECS 5.0. El modelo de lazo cerrado tiene duració
 
 ### Ensayo conectado en el modelo de lazo cerrado
 
-La fuente que alimenta el puente es `V_dc`, fijada en 12 V. La resistencia `R3`, de 3,3 Ω, está inicialmente puenteada por `S1`; `Step2` abre ese interruptor a los 0,205 s y eleva la resistencia externa de 6,6 a 9,9 Ω. La referencia permanece en 0,5 A pico.
+La fuente que alimenta el puente es `V_dc`, fijada en 12 V. La resistencia `R3`, de 3,3 Ω, está inicialmente puenteada por `S_R3` (bloque `S1` en este archivo PLECS). `Step2` abre ese interruptor a los 0,205 s y eleva la resistencia externa de 6,6 a 9,9 Ω. La referencia permanece en 0,5 A pico.
 
 También aparecen una fuente controlada `V` y los bloques `Step` y `Step1`, preparados para cambios de 12 a 24 V a los 0,205 s y retorno a 12 V a los 0,405 s. Esa fuente no tiene sus terminales eléctricos conectados al puente. Por tanto, ejecutar el archivo tal como está guardado reproduce el cambio resistivo a 12 V, no el ensayo de variación del bus.
 

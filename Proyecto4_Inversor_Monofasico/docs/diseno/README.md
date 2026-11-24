@@ -38,6 +38,8 @@ El hardware mantiene la temporización de los pulsos independiente de la carga d
 
 El top de laboratorio `inversor_basys3` conecta las cuatro órdenes al conector JA. SW15 habilita su paso previa sincronización y a partir de una frontera de período. Al bajarlo, el top bloquea las cuatro órdenes. El apagado por SD pertenece al driver IR2110. El ACS712 va en serie con la carga entre los nodos de conmutación y su salida se acondiciona para el rango analógico del XADC. El retorno a VAUX6 negativo se cablea junto a la referencia del divisor. La corriente se reconstruye con una calibración de cero y ganancia con signo. El [diseño de potencia](../../Potencia/01_diseno_y_componentes.md) documenta el circuito, las fuentes y el dimensionamiento.
 
+El [esquemático completo y los criterios de integración](criterios_de_diseno.md) muestran los estados del puente H con S1–S4. La [tabla de conexiones](integracion_basys3.md#conexiones) identifica el pin de Basys 3 y el canal del IR2110 para cada interruptor.
+
 ## Estrategia de verificación
 
 | Nivel de prueba | Estímulo y criterio de aceptación |

@@ -2,7 +2,7 @@
 instante del evento, pico posterior y tiempo hasta quedar dentro de +-10 % de la referencia.
 
 Uso: python analizar_transitorio.py trama.csv [--sin-grafica]
-El evento es el cambio de amplitud de la referencia; si no lo hay (BTNL), el centro de la trama.
+El evento se detecta por el cambio de amplitud de la referencia.
 """
 import csv
 import math
@@ -38,7 +38,7 @@ def main():
     t, i, ref, m = d["t_s"], d["i_med_A"], d["i_ref_A"], d["m"]
     tr = t[1] - t[0]
     n = int(round(1 / 50.0 / tr))
-    e_i, e_r = envolvente(t, i, n), envolvente(t, ref, n)
+    e_i = envolvente(t, i, n)
     cruces = np.nonzero(np.sign(ref[1:]) != np.sign(ref[:-1]))[0] + 1
     semiciclos = list(zip(cruces[:-1], cruces[1:]))
     picos = [np.max(np.abs(ref[a:b])) for a, b in semiciclos]
@@ -47,18 +47,23 @@ def main():
         if abs(p - picos[0]) > 0.05 * max(p, picos[0]):
             k0 = int(a)
             break
-    escalon = k0 is not None
-    if not escalon:
-        k0 = len(t) // 2
-    final = picos[-1] if escalon else np.nanmax(e_r)
-    fuera = [k for k in range(k0, len(t) - n // 2) if abs(e_i[k] - final) > 0.10 * final]
-    t_est = (fuera[-1] + 1 - k0) * tr * 1e3 if fuera else 0.0
+    if k0 is None:
+        sys.exit("La trama no contiene un cambio de amplitud de la referencia.")
+    final = picos[-1]
+    evaluados = np.flatnonzero((np.arange(len(t)) >= k0) & np.isfinite(e_i))
+    if not len(evaluados):
+        sys.exit("La ventana no permite evaluar la envolvente posterior al escalón.")
+    fuera = evaluados[np.abs(e_i[evaluados] - final) > 0.10 * final]
     pico = np.max(np.abs(i[k0:]))
     print(cab)
-    print(f"evento en t = {t[k0]*1e3:.1f} ms ({'cambio de referencia' if escalon else 'centro de la trama'})")
+    print(f"cambio de referencia en t = {t[k0] * 1e3:.1f} ms")
     print(f"amplitud antes: {np.nanmean(e_i[n//2:max(k0-n//2, n//2+1)]):.3f} A; referencia final {final:.3f} A")
     print(f"pico de |i| despues del evento: {pico:.3f} A ({100*(pico/final-1):+.1f} % sobre la referencia)")
-    print(f"envolvente dentro de +-10 % a los {t_est:.1f} ms (incluye ~10 ms de retardo de la ventana de un ciclo)")
+    if fuera.size and fuera[-1] == evaluados[-1]:
+        print("establecimiento en +-10 % no observado dentro de la ventana evaluable")
+    else:
+        t_est = (fuera[-1] + 1 - k0) * tr * 1e3 if fuera.size else 0.0
+        print(f"envolvente dentro de +-10 % a los {t_est:.1f} ms (ajuste centrado de un ciclo)")
     print(f"|m| maximo despues del evento: {np.max(np.abs(m[k0:])):.3f}")
     if "--sin-grafica" in sys.argv:
         return

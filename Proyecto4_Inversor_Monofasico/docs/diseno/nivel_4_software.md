@@ -14,7 +14,7 @@ Este documento desarrolla los bloques del [tercer nivel del software](nivel_3_so
 |---|---|---|
 | 1 | Activar la salida GPIO de medición | Marca el inicio de la iteración para el osciloscopio |
 | 2 | Leer el ADC | Código, número de muestra `n` y estado, en una lectura coherente |
-| 3 | Convertir y supervisar | Con muestra válida: corriente en amperios, rango del código, continuidad de `n` y sobrecorriente. Sin muestra válida solo se evalúa la continuidad de `n` y se usa `i_med = 0`. Un bit de error del ADC marca falla de muestras |
+| 3 | Convertir y supervisar | Con dato válido: convertir a amperios, revisar la continuidad de `n` y supervisar rango y sobrecorriente. Si el código está fuera de rango, se usa la última corriente cuyo código fue admitido. Sin muestra válida solo se evalúa la continuidad de `n` y se usa `i_med = 0`. Un bit de error del ADC marca falla de muestras |
 | 4 | Atender la parada | Si BTND está presionado en OPERACIÓN, se solicita apagar el PWM |
 | 5 | Aplicar las solicitudes del lazo principal | Solo si no hay falla. Habilitar (desde DETENIDO) exige `MEDICION_CALIBRADA = 1`; si no, la causa es una falla de configuración. Al habilitar se ponen en cero los estados del PR y se escribe REFERENCE = 0 antes de `enable = 1`. Apagar (desde OPERACIÓN) vuelve a DETENIDO. Se hace después de leer la muestra para que la conversión por software ya esté reconocida cuando el PWM empieza a disparar conversiones |
 | 6 | Decidir el estado | Una falla apaga el PWM y salta al paso 12. Fuera de OPERACIÓN no hay control: los estados del PR se ponen en cero y se salta al paso 12. En los primeros `N_ARRANQUE` períodos después de habilitar se escribe REFERENCE = 0 para cargar el bootstrap de los drivers y se salta al paso 12; al terminar, `θ` arranca en cero con la amplitud pedida |
@@ -28,7 +28,7 @@ Este documento desarrolla los bloques del [tercer nivel del software](nivel_3_so
 | 14 | Reconocer la interrupción | Limpiar el pendiente del Timer y del controlador de interrupciones |
 | 15 | Desactivar la salida GPIO de medición | El ancho del pulso es la duración de la ISR |
 
-Las solicitudes de habilitar y apagar vienen del lazo principal, pero solo la ISR las aplica, de modo que el cambio de estado nunca ocurre a mitad de una iteración. El paso 10 ocurre antes que el registro y la medición para que la referencia llegue al PWM lo antes posible dentro del período. El paso 14 es el único que depende de la configuración del controlador de interrupciones, que define la plataforma. La fase de la referencia avanza en cada iteración de OPERACIÓN y no solo cuando llega una muestra nueva, porque los 50 Hz son una magnitud del tiempo y no del número de muestras recibidas; de lo contrario, cada muestra repetida atrasaría la referencia 0,9° a 20 kHz.
+Las solicitudes de habilitar y apagar vienen del lazo principal, pero solo la ISR las aplica, de modo que el cambio de estado nunca ocurre a mitad de una iteración. El paso 10 ocurre antes que el registro y la medición para que la referencia llegue al PWM lo antes posible dentro del período. El paso 14 es el único que depende de la configuración del controlador de interrupciones, que define la plataforma. La fase de la referencia avanza en cada iteración de OPERACIÓN y no solo cuando llega una muestra nueva, porque los 50 Hz son una magnitud del tiempo y no del número de muestras recibidas; de lo contrario, cada muestra repetida atrasaría la referencia 1,8° a 10 kHz.
 
 ### Lectura y validación de la muestra
 
@@ -37,6 +37,8 @@ La corriente se obtiene con la relación lineal que documente la adquisición:
 ```math
 i_{med} = (\text{código} - \text{OFFSET\_ADC}) \cdot \text{GANANCIA\_ADC}\quad [\text{A}].
 ```
+
+El firmware de banco habilita la operación con un cero de 1776 códigos, signo positivo y ganancia nominal de 7,6383 mA por código. El cero y el signo proceden de las pruebas de banco. Queda pendiente contrastar la ganancia con una medición independiente.
 
 El número de muestra es un contador de 16 bits que avanza con cada conversión. La diferencia con el anterior se calcula en aritmética modular:
 
@@ -58,8 +60,8 @@ En DETENIDO y FALLA el PWM está apagado y no hay disparos. Para seguir midiendo
 
 | Condición | Detección | Parámetro |
 |---|---|---|
-| Sobrecorriente | `|i_med| > I_MAX` en `N_SOBRECORRIENTE` muestras seguidas; una muestra normal reinicia la cuenta | `I_MAX`, de PEDP; `N_SOBRECORRIENTE = 3` |
-| Código fuera de rango | `código < CODIGO_MIN` o `código > CODIGO_MAX` en `N_CODIGO_FUERA` muestras seguidas: sensor saturado o desconectado. Una muestra aislada fuera de rango no entra al PR, que usa la última muestra válida | Límites de la adquisición; `N_CODIGO_FUERA = 3` |
+| Sobrecorriente | `|i_med| > I_MAX` en `N_SOBRECORRIENTE` evaluaciones consecutivas con dato válido. Un valor dentro del umbral reinicia la cuenta | `I_MAX`, = 1,5 A en banco. `N_SOBRECORRIENTE = 3` |
+| Código fuera de rango | `código < CODIGO_MIN` o `código > CODIGO_MAX` en `N_CODIGO_FUERA` evaluaciones consecutivas con dato válido. El PR conserva la última corriente con código admitido. Los picos que caen dentro del rango siguen llegando al PR | Límites de banco 16–4079. `N_CODIGO_FUERA = 3` |
 | Muestras anómalas | `N_FALLA_MUESTRAS` iteraciones consecutivas con `Δn` incorrecto, o un bit de error en el estado del ADC | `N_FALLA_MUESTRAS = 3` |
 | Exceso de tiempo | La duración medida en el paso 13 supera el período de control menos un margen | `MARGEN_ISR` = 10 µs |
 | Error de configuración | La lectura de comprobación del PWM no coincide, `running` no sube, o se pide habilitar con `MEDICION_CALIBRADA = 0` | `MEDICION_CALIBRADA` |
@@ -137,7 +139,7 @@ La ventana registrada es `N_BUF · K_REG · Ts`. El enunciado pide al menos 100 
 | 20 kHz | 50 µs | 2 | 102,4 ms | 10 kHz |
 | 25 kHz | 40 µs | 3 | 122,9 ms | 8,33 kHz |
 
-La construcción de Basys 3 usa `N_BUF = 512` y `K_REG = 2` para el controlador general. El ELF de laboratorio usa 256 y 4. Ambos conservan una ventana nominal de 102,4 ms con `Ts = 100 µs`. Los casos de 20 y 25 kHz de la tabla ilustran el dimensionamiento si se cambia la cadencia del control.
+La construcción de Basys 3 usa `N_BUF = 512` y `K_REG = 2` para el controlador general. El ELF de diagnóstico `lazo_laboratorio` usa 256 y 4. Las variantes de captura pueden cambiar la cadencia de registro, como consta en los resultados de laboratorio. Ambos conservan una ventana nominal de 102,4 ms con `Ts = 100 µs`. Los casos de 20 y 25 kHz de la tabla ilustran el dimensionamiento si se cambia la cadencia del control.
 
 La configuración inicial dispara la adquisición a mitad del período PWM (`TRIGGER_PHASE=5000` a 10 kHz). La relación con la ISR y la aplicación de la referencia se detalla en el [contrato de integración](pwm_integracion.md). La fase de disparo no garantiza por sí sola que la corriente leída sea exactamente el valor medio; se debe comprobar el efecto de los bordes y la latencia de adquisición. El rizado pico a pico se mide con el osciloscopio; la PC analiza la fundamental, su error y su desfase, con una adquisición que evite confundir rizado y aliasing.
 

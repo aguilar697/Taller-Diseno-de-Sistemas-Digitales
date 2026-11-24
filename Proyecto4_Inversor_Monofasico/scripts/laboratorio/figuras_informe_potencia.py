@@ -112,20 +112,21 @@ def main():
         print(f"{k}, {r['I1']:.4f}, {r['error']:+.2f}, {r['fase']:+.2f}, {r['M1']:.4f}, "
               f"{r['R']:.2f}, {r['L'] * 1e3:.1f}, {r['Z']:.2f}")
 
-    a, b = leer(tramas / "04_pr_24v_0a2.csv"), leer(tramas / "21_pr_24v_0a5_rep2.csv")
-    fig, ejes = plt.subplots(2, 2, figsize=(7.0, 3.6), sharex=True, gridspec_kw={"height_ratios": [2, 1]})
-    corrientes(ejes[0, 0], a, "(a) 24 V, 0,2 A pico")
-    corrientes(ejes[0, 1], b, "(b) 24 V, 0,5 A pico")
-    modulacion(ejes[1, 0], a)
-    modulacion(ejes[1, 1], b)
-    ejes[0, 1].set_ylabel("")
-    ejes[1, 1].set_ylabel("")
-    ejes[0, 0].set_ylim(-0.3, 0.3)
-    ejes[0, 1].set_ylim(-0.8, 0.8)
-    ejes[0, 0].legend(fontsize=6.5, frameon=False, loc="upper right", ncol=2)
-    fig.tight_layout(pad=0.4)
-    fig.savefig(figuras / "seguimiento_23nov.pdf")
-    plt.close(fig)
+    casos = (
+        ("04_pr_24v_0a2", "seguimiento_0a2.pdf", "24 V, 0,2 A pico", (-0.3, 0.3)),
+        ("21_pr_24v_0a5_rep2", "seguimiento_0a5.pdf", "24 V, 0,5 A pico", (-0.8, 0.8)),
+    )
+    for nombre, salida, titulo, limites in casos:
+        d = leer(tramas / f"{nombre}.csv")
+        fig, ejes = plt.subplots(2, 1, figsize=(3.5, 2.8), sharex=True,
+                                 gridspec_kw={"height_ratios": [2, 1]})
+        corrientes(ejes[0], d, titulo)
+        ejes[0].set_ylim(*limites)
+        ejes[0].legend(fontsize=6.5, frameon=False, loc="upper right", ncol=2)
+        modulacion(ejes[1], d)
+        fig.tight_layout(pad=0.4)
+        fig.savefig(figuras / salida)
+        plt.close(fig)
 
     c = leer(tramas / "08_pr_24v_1a.csv")
     fig, ejes = plt.subplots(2, 1, figsize=(3.5, 3.2), sharex=True, gridspec_kw={"height_ratios": [2, 1]})
@@ -138,34 +139,41 @@ def main():
     plt.close(fig)
 
     e = leer(tramas / "24_escalon_0a2_0a5_c102.csv")
-    g = leer(tramas / "37_cambio_carga_6v6_9v9_c410.csv")
-    fig, ejes = plt.subplots(2, 2, figsize=(7.0, 3.6), sharex="col", gridspec_kw={"height_ratios": [2, 1]})
+    fig, ejes = plt.subplots(2, 1, figsize=(3.5, 2.8), sharex=True,
+                             gridspec_kw={"height_ratios": [2, 1]})
     te = (e["t_s"] - e["t_s"][0]) * 1e3
     todo = slice(None)
-    corrientes(ejes[0, 0], e, "(a) Escalón 0,2 → 0,5 A, 24 V", todo, te)
-    modulacion(ejes[1, 0], e, todo, te)
-    ejes[0, 0].set_ylim(-0.8, 0.8)
-    ejes[0, 0].legend(fontsize=6.5, frameon=False, loc="upper left", ncol=2)
+    corrientes(ejes[0], e, "Escalón 0,2 a 0,5 A, 24 V", todo, te)
+    modulacion(ejes[1], e, todo, te)
+    ejes[0].set_ylim(-0.8, 0.8)
+    ejes[0].legend(fontsize=6.5, frameon=False, loc="upper left", ncol=2)
+    for ax in ejes:
+        ax.axvline(51.0, color=GRIS, lw=0.8, ls="--")
+    fig.tight_layout(pad=0.4)
+    fig.savefig(figuras / "escalon_referencia.pdf")
+    plt.close(fig)
+
+    g = leer(tramas / "37_cambio_carga_6v6_9v9_c410.csv")
+    fig, ejes = plt.subplots(2, 1, figsize=(3.5, 2.8), sharex=True,
+                             gridspec_kw={"height_ratios": [2, 1]})
     tg = (g["t_s"] - g["t_s"][0]) * 1e3
     ei, em = envolvente(g["t_s"], g["i_med_A"]), envolvente(g["t_s"], g["m"])
-    ejes[0, 1].plot(tg, ei, color=AZUL, lw=1.3, label="Amplitud de la corriente")
-    ejes[0, 1].axhline(0.5, color=NARANJA, ls="--", lw=1.0, label="Referencia")
-    ejes[0, 1].set_ylim(0.40, 0.52)
-    ejes[0, 1].set_title("(b) Cambio de carga 6,6 → 9,9 Ω, 0,5 A, 24 V", fontsize=8, color=TINTA, loc="left")
-    ejes[0, 1].set_ylabel("Amplitud (A)", fontsize=7, color=TINTA)
-    ejes[0, 1].legend(fontsize=6.5, frameon=False, loc="lower left")
-    estilo(ejes[0, 1])
-    ejes[1, 1].plot(tg, em, color=TINTA, lw=1.3)
-    ejes[1, 1].set_ylim(0.6, 0.8)
-    ejes[1, 1].set_ylabel("Amplitud de m", fontsize=7, color=TINTA)
-    ejes[1, 1].set_xlabel("Tiempo (ms)", fontsize=7, color=TINTA)
-    estilo(ejes[1, 1])
-    for ax in ejes[:, 0]:
-        ax.axvline(51.0, color=GRIS, lw=0.8, ls="--")
-    for ax in ejes[:, 1]:
+    ejes[0].plot(tg, ei, color=AZUL, lw=1.3, label="Amplitud de la corriente")
+    ejes[0].axhline(0.5, color=NARANJA, ls="--", lw=1.0, label="Referencia")
+    ejes[0].set_ylim(0.40, 0.52)
+    ejes[0].set_title("Cambio de carga 6,6 a 9,9 Ω, 0,5 A, 24 V", fontsize=8, color=TINTA, loc="left")
+    ejes[0].set_ylabel("Amplitud (A)", fontsize=7, color=TINTA)
+    ejes[0].legend(fontsize=6.5, frameon=False, loc="lower left")
+    estilo(ejes[0])
+    ejes[1].plot(tg, em, color=TINTA, lw=1.3)
+    ejes[1].set_ylim(0.6, 0.8)
+    ejes[1].set_ylabel("Amplitud de m", fontsize=7, color=TINTA)
+    ejes[1].set_xlabel("Tiempo (ms)", fontsize=7, color=TINTA)
+    estilo(ejes[1])
+    for ax in ejes:
         ax.axvline(297.0, color=GRIS, lw=0.8, ls="--")
     fig.tight_layout(pad=0.4)
-    fig.savefig(figuras / "transitorios.pdf")
+    fig.savefig(figuras / "cambio_carga.pdf")
     plt.close(fig)
     print("Figuras en", figuras)
 

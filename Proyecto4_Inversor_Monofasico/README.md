@@ -21,12 +21,12 @@ Taller de Diseño Digital comprende a los cuatro integrantes. En Procesamiento E
 
 ## Documentación
 
-- [Documento de diseño](docs/diseno/README.md) con objetivos, diagramas, interfaces y estrategia de verificación.
+- [Documento de diseño](docs/diseno/README.md) con objetivos, diagramas, interfaces y estrategia de verificación. Incluye los [criterios de diseño y el esquemático completo](docs/diseno/criterios_de_diseno.md).
 - [Informe técnico de Taller de Diseño Digital](docs/informe/README.md) con simulaciones, resultados de implementación y análisis de las mediciones.
-- [Reconstrucción y conexiones en Basys 3](docs/diseno/integracion_basys3.md).
+- [Reconstrucción en Basys 3](docs/diseno/integracion_basys3.md) y [conexiones de S1–S4 desde el PWM](docs/diseno/integracion_basys3.md#conexiones).
 - [Diseño, simulación e informe de Potencia](Potencia/README.md).
 
-La implementación digital generó bitstream y los bancos funcionales del PWM y la integración PWM–ADC pasaron. En el montaje se comprobó la conmutación a 10 kHz y la lectura del XADC en reposo. El ensayo a 3 V se detuvo durante el sondeo previo al PR y el seguimiento físico en lazo cerrado sigue pendiente.
+La Basys 3 ejecutó el control PR del inversor en lazo cerrado y exportó por UART la referencia, la corriente medida y la modulación. Con la carga de laboratorio, la fundamental quedó dentro de ±10 % a 0,2 A pico con 12 y 24 V, y a 0,5 A pico con 24 V. También se registraron el escalón de 0,2 a 0,5 A y el aumento de resistencia externa de 6,6 a 9,9 Ω en marcha. Quedan por resolver el seguimiento a 0,5 A pico con 12 V y a 1 A pico con ambos buses, el escalón hacia esa consigna y la medición del rizado. [Resultados de laboratorio](docs/informe/README.md#laboratorio-y-análisis-de-discrepancias).
 
 ## Estructura
 
@@ -66,13 +66,14 @@ Proyecto4_Inversor_Monofasico/
 ├── scripts/
 │   ├── vivado/
 │   ├── vitis/
-│   └── verificacion/
+│   ├── verificacion/
+│   └── laboratorio/
 └── modelos/
     ├── analisis/
     └── plecs/
 ```
 
-Las fuentes, los modelos y la documentación se conservan en estas carpetas. Vivado y Vitis generan proyectos, bitstreams y ejecutables en directorios externos al repositorio. Las pruebas de PC utilizan `build/`, excluido de Git. Las evidencias utilizadas en el informe se almacenan en `docs/informe/resultados/` con sus condiciones de ensayo.
+Vivado y Vitis generan proyectos, bitstreams y ejecutables en directorios externos al repositorio. Las pruebas de PC utilizan `build/`, excluido de Git. Los informes enlazan los datos de UART, los reportes digitales y las capturas de osciloscopio con sus condiciones de ensayo.
 
 ## Herramientas
 

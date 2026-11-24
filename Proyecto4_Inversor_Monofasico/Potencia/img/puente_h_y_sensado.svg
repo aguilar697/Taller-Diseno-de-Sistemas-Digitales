@@ -42,10 +42,10 @@
     </g>
     <g font-size="16">
       <text x="490" y="70">+Vbus · 12–24 V DC</text>
-      <text x="230" y="142"><tspan x="230" dy="5">Q_AH</tspan><tspan x="230" dy="19">IRF540N</tspan></text>
-      <text x="750" y="142"><tspan x="750" dy="5">Q_BH</tspan><tspan x="750" dy="19">IRF540N</tspan></text>
-      <text x="230" y="292"><tspan x="230" dy="5">Q_AL</tspan><tspan x="230" dy="19">IRF540N</tspan></text>
-      <text x="750" y="292"><tspan x="750" dy="5">Q_BL</tspan><tspan x="750" dy="19">IRF540N</tspan></text>
+      <text x="230" y="142"><tspan x="230" dy="5">S1</tspan><tspan x="230" dy="19">IRF540N</tspan></text>
+      <text x="750" y="142"><tspan x="750" dy="5">S3</tspan><tspan x="750" dy="19">IRF540N</tspan></text>
+      <text x="230" y="292"><tspan x="230" dy="5">S4</tspan><tspan x="230" dy="19">IRF540N</tspan></text>
+      <text x="750" y="292"><tspan x="750" dy="5">S2</tspan><tspan x="750" dy="19">IRF540N</tspan></text>
       <text x="215" y="219">A</text><text x="765" y="219">B</text>
       <text x="352" y="230">ACS712 de 5 A</text>
       <text x="485" y="230">Devanado</text>

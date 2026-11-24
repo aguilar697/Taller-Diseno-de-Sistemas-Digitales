@@ -1,37 +1,27 @@
-# Pendientes y validación de potencia
+# Estado de validación de potencia
 
 ## Revisión frente al instructivo
 
-El alcance se toma de la sección 4.3 y del anexo B del [instructivo](../docs/enunciado/Proyecto_4_EL3313__Taller_de_Diseño_Digital.pdf). La siguiente comparación identifica el estado documentado, no una calificación ni una validación física.
+El alcance se toma de la sección 4.3 y del anexo B del [instructivo](../docs/enunciado/Proyecto_4_EL3313__Taller_de_Diseño_Digital.pdf). El [informe experimental](../docs/informe/potencia/informe_potencia.pdf) presenta las mediciones, su contraste con PLECS y las discrepancias.
 
 | Requisito | Disponible | Trabajo por completar |
 |---|---|---|
-| Etapa de potencia y carga | Componentes, mediciones LCR, dimensionamiento y esquemas del puente y del accionamiento | Contrastar el esquema con el cableado definitivo y registrar la instrumentación y desconexión |
-| Pérdidas y frecuencia | Frecuencias de evaluación y barrido inicial de rizado | Estimaciones de pérdidas de conducción/conmutación con los componentes elegidos y justificación de la frecuencia nominal |
-| Planta RL | Parámetros iniciales y simulaciones lineales | Contrastar los parámetros y la respuesta del modelo RL con el montaje |
-| Controlador PR | Candidatos continuo y discreto; coeficientes reproducibles, estabilidad lineal con retardo y seis ensayos nominales en PLECS | Validar sintonización, saturación y retardo con la planta y el sensor físicos |
-| Medición | ACS712 disponible, divisor propuesto y evaluación nominal con filtro y ADC cuantizado | Alimentación a 5 V, calibración, signo, ruido, filtro y precisión físicos; verificar dato convertido y retardo |
-| Simulación PLECS | Cuatro originales conservados, PR discreto y copia funcional con tiempo muerto, Ron y medición; nominales y escalones reproducibles | Completar diodos, pérdidas de conmutación, saturación, rizado, tolerancias y contraste con el montaje |
-| Demostración e informe | Plan de ensayos y cálculos exploratorios | Pruebas físicas, exportación de datos, extracción de fundamental, rizado y comparación cuantitativa |
-| Integración con Taller | Interfaces, RTL, simulación digital integrada y puesta en marcha | Completar ejecución física del PR, calibración y medición de latencias |
+| Etapa de potencia y carga | Puente H con IRF540N e IR2110, carga con 6,6 y 9,9 Ω externos, dimensionamiento y cambio de carga en marcha | Caracterizar el devanado de reemplazo en la banda de operación |
+| Pérdidas y frecuencia | Estimaciones de conducción y conmutación, comparación de frecuencias y selección de 10 kHz | Confirmar el rizado experimental |
+| Planta RL y PR | Modelo nominal en PLECS, comparación experimental e impedancia aparente estimada | Comprobar la impedancia con tensión y corriente medidas de forma independiente |
+| Medición | Cero y signo comprobados, escala nominal aplicada y tramas del XADC | Contrastar la ganancia y el ruido con una referencia independiente |
+| Seguimiento de 50 Hz | Dentro de ±10 % a 0,2 A con ambos buses y a 0,5 A con 24 V. Fuera de tolerancia a 0,5 A con 12 V y a 1 A con ambos buses | Mejorar el margen del montaje para los puntos fuera de tolerancia |
+| Cambio de referencia | Seis ensayos de 0,2 a 0,5 A con 24 V y 6,6 Ω | Ensayar 0,5 a 1 A con la misma carga cuando el punto de 1 A sea viable |
+| Cambio de carga | +50 % con inductancia fija a 0,5 A pico y 24 V. Amplitud dentro de ±10 % antes y después | Completar las trazas de tensión, corriente independiente y PWM del transitorio |
+| Integración con Taller | Lazo físico con MicroBlaze V, PWM, XADC y exportación UART en operación | Medir período efectivo, jitter y relación entre disparo, ISR y actuación |
 
 El diseño de potencia y su informe corresponden a Kevin Aguilar, Kenneth Campos y Kevin Cortés. La plataforma de Daniel Puentes pertenece a Taller. La sección 8.2 separa los 80 puntos propios de PEDP de los 20 de integración; demostrar los primeros también requiere un controlador discreto funcionando físicamente. La organización de ambos informes se conserva en [docs/informe](../docs/informe/README.md).
 
-## Trabajo pendiente
+## Mediciones por completar
 
-La salida inferior derecha respondió al sustituir la protoboard. La prioridad actual es confirmar ganancia, signo y ruido del sensado con el retorno VAUX6 corregido, y explicar la respuesta débil obtenida en el sondeo abierto. El [registro de laboratorio](04_registro_laboratorio.md) distingue estas comprobaciones del cierre del lazo, todavía pendiente.
-
-| Orden | Actividad | Resultado necesario |
-|---|---|---|
-| 1 | Verificar el esquema de accionamiento IR2110 | Salidas inferiores verificadas; completar VGS superior, caída de bootstrap y tiempo muerto de ambas ramas. Los pines JA y el SD manual están definidos |
-| 2 | Evaluar la adaptación del ACS712 | Probar el divisor de 4,7 kΩ/1 kΩ, calibrar y medir ruido y precisión a 0,2 A; confirmar canal XADC, alineación de dato y filtrado; añadir ganancia si los resultados lo requieren |
-| 3 | Completar la carga y la protección | Identificar devanado, comprobar resistencia y comportamiento con corriente; definir cambio de carga, límite de fuente, fusible y desconexión |
-| 4 | Completar la simulación con los componentes comprados | Contrastar la copia funcional con mediciones del sensor, accionamiento y carga; completar diodos, pérdidas, saturación y rizado; separar ensayos de bus y carga |
-| 5 | Coordinar el lazo digital | Verificar en tarjeta 10 kHz, disparo en fase 5000, período de control de 100 µs y latencias. Confirmar la escala firmada del sensor |
-| 6 | Verificar el montaje | Comprobar compuertas sin energizar el bus, iniciar con corriente limitada y registrar los ensayos nominales y transitorios |
-| 7 | Completar resultados | Exportar datos, calcular fundamental, fase y rizado, y comparar teoría, PLECS y laboratorio |
-
-La coordinación mantiene actuación con Kevin Aguilar, adquisición con Kenneth Campos y control con Kevin Cortés; la integración digital se acuerda además con Daniel Puentes. Las decisiones de interfaz se comparten antes de modificar puertos, escalas o temporización. La implementación digital y las pruebas del circuito avanzan en paralelo.
+1. Repetir una condición estable a 24 V y 0,5 A con corriente independiente, tensión aplicada y PWM registrados en la misma prueba. Para el rizado se requiere una ventana corta, con los canales dentro de escala y una tasa de muestreo que resuelva la conmutación.
+2. Caracterizar el devanado y contrastar el cero y la ganancia del ACS712 en ambos sentidos. Con esa evidencia, seleccionar la carga que ofrezca margen para llegar a 1 A y repetir el seguimiento y el escalón de 0,5 a 1 A.
+3. Medir el período y jitter en JB1 durante operación extendida, incluida la exportación UART. Documentar por separado el ancho del pulso de diagnóstico y el intervalo entre flancos sucesivos.
 
 ## Condiciones de aceptación
 
@@ -46,7 +36,7 @@ El [instructivo del proyecto](../docs/enunciado/Proyecto_4_EL3313__Taller_de_Dis
 | Fase | Medir y reportar el desfase respecto a la referencia |
 | Rizado | Conmutación ≤0,20 A pico a pico, separada de la componente de baja frecuencia |
 | Cambio de referencia | Ensayar 0,2 → 0,5 A y 0,5 → 1 A pico sin cambiar la carga |
-| Cambio de carga | Variar la resistencia externa al menos 25 %, con L fija y referencia de 0,5 A pico; se propone 6,6 → 9,9 Ω |
+| Cambio de carga | Variar la resistencia externa al menos 25 % con L fija y referencia de 0,5 A pico. El ensayo registrado empleó 6,6 → 9,9 Ω |
 | Control | Justificar sintonización, discretización, estabilidad y retardo del PR implementado |
 | Carga inductiva | Documentar los valores utilizados, resistencia del devanado y condición del primario; verificar corriente y disipación. El instructivo no exige curvas de saturación ni caracterización magnética especializada |
 | PWM digital | Ofrecer al menos tres frecuencias seleccionables y justificar la frecuencia nominal, el tiempo muerto y la saturación |

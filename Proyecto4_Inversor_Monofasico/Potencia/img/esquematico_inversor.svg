@@ -1,0 +1,429 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1500" viewBox="0 0 1600 1500" role="img" aria-labelledby="titulo detalle">
+<title id="titulo">Esquemático del inversor monofásico y de su interfaz con la Basys 3</title>
+<desc id="detalle">Dos IR2110 con sus circuitos de bootstrap y desacoplo, un puente H de cuatro IRF540N, carga RL con ACS712, acondicionamiento analógico, alimentaciones y conectores de la Basys 3.</desc>
+<style>
+text{font-family:Arial,sans-serif;fill:#162832;font-size:16px}
+.titulo{font-size:36px;font-weight:700;letter-spacing:-.45px}
+.subtitulo{font-size:17px;fill:#4a606b}
+.seccion{font-size:20px;font-weight:700;fill:#0d394a}
+.comp{font-weight:700}
+.peq{font-size:14px;fill:#425966}
+.red{font-size:14px;font-weight:700;fill:#13586c}
+.w{fill:none;stroke:#243d48;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.i{fill:none;stroke:#167088;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+.p{fill:none;stroke:#953f20;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.bg{fill:#f3f7f8}.panel{fill:white;stroke:#c2d2da;stroke-width:1.5}
+.ic{fill:#edf6f8;stroke:#294d5d;stroke-width:2}
+.dot{fill:#243d48}.tag{fill:#eaf5f7;stroke:#8cbcc7;stroke-width:1}
+</style>
+<rect width="1600" height="1500" class="bg"/>
+
+<text x="35" y="54" class="titulo" text-anchor="start">Inversor monofásico · esquemático de interconexión</text>
+<text x="35" y="82" class="subtitulo" text-anchor="start">Basys 3 · accionamiento, puente H, carga RL y medida de corriente</text>
+<text x="1564" y="78" class="peq" text-anchor="end">Las etiquetas iguales representan el mismo nodo.</text>
+<rect x="35" y="105" width="752" height="384" rx="10" class="panel"/>
+<text x="56" y="135" class="seccion" text-anchor="start">Accionamiento A · U1, IR2110 DIP-14</text>
+<rect x="272" y="189" width="233" height="212" rx="6" class="ic"/>
+<text x="388" y="220" class="comp" text-anchor="middle">IR2110</text>
+<rect x="56" y="232" width="97" height="24" rx="4" class="tag"/>
+<text x="104.5" y="249" class="red" text-anchor="middle">JA1</text>
+<path d="M153 244H272" class="i"/>
+<text x="283" y="249" class="" text-anchor="start">HIN · 10</text>
+<rect x="56" y="266" width="97" height="24" rx="4" class="tag"/>
+<text x="104.5" y="283" class="red" text-anchor="middle">JA2</text>
+<path d="M153 278H272" class="i"/>
+<text x="283" y="283" class="" text-anchor="start">LIN · 12</text>
+<rect x="56" y="300" width="97" height="24" rx="4" class="tag"/>
+<text x="104.5" y="317" class="red" text-anchor="middle">SD</text>
+<path d="M153 312H272" class="i"/>
+<text x="283" y="317" class="" text-anchor="start">SD · 11</text>
+<rect x="56" y="334" width="97" height="24" rx="4" class="tag"/>
+<text x="104.5" y="351" class="red" text-anchor="middle">+3V3_AUX</text>
+<path d="M153 346H272" class="i"/>
+<text x="283" y="351" class="" text-anchor="start">VDD · 9</text>
+<rect x="56" y="368" width="97" height="24" rx="4" class="tag"/>
+<text x="104.5" y="385" class="red" text-anchor="middle">GND</text>
+<path d="M153 380H272" class="i"/>
+<text x="283" y="385" class="" text-anchor="start">VSS · 13</text>
+<text x="494" y="249" class="" text-anchor="end">6 · VB</text>
+<path d="M505 244H693" class="i"/>
+<rect x="693" y="232" width="70" height="24" rx="4" class="tag"/>
+<text x="728.0" y="249" class="red" text-anchor="middle">VB_A</text>
+<text x="494" y="283" class="" text-anchor="end">5 · VS</text>
+<path d="M505 278H693" class="i"/>
+<rect x="693" y="266" width="70" height="24" rx="4" class="tag"/>
+<text x="728.0" y="283" class="red" text-anchor="middle">A</text>
+<text x="494" y="317" class="" text-anchor="end">7 · HO</text>
+<path d="M505 312H583v-5h32v10h-32v-5m32 0H693" class="w"/>
+<text x="599" y="300" class="peq" text-anchor="middle">22 Ω</text>
+<rect x="693" y="300" width="70" height="24" rx="4" class="tag"/>
+<text x="728.0" y="317" class="red" text-anchor="middle">G_AH</text>
+<text x="494" y="351" class="" text-anchor="end">1 · LO</text>
+<path d="M505 346H583v-5h32v10h-32v-5m32 0H693" class="w"/>
+<text x="599" y="334" class="peq" text-anchor="middle">22 Ω</text>
+<rect x="693" y="334" width="70" height="24" rx="4" class="tag"/>
+<text x="728.0" y="351" class="red" text-anchor="middle">G_AL</text>
+<text x="494" y="385" class="" text-anchor="end">2 · COM</text>
+<path d="M505 380H693" class="i"/>
+<rect x="693" y="368" width="70" height="24" rx="4" class="tag"/>
+<text x="728.0" y="385" class="red" text-anchor="middle">GND</text>
+<path d="M387 189v-10" class="w"/>
+<rect x="339" y="156" width="96" height="24" rx="4" class="tag"/>
+<text x="387.0" y="173" class="red" text-anchor="middle">+12V_AUX</text>
+<text x="442" y="185" class="peq" text-anchor="start">3 · VCC</text>
+<text x="388" y="393" class="peq" text-anchor="middle">4/8/14 · NC</text>
+<path d="M636 244v-57" class="i"/>
+<circle cx="636" cy="244" r="3.5" class="dot"/>
+<path d="M514 187H527v-5h32v10h-32v-5m32 0H572" class="w"/>
+<text x="543" y="211" class="peq" text-anchor="middle">2,2 Ω</text>
+<path d="M572 187H594m0 -8v16l18 -8zM612 178v18m0 -9H636" class="w"/>
+<rect x="497" y="142" width="96" height="24" rx="4" class="tag"/>
+<text x="545.0" y="159" class="red" text-anchor="middle">+12V_AUX</text>
+<path d="M514 166v21" class="i"/>
+<text x="604" y="172" class="peq" text-anchor="middle">SB360</text>
+<text x="654" y="191" class="peq" text-anchor="start">banda a VB</text>
+<rect x="56" y="424" width="70" height="24" rx="4" class="tag"/>
+<text x="91.0" y="441" class="red" text-anchor="middle">VB_A</text>
+<path d="M126 436h31" class="i"/>
+<path d="M157 436v12m-11 0h22m-22 8h22m-11 0V469" class="w"/>
+<path d="M157 469h33" class="i"/>
+<rect x="190" y="457" width="42" height="24" rx="4" class="tag"/>
+<text x="211.0" y="474" class="red" text-anchor="middle">A</text>
+<text x="172" y="444" class="peq" text-anchor="start">1 µF ∥ 100 nF</text>
+<rect x="272" y="424" width="104" height="24" rx="4" class="tag"/>
+<text x="324.0" y="441" class="red" text-anchor="middle">+12V_AUX</text>
+<path d="M376 436h27" class="i"/>
+<path d="M403 436v12m-11 0h22m-22 8h22m-11 0V469" class="w"/>
+<path d="M403 469v8m-10 0h20m-16 5h12m-9 5h6" class="w"/>
+<text x="417" y="446" class="peq" text-anchor="start">10 µF ∥ 100 nF</text>
+<rect x="540" y="424" width="104" height="24" rx="4" class="tag"/>
+<text x="592.0" y="441" class="red" text-anchor="middle">+3V3_AUX</text>
+<path d="M644 436h19" class="i"/>
+<path d="M663 436v12m-11 0h22m-22 8h22m-11 0V469" class="w"/>
+<path d="M663 469v8m-10 0h20m-16 5h12m-9 5h6" class="w"/>
+<text x="677" y="446" class="peq" text-anchor="start">1 µF ∥</text>
+<text x="677" y="464" class="peq" text-anchor="start">100 nF</text>
+<rect x="813" y="105" width="752" height="384" rx="10" class="panel"/>
+<text x="834" y="135" class="seccion" text-anchor="start">Accionamiento B · U2, IR2110 DIP-14</text>
+<rect x="1050" y="189" width="233" height="212" rx="6" class="ic"/>
+<text x="1166" y="220" class="comp" text-anchor="middle">IR2110</text>
+<rect x="834" y="232" width="97" height="24" rx="4" class="tag"/>
+<text x="882.5" y="249" class="red" text-anchor="middle">JA3</text>
+<path d="M931 244H1050" class="i"/>
+<text x="1061" y="249" class="" text-anchor="start">HIN · 10</text>
+<rect x="834" y="266" width="97" height="24" rx="4" class="tag"/>
+<text x="882.5" y="283" class="red" text-anchor="middle">JA4</text>
+<path d="M931 278H1050" class="i"/>
+<text x="1061" y="283" class="" text-anchor="start">LIN · 12</text>
+<rect x="834" y="300" width="97" height="24" rx="4" class="tag"/>
+<text x="882.5" y="317" class="red" text-anchor="middle">SD</text>
+<path d="M931 312H1050" class="i"/>
+<text x="1061" y="317" class="" text-anchor="start">SD · 11</text>
+<rect x="834" y="334" width="97" height="24" rx="4" class="tag"/>
+<text x="882.5" y="351" class="red" text-anchor="middle">+3V3_AUX</text>
+<path d="M931 346H1050" class="i"/>
+<text x="1061" y="351" class="" text-anchor="start">VDD · 9</text>
+<rect x="834" y="368" width="97" height="24" rx="4" class="tag"/>
+<text x="882.5" y="385" class="red" text-anchor="middle">GND</text>
+<path d="M931 380H1050" class="i"/>
+<text x="1061" y="385" class="" text-anchor="start">VSS · 13</text>
+<text x="1272" y="249" class="" text-anchor="end">6 · VB</text>
+<path d="M1283 244H1471" class="i"/>
+<rect x="1471" y="232" width="70" height="24" rx="4" class="tag"/>
+<text x="1506.0" y="249" class="red" text-anchor="middle">VB_B</text>
+<text x="1272" y="283" class="" text-anchor="end">5 · VS</text>
+<path d="M1283 278H1471" class="i"/>
+<rect x="1471" y="266" width="70" height="24" rx="4" class="tag"/>
+<text x="1506.0" y="283" class="red" text-anchor="middle">B</text>
+<text x="1272" y="317" class="" text-anchor="end">7 · HO</text>
+<path d="M1283 312H1361v-5h32v10h-32v-5m32 0H1471" class="w"/>
+<text x="1377" y="300" class="peq" text-anchor="middle">22 Ω</text>
+<rect x="1471" y="300" width="70" height="24" rx="4" class="tag"/>
+<text x="1506.0" y="317" class="red" text-anchor="middle">G_BH</text>
+<text x="1272" y="351" class="" text-anchor="end">1 · LO</text>
+<path d="M1283 346H1361v-5h32v10h-32v-5m32 0H1471" class="w"/>
+<text x="1377" y="334" class="peq" text-anchor="middle">22 Ω</text>
+<rect x="1471" y="334" width="70" height="24" rx="4" class="tag"/>
+<text x="1506.0" y="351" class="red" text-anchor="middle">G_BL</text>
+<text x="1272" y="385" class="" text-anchor="end">2 · COM</text>
+<path d="M1283 380H1471" class="i"/>
+<rect x="1471" y="368" width="70" height="24" rx="4" class="tag"/>
+<text x="1506.0" y="385" class="red" text-anchor="middle">GND</text>
+<path d="M1165 189v-10" class="w"/>
+<rect x="1117" y="156" width="96" height="24" rx="4" class="tag"/>
+<text x="1165.0" y="173" class="red" text-anchor="middle">+12V_AUX</text>
+<text x="1220" y="185" class="peq" text-anchor="start">3 · VCC</text>
+<text x="1166" y="393" class="peq" text-anchor="middle">4/8/14 · NC</text>
+<path d="M1414 244v-57" class="i"/>
+<circle cx="1414" cy="244" r="3.5" class="dot"/>
+<path d="M1292 187H1305v-5h32v10h-32v-5m32 0H1350" class="w"/>
+<text x="1321" y="211" class="peq" text-anchor="middle">2,2 Ω</text>
+<path d="M1350 187H1372m0 -8v16l18 -8zM1390 178v18m0 -9H1414" class="w"/>
+<rect x="1275" y="142" width="96" height="24" rx="4" class="tag"/>
+<text x="1323.0" y="159" class="red" text-anchor="middle">+12V_AUX</text>
+<path d="M1292 166v21" class="i"/>
+<text x="1382" y="172" class="peq" text-anchor="middle">SB360</text>
+<text x="1432" y="191" class="peq" text-anchor="start">banda a VB</text>
+<rect x="834" y="424" width="70" height="24" rx="4" class="tag"/>
+<text x="869.0" y="441" class="red" text-anchor="middle">VB_B</text>
+<path d="M904 436h31" class="i"/>
+<path d="M935 436v12m-11 0h22m-22 8h22m-11 0V469" class="w"/>
+<path d="M935 469h33" class="i"/>
+<rect x="968" y="457" width="42" height="24" rx="4" class="tag"/>
+<text x="989.0" y="474" class="red" text-anchor="middle">B</text>
+<text x="950" y="444" class="peq" text-anchor="start">1 µF ∥ 100 nF</text>
+<rect x="1050" y="424" width="104" height="24" rx="4" class="tag"/>
+<text x="1102.0" y="441" class="red" text-anchor="middle">+12V_AUX</text>
+<path d="M1154 436h27" class="i"/>
+<path d="M1181 436v12m-11 0h22m-22 8h22m-11 0V469" class="w"/>
+<path d="M1181 469v8m-10 0h20m-16 5h12m-9 5h6" class="w"/>
+<text x="1195" y="446" class="peq" text-anchor="start">10 µF ∥ 100 nF</text>
+<rect x="1318" y="424" width="104" height="24" rx="4" class="tag"/>
+<text x="1370.0" y="441" class="red" text-anchor="middle">+3V3_AUX</text>
+<path d="M1422 436h19" class="i"/>
+<path d="M1441 436v12m-11 0h22m-22 8h22m-11 0V469" class="w"/>
+<path d="M1441 469v8m-10 0h20m-16 5h12m-9 5h6" class="w"/>
+<text x="1455" y="446" class="peq" text-anchor="start">1 µF ∥</text>
+<text x="1455" y="464" class="peq" text-anchor="start">100 nF</text>
+<rect x="35" y="510" width="1019" height="492" rx="10" class="panel"/>
+<text x="56" y="540" class="seccion" text-anchor="start">Puente H y carga · IRF540N de canal N</text>
+<path d="M85 596H974M85 936H974" class="p"/>
+<text x="85" y="582" class="red" text-anchor="start">BUS+ · 12–24 V DC</text>
+<text x="83" y="969" class="red" text-anchor="start">GND · negativo del bus</text>
+<path d="M95 596v166m-11 0h22m-22 8h22m-11 0V936" class="w"/>
+<path d="M160 596v166m-11 0h22m-22 8h22m-11 0V936" class="w"/>
+<circle cx="95" cy="596" r="3.5" class="dot"/>
+<circle cx="95" cy="936" r="3.5" class="dot"/>
+<circle cx="160" cy="596" r="3.5" class="dot"/>
+<circle cx="160" cy="936" r="3.5" class="dot"/>
+<text x="109" y="747" class="comp" text-anchor="start">+</text>
+<text x="107" y="793" class="peq" text-anchor="start">100 µF</text>
+<text x="173" y="814" class="peq" text-anchor="start">100 nF</text>
+<path d="M280 596V625M280 703V834M280 912V936" class="p"/>
+<path d="M280 625v17h-18v9m0 8v8m0 7v9h18v20" class="w"/>
+<path d="M253 640v42M225 661H253" class="w"/>
+<path d="M262 663h18v20m-4 -24l-7 4  7 4" class="w"/>
+<path d="M280 634h18v16m-8 0h16m-16 16h16l-8 -16zM298 666v26h-18" class="w"/>
+<text x="327" y="647" class="comp" text-anchor="start">S1</text>
+<rect x="176" y="649" width="49" height="24" rx="4" class="tag"/>
+<text x="200.5" y="666" class="red" text-anchor="middle">G_AH</text>
+<path d="M280 834v17h-18v9m0 8v8m0 7v9h18v20" class="w"/>
+<path d="M253 849v42M225 870H253" class="w"/>
+<path d="M262 872h18v20m-4 -24l-7 4  7 4" class="w"/>
+<path d="M280 843h18v16m-8 0h16m-16 16h16l-8 -16zM298 875v26h-18" class="w"/>
+<text x="327" y="856" class="comp" text-anchor="start">S4</text>
+<rect x="176" y="858" width="49" height="24" rx="4" class="tag"/>
+<text x="200.5" y="875" class="red" text-anchor="middle">G_AL</text>
+<circle cx="280" cy="596" r="3.5" class="dot"/>
+<circle cx="280" cy="936" r="3.5" class="dot"/>
+<circle cx="280" cy="772" r="3.5" class="dot"/>
+<path d="M974 596V625M974 703V834M974 912V936" class="p"/>
+<path d="M974 625v17h18v9m0 8v8m0 7v9h-18v20" class="w"/>
+<path d="M1001 640v42M1029 661H1001" class="w"/>
+<path d="M992 663h-18v20m4 -24l7 4  -7 4" class="w"/>
+<path d="M974 634h-18v16m-8 0h16m-16 16h16l-8 -16zM956 666v26h18" class="w"/>
+<text x="927" y="647" class="comp" text-anchor="end">S3</text>
+<path d="M1029 661v-26" class="w"/>
+<rect x="977" y="611" width="65" height="24" rx="4" class="tag"/>
+<text x="1009.5" y="628" class="red" text-anchor="middle">G_BH</text>
+<path d="M974 834v17h18v9m0 8v8m0 7v9h-18v20" class="w"/>
+<path d="M1001 849v42M1029 870H1001" class="w"/>
+<path d="M992 872h-18v20m4 -24l7 4  -7 4" class="w"/>
+<path d="M974 843h-18v16m-8 0h16m-16 16h16l-8 -16zM956 875v26h18" class="w"/>
+<text x="927" y="856" class="comp" text-anchor="end">S2</text>
+<path d="M1029 870v-26" class="w"/>
+<rect x="977" y="820" width="65" height="24" rx="4" class="tag"/>
+<text x="1009.5" y="837" class="red" text-anchor="middle">G_BL</text>
+<circle cx="974" cy="596" r="3.5" class="dot"/>
+<circle cx="974" cy="936" r="3.5" class="dot"/>
+<circle cx="974" cy="772" r="3.5" class="dot"/>
+<path d="M280 772H319M457 772H489M580 772H599M703 772H719M823 772H840M942 772H974" class="p"/>
+<rect x="241" y="732" width="36" height="24" rx="4" class="tag"/>
+<text x="259.0" y="749" class="red" text-anchor="middle">A</text>
+<path d="M277 744h3v28" class="i"/>
+<rect x="977" y="732" width="36" height="24" rx="4" class="tag"/>
+<text x="995.0" y="749" class="red" text-anchor="middle">B</text>
+<path d="M977 744h-3v28" class="i"/>
+<rect x="319" y="750" width="138" height="44" rx="5" class="ic"/>
+<text x="388" y="745" class="comp" text-anchor="middle">U3 · ACS712 5 A</text>
+<text x="333" y="777" class="peq" text-anchor="start">IP+</text>
+<text x="443" y="777" class="peq" text-anchor="end">IP−</text>
+<path d="M489 772h9a9 9 0 0 1 18 0a9 9 0 0 1 18 0a9 9 0 0 1 18 0a9 9 0 0 1 18 0h10" class="p"/>
+<text x="535" y="745" class="comp" text-anchor="middle">L · secundario</text>
+<path d="M599 772H635v-5h32v10h-32v-5m32 0H703" class="w"/>
+<text x="651" y="760" class="peq" text-anchor="middle">R1 · 3,3 Ω</text>
+<path d="M719 772H755v-5h32v10h-32v-5m32 0H823" class="w"/>
+<text x="771" y="760" class="peq" text-anchor="middle">R2 · 3,3 Ω</text>
+<path d="M840 772H875v-5h32v10h-32v-5m32 0H942" class="w"/>
+<text x="891" y="760" class="peq" text-anchor="middle">R3 · 3,3 Ω</text>
+<path d="M840 772v-72M942 700v72" class="p"/>
+<path d="M840 700H854l71 -12m3 12H942" class="w"/>
+<circle cx="854" cy="700" r="3.5" class="dot"/>
+<circle cx="928" cy="700" r="3.5" class="dot"/>
+<circle cx="840" cy="772" r="3.5" class="dot"/>
+<circle cx="942" cy="772" r="3.5" class="dot"/>
+<text x="869" y="678" class="peq" text-anchor="middle">S_R3 · puente sobre R3</text>
+<path d="M353 822h60m-8 -5l8 5 -8 5" class="i"/>
+<text x="422" y="827" class="peq" text-anchor="start">i_L positiva de A hacia B</text>
+<text x="574" y="849" class="peq" text-anchor="start">Resistencias de carga · 5 W cada una</text>
+<text x="574" y="872" class="peq" text-anchor="start">S_R3 cerrado: 6,6 Ω externos · abierto: 9,9 Ω</text>
+<text x="574" y="895" class="peq" text-anchor="start">Primario del transformador abierto y aislado</text>
+<text x="367" y="976" class="peq" text-anchor="start">vAB = vA − vB · S1 y S2 → +Vdc · S3 y S4 → −Vdc</text>
+<text x="367" y="993" class="peq" text-anchor="start">Tensión nula: S1 y S3, o S2 y S4</text>
+<text x="367" y="957" class="peq" text-anchor="start">El cuerpo de cada MOSFET incorpora un diodo de S a D.</text>
+<rect x="1075" y="510" width="490" height="492" rx="10" class="panel"/>
+<text x="1096" y="540" class="seccion" text-anchor="start">Sensor y Basys 3</text>
+<rect x="1100" y="586" width="137" height="166" rx="6" class="ic"/>
+<text x="1168" y="615" class="comp" text-anchor="middle">U3 · ACS712</text>
+<text x="1168" y="636" class="peq" text-anchor="middle">lado de señal</text>
+<text x="1111" y="663" class="" text-anchor="start">VCC</text>
+<text x="1226" y="696" class="" text-anchor="end">OUT</text>
+<text x="1111" y="729" class="" text-anchor="start">GND</text>
+<rect x="1099" y="548" width="94" height="24" rx="4" class="tag"/>
+<text x="1146.0" y="565" class="red" text-anchor="middle">+5V_SENS</text>
+<path d="M1110 572v7h-18v79h8" class="i"/>
+<path d="M1100 724h-12v45h35v66" class="i"/>
+<path d="M1237 691H1291v-5h32v10h-32v-5m32 0H1378" class="w"/>
+<text x="1307" y="679" class="peq" text-anchor="middle">4,7 kΩ</text>
+<path d="M1378 691H1420" class="i"/>
+<rect x="1420" y="628" width="121" height="128" rx="6" class="ic"/>
+<text x="1480" y="653" class="comp" text-anchor="middle">JXADC</text>
+<text x="1431" y="696" class="" text-anchor="start">1 · VAUX6P</text>
+<text x="1431" y="721" class="" text-anchor="start">7 · VAUX6N</text>
+<text x="1431" y="746" class="peq" text-anchor="start">5 u 11 · GND</text>
+<path d="M1420 716h-16v119H1123M1420 741h-7v94h-9" class="i"/>
+<path d="M1123 835v8m-10 0h20m-16 5h12m-9 5h6" class="w"/>
+<circle cx="1123" cy="835" r="3.5" class="dot"/>
+<circle cx="1404" cy="835" r="3.5" class="dot"/>
+<path d="M1378 691v67h-65" class="i"/>
+<path d="M1378 758v34m-11 0h22m-22 8h22m-11 0V835" class="w"/>
+<path d="M1313 758V785h-5v22h10v-22h-5m0 22V835" class="w"/>
+<circle cx="1378" cy="691" r="3.5" class="dot"/>
+<circle cx="1378" cy="758" r="3.5" class="dot"/>
+<circle cx="1378" cy="835" r="3.5" class="dot"/>
+<text x="1298" y="801" class="peq" text-anchor="end">1 kΩ</text>
+<text x="1363" y="817" class="peq" text-anchor="end">100 nF¹</text>
+<text x="1099" y="881" class="peq" text-anchor="start">¹ Filtro previsto en el nodo del divisor.</text>
+<text x="1099" y="905" class="peq" text-anchor="start">JXADC7 se cablea al retorno local del sensor.</text>
+<text x="1099" y="929" class="peq" text-anchor="start">JA5 o JA11 lleva GND a COM/VSS.</text>
+<text x="1099" y="953" class="peq" text-anchor="start">JA7 y JB1 son salidas de diagnóstico.</text>
+<rect x="35" y="1019" width="752" height="221" rx="10" class="panel"/>
+<text x="56" y="1049" class="seccion" text-anchor="start">Polarización de compuertas y entradas</text>
+<rect x="57" y="1068" width="70" height="24" rx="4" class="tag"/>
+<text x="92.0" y="1085" class="red" text-anchor="middle">G_AH</text>
+<path d="M127 1080H195v-5h32v10h-32v-5m32 0H295" class="w"/>
+<text x="211" y="1068" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="295" y="1068" width="66" height="24" rx="4" class="tag"/>
+<text x="328.0" y="1085" class="red" text-anchor="middle">A</text>
+<rect x="417" y="1068" width="70" height="24" rx="4" class="tag"/>
+<text x="452.0" y="1085" class="red" text-anchor="middle">G_AL</text>
+<path d="M487 1080H555v-5h32v10h-32v-5m32 0H655" class="w"/>
+<text x="571" y="1068" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="655" y="1068" width="66" height="24" rx="4" class="tag"/>
+<text x="688.0" y="1085" class="red" text-anchor="middle">GND</text>
+<rect x="57" y="1110" width="70" height="24" rx="4" class="tag"/>
+<text x="92.0" y="1127" class="red" text-anchor="middle">G_BH</text>
+<path d="M127 1122H195v-5h32v10h-32v-5m32 0H295" class="w"/>
+<text x="211" y="1110" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="295" y="1110" width="66" height="24" rx="4" class="tag"/>
+<text x="328.0" y="1127" class="red" text-anchor="middle">B</text>
+<rect x="417" y="1110" width="70" height="24" rx="4" class="tag"/>
+<text x="452.0" y="1127" class="red" text-anchor="middle">G_BL</text>
+<path d="M487 1122H555v-5h32v10h-32v-5m32 0H655" class="w"/>
+<text x="571" y="1110" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="655" y="1110" width="66" height="24" rx="4" class="tag"/>
+<text x="688.0" y="1127" class="red" text-anchor="middle">GND</text>
+<rect x="57" y="1155" width="70" height="24" rx="4" class="tag"/>
+<text x="92.0" y="1172" class="red" text-anchor="middle">JA1</text>
+<path d="M127 1167H195v-5h32v10h-32v-5m32 0H295" class="w"/>
+<text x="211" y="1155" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="295" y="1155" width="66" height="24" rx="4" class="tag"/>
+<text x="328.0" y="1172" class="red" text-anchor="middle">GND</text>
+<rect x="417" y="1155" width="70" height="24" rx="4" class="tag"/>
+<text x="452.0" y="1172" class="red" text-anchor="middle">JA2</text>
+<path d="M487 1167H555v-5h32v10h-32v-5m32 0H655" class="w"/>
+<text x="571" y="1155" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="655" y="1155" width="66" height="24" rx="4" class="tag"/>
+<text x="688.0" y="1172" class="red" text-anchor="middle">GND</text>
+<rect x="57" y="1197" width="70" height="24" rx="4" class="tag"/>
+<text x="92.0" y="1214" class="red" text-anchor="middle">JA3</text>
+<path d="M127 1209H195v-5h32v10h-32v-5m32 0H295" class="w"/>
+<text x="211" y="1197" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="295" y="1197" width="66" height="24" rx="4" class="tag"/>
+<text x="328.0" y="1214" class="red" text-anchor="middle">GND</text>
+<rect x="417" y="1197" width="70" height="24" rx="4" class="tag"/>
+<text x="452.0" y="1214" class="red" text-anchor="middle">JA4</text>
+<path d="M487 1209H555v-5h32v10h-32v-5m32 0H655" class="w"/>
+<text x="571" y="1197" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="655" y="1197" width="66" height="24" rx="4" class="tag"/>
+<text x="688.0" y="1214" class="red" text-anchor="middle">GND</text>
+<rect x="813" y="1019" width="752" height="221" rx="10" class="panel"/>
+<text x="834" y="1049" class="seccion" text-anchor="start">Permiso manual y alimentaciones</text>
+<rect x="837" y="1078" width="102" height="24" rx="4" class="tag"/>
+<text x="888.0" y="1095" class="red" text-anchor="middle">+3V3_AUX</text>
+<path d="M939 1090H961v-5h32v10h-32v-5m32 0H1016" class="w"/>
+<text x="977" y="1078" class="peq" text-anchor="middle">10 kΩ</text>
+<rect x="1016" y="1078" width="55" height="24" rx="4" class="tag"/>
+<text x="1043.5" y="1095" class="red" text-anchor="middle">SD</text>
+<path d="M1071 1090h20" class="w"/>
+<path d="M1091 1090H1105l46 -12m3 12H1168" class="w"/>
+<circle cx="1105" cy="1090" r="3.5" class="dot"/>
+<circle cx="1154" cy="1090" r="3.5" class="dot"/>
+<path d="M1168 1090h18" class="w"/>
+<path d="M1186 1090v8m-10 0h20m-16 5h12m-9 5h6" class="w"/>
+<text x="1209" y="1095" class="peq" text-anchor="start">Abierto: SD alto, drivers inhibidos.</text>
+<text x="837" y="1140" class="peq" text-anchor="start">BUS+ variable para drenadores · +12V_AUX fijo para VCC.</text>
+<text x="837" y="1165" class="peq" text-anchor="start">+3V3_AUX externo para VDD · +5V_SENS para VCC de U3.</text>
+<text x="837" y="1190" class="peq" text-anchor="start">Los retornos confluyen en el negativo del bus. Basys 3 alimentada por USB.</text>
+<rect x="35" y="1256" width="752" height="183" rx="10" class="panel"/>
+<text x="56" y="1286" class="seccion" text-anchor="start">Basys 3 · conector JA y salidas de diagnóstico</text>
+<text x="58" y="1326" class="comp" text-anchor="start">1</text>
+<path d="M112 1321h14" class="i"/>
+<rect x="126" y="1309" width="135" height="24" rx="4" class="tag"/>
+<text x="193.5" y="1326" class="red" text-anchor="middle">JA1 → S1</text>
+<text x="292" y="1326" class="comp" text-anchor="start">2</text>
+<path d="M346 1321h14" class="i"/>
+<rect x="360" y="1309" width="135" height="24" rx="4" class="tag"/>
+<text x="427.5" y="1326" class="red" text-anchor="middle">JA2 → S4</text>
+<text x="526" y="1326" class="comp" text-anchor="start">3</text>
+<path d="M580 1321h14" class="i"/>
+<rect x="594" y="1309" width="135" height="24" rx="4" class="tag"/>
+<text x="661.5" y="1326" class="red" text-anchor="middle">JA3 → S3</text>
+<text x="58" y="1370" class="comp" text-anchor="start">4</text>
+<path d="M112 1365h14" class="i"/>
+<rect x="126" y="1353" width="135" height="24" rx="4" class="tag"/>
+<text x="193.5" y="1370" class="red" text-anchor="middle">JA4 → S2</text>
+<text x="292" y="1370" class="comp" text-anchor="start">5 u 11</text>
+<path d="M346 1365h14" class="i"/>
+<rect x="360" y="1353" width="135" height="24" rx="4" class="tag"/>
+<text x="427.5" y="1370" class="red" text-anchor="middle">GND</text>
+<text x="526" y="1370" class="comp" text-anchor="start">7</text>
+<path d="M580 1365h14" class="i"/>
+<rect x="594" y="1353" width="135" height="24" rx="4" class="tag"/>
+<text x="661.5" y="1370" class="red" text-anchor="middle">PERIOD_START</text>
+<text x="57" y="1417" class="peq" text-anchor="start">JB1: ISR_DEBUG · JA7 y JB1 se reservan para diagnóstico.</text>
+<rect x="813" y="1256" width="752" height="183" rx="10" class="panel"/>
+<text x="834" y="1286" class="seccion" text-anchor="start">Entradas de alimentación · positivo y retorno</text>
+<text x="834" y="1326" class="peq" text-anchor="start">12–24 V variable</text>
+<rect x="946" y="1309" width="100" height="24" rx="4" class="tag"/>
+<text x="996.0" y="1326" class="red" text-anchor="middle">BUS+</text>
+<rect x="1056" y="1309" width="59" height="24" rx="4" class="tag"/>
+<text x="1085.5" y="1326" class="red" text-anchor="middle">GND</text>
+<text x="1198" y="1326" class="peq" text-anchor="start">12 V fijo</text>
+<rect x="1310" y="1309" width="100" height="24" rx="4" class="tag"/>
+<text x="1360.0" y="1326" class="red" text-anchor="middle">+12V_AUX</text>
+<rect x="1420" y="1309" width="59" height="24" rx="4" class="tag"/>
+<text x="1449.5" y="1326" class="red" text-anchor="middle">GND</text>
+<text x="834" y="1370" class="peq" text-anchor="start">3,3 V fijo</text>
+<rect x="946" y="1353" width="100" height="24" rx="4" class="tag"/>
+<text x="996.0" y="1370" class="red" text-anchor="middle">+3V3_AUX</text>
+<rect x="1056" y="1353" width="59" height="24" rx="4" class="tag"/>
+<text x="1085.5" y="1370" class="red" text-anchor="middle">GND</text>
+<text x="1198" y="1370" class="peq" text-anchor="start">5 V fijo</text>
+<rect x="1310" y="1353" width="100" height="24" rx="4" class="tag"/>
+<text x="1360.0" y="1370" class="red" text-anchor="middle">+5V_SENS</text>
+<rect x="1420" y="1353" width="59" height="24" rx="4" class="tag"/>
+<text x="1449.5" y="1370" class="red" text-anchor="middle">GND</text>
+<text x="834" y="1417" class="peq" text-anchor="start">Cada fuente entra por su par de terminales. Basys 3 por USB.</text>
+<text x="35" y="1470" class="subtitulo" text-anchor="start">Esquemático de diseño de banco. Valores y conexiones nominales; las mediciones y cambios del montaje se registran en la bitácora.</text>
+</svg>

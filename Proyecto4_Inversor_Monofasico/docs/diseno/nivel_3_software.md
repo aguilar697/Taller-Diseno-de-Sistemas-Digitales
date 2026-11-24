@@ -260,16 +260,15 @@ Cada paso se integra en la rama `kCortes` mediante un issue y un pull request pr
 
 Las pruebas de PC terminan con un código de error ante cualquier falla y guardan su registro en `docs/informe/resultados/`.
 
-## Pendientes
+## Validación en tarjeta
 
-Las decisiones de configuración están cerradas y sus valores están en `software/embedded/control/parametros.h` y en la tabla de interfaces. Queda la validación física:
+El ensayo a 12 y 24 V verificó el seguimiento de corriente en parte del rango, el cambio de carga y la recepción de tramas UART durante operación. El firmware conserva los parámetros en `software/embedded/control/parametros.h`. [Resultados de integración física](../informe/README.md#operación-a-12-y-24-v).
 
 | Pendiente | Qué falta | Afecta a |
 |---|---|---|
-| Calibración de la medición | Medir el cero y la ganancia con signo del ACS712 en el montaje y compilar con `MEDICION_CALIBRADA = 1`; mientras valga 0, la solicitud de habilitar lleva a FALLA | Conversión a amperios y habilitación del control |
-| Temporización en la tarjeta | Medir con la salida de medición el período, el jitter y la duración máxima de la ISR, también durante la exportación | Margen de `MARGEN_ISR` |
-| Seguimiento con la carga | Ensayos de 0,2, 0,5 y 1,0 A en el inversor físico, con el criterio de 10 % | Validación del PR |
-| Exportación durante el control | Exportar en OPERACIÓN y comprobar que los números de muestra no muestran pérdidas | Registro y exportación |
+| Escala de corriente | Confirmar con un instrumento independiente la ganancia nominal empleada en la serie física | Conversión a amperios |
+| Temporización en la tarjeta | Medir el período efectivo y el jitter, también mientras se transmite por UART | Precisión temporal |
+| Seguimiento con la carga | Alcanzar 1 A pico y ensayar el escalón desde 0,5 A | Validación del PR |
 | Uso de pila | Medir el uso real frente a los 2 KiB reservados | Memoria |
 
 

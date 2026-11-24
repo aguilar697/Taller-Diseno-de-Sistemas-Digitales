@@ -28,12 +28,12 @@ La banda de configuración representa conexiones internas agrupadas, no una segu
 | Canal AXI `B` | Salida de respuesta; entrada de aceptación | Informar la finalización o rechazo de la escritura |
 | Canal AXI `AR` | Recepción de dirección; salida de disponibilidad | Recibir una solicitud de lectura |
 | Canal AXI `R` | Salida de datos/respuesta; entrada de aceptación | Entregar el valor leído y el resultado del acceso |
-| `pwm_ah`, `pwm_al` | Salidas | Órdenes superior e inferior de la rama A |
-| `pwm_bh`, `pwm_bl` | Salidas | Órdenes superior e inferior de la rama B |
+| `pwm_ah`, `pwm_al` | Salidas | Órdenes para S1 (superior A) y S4 (inferior A), respectivamente |
+| `pwm_bh`, `pwm_bl` | Salidas | Órdenes para S3 (superior B) y S2 (inferior B), respectivamente |
 | `pwm_trigger_o` | Salida | Evento de inicio de adquisición dirigido a la interfaz ADC |
 | `pwm_period_start_o` | Salida | Pulso de diagnóstico de un ciclo al comenzar cada período; permite medir la fase respecto al Timer |
 
-En la interfaz lógica, uno representa una orden de activación y cero una orden inactiva. La adaptación a los drivers, la correspondencia de pines y los niveles eléctricos pertenecen a la conexión de actuación. El periférico permanece deshabilitado después del reset.
+En la interfaz lógica, uno representa una orden de activación y cero una orden inactiva. La [conexión en Basys 3](integracion_basys3.md#conexiones) relaciona las órdenes lógicas con los pines y drivers. El periférico permanece deshabilitado después del reset.
 
 ## Bloques funcionales
 

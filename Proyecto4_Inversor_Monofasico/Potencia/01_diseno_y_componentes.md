@@ -28,18 +28,22 @@ La lista anterior corresponde a los componentes principales disponibles. Los aux
 
 La adquisición de los auxiliares se completó para continuar las pruebas. Los valores y conexiones de estas tablas son la especificación de diseño; sus resultados de laboratorio y las comprobaciones pendientes se conservan en el [registro de pruebas](04_registro_laboratorio.md).
 
+El [esquemático completo de interconexión](img/esquematico_inversor.svg) reúne ambas ramas, las alimentaciones y la interfaz analógica. Los [criterios de integración](../docs/diseno/criterios_de_diseno.md) explican el recorrido desde la consigna de corriente hasta las compuertas.
+
 ### Topología y alimentaciones
 
-![Puente H, carga serie y adquisición de corriente](img/puente_h_y_sensado.svg)
+![Puente H con carga nominal de 6,6 Ω externos y adquisición de corriente](img/puente_h_y_sensado.svg)
 
 Se utiliza un puente H completo porque la corriente de referencia cambia de signo. Las dos ramas permiten aplicar tensión positiva, negativa o nula a una carga alimentada desde una fuente DC. La modulación unipolar centrada utiliza una portadora común y referencias opuestas para las ramas, con tiempo muerto independiente en cada una.
 
+S1 y S4 corresponden a las órdenes AH y AL de la rama A. S3 y S2 corresponden a BH y BL de la rama B. El puente conmutable sobre R3 se designa `S_R3` en el esquemático completo. [Pines de actuación](../docs/diseno/integracion_basys3.md#conexiones).
+
 | Conexión | Elementos conectados |
 |---|---|
-| +Vbus, variable entre 12 y 24 V | Drenadores de Q_AH y Q_BH |
-| GND de potencia | Fuentes de Q_AL y Q_BL |
-| Nodo A | Fuente de Q_AH, drenador de Q_AL y VS del driver A |
-| Nodo B | Fuente de Q_BH, drenador de Q_BL y VS del driver B |
+| +Vbus, variable entre 12 y 24 V | Drenadores de S1 y S3 |
+| GND de potencia | Fuentes de S4 y S2 |
+| Nodo A | Fuente de S1, drenador de S4 y VS del driver A |
+| Nodo B | Fuente de S3, drenador de S2 y VS del driver B |
 | Camino de carga | A → terminal de corriente del ACS712 → segundo terminal del sensor → devanado L → dos resistencias de 3,3 Ω en serie → B |
 
 El orden de los elementos en serie no modifica el modelo RL. Ningún extremo de la carga se conecta directamente a GND: ambos extremos pertenecen a nodos conmutados. El camino de corriente del ACS712 está separado de sus terminales VCC, OUT y GND. El signo de la lectura depende del sentido de paso por el módulo.
@@ -48,12 +52,12 @@ Los estados ideales del puente son los siguientes; cada orden inferior es comple
 
 | Orden superior A | Orden superior B | MOSFET con orden activa | Tensión ideal A−B |
 |---|---|---|---|
-| 1 | 0 | Q_AH y Q_BL | +Vbus |
-| 0 | 1 | Q_AL y Q_BH | −Vbus |
-| 0 | 0 | Q_AL y Q_BL | 0 V |
-| 1 | 1 | Q_AH y Q_BH | 0 V |
+| 1 | 0 | S1 y S2 | +Vbus |
+| 0 | 1 | S3 y S4 | −Vbus |
+| 0 | 0 | S2 y S4 | 0 V |
+| 1 | 1 | S1 y S3 | 0 V |
 
-Los dos estados de tensión nula conectan ambos extremos de la carga al mismo riel y permiten recirculación. Durante el tiempo muerto, la corriente inductiva encuentra camino por los diodos internos de los MOSFET según su sentido. Estos diodos no son los SB360 del bootstrap. La necesidad de diodos externos de potencia se evalúa con la recuperación y los transitorios medidos. Activar simultáneamente el superior y el inferior de una misma rama cortocircuita el bus; el tiempo muerto debe impedir esa combinación.
+Los dos estados de tensión nula conectan ambos extremos de la carga al mismo riel y permiten recirculación. Durante el tiempo muerto, la corriente inductiva encuentra camino por los diodos internos de los MOSFET según su sentido. Estos diodos no son los SB360 del bootstrap. La necesidad de diodos externos de potencia se evalúa con la recuperación y los transitorios medidos. Activar simultáneamente S1 y S4, o S3 y S2, cortocircuita el bus; el tiempo muerto debe impedir esa combinación.
 
 | Alimentación | Valor | Destino y criterio |
 |---|---|---|

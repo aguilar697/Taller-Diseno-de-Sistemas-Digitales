@@ -2,7 +2,7 @@
 
 Este documento desarrolla los bloques de la [plataforma de tercer nivel](nivel_3_microblaze.md) mediante cuatro vistas: interconexión, memoria/procesamiento, reloj/reset y Timer/interrupciones. Se conservan los requisitos del [segundo nivel](nivel_2.md): 100 MHz, caché de instrucciones de 8 KB, memoria local de 32 KB y acceso AXI a periféricos.
 
-El Block Design ya fue construido y validado con Vivado/Vitis 2026.1. Las figuras conservan la propuesta inicial: sus rótulos pendientes y conexiones agrupadas no sustituyen el diseño implementado. La [guía de implementación](implementacion_microblaze.md#arquitectura-y-conexiones) describe la plataforma digital independiente y la [integración Basys 3](integracion_basys3.md) identifica la construcción de laboratorio. La compatibilidad con 2025.1 sigue pendiente. No se considera validado físicamente el lazo PR completo.
+El Block Design ya fue construido y validado con Vivado/Vitis 2026.1. Las figuras conservan la propuesta inicial: sus rótulos pendientes y conexiones agrupadas no sustituyen el diseño implementado. La [guía de implementación](implementacion_microblaze.md#arquitectura-y-conexiones) describe la plataforma digital independiente y la [integración Basys 3](integracion_basys3.md) identifica la construcción de laboratorio. La compatibilidad con 2025.1 sigue pendiente. El lazo PR integrado operó en el [montaje de laboratorio](../informe/README.md#operación-a-12-y-24-v).
 
 ## 1. Interconexión AXI y mapa de memoria
 
@@ -183,6 +183,6 @@ La fecha del evento del Timer y el comienzo real de la rutina son instantes dist
 
 El presupuesto de una iteración debe incluir atención, lectura ADC, cálculo PR, escritura PWM y registro de muestra. Debe terminar antes del siguiente plazo acordado, con margen para las demás tareas. La exportación UART solicitada mediante GPIO se atiende sin esperas bloqueantes que impidan ese cumplimiento; el tamaño del buffer y su gestión pertenecen a la aplicación.
 
-Separar Timer, adquisición y PWM permite verificar cada función sin confundir sus frecuencias. El [informe conjunto](../informe/README.md) distingue pruebas digitales, implementación y observaciones de laboratorio. La fase Timer–PWM, el jitter, el tiempo máximo de atención, la latencia muestra–actuación y la exportación concurrente siguen pendientes de medición; tampoco están cerrados los avisos de BSP y metodología ni la compatibilidad con 2025.1. Ninguna de esas prestaciones se considera probada únicamente por estas figuras.
+Separar Timer, adquisición y PWM permite verificar cada función sin confundir sus frecuencias. El [informe conjunto](../informe/README.md) distingue pruebas digitales, implementación y observaciones de laboratorio. La fase Timer–PWM, el jitter, el tiempo máximo de atención, la latencia muestra–actuación y la interacción con la exportación UART siguen pendientes de medición instrumental; tampoco están cerrados los avisos de BSP y metodología ni la compatibilidad con 2025.1. Ninguna de esas prestaciones se considera probada únicamente por estas figuras.
 
 [Tercer nivel: plataforma y funciones](nivel_3_microblaze.md) · [Segundo nivel del sistema](nivel_2.md) · [Índice del diseño](README.md)

@@ -1,4 +1,4 @@
-"""Genera los borradores de Potencia en PDF mediante LaTeX."""
+"""Genera los documentos de Potencia en PDF mediante LaTeX."""
 
 from __future__ import annotations
 
@@ -22,7 +22,9 @@ def numero(valor: float, decimales: int = 3) -> str:
 def tablas(datos: dict) -> str:
     lineas = [
         r"\par",
-        r"\begin{table}[ht]",
+        r"La Tabla~\ref{tab:nominal} reúne la fundamental, el error de amplitud y el desfase "
+        r"de los seis puntos nominales simulados con la copia funcional.",
+        r"\begin{table}[H]",
         r"\caption{Seguimiento simulado de la copia funcional}",
         r"\label{tab:nominal}\centering\small",
         r"\begin{tabular}{@{}ccccc@{}}\toprule",
@@ -48,7 +50,10 @@ def tablas(datos: dict) -> str:
         lineas.append(" & ".join(valores) + r"\\")
     lineas += [
         r"\bottomrule\end{tabular}\end{table}\par",
-        r"\begin{table}[ht]",
+        r"La Tabla~\ref{tab:transitorios} resume los cambios de referencia y de carga "
+        r"simulados a 12 V. Se reportan el seguimiento final y la máxima modulación "
+        r"del registro para comprobar el margen disponible durante la transición.",
+        r"\begin{table}[H]",
         r"\caption{Simulación de transitorios a 12 V}",
         r"\label{tab:transitorios}\centering\small",
         r"\begin{tabular}{@{}lccc@{}}\toprule",

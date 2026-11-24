@@ -17,6 +17,8 @@ import receptor  # noqa: E402
 PLECS = {12: {0.2: (0.193541, -0.899), 0.5: (0.483850, -0.899), 1.0: (0.967687, -0.899)},
          24: {0.2: (0.196722, -0.452), 0.5: (0.491804, -0.452), 1.0: (0.983605, -0.452)}}
 
+ENSAYOS_NO_ESTACIONARIOS = {"reposo", "escalon", "cambio_carga", "circuito_abierto", "falla"}
+
 
 def plecs(bus, amplitud):
     p = PLECS[bus].get(round(amplitud, 1))
@@ -27,7 +29,10 @@ def main():
     if len(sys.argv) != 2:
         sys.exit(__doc__)
     carpeta = Path(sys.argv[1])
-    filas = ["| Ensayo | Estado | Causa | Ref. pico | Fundamental | Error | ≤10 % | Desfase | "
+    filas = ["# Resultados de laboratorio", "",
+             "Las métricas de régimen se calculan para capturas estacionarias. Las demás "
+             "tramas conservan el estado y el diagnóstico para su análisis por separado.", "",
+             "| Ensayo | Estado | Causa | Ref. pico | Fundamental | Error | ≤10 % | Desfase | "
              "PLECS 12 V | PLECS 24 V | ISR máx. | Conv. perdidas |",
              "|---|---|---|---:|---:|---:|---|---:|---|---|---:|---:|"]
     for archivo in sorted(carpeta.glob("*.bin")):
@@ -35,6 +40,10 @@ def main():
         base = (f"| {archivo.stem} | {receptor.ESTADOS.get(t['estado'], '?')} | "
                 f"{receptor.describir_causa(t['causa'])} |")
         isr = f"{t['t_isr_max'] / 100:.2f} µs | {t['perdidas']} |"
+        nombre = archivo.stem.lower().partition("_")[2]
+        if t["causa"] or any(nombre.startswith(tipo) for tipo in ENSAYOS_NO_ESTACIONARIOS):
+            filas.append(f"{base} — | — | — | — | — | — | — | {isr}")
+            continue
         try:
             r = receptor.analizar(t, max(1, round(t["f_sw"] / 10000)))
         except receptor.TramaInvalida:
@@ -43,8 +52,14 @@ def main():
         filas.append(f"{base} {r['amp_ref']:.3f} A | {r['amp_med']:.4f} A | {100 * r['error']:+.2f} % | "
                      f"{'sí' if r['cumple'] else 'no'} | {r['desfase']:+.2f}° | "
                      f"{plecs(12, r['amp_ref'])} | {plecs(24, r['amp_ref'])} | {isr}")
+    salida = carpeta / "resultados.md"
+    # Conservar las condiciones y observaciones añadidas a mano después de la tabla.
+    notas = salida.read_text(encoding="utf-8").partition("\n## Notas\n")[2] if salida.exists() else ""
     texto = "\n".join(filas) + "\n"
-    (carpeta / "resultados.md").write_text(texto, encoding="utf-8")
+    if notas:
+        texto += "\n## Notas\n" + notas
+    salida.write_text(texto, encoding="utf-8", newline="
+")
     print(texto)
 
 

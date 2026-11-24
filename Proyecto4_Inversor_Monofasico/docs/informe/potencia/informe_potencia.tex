@@ -5,7 +5,7 @@
 \title{Implementación y evaluación de un inversor monofásico con control PR de corriente}
 \autores\maketitle
 \begin{abstract}
-Se evalúa un inversor monofásico en puente H con carga RL y control PR discreto ejecutado en MicroBlaze V sobre una Basys 3, con PWM unipolar de 10 kHz y período de control de 100 $\mu$s. Con bus de 24 V, el error de amplitud de la fundamental fue de $-3{,}6$\,\% a 0,2 A pico y de $-5{,}9$\,\% a 0,5 A pico; con 12 V, de $-5{,}1$\,\% a 0,2 A. Los escalones de 0,2 a 0,5 A se establecieron en el primer ciclo sin saturar la modulación, y el aumento de la resistencia externa de 6,6 a 9,9 $\Omega$ a 0,5 A pico se registró en marcha, con errores de $-5{,}6$\,\% antes y $-3{,}3$\,\% después. El punto de 1 A no se alcanzó: el devanado usado como inductancia satura y su impedancia aparente, de 34 $\Omega$ a 0,5 A, exige más tensión que la disponible. Con la impedancia identificada en cada ensayo, el modelo discreto del lazo reproduce el error medido con una diferencia de 0,3 puntos o menos, mientras que PLECS con la carga nominal lo subestima. Se documentan una falla por lectura imposible del ADC y las limitaciones de la medición del rizado.
+Se evalúa un inversor monofásico en puente H con carga RL y control PR discreto ejecutado en MicroBlaze V sobre una Basys 3. El PWM opera a 10 kHz y el período de control es de 100 $\mu$s. El criterio de error de amplitud del 10\,\% se cumplió a 0,2 A pico con ambos buses y a 0,5 A pico con 24 V. Los seis escalones de 0,2 a 0,5 A se establecieron en 16,4--16,8 ms, según el ajuste de la fundamental en una ventana centrada de un ciclo. El aumento de la resistencia externa de 6,6 a 9,9 $\Omega$ se ensayó en marcha a 0,5 A pico. A 1 A pico, la modulación alcanzó su límite y la fundamental medida quedó en 0,736 A con 24 V en la primera serie. Las diferencias respecto a PLECS se analizan mediante la impedancia aparente estimada, las limitaciones del sensado y el registro de fallas. La medición del rizado sigue pendiente.
 \end{abstract}
 \begin{IEEEkeywords}control de corriente, inversor, PR discreto, validación experimental, PWM unipolar.\end{IEEEkeywords}
 
@@ -13,9 +13,9 @@ Se evalúa un inversor monofásico en puente H con carga RL y control PR discret
 El objetivo es seguir referencias sinusoidales de 50 Hz con 0,2, 0,5 y 1 A pico en una carga RL alimentada desde un bus de 12 a 24 V, con error de amplitud de la fundamental no mayor del 10\,\% y rizado no mayor de 0,20 A pico a pico, además de responder a cambios de referencia y a un aumento resistivo de al menos 25\,\% a 0,5 A pico \cite{enunciado}. El documento de diseño desarrolla la topología, el dimensionamiento y la sintonización del PR. Este informe reúne los parámetros medidos, la simulación en PLECS, los registros experimentales del 20, 21 y 23 de noviembre, la comparación cuantitativa y la discusión de las diferencias.
 
 \section{Montaje y parámetros}
-El puente usa cuatro IRF540N con dos IR2110 DIP-14, un ACS712 de 5 A con divisor de 4,7 k$\Omega$/1 k$\Omega$ y 100 nF hacia el canal VAUX6 del XADC, y una carga de dos resistencias de 3,3 $\Omega$ en serie con el secundario de un transformador con el primario abierto \cite{irf,ir,acs,xadc}. Una tercera resistencia, puenteada con un cable, permite pasar de 6,6 a 9,9 $\Omega$ sin abrir el circuito. La Tabla~\ref{tab:parametros} compara los valores del modelo con los del montaje.
+El puente usa cuatro IRF540N con dos IR2110 DIP-14, un ACS712 de 5 A con divisor de 4,7 k$\Omega$/1 k$\Omega$ hacia el canal VAUX6 del XADC, y una carga de dos resistencias de 3,3 $\Omega$ en serie con el secundario de un transformador con el primario abierto \cite{irf,ir,acs,xadc}. Las salidas JA1--JA4 ordenan $S_1$, $S_4$, $S_3$ y $S_2$, respectivamente. Con $v_{AB}=v_A-v_B$, los estados activos ideales son $S_1$--$S_2$ para $+V_{dc}$ y $S_3$--$S_4$ para $-V_{dc}$. Al cerrar $S_{R3}$ se puentea la tercera resistencia y quedan 6,6 $\Omega$ externos. Al abrirlo, se inserta $R_3$ y la resistencia externa sube a 9,9 $\Omega$. El diseño contempla 100 nF en el nodo del divisor. Su instalación y respuesta en la serie final requieren verificación. La Tabla~\ref{tab:parametros} compara los valores del modelo con los del montaje.
 
-\begin{table}[ht]\caption{Parámetros del modelo y del montaje}\centering\small
+\begin{table}[H]\caption{Parámetros del modelo y del montaje}\centering\small
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.27\columnwidth}@{\hspace{0.5em}}>{\raggedright\arraybackslash}p{0.22\columnwidth}@{\hspace{0.5em}}>{\raggedright\arraybackslash}p{0.43\columnwidth}@{}}\toprule
 Magnitud & Modelo & Montaje\\\midrule
 Bus & 12 y 24 V & 12 y 24 V; límite de fuente 1 A (1,5 A para 1 A pico)\\
@@ -29,7 +29,7 @@ Ruido en reposo & -- & 20--21 mA RMS (2,7 códigos)\\
 Límite de modulación & $\pm0{,}85$ & $\pm0{,}85$\\\bottomrule
 \end{tabular}\label{tab:parametros}\end{table}
 
-El devanado con el que se diseñó el modelo, de 9,291 mH a 120 Hz y 6,984 mH a 1 kHz, se sustituyó durante la puesta en marcha. El devanado actual no se midió con LCR; su resistencia e inductancia a 50 Hz se identificaron en operación para cada punto de ensayo (Sección~\ref{sec:discusion}).
+El devanado usado para construir el modelo se midió en 9,291 mH a 120 Hz y 6,984 mH a 1 kHz. Se sustituyó durante la puesta en marcha. Los parámetros equivalentes del reemplazo se estimaron a 50 Hz con la corriente del XADC y la tensión reconstruida a partir de la modulación (Sección~\ref{sec:discusion}).
 
 \section{Control y medición implementados}
 El PR no ideal del documento de diseño, con $K_p=12$, $K_r=200$, $\omega_0=2\pi\cdot50$ rad/s y $\omega_c=2\pi\cdot2$ rad/s, se discretizó con Tustin preajustado \cite{pr,yepes}:
@@ -40,7 +40,7 @@ r[k]={}&0{,}2509707453602995\,(e[k]-e[k-2])\nonumber\\
 \end{align}
 La salida $12e[k]+r[k]$ se normaliza con 12 V fijos, se limita a $\pm0{,}85$ y se aplica en el período siguiente. Si la modulación satura y el error empuja en el mismo sentido, los estados no se actualizan. La referencia se genera con un acumulador de fase de 32 bits y una tabla de 256 muestras; un cambio de amplitud con SW1--SW0 se aplica en el siguiente cruce por cero.
 
-El XADC se dispara a mitad del período PWM y entrega un código por período de control. La corriente es $i=(n-1776)\cdot7{,}6383$ mA, con la ganancia nominal del ACS712 para el $V_{CC}$ medido y el signo comprobado por el sondeo del lazo. La supervisión detiene el puente si $|i|>1{,}5$ A o si el código sale de 16--4079 durante tres muestras seguidas; una muestra con código imposible se reemplaza por la última válida. El firmware se construyó con Vivado y Vitis 2026.1 a partir del repositorio, con holgura de temporización de +0,289 ns. Para los transitorios se usaron variantes que solo cambian el momento de exportar el registro; el control y la supervisión son idénticos.
+El XADC se dispara a mitad del período PWM y entrega un código por período de control. La corriente es $i=(n-1776)\cdot7{,}6383$ mA, con la ganancia nominal del ACS712 para el $V_{CC}$ medido y el signo comprobado por el sondeo del lazo. La supervisión detiene el puente tras tres evaluaciones consecutivas con corriente superior a 1,5 A en magnitud o con código fuera de 16--4079. Ante un código fuera de rango, el PR usa la última corriente admitida. La serie principal empleó el bitstream de \texttt{da2b7c3} y la aplicación de \texttt{d2d60c6}, construidos con Vivado y Vitis 2026.1. La implementación digital enrutada obtuvo una holgura de +0,289 ns. Para los transitorios se usaron variantes que solo cambian el momento de exportar el registro; el control y la supervisión son idénticos.
 
 \section{Método experimental}
 \subsection{Registro y fundamental}
@@ -51,16 +51,16 @@ I_1=\frac{2}{N}\sum_{k=0}^{N-1}i[k]e^{-j\omega_0kT_r},\qquad E_A=100\frac{|I_1|-
 con $T_r$ el intervalo entre muestras. El desfase es $\arg(I_1/I_{\mathrm{ref},1})$; un valor negativo indica atraso. En este informe se usa además un ajuste por mínimos cuadrados con seno, coseno y constante, que separa la componente continua y da los mismos valores.
 
 \subsection{Impedancia aparente}
-Con la fundamental de la modulación $M_1$, corregida por la muestra de retardo, la tensión fundamental aplicada es $V_1=M_1e^{-j\omega_0T_s}V_{dc}$. La impedancia aparente que ve el controlador es $Z_{ap}=V_1/I_1$. Restando la onda cuadrada del tiempo muerto, de fundamental $(4/\pi)\,2t_df_{sw}V_{dc}$ en fase con la corriente \cite{mohan}, se obtiene la impedancia de la carga:
+Se estima la tensión fundamental comandada como $V_1=M_1e^{-j\omega_0T_s}V_{dc}$, donde $M_1$ es la fundamental de la modulación registrada. La impedancia aparente es $Z_{ap}=V_1/I_1$. Si se descuenta la caída por tiempo muerto, de fundamental $(4/\pi)\,2t_df_{sw}V_{dc}$ en fase con la corriente \cite{mohan}, se obtiene la impedancia equivalente estimada de la carga:
 \begin{equation}
 Z=\frac{V_1-(4/\pi)\,2t_df_{sw}V_{dc}\,I_1/|I_1|}{I_1}.
 \end{equation}
 
 \subsection{Transitorios}
-El registro conserva una ventana fija y se exporta después del evento. Para los escalones, una variante del firmware exporta la ventana medio registro después de que la referencia cambia; para el cambio de carga, lo hace a partir de la pulsación de BTNL al retirar el puente. Se usaron ventanas de 102,4 ms (una muestra cada 200 $\mu$s) y de 409,6 ms (una cada 800 $\mu$s). La respuesta se cuantifica con la envolvente de la corriente calculada en una ventana deslizante de un ciclo, que agrega unos 10 ms de retardo, y con la amplitud de la modulación.
+El registro conserva una ventana fija y se exporta después del evento. Para los escalones, una variante del firmware exporta la ventana medio registro después de que la referencia cambia. Para el cambio de carga, la exportación se prepara al pulsar BTNL durante el retiro del puente. Se usaron ventanas de 102,4 ms (una muestra cada 200 $\mu$s) y de 409,6 ms (una cada 800 $\mu$s). Para estimar la envolvente de la corriente y de la modulación se ajusta su fundamental en una ventana deslizante centrada de un ciclo de 50 Hz. Esta ventana limita la resolución temporal de la estimación cerca del escalón.
 
 \subsection{Rizado}
-El registro se toma en el centro de la portadora y no contiene el rizado de conmutación. El método previsto es la resta de dos canales del osciloscopio en los extremos de una resistencia de 3,3 $\Omega$, con el límite de 0,20 A equivalente a 0,66 V pico a pico.
+El registro usa muestras tomadas en una fase fija de la portadora. Su intervalo y sincronización impiden usarlo para cuantificar el rizado de conmutación. El método previsto es la resta de dos canales del osciloscopio en los extremos de una resistencia de 3,3 $\Omega$, con el límite de 0,20 A equivalente a 0,66 V pico a pico.
 
 \section{Simulación}
 El modelo PR discreto conserva el puente ideal. La copia funcional añade $R_{on}$ de 44 m$\Omega$, órdenes con tiempo muerto de 1 $\mu$s, el sensor nominal, el divisor, un filtro de 10 nF y la cuantización de 12 bits \cite{irf,plecs}. No reproduce el bootstrap, $V_{GS}$, los parásitos, la temperatura, las pérdidas de conmutación, la recuperación de diodos, la no linealidad magnética ni el anti-windup.
@@ -74,7 +74,7 @@ Con el bus a 3 V se verificaron 11,93 V entre LO y COM, unos 11,95 V de bootstra
 \subsection{Seguimiento en el rango nominal}
 El 23/11 se ensayaron las tres referencias con 12 y 24 V y la carga de 6,6 $\Omega$, y la serie se repitió dos horas después (Tabla~\ref{tab:nominal23}). Ninguna trama registró conversiones perdidas ni saltos en el número de muestra.
 
-\begin{table}[ht]\caption{Seguimiento con 6,6 $\Omega$ (23/11)}\centering\small
+\begin{table}[H]\caption{Seguimiento con 6,6 $\Omega$ (23/11)}\centering\small
 \begin{tabular}{@{}lccccc@{}}\toprule
 Bus, ref. & $E_A$ (\%) & Fase ($^\circ$) & Rep. & $m$ sat. & $h_3$\\\midrule
 12 V, 0,2 A & $-5{,}05$ & $-3{,}05$ & $-6{,}66$\,\% & 0\,\% & 4\,\%\\
@@ -87,55 +87,73 @@ Bus, ref. & $E_A$ (\%) & Fase ($^\circ$) & Rep. & $m$ sat. & $h_3$\\\midrule
 \multicolumn{6}{@{}l}{\footnotesize $h_3$: tercer armónico respecto de la fundamental.}
 \end{tabular}\label{tab:nominal23}\end{table}
 
-Cumplen el criterio del 10\,\% los puntos de 0,2 A con ambos buses y el de 0,5 A con 24 V. En la repetición, el punto de 0,5 A con 24 V difiere 0,03 puntos y los de 0,2 A, hasta 1,6 puntos. La Fig.~\ref{fig:seguimiento} muestra las formas de onda. A 0,2 A la corriente es senoidal; a 0,5 A aparecen picos agudos cerca del máximo de cada semiciclo y un 25\,\% de tercer armónico, y la modulación toma forma triangular. Los puntos de 0,5 A con 12 V y de 1 A con ambos buses saturan la modulación (Fig.~\ref{fig:limite}), por las razones que se discuten en la Sección~\ref{sec:discusion}. Con la carga de 9,9 $\Omega$ se obtuvieron $-7{,}49$\,\% y $-4{,}25$\,\% a 0,2 A (12 y 24 V) y $-5{,}23$\,\% a 0,5 A con 24 V.
+Cumplen el criterio del 10\,\% los puntos de 0,2 A con ambos buses y el de 0,5 A con 24 V. En la repetición, el punto de 0,5 A con 24 V difiere 0,03 puntos y los de 0,2 A, hasta 1,6 puntos. La Fig.~\ref{fig:seguimiento02} presenta el caso de 0,2 A con 24 V: la corriente conserva una forma aproximadamente senoidal y la modulación permanece dentro de sus límites.
 
-\begin{figure*}[t]\centering
-\includegraphics[width=\textwidth]{seguimiento_23nov.pdf}
-\caption{Últimos tres ciclos de las tramas 04 y 21 del 23/11 con 24 V y 6,6 $\Omega$: referencia y corriente medida por el XADC (arriba) y modulación (abajo). Errores de $-3{,}62$\,\% y $-5{,}88$\,\%.}
-\label{fig:seguimiento}
-\end{figure*}
+\begin{figure}[H]\centering
+\includegraphics[width=\columnwidth]{seguimiento_0a2.pdf}
+\caption{Últimos tres ciclos de la trama 04, con 24 V, 0,2 A pico y 6,6 $\Omega$: referencia y corriente del XADC (arriba) y modulación (abajo). Error de amplitud de $-3{,}62$\,\%.}
+\label{fig:seguimiento02}
+\end{figure}
 
-\begin{figure}[t]\centering
+La Fig.~\ref{fig:seguimiento05} corresponde a la repetición a 0,5 A con 24 V. La fundamental cumple el criterio de amplitud, pero aparecen picos agudos cerca del máximo de cada semiciclo y un 25\,\% de tercer armónico; la modulación toma forma triangular. Por tanto, el cumplimiento de amplitud no implica ausencia de distorsión.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\columnwidth]{seguimiento_0a5.pdf}
+\caption{Últimos tres ciclos de la trama 21, con 24 V, 0,5 A pico y 6,6 $\Omega$. El error de la fundamental es de $-5{,}88$\,\%; los picos de corriente y la deformación del mando permanecen visibles.}
+\label{fig:seguimiento05}
+\end{figure}
+
+Los puntos de 0,5 A con 12 V y de 1 A con ambos buses saturan la modulación. La Fig.~\ref{fig:limite} ilustra el ensayo de 1 A con 24 V; las causas se discuten en la Sección~\ref{sec:discusion}.
+
+\begin{figure}[H]\centering
 \includegraphics[width=\columnwidth]{limite_1a.pdf}
 \caption{Trama 08: 1 A pico con 24 V. La modulación satura en el 33\,\% de las muestras y la fundamental queda en 0,736 A.}
 \label{fig:limite}
 \end{figure}
 
-\subsection{Cambios de referencia}
-Se registraron seis escalones de 0,2 a 0,5 A y dos de 0,5 a 0,2 A, con 24 V y 6,6 $\Omega$ (Tabla~\ref{tab:escalones} y Fig.~\ref{fig:transitorios}a). En todos, el cambio se aplica en el cruce por cero y la corriente alcanza la nueva amplitud en el primer semiciclo. La envolvente entra en la banda de $\pm10$\,\% entre 16 y 17 ms después del cambio, incluido el retardo de la ventana de un ciclo, sin saturar la modulación. El escalón de 0,5 a 1 A no se ensayó porque el punto de 1 A no es alcanzable con esta carga.
+Con la carga de 9,9 $\Omega$ se obtuvieron $-7{,}49$\,\% y $-4{,}25$\,\% a 0,2 A (12 y 24 V) y $-5{,}23$\,\% a 0,5 A con 24 V.
 
-\begin{table}[ht]\caption{Escalones de referencia con 24 V y 6,6 $\Omega$}\centering\small
+\subsection{Cambios de referencia}
+Se registraron seis escalones de 0,2 a 0,5 A y dos de 0,5 a 0,2 A, con 24 V y 6,6 $\Omega$ (Tabla~\ref{tab:escalones}). La referencia cambia en el cruce por cero. En los seis escalones de subida, la envolvente se mantuvo dentro de la banda de $\pm10$\,\% a partir de 16,4--16,8 ms y la modulación conservó margen. La trama 35 se estableció en 14,4 ms en el escalón de bajada. En la trama 31, la última ventana evaluable seguía fuera de la banda. El escalón de 0,5 a 1 A quedó pendiente tras observar saturación de la modulación con 1 A en régimen.
+
+\begin{table}[H]\caption{Escalones de referencia con 24 V y 6,6 $\Omega$}\centering\small
 \begin{tabular}{@{}lccc@{}}\toprule
 Escalón (capturas) & $\pm10$\,\% & Pico & $\max|m|$\\\midrule
 0,2$\to$0,5 A (6) & 16,4--16,8 ms & 0,66--0,70 A & 0,82--0,84\\
 0,5$\to$0,2 A (2) & 14,4 ms$^{*}$ & 0,27--0,29 A & 0,44--0,46\\\bottomrule
-\multicolumn{4}{@{}l}{\footnotesize $\pm10$\,\%: tiempo hasta que la envolvente entra en la banda.}\\
-\multicolumn{4}{@{}l}{\footnotesize $^{*}$ En la otra captura, el ruido supera la banda de $\pm20$ mA.}
+\multicolumn{4}{@{}l}{\footnotesize $\pm10$\,\%: tiempo de establecimiento dentro de la ventana.}\\
+\multicolumn{4}{@{}l}{\footnotesize $^{*}$ La trama 31 no se estableció en la ventana.}
 \end{tabular}\label{tab:escalones}\end{table}
 
-El pico posterior al escalón de subida, de 0,66--0,70 A, es el mismo que se observa en régimen a 0,5 A: corresponde a la forma de onda del devanado y no a un sobrepico del control.
+El pico instantáneo posterior al escalón de subida, entre 0,66 y 0,70 A, es comparable con los picos de la forma de onda en régimen a 0,5 A. Para evaluar el seguimiento del control se usa la amplitud de la fundamental. La Fig.~\ref{fig:escalon} muestra un escalón representativo y la evolución de la modulación, con el cambio aplicado cerca de 51 ms dentro del registro.
+
+\begin{figure}[H]\centering
+\includegraphics[width=\columnwidth]{escalon_referencia.pdf}
+\caption{Escalón de 0,2 a 0,5 A con 24 V y 6,6 $\Omega$ (trama 24, ventana de 102 ms). La línea discontinua señala el cambio de referencia.}
+\label{fig:escalon}
+\end{figure}
 
 \subsection{Cambio de carga}
-Con 0,5 A pico y 24 V se retiró el puente de la tercera resistencia, de 6,6 a 9,9 $\Omega$ externos (+50\,\%). La Fig.~\ref{fig:transitorios}b muestra la trama 37: en el instante del cambio, la amplitud de la modulación pasa de 0,666 a 0,715 y la envolvente de la corriente cae a 0,454 A ($-3{,}7$\,\%) durante un ciclo antes de recuperarse. La fundamental fue de 0,472 A ($-5{,}56$\,\%) antes del cambio y de 0,483 A ($-3{,}29$\,\%) después; en régimen con 9,9 $\Omega$ se midieron $-5{,}23$ y $-5{,}24$\,\%. Ambos puntos de operación cumplen el criterio.
+Con 0,5 A pico y 24 V se retiró el puente de la tercera resistencia, de 6,6 a 9,9 $\Omega$ externos (+50\,\%). En la trama 37 (Fig.~\ref{fig:cambio_carga}), el cambio se ubica cerca de 297 ms dentro del registro por el aumento sostenido de la amplitud de $m$ de 0,666 a 0,715. La envolvente transitoria de la corriente baja a 0,454 A, un 3,7\,\% respecto a 0,472 A antes del cambio. Las ventanas antes y después dieron 0,472 A ($-5{,}56$\,\%) y 0,483 A ($-3{,}29$\,\%). En los ensayos estacionarios de 9,9 $\Omega$ se obtuvieron $-5{,}23$\,\% (trama 15) y $-5{,}49$\,\% (tramas 34 y 38), dentro del criterio del 10\,\%.
 
-El efecto es pequeño porque la impedancia del circuito la domina el devanado: el aumento de 3,3 $\Omega$ eleva $|Z_{ap}|$ de 34 a unos 36 $\Omega$, alrededor de un 5\,\%. Sin control, la corriente caería a 0,44 A con la misma modulación.
+El aumento de 3,3 $\Omega$ externos es pequeño frente a los aproximadamente 34 $\Omega$ de impedancia aparente con 6,6 $\Omega$ externos. El aumento de modulación observado es coherente con la corrección del controlador ante una carga de mayor impedancia.
 
-\begin{figure*}[t]\centering
-\includegraphics[width=\textwidth]{transitorios.pdf}
-\caption{(a) Escalón de 0,2 a 0,5 A (trama 24, ventana de 102 ms). (b) Cambio de carga de 6,6 a 9,9 $\Omega$ a 0,5 A (trama 37, ventana de 410 ms): amplitud de la corriente y de la modulación calculadas en una ventana de un ciclo. La línea discontinua marca el instante del cambio.}
-\label{fig:transitorios}
-\end{figure*}
+\begin{figure}[H]\centering
+\includegraphics[width=\columnwidth]{cambio_carga.pdf}
+\caption{Cambio de carga de 6,6 a 9,9 $\Omega$ a 0,5 A pico y 24 V (trama 37, ventana de 410 ms). Se muestran las amplitudes estimadas de corriente y modulación. La línea discontinua marca el cambio estimado a partir del mando.}
+\label{fig:cambio_carga}
+\end{figure}
 
 \subsection{Rizado}
-El rizado no quedó medido. En las capturas del osciloscopio, la escala de los canales se ajustó para la caída de la resistencia y ambos saturaban cuando sus extremos subían a $+V_{dc}$; la resta solo es válida en parte de cada período y el archivo exportado tiene un punto cada 50 $\mu$s, insuficiente para la componente de 20 kHz. La estimación con $\Delta i_{pp,\max}=V_{dc}/(8f_{sw}L)$ da entre 4 y 10 mA con 24 V y las inductancias identificadas a 50 Hz (31--70 mH) y 43 mA con 7 mH, el menor valor medido en un devanado a 1 kHz. En todos los casos queda por debajo del límite de 0,20 A, pero la inductancia del devanado a 10--20 kHz no se midió.
+Las capturas del osciloscopio se tomaron con la escala ajustada a la caída de la resistencia. Los canales recortaron las señales al subir el modo común hacia $+V_{dc}$ y la resta solo sirve en parte del período. El paso de 50 $\mu$s de los archivos exportados tampoco permite resolver la componente de 20 kHz. Con $\Delta i_{pp,\max}=V_{dc}/(8f_{sw}L)$ se estiman de 4 a 10 mA a 24 V si se emplean los 31--70 mH identificados a 50 Hz. Con 7 mH, medidos en el primer devanado a 1 kHz, se estiman 43 mA. La comprobación del límite de 0,20 A requiere una medición válida a la frecuencia de conmutación con el devanado usado en el ensayo.
 
 \subsection{Fallas y perturbaciones}
-El 21/11, las corridas de 0,5 A con 24 V se detuvieron por sobrecorriente y por códigos fuera de rango, que equivalen a corrientes imposibles. El 23/11, con 12 V, 0,5 A y 9,9 $\Omega$, la trama 13 registró el corte: con la modulación saturada, la corriente medida descendió hasta $-12{,}6$ A en 1,6 ms, el PR invirtió la modulación en respuesta y la protección cortó tras tres muestras; al detenerse el PWM, la lectura volvió a cero de inmediato. En las tramas 04, 06 y 08 aparecen lecturas falsas aisladas o en ráfagas de hasta 5 ms, de hasta 1,2 A, a las que el PR responde. Las cuatro perturbaciones del día, incluida la de la trama 13, ocurrieron en los 60 ms previos a la exportación, mientras se manipulaba la placa para pulsar el botón; en las tramas de régimen posteriores no aparecen. En la trama 09, el semiciclo positivo dejó de conducir y en la siguiente la conducción se restableció, lo que apunta a un contacto intermitente en la rama de $Q_{AH}$ o $Q_{BL}$.
+El 21/11 hubo paradas con indicadores de sobrecorriente y de códigos fuera de rango a 0,5 A con 24 V. El 23/11, la trama 13 (12 V, 0,5 A y 9,9 $\Omega$) registró un corte con la modulación saturada. El ADC reportó una corriente aparente de $-12{,}6$ A, el PR cambió el signo de la modulación y la protección deshabilitó el PWM. La lectura volvió al entorno de cero al cesar la conmutación. En las tramas 04, 06 y 08 aparecen perturbaciones aisladas o en ráfagas de hasta 5 ms, con lecturas de hasta 1,2 A. Las cuatro perturbaciones quedaron en los últimos 60 ms antes de la exportación. La manipulación de la placa al pulsar BTNL es una posible fuente de acoplamiento. En la trama 09 se observó un semiciclo positivo incompleto y el funcionamiento normal reapareció en la trama 10. Un contacto intermitente en el camino de la diagonal $S_1$--$S_2$ es una hipótesis pendiente de comprobación.
 
 \section{Comparación con la simulación}
 La Tabla~\ref{tab:comparacion} compara los resultados de la primera serie del 23/11 con PLECS y con el modelo discreto del lazo (\url{pr_discreto.py}) evaluado con la impedancia aparente de cada ensayo.
 
-\begin{table}[ht]\caption{Error de amplitud y desfase: simulación y medición}\centering\small
+\begin{table}[H]\caption{Error de amplitud y desfase: simulación y medición}\centering\small
 \begin{tabular}{@{}lcccc@{}}\toprule
  & PLECS & PLECS & Modelo & \\
 Ensayo & ideal & funcional & con $Z_{ap}$ & Medido\\\midrule
@@ -148,14 +166,14 @@ Ensayo & ideal & funcional & con $Z_{ap}$ & Medido\\\midrule
 24 V, 1 A & $-1{,}64$\,\% & $-2{,}28$\,\% & satura & $-26{,}4$\,\%\\\bottomrule
 \end{tabular}\label{tab:comparacion}\end{table}
 
-Con la carga nominal de 7,2 $\Omega$ y 10 mH, la copia funcional de PLECS subestima el error entre 0,7 y 3,4 puntos donde la modulación no satura, y predice que 1 A cumple. Con la impedancia aparente de cada ensayo, el modelo discreto coincide con la medición dentro de 0,3 puntos de amplitud y 0,9$^\circ$ de fase. La impedancia se identificó con la modulación y la corriente del mismo ensayo, de modo que la concordancia no predice la carga: confirma que el PR implementado, con su retardo y su normalización, se comporta como el modelo, y atribuye la diferencia con PLECS a la carga.
+Con la carga nominal de 7,2 $\Omega$ y 10 mH, PLECS funcional subestima el error entre 0,7 y 3,4 puntos donde la modulación conserva margen, y predice seguimiento a 1 A. Para los tres puntos de la Tabla~\ref{tab:comparacion} con 6,6 $\Omega$ externos y modulación sin saturación, el modelo discreto con $Z_{ap}$ difiere hasta 0,3 puntos porcentuales de amplitud y 0,9$^\circ$ de fase. La tensión reconstruida y la corriente usadas para estimar $Z_{ap}$ proceden del mismo registro que se compara. Esta concordancia es una comprobación de consistencia con el modelo del PR.
 
 \section{Discusión de las diferencias}
 \label{sec:discusion}
 \subsection{Carga}
 La Tabla~\ref{tab:impedancia} reúne la carga identificada a 50 Hz, con el término de tiempo muerto descontado.
 
-\begin{table}[ht]\caption{Carga identificada a 50 Hz}\centering\small
+\begin{table}[H]\caption{Carga identificada a 50 Hz}\centering\small
 \begin{tabular}{@{}lcccc@{}}\toprule
 Ensayo & $|I_1|$ (A) & $R$ ($\Omega$) & $L$ (mH) & $|Z|$ ($\Omega$)\\\midrule
 Lazo abierto, 3 V (21/11) & 0,027 & -- & -- & 8,2\\
@@ -167,9 +185,9 @@ PR, 24 V$^{*}$ & 0,736 & 17,1 & 61,7 & 25,9\\\bottomrule
 \multicolumn{5}{@{}l}{\footnotesize $^{*}$ Con la modulación saturada en parte del registro.}
 \end{tabular}\label{tab:impedancia}\end{table}
 
-La inductancia aumenta con la corriente hasta 0,5 A y la resistencia equivalente, que incluye las pérdidas del núcleo, pasa de 10 a 25 $\Omega$: es la conducta de un núcleo de hierro a baja inducción. A 0,74 A la inductancia disminuye y aparecen picos agudos con un 29\,\% de tercer armónico, señal de que el núcleo satura en los picos de corriente. PLECS usa una inductancia constante y no puede reproducir ninguno de estos efectos. A 0,2 A, la diferencia entre 12 y 24 V refleja la sensibilidad del devanado al punto de operación.
+Entre 0,190 y 0,471 A de fundamental, la inductancia equivalente estimada aumenta y la resistencia equivalente pasa de unos 10 a 25 $\Omega$. Cerca de 0,736 A, la inductancia equivalente disminuye y aparecen picos agudos con un 29\,\% de tercer armónico en la corriente. La dependencia con la amplitud y la distorsión son compatibles con pérdidas y saturación del núcleo. Para identificar su contribución y separarla de la del accionamiento y del sensado se necesita caracterizar el devanado del montaje de forma independiente.
 
-Con $|Z_{ap}|\approx34\ \Omega$, 0,5 A pico exige una modulación fundamental de 0,71 con 24 V y de 1,43 con 12 V, por lo que este punto solo es alcanzable con 24 V. Para 1 A, aun con la impedancia reducida por la saturación, haría falta $m\approx1{,}1$ con 24 V. El punto de 1 A requiere un inductor de menor inductancia y sin saturación en el rango de corriente; no es un límite del controlador. El mismo mecanismo explica el $-36$\,\% del 21/11 a 0,5 A, igual al que se mide hoy con 12 V.
+Con $|Z_{ap}|\approx34\ \Omega$, 0,5 A pico exige una modulación fundamental estimada de 0,71 con 24 V y de 1,42 con 12 V. Prolongando el valor aparente observado cerca de 0,736 A ($\approx26\ \Omega$), 1 A requeriría $m\approx1{,}1$ con 24 V. Esta última estimación es orientativa por el comportamiento no lineal de la carga. La saturación del mando en las tramas de 1 A sí se observó en el banco. Conviene caracterizar un inductor de impedancia menor y repetir los ensayos de ese punto.
 
 \subsection{Tiempo muerto}
 La caída por tiempo muerto equivale a 1,6 $\Omega$ con 12 V y 3,2 $\Omega$ con 24 V para 0,19 A, y su efecto relativo disminuye con la corriente. Está incluida en la copia funcional de PLECS y en $Z_{ap}$.
@@ -179,15 +197,36 @@ La ganancia del sensor es la nominal, ajustada por el $V_{CC}$ medido, y no se c
 
 El 23/11 el cero subió unos 10 códigos respecto del cargado, después de los cambios de cableado, y encender el bus lo desplazó solo 1,8 códigos más, frente a 4--5 el 21/11. La diferencia aparece como una componente continua de hasta 33 mA en la corriente medida, sin efecto sobre la fundamental. El ruido en reposo, de 20 mA RMS, se reduce a unos 1,3 mA en la fundamental al promediar 500 muestras.
 
-Las lecturas falsas son el principal riesgo para la operación: a diferencia de los códigos imposibles, las que quedan dentro del rango llegan al PR. Su coincidencia con la manipulación de la placa sugiere acoplamiento a través del cableado de JXADC o de la referencia; la corrección requiere revisar ese cableado y, en el firmware, filtrar por conversión nueva y no solo por rango.
+Las muestras espurias dentro del rango del ADC pueden llegar al PR. Para aislar su origen se requiere observar simultáneamente el sensado y los flancos de conmutación con una referencia de medida común. Una vez caracterizadas las perturbaciones, se puede evaluar un filtro con el retardo incluido en el lazo y repetir la comprobación de los umbrales de protección.
 
 \section{Integración con Taller}
-La Basys 3 genera las cuatro órdenes PWM con tiempo muerto en un periférico AXI4-Lite propio, dispara el XADC a mitad del período y ejecuta el PR en la ISR del temporizador de MicroBlaze V. En las tramas en operación, la ISR duró como máximo 8,57 $\mu$s de los 100 $\mu$s del período, y ninguna de las 36 tramas de ensayo del 23/11 registró conversiones perdidas ni saltos en el número de muestra. La exportación por UART y \texttt{receptor.py} produjeron los registros de este informe.
+La Basys 3 genera las cuatro órdenes PWM con tiempo muerto en un periférico AXI4-Lite propio, dispara el XADC a mitad del período y ejecuta el PR en la ISR del temporizador de MicroBlaze V. La duración máxima registrada de la ISR fue 8,57 $\mu$s de los 100 $\mu$s del período. Las 36 tramas en operación del 23/11 registraron cero conversiones perdidas y secuencias de identificadores de muestra sin saltos en las ventanas capturadas. La exportación por UART y \texttt{receptor.py} produjeron los registros de este informe.
+
+\clearpage
+\twocolumn[{
+\begin{minipage}{\textwidth}
+\section{Evidencias del montaje y la demostración}
+La demostración funcional del sistema está disponible en el video \emph{Proyecto 4: control de corriente de un inversor monofásico con MicroBlaze V y PWM}: \url{https://youtu.be/cNjZ2tLcRmQ}. Se complementa con la fotografía de la Fig.~\ref{fig:montaje}, tomada durante el ensayo con bus de 24 V y referencia de 0,2 A pico. La imagen permite reconocer la Basys 3, el puente y sus drivers, el sensor, la carga y las fuentes auxiliares. Los valores de seguimiento se evalúan con los registros cuantitativos de las secciones anteriores.
+
+\medskip\centering
+\includegraphics[width=0.78\textwidth]{circuito_completo.JPG}
+\captionof{figure}{Montaje experimental del inversor y la plataforma de control durante el ensayo de 24 V y 0,2 A pico. Se observan la fuente del bus, las alimentaciones auxiliares, la carga, la Basys 3 y la pantalla del osciloscopio.}
+\label{fig:montaje}
+\end{minipage}
+\vspace{12pt}
+}]
+
+La Fig.~\ref{fig:captura_scope} conserva una captura directa del osciloscopio para la misma condición nominal de bus y referencia, con 6,6 $\Omega$ externos. La función matemática corresponde a la resta de los canales en los extremos de una resistencia de 3,3 $\Omega$. Se aprecian perturbaciones y la limitación de rango descrita en el apartado de rizado. Esta captura documenta el ensayo y las dificultades de instrumentación; no permite certificar el rizado ni calibrar la ganancia del sensor.
+
+\begin{figure}[H]\centering
+\includegraphics[width=0.92\columnwidth]{osciloscopio_24v_0a2.png}
+\caption{Captura original del osciloscopio a 24 V y 0,2 A pico, con 6,6 $\Omega$ externos y 10 ms/div. La resta sobre la resistencia está afectada por el recorte de los canales y los picos; la frecuencia automática mostrada no representa la fundamental de la corriente.}
+\label{fig:captura_scope}
+\end{figure}
 
 \section{Conclusiones}
-El PR discreto implementado en MicroBlaze V cumplió el criterio del 10\,\% a 0,2 A pico con 12 y 24 V y a 0,5 A pico con 24 V, con resultados repetibles dentro de 1,6 puntos. Respondió a los escalones de 0,2 a 0,5 A en el primer semiciclo sin saturar y mantuvo el error dentro del criterio antes y después del aumento resistivo del 50\,\%. El punto de 1 A no se alcanzó porque el devanado satura y su impedancia exige más tensión que la disponible; corregirlo requiere otro inductor. Con la impedancia identificada en cada ensayo, el modelo discreto reproduce el error medido con una diferencia de 0,3 puntos o menos, por lo que la diferencia con PLECS proviene de la carga. Quedan pendientes la medición del rizado, el contraste independiente de la ganancia del sensor y la medida directa de $R$ y $L$ del devanado.
+El lazo cerrado cumplió el criterio del 10\,\% a 0,2 A pico con 12 y 24 V y a 0,5 A pico con 24 V. Los seis escalones de 0,2 a 0,5 A se establecieron en 16,4--16,8 ms con modulación por debajo de su límite. El cambio del 50\,\% en la resistencia externa mantuvo el error de amplitud dentro del criterio en las ventanas anterior y posterior. El ensayo a 1 A quedó fuera de especificación con ambos buses y mostró saturación de la modulación. Quedan pendientes una medición válida del rizado, el contraste independiente de la ganancia del sensor y la caracterización del devanado de reemplazo.
 
-\section*{Evidencias}
-Los modelos de PLECS están en \url{modelos/plecs} y sus análisis en \url{modelos/analisis}; los resultados de simulación, en \url{docs/informe/resultados/potencia/lazo_funcional.json} y \url{pr_discreto_plecs.json}. Las tramas del 21/11 y del 23/11 (CSV, binario y gráficas) y sus tablas están en \url{docs/informe/resultados/potencia/laboratorio}, y las capturas del osciloscopio en \url{Potencia/mediciones_lab_osciloscopio}. Las figuras se regeneran con \url{scripts/laboratorio/figuras_informe_potencia.py}, y los transitorios se analizan con \url{analizar_transitorio.py} y \url{analizar_cambio_carga.py}. El registro completo de las sesiones está en \url{Potencia/04_registro_laboratorio.md}.
+\IEEEtriggeratref{11}
 \referencias
 \end{document}

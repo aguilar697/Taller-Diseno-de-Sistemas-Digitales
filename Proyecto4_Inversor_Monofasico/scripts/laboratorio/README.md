@@ -1,6 +1,6 @@
 # Herramientas de laboratorio
 
-Análisis de las tramas que exporta `control_inversor` por UART (botón BTNL) y compilación de variantes de frecuencia. Se usaron en la sesión del 21/11 registrada en la [bitácora](../../Potencia/04_registro_laboratorio.md).
+Análisis de las tramas que exporta `control_inversor` por UART y compilación de variantes de captura y frecuencia. Las condiciones de los ensayos del 21 y 23 de noviembre constan en la [bitácora](../../Potencia/04_registro_laboratorio.md).
 
 | Herramienta | Uso |
 |---|---|
@@ -13,12 +13,12 @@ Análisis de las tramas que exporta `control_inversor` por UART (botón BTNL) y 
 | `aplicar_captura_transitorio.py` | Parche de captura centrada: BTNL o un cambio de amplitud en marcha exportan la trama 51,2 ms después, con la mitad antes y la mitad después del evento |
 | `aplicar_captura_larga.py` | La misma captura con ventana de 409,6 ms (`K_REG = 8`): la trama sale 204,8 ms después del evento |
 | `aplicar_captura_carga.py` | Captura para el cambio de carga: ventana de 819,2 ms (`K_REG = 16`); con BTNL la trama sale 50 ms después y guarda ~0,77 s anteriores. Primero se retira el puente y enseguida se pulsa BTNL |
-| `analizar_transitorio.py` | Escalones en los dos sentidos: instante del cambio (primer semiciclo con otra amplitud de referencia), pico posterior y tiempo hasta que la envolvente de un ciclo queda dentro de ±10 % |
-| `analizar_cambio_carga.py` | Cambio de carga: lo ubica por el salto de la amplitud de m, mide la caída de la corriente y el error antes y después |
+| `analizar_transitorio.py` | Detecta un cambio de amplitud de la referencia y reporta el pico y el establecimiento de la envolvente, si este se observa dentro de la captura |
+| `analizar_cambio_carga.py` | Estima el cambio por un cruce sostenido de la amplitud de m. Admite la marca `--evento-ms` cuando el instante se conoce por otro medio. Reporta la caída y los errores antes y después |
 | `analizar_osciloscopio.py` | Amplitud de 50 Hz de la resta CH1−CH2 del osciloscopio, descartando las muestras en 0 de los canales saturados |
 | `figuras_informe_potencia.py` | Figuras de los [informes de Potencia](../../docs/informe/potencia/README.md) a partir de las tramas, e impedancia de la carga a 50 Hz: fundamental de `m·Vdc`, menos la caída por tiempo muerto, dividida por la fundamental de la corriente |
 
-Las dos herramientas de Python usan el decodificador y el análisis de [`receptor.py`](../../software/pc/receptor.py), así que dan los mismos números que el receptor.
+`graficar_ensayos.py` y `resumen_ensayos.py` usan el decodificador y el ajuste de fundamental de [`receptor.py`](../../software/pc/receptor.py). El resumen reserva las columnas de cumplimiento para las capturas de régimen y conserva la sección de notas.
 
 ## Captura y análisis
 
@@ -30,7 +30,9 @@ python scripts/laboratorio/graficar_ensayos.py CARPETA
 python scripts/laboratorio/resumen_ensayos.py CARPETA
 ```
 
-El receptor espera una trama, la valida, guarda `ensayo.bin` y `ensayo.csv`, imprime el análisis y muestra la gráfica. Cada BTNL envía una sola trama con los últimos 102,4 ms. Para otra trama hay que volver a lanzar el receptor.
+El receptor espera una trama, verifica el CRC, guarda `ensayo.bin` y `ensayo.csv`, imprime el análisis y muestra la gráfica. Con el controlador general, cada pulsación de BTNL solicita una trama de los últimos 102,4 ms. Para otra trama hay que volver a lanzar el receptor.
+
+Los analizadores de escalón y cambio de carga requieren NumPy y Matplotlib. Si se usa detección automática, un cambio menor de 0,03 en la envolvente de m o sin persistencia de un ciclo se reporta como indeterminado. El ajuste centrado usa muestras a ambos lados de cada instante. La última parte de la captura queda fuera del cálculo de establecimiento.
 
 ## Variantes de frecuencia
 
