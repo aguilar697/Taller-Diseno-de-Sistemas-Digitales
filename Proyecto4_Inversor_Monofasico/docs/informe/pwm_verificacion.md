@@ -60,19 +60,25 @@ Se mantuvieron los offsets del driver C y se configuró `TRIGGER_PHASE=5000` en 
 
 Los coeficientes resonantes del C coinciden con Tustin preajustado a 50 Hz, Kp=12, Kr=200 y ancho resonante de 2 Hz. El [contraste numérico](resultados/pwm/control_parametros.json) evalúa 24 combinaciones de R=7,2/10,5 Ω, L=6,984/9,291/10 mH, bus=12/24 V y retardos de uno/dos períodos. Los modelos lineales resultan estables y con error de amplitud menor de 10 %. Este análisis no demuestra el montaje real, la recuperación en saturación ni el retardo fraccionario integrado.
 
-Las 13 pruebas existentes de software y las 18 pruebas de análisis numérico terminaron correctamente después del ajuste de parámetros. Los modelos PLECS y sus resultados previos permanecen sin modificaciones; sus condiciones, incluido el retardo utilizado, se consultan en el [análisis de potencia](../../modelos/analisis/README.md).
+En la revisión inicial, las 13 pruebas existentes de software y las 18 pruebas de análisis numérico terminaron correctamente después del ajuste de parámetros. Los modelos PLECS y sus resultados previos permanecen sin modificaciones; sus condiciones, incluido el retardo utilizado, se consultan en el [análisis de potencia](../../modelos/analisis/README.md).
 
 ## Reproducción y validación pendiente
 
 El [procedimiento de ejecución](../../src/testbench/pwm/README.md) utiliza fuentes del repositorio y genera comandos, logs y huellas en `build/pwm/`, excluido de Git. Las evidencias citadas son una selección de esos resultados; las netlists, SDF, checkpoints y ejecutables se regeneran con los scripts.
 
-Antes de aceptar el sistema integrado se requiere:
+## Integración y pruebas de laboratorio
 
-- comprobar la versión Vivado/Vitis 2025.1 solicitada por el instructivo; esta verificación se ejecutó en 2026.1;
-- comprobar físicamente el mapa y los pines de la plataforma integrada; la construcción y el timing completos ya se documentan en la [integración Basys 3](../diseno/integracion_basys3.md#resultados-de-la-construcción-integrada);
-- medir la fase Timer–PWM, la disponibilidad ADC y el tiempo de ISR para confirmar el retardo y el plazo de escritura;
-- medir el uso máximo de pila y la ejecución de las interrupciones; los ELF integrados ya pasan el control estático de ocupación de los 32 KiB;
-- calibrar cero y ganancia firmada del sensor y definir el permiso de apagado SD;
-- comprobar ambos drivers, bootstrap, VGS y ausencia de solapamiento físico antes de cerrar el lazo con potencia.
+La plataforma integrada ejecutó el controlador PR con adquisición XADC y exportación UART en los ensayos a 12 y 24 V. Se ajustó el cero del sensor y se comprobó su sentido; la ganancia empleada sigue siendo nominal y requiere contraste independiente. El máximo de ejecución de ISR registrado por software fue de 8,57 µs. El permiso SD de los IR2110 se maneja mediante la conexión externa descrita en la [integración Basys 3](../diseno/integracion_basys3.md), además de la habilitación digital por SW15.
 
-La verificación independiente del PWM está completada bajo las condiciones indicadas. La integración con MicroBlaze dispone de bitstream y ELF construidos; su ejecución conjunta y la validación eléctrica permanecen pendientes.
+Los resultados de seguimiento y perturbaciones se presentan en el [informe técnico](README.md) y en la [bitácora de laboratorio](../../Potencia/04_registro_laboratorio.md). La ejecución física confirma la integración de los subsistemas, pero el cumplimiento se evalúa para cada condición: con 6,6 Ω externos se cumplió el error de amplitud a 0,2 A en ambos buses y a 0,5 A con 24 V; las demás condiciones de esa serie excedieron el límite del 10 %.
+
+Para completar la validación se requiere:
+
+- comprobar la compatibilidad con Vivado/Vitis 2025.1; las construcciones y simulaciones registradas se realizaron en 2026.1;
+- medir la fase Timer–PWM, la disponibilidad de cada muestra y la variación temporal de la ISR para confirmar el retardo y el plazo de escritura;
+- medir el uso máximo de pila y verificar el peor tiempo de ejecución; los ELF integrados pasan el control estático de ocupación de los 32 KiB;
+- contrastar la ganancia del sensor y la corriente con una medición independiente, y medir el rizado con resolución suficiente;
+- registrar VGS, bootstrap y separación efectiva de conducción de ambas ramas bajo carga, distinguiéndolos del tiempo muerto medido en las salidas de la FPGA;
+- completar el escalón de referencia hacia 1 A y resolver o delimitar las condiciones que no cumplen el error de amplitud.
+
+La verificación independiente del PWM está completada bajo las condiciones indicadas. La integración física cuenta con resultados de laboratorio; permanecen las comprobaciones anteriores y las limitaciones de seguimiento documentadas.

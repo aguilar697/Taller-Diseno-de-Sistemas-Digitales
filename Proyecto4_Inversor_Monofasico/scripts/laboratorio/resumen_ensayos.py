@@ -58,8 +58,7 @@ def main():
     texto = "\n".join(filas) + "\n"
     if notas:
         texto += "\n## Notas\n" + notas
-    salida.write_text(texto, encoding="utf-8", newline="
-")
+    salida.write_text(texto, encoding="utf-8", newline="\n")
     print(texto)
 
 

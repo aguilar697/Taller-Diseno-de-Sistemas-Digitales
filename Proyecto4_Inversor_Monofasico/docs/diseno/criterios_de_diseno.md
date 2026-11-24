@@ -94,4 +94,3 @@ El firmware integrado configura un buffer circular de 512 registros de 8 bytes y
 El tiempo muerto, el acceso AXI al PWM y al ADC y la secuencia de disparo se comprobaron en bancos de prueba. La implementación ruteada en Vivado 2026.1 obtuvo holguras positivas de setup y hold a 100 MHz. La compatibilidad con la versión 2025.1 solicitada por el instructivo sigue pendiente. [Integración en Basys 3](integracion_basys3.md) · [Informe técnico de Taller](../informe/README.md).
 
 Los resultados se interpretan por condición de ensayo y por tipo de evidencia. Las trazas UART muestran la corriente estimada por el canal de realimentación y el índice ordenado. Las capturas de osciloscopio muestran tensiones en sus puntos de conexión. Las simulaciones sirven para contrastar el modelo y sus supuestos. [Resultados y archivos de medición](../informe/resultados/potencia/laboratorio/2026-11-23/resultados.md) · [Estado de validación](../../Potencia/03_pendientes_y_validacion.md).
-
