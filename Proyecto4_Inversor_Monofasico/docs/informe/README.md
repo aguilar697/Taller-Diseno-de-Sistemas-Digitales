@@ -36,9 +36,13 @@ El periférico `pwm_system_axi` recibe reloj y reset activo bajo, expone un escl
 
 El ADC, en `0x44A00000`, ofrece CONTROL (0x00, inicio por software), STATUS (0x04, validez, novedad y ocupación), SAMPLE (0x08, identificador de 16 bits y conversión de 12 bits), ERROR (0x0C) y ACK_ID (0x10, token de 32 bits). La lectura de SAMPLE captura también su token. El software lee y devuelve ese token al reconocer la muestra. Una coincidencia limpia `new_data` de la publicación correspondiente. [Semántica detallada de AXI y ACK](../diseno/adc/mapa_registros.md).
 
+La Figura 1 presenta los estados de la aplicación y las transiciones ante solicitudes y fallas.
+
 ![Estados de la aplicación de control](../diseno/img/nivel_3_software_estados.png)
 
 *Figura 1. Estados de la aplicación y transiciones de supervisión.*
+
+La Figura 2 detalla la secuencia de una rama del PWM, que impide activar simultáneamente sus dos órdenes complementarias.
 
 ![Máquina de estados para las salidas complementarias del PWM](../diseno/img/nivel_4_pwm_tiempo_muerto.svg)
 
@@ -59,6 +63,8 @@ Los bancos funcionales se repitieron en XSim 2026.1 sobre las fuentes de `2b7a18
 | `tb_permiso_basys3` | Bloqueo, sincronización, inicio de período y reset del permiso SW15 con plataforma modelada | Aprobado |
 
 La ejecución negativa de `tb_pwm_adc_axi +INJECT_ERROR` terminó con `ERROR_INYECTADO_DETECTADO` y sin mensaje de aprobación. El ensayo independiente del PWM también verifica que se detecte el solapamiento de órdenes complementarias. Se conservan [los extractos de la ejecución](resultados/integracion_basys3/xsim_funcional.txt), [el procedimiento de reproducción](../../src/testbench/README.md) y los [resultados detallados del PWM](pwm_verificacion.md).
+
+La Figura 3 reúne las ondas de tiempo muerto, publicación de muestra y actualización de referencia obtenidas en el banco conjunto.
 
 ![Ondas de XSim con el tiempo muerto, la publicación de SAMPLE y el cambio de referencia](resultados/integracion_basys3/ondas_pwm_adc.svg)
 

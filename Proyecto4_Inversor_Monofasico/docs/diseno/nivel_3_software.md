@@ -86,7 +86,7 @@ Las variables que comparten ambos contextos son pocas y se declaran `volatile`: 
 
 ### Aritmética
 
-El controlador se implementa en punto flotante de 32 bits (`float`) con la FPU de MicroBlaze V (extensión F). Así, los coeficientes y las variables conservan las unidades del diseño de PEDP (A y V), y la comparación con PLECS es directa. Además, el cálculo se ejecuta en un número de ciclos acotado sin analizar escalas ni desbordes intermedios.
+El controlador se implementa en punto flotante de 32 bits (`float`) con la FPU de MicroBlaze V (extensión F). Así, los coeficientes y las variables conservan las unidades del diseño de PEDP (A y V), y la comparación con PLECS es directa. Esta elección evita definir un escalado de punto fijo para cada operación. El cumplimiento del período de control se evalúa mediante la duración instrumentada de la ISR; el uso de la FPU no garantiza por sí solo un tiempo máximo de ejecución.
 
 Solo las interfaces con el hardware usan enteros: el código del ADC, la referencia Q1.15 y las muestras de 16 bits del registro. Si la plataforma no puede incluir la FPU, se cambia a punto fijo Q15/Q31 con las mismas interfaces de bloque.
 
