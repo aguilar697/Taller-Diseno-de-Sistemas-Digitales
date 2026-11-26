@@ -28,7 +28,11 @@ Plecs {
   AlgebraicLoopWithStateMachineMsg "3"
   AssertionAction "1"
   FixedPointDatatypeOverride "1"
-  InitializationCommands "Ts = 100e-6; Kp = 12; Kr = 200; w0 = 2*pi*50; wc = 2*pi*2;\nkt = w0/tan(w0*Ts/2); d0 = kt^2+2*wc*kt+w0^2;\nb0 = 2*Kr*wc*kt/d0; a1 = 2*(w0^2-kt^2)/d0; a2 = (kt^2-2*wc*kt+w0^2)/d0;\nVbus = 12; Iref = 0.5; Lcarga = 10e-3; Rdev = 0.6; Rext = 6.6;\nT_cambio_R = 2; Rextra = 3.3; Vnorm = 12;"
+  InitializationCommands "Ts = 100e-6; Kp = 12; Kr = 200; w0 = 2*pi*50; wc = 2"
+"*pi*2;\nkt = w0/tan(w0*Ts/2); d0 = kt^2+2*wc*kt+w0^2;\nb0 = 2*Kr*wc*kt/d0; a1"
+" = 2*(w0^2-kt^2)/d0; a2 = (kt^2-2*wc*kt+w0^2)/d0;\nVbus = 12; Iref = 0.5; Lca"
+"rga = 10e-3; Rdev = 0.6; Rext = 6.6;\nT_cambio_R = 2; Rextra = 3.3; Vnorm = 1"
+"2;"
   InitialState  "1"
   SystemState   ""
   JacobianComputation "2"
@@ -265,7 +269,6 @@ Plecs {
         Show          off
       }
     }
-
     Component {
       Type          Resistor
       Name          "R2"
@@ -580,7 +583,7 @@ Plecs {
       LabelPosition west
       Parameter {
         Variable      "Amplitude"
-        Value         "Iref"
+        Value         "1"
         Show          off
       }
       Parameter {
@@ -934,116 +937,10 @@ Plecs {
       }
     }
     Component {
-      Type          VoltageSource
-      Name          "V"
-      Show          on
-      Position      [725, 430]
-      Direction     down
-      Flipped       on
-      LabelPosition east
-      Parameter {
-        Variable      "DiscretizationBehavior"
-        Value         "2"
-        Show          off
-      }
-      Parameter {
-        Variable      "StateSpaceInlining"
-        Value         "1"
-        Show          off
-      }
-    }
-    Component {
-      Type          Step
-      Name          "Step"
-      Show          on
-      Position      [510, 675]
-      Direction     right
-      Flipped       off
-      LabelPosition south
-      Parameter {
-        Variable      "Time"
-        Value         "0.205"
-        Show          off
-      }
-      Parameter {
-        Variable      "Before"
-        Value         "Vbus"
-        Show          off
-      }
-      Parameter {
-        Variable      "After"
-        Value         "Vbus"
-        Show          off
-      }
-      Parameter {
-        Variable      "DataType"
-        Value         "10"
-        Show          off
-      }
-    }
-    Component {
-      Type          Step
-      Name          "Step1"
-      Show          on
-      Position      [510, 730]
-      Direction     right
-      Flipped       off
-      LabelPosition south
-      Parameter {
-        Variable      "Time"
-        Value         "0.405"
-        Show          off
-      }
-      Parameter {
-        Variable      "Before"
-        Value         "0"
-        Show          off
-      }
-      Parameter {
-        Variable      "After"
-        Value         "0"
-        Show          off
-      }
-      Parameter {
-        Variable      "DataType"
-        Value         "10"
-        Show          off
-      }
-    }
-    Component {
-      Type          Sum
-      Name          "Sum2"
-      Show          off
-      Position      [580, 675]
-      Direction     up
-      Flipped       off
-      LabelPosition south
-      Parameter {
-        Variable      "IconShape"
-        Value         "2"
-        Show          off
-      }
-      Parameter {
-        Variable      "Inputs"
-        Value         "|++"
-        Show          off
-      }
-      Parameter {
-        Variable      "DataType"
-        Value         "11"
-        Show          off
-      }
-      Parameter {
-        Variable      "DataTypeOverflowMode"
-        Value         "1"
-        Show          off
-      }
-    }
-    Component {
       Type          Resistor
       Name          "R3"
       Show          on
-      Position      [1095, 405]
+      Position      [1095, 385]
       Direction     right
       Flipped       off
       LabelPosition south
@@ -1054,55 +951,16 @@ Plecs {
       }
     }
     Component {
-      Type          Switch
-      Name          "S1"
+      Type          DCVoltageSource
+      Name          "V_dc"
       Show          on
-      Position      [1095, 455]
-      Direction     right
-      Flipped       off
-      LabelPosition north
+      Position      [710, 430]
+      Direction     down
+      Flipped       on
+      LabelPosition east
       Parameter {
-        Variable      "s_init"
-        Value         "1"
-        Show          off
-      }
-      Parameter {
-        Variable      "SwitchModel"
-        Value         "1"
-        Show          off
-      }
-      Parameter {
-        Variable      "f_grid"
-        Value         "0"
-        Show          off
-      }
-    }
-    Component {
-      Type          Step
-      Name          "Step2"
-      Show          on
-      Position      [985, 605]
-      Direction     right
-      Flipped       off
-      LabelPosition south
-      Parameter {
-        Variable      "Time"
-        Value         "T_cambio_R"
-        Show          off
-      }
-      Parameter {
-        Variable      "Before"
-        Value         "1"
-        Show          off
-      }
-      Parameter {
-        Variable      "After"
-        Value         "0"
-        Show          off
-      }
-      Parameter {
-        Variable      "DataType"
-        Value         "10"
+        Variable      "V"
+        Value         "12"
         Show          off
       }
     }
@@ -1117,14 +975,14 @@ Plecs {
         DstTerminal   2
       }
       Branch {
-        Points        [725, 560]
+        Points        [710, 560]
         Branch {
           Points        [650, 560]
           DstComponent  "Ground"
           DstTerminal   1
         }
         Branch {
-          DstComponent  "V"
+          DstComponent  "V_dc"
           DstTerminal   2
         }
       }
@@ -1162,17 +1020,8 @@ Plecs {
           DstTerminal   2
         }
         Branch {
-          Points        [1125, 430]
-          Branch {
-            Points        [1125, 405]
-            DstComponent  "R3"
-            DstTerminal   1
-          }
-          Branch {
-            Points        [1125, 455]
-            DstComponent  "S1"
-            DstTerminal   1
-          }
+          DstComponent  "R1"
+          DstTerminal   1
         }
       }
       Branch {
@@ -1374,37 +1223,6 @@ Plecs {
     }
     Connection {
       Type          Signal
-      SrcComponent  "Step"
-      SrcTerminal   1
-      DstComponent  "Sum2"
-      DstTerminal   2
-    }
-    Connection {
-      Type          Signal
-      SrcComponent  "Step1"
-      SrcTerminal   1
-      Points        [580, 730]
-      DstComponent  "Sum2"
-      DstTerminal   3
-    }
-    Connection {
-      Type          Signal
-      SrcComponent  "Sum2"
-      SrcTerminal   1
-      Points        [695, 675; 695, 430]
-      DstComponent  "V"
-      DstTerminal   3
-    }
-    Connection {
-      Type          Signal
-      SrcComponent  "Step2"
-      SrcTerminal   1
-      Points        [1095, 605]
-      DstComponent  "S1"
-      DstTerminal   3
-    }
-    Connection {
-      Type          Signal
       SrcComponent  "i_ref"
       SrcTerminal   1
       Points        [145, 245]
@@ -1430,24 +1248,9 @@ Plecs {
         DstTerminal   1
       }
       Branch {
-        Points        [725, 300]
-        DstComponent  "V"
+        Points        [710, 300]
+        DstComponent  "V_dc"
         DstTerminal   1
-      }
-    }
-    Connection {
-      Type          Wire
-      SrcComponent  "R3"
-      SrcTerminal   2
-      Points        [1065, 405; 1065, 430]
-      Branch {
-        DstComponent  "R1"
-        DstTerminal   1
-      }
-      Branch {
-        Points        [1065, 455]
-        DstComponent  "S1"
-        DstTerminal   2
       }
     }
   }

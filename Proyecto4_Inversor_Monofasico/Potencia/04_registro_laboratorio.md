@@ -438,4 +438,14 @@ En el ensayo de la variante con rampa, el equipo report? otra interrupci?n al se
 
 La trama UART del ensayo con rampa identific? sobrecorriente (`0x0001`), sin conversiones perdidas. En muestras consecutivas, la corriente reportada pas? de +0,428 A a ?0,665 A, ?1,742 A, ?2,742 A y ?3,643 A. La modulaci?n se mantuvo en 0,431 durante las dos primeras muestras por encima del umbral y pas? a cero en la tercera. El m?ximo de la magnitud de la modulaci?n en la trama fue 0,669. El valor de corriente reportado lleg? a ?6,36 A despu?s del corte. Se requiere una captura sincronizada de la entrada del XADC y de una medici?n independiente de la corriente para determinar si el transitorio se origina en la carga o en el sensado.
 
+## Verificación del lazo cerrado tras la defensa
+
+El inversor operó en lazo cerrado con el bus fijo en 12 V, una referencia de 0,20 A pico a 50 Hz y R3 puenteada. La última resistencia DC medida entre A y B para esa configuración fue de 7,3 Ω.
+
+La exportación UART mediante BTNL registró 512 muestras, con un intervalo registrado de 200 µs y cinco ciclos completos para el ajuste de la fundamental. La trama llegó con CRC válido, estado de operación, sin fallas ni pérdidas de muestras. La frecuencia PWM registrada fue de 10 kHz.
+
+La fundamental estimada a partir del ACS712 y el XADC fue de 177 mA pico, con un error de amplitud de −11,5 % y un desfase de −6,87° respecto de la referencia. La corrida confirma operación del lazo en la ventana registrada. La amplitud quedó fuera de la tolerancia de ±10 %. Para esta trama queda pendiente el contraste simultáneo con el osciloscopio. Se acordó continuar las demostraciones desde otro equipo.
+
+[Trama UART](../docs/informe/resultados/potencia/laboratorio/2026-11-26/regimen_173242.bin) · [Muestras en CSV](../docs/informe/resultados/potencia/laboratorio/2026-11-26/regimen_173242.csv)
+
 [Diseño y componentes](01_diseno_y_componentes.md) · [Pendientes](03_pendientes_y_validacion.md)
