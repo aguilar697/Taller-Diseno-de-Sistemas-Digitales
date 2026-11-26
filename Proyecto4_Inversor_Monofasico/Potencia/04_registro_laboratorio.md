@@ -397,4 +397,45 @@ En dos tramas de operación a 0,20 A, el ajuste de 50 Hz del receptor UART dio 1
 
 Una captura de diagnóstico distinta registró códigos consecutivos de 1119, 593, 325 y 247 cerca del corte. Los cuatro llevaban identificadores nuevos y STATUS sin errores de conversión. Ese evento llevó la lectura aparente hasta −11,7 A y la orden llegó a +0,85 antes de quedar en cero. Los cuatro códigos están dentro de los límites digitales. El evento se distingue de la trama anterior con causa `0x0002` (`FALLA_CODIGO`). La comparación pendiente es entre la señal diferencial analógica y una medición independiente de la corriente en el instante del evento.
 
+## Medición de resistencia de la carga antes del ensayo a bus fijo
+
+Se utilizó el secundario del transformador como inductor, con el primario desconectado y sus terminales aislados. La resistencia DC medida del devanado fue de 0,5 Ω y la de la tercera resistencia (R3) fue de 3,4 Ω.
+
+| Configuración de la carga | Resistencia DC medida entre A y B |
+| --- | ---: |
+| R3 puenteada | 7,3 Ω |
+| R3 en serie | 10,6 Ω |
+
+La diferencia entre las configuraciones fue de 3,3 Ω, consistente con la medición de R3. La inductancia del devanado a 50 Hz queda pendiente de medición.
+
+### Seguimiento a 0,200 A pico y cambio de carga
+
+Con el bus fijo en 24 V y R3 puenteada, la captura UART tomada al detener el osciloscopio reportó 0,190 A pico en la fundamental de 50 Hz, sin fallas ni conversiones perdidas. El ajuste de cinco ciclos del CSV del osciloscopio dio 0,406 V RMS sobre una resistencia medida de 3,4 Ω, equivalentes a 0,169 A pico y un error de −15,6 % respecto de la consigna. Se conservaron el cero y la ganancia del firmware.
+
+En el ensayo de cambio de carga, la forma de onda observada en el osciloscopio se mantuvo estable a simple vista durante la maniobra. La observación es cualitativa. Para cuantificar el transitorio se requiere una captura que incluya el instante del cambio y varios ciclos antes y después.
+
+### Disparo de protección al seleccionar 0,500 A pico
+
+La aplicación de operación registró sobrecorriente sin pérdida de conversiones. En un ensayo posterior con la variante de diagnóstico, el código del ADC pasó de 1862 a 1667 y luego a 553, 219 y 110 en muestras consecutivas separadas por 100 µs. La orden de modulación llegó a cero en la muestra de código 110. Después se registraron tres códigos cero y la lectura se recuperó hasta el nivel de reposo. La trama registró sobrecorriente y código fuera de rango (`0x0003`), sin pérdida de conversiones. El código cero apareció después del corte de la orden de modulación.
+
+En la captura del osciloscopio de la primera corrida, el máximo registrado fue de 3,01 V sobre 3,4 Ω, equivalente a 0,886 A instantáneos. El CSV contiene muestras cada 50 µs y corresponde a un ensayo distinto de la captura cruda del ADC. Para identificar el origen de la caída del código queda por comparar el voltaje diferencial en JXADC con la corriente independiente en el mismo evento.
+
+### Correcci?n de la configuraci?n para el bus fijo
+
+En los proyectos locales de Vitis, la tensi?n usada para normalizar la salida del PR estaba configurada en 12 V durante los ensayos con el bus a 24 V. Para una misma orden de tensi?n, el firmware solicitaba el doble del ?ndice de modulaci?n correspondiente a 24 V antes de aplicar el l?mite. Se recompilaron las variantes de operaci?n y diagn?stico con 24 V. Se conservan la mediana de tres muestras admitidas y la protecci?n de 1,5 A sobre los datos crudos. Queda por repetir la transici?n de 0,20 a 0,50 A para comprobar el efecto de la correcci?n.
+
+### Ensayo a 0,50 A pico con bus fijo de 24 V
+
+La captura de la ca?da de tensi?n en la resistencia de 3,4 ?, exportada como `scope_8.csv`, contiene 200 ms de se?al. Un ajuste senoidal a 50 Hz sobre los diez ciclos dio 1,24 V pico en la fundamental, equivalentes a 0,366 A pico. La amplitud de corriente ajustada por ciclo estuvo entre 0,359 y 0,372 A pico. La diferencia respecto de la consigna fue del 27 %. La captura muestra operaci?n sostenida durante la ventana del osciloscopio. Para localizar el origen de la diferencia de amplitud se requiere contrastar la fundamental estimada por el ADC y el registro de modulaci?n con esta medici?n.
+
+Una exportaci?n UART posterior, con la misma consigna de 0,50 A y el bus fijo en 24 V, registr? 512 muestras en operaci?n, sin fallas ni conversiones perdidas. El ajuste a 50 Hz dio 0,454 A pico en la corriente estimada por la FPGA y el m?ximo de `|m|` fue 0,673, por debajo del l?mite de 0,85. La diferencia respecto de los 0,366 A pico del osciloscopio justifica contrastar la escala del ADC con una captura simult?nea. En esta variante de diagn?stico, el segundo valor de cada muestra contiene el c?digo crudo y las banderas del ADC.
+
+En una prueba exploratoria se aument? la ganancia resonante del PR de 200 a 300 V/A. El equipo report? que la operaci?n se interrumpi? al seleccionar 0,50 A. La causa de la interrupci?n queda pendiente de confirmar por UART. Se restauraron los coeficientes y el ejecutable de diagn?stico de 24 V con la ganancia de 200 V/A para retomar el ensayo anterior.
+
+Se prepar? una variante con incremento o decremento de amplitud de hasta 50 mA por ciclo de 50 Hz y arranque desde cero. La se?al que recibe el PR pasa por la mediana de tres muestras y luego por un promedio exponencial con factor 0,5. La supervisi?n sigue utilizando la corriente cruda. El ELF de diagn?stico se compil? para 24 V, con la ganancia resonante de 200 V/A y la protecci?n de 1,5 A. Pasaron las pruebas de software con la carga RL simulada a 24 V. La validaci?n en banco queda pendiente.
+
+En el ensayo de la variante con rampa, el equipo report? otra interrupci?n al seleccionar 0,50 A. La captura `scope_9.csv`, tomada sobre la resistencia de 3,4 ?, abarca de ?100 a +100 ms respecto del disparo. En los 100 ms posteriores al disparo, el m?ximo absoluto registrado fue de 1,81 V (0,532 A). La fundamental de corriente de los ?ltimos 20 ms fue de 0,160 A pico. La captura muestra parte del arranque y no contiene toda la transici?n hasta 0,50 A. La causa de la interrupci?n requiere la trama del mismo ensayo.
+
+La trama UART del ensayo con rampa identific? sobrecorriente (`0x0001`), sin conversiones perdidas. En muestras consecutivas, la corriente reportada pas? de +0,428 A a ?0,665 A, ?1,742 A, ?2,742 A y ?3,643 A. La modulaci?n se mantuvo en 0,431 durante las dos primeras muestras por encima del umbral y pas? a cero en la tercera. El m?ximo de la magnitud de la modulaci?n en la trama fue 0,669. El valor de corriente reportado lleg? a ?6,36 A despu?s del corte. Se requiere una captura sincronizada de la entrada del XADC y de una medici?n independiente de la corriente para determinar si el transitorio se origina en la carga o en el sensado.
+
 [Diseño y componentes](01_diseno_y_componentes.md) · [Pendientes](03_pendientes_y_validacion.md)
