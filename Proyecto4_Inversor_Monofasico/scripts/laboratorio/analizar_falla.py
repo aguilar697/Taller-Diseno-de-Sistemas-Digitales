@@ -15,7 +15,7 @@ lineas = ruta.read_text(encoding="utf-8").splitlines()
 print(lineas[0])
 filas = list(csv.DictReader([l for l in lineas if not l.startswith("#")]))
 t = np.array([float(f["t_s"]) for f in filas])
-i_pr = np.array([float(f["i_med_A"]) for f in filas])
+i_registrada = np.array([float(f["i_med_A"]) for f in filas])
 raw = np.array([int(round(float(f["i_ref_A"]) * 1000)) for f in filas])
 m = np.array([float(f["m"]) for f in filas])
 n = np.array([int(f["n"]) for f in filas])
@@ -28,17 +28,21 @@ malas = [k for k in range(len(t)) if not COD_MIN <= codigo[k] <= COD_MAX or abs(
          or errores[k] or not valido[k]]
 k0 = malas[0] if malas else len(t) - 21
 print(f"primera muestra anormal: indice {k0}, t = {t[k0]*1e3:.1f} ms" if malas else "sin muestras anormales")
-print(" idx      n  codigo  i_bruta(A)  i_PR(A)       m  err  valida")
+print(" idx      n  codigo  i_bruta(A) i_reg.(A)       m  err  valida")
 for k in range(max(0, k0 - 30), min(len(t), k0 + 22)):
     marca = "  <--" if k in malas else ""
-    print(f"{k:4d} {n[k]:6d} {codigo[k]:7d} {i_bruta[k]:+10.3f} {i_pr[k]:+8.3f} {m[k]:+7.3f} {errores[k]:4d} {int(valido[k]):6d}{marca}")
+    print(f"{k:4d} {n[k]:6d} {codigo[k]:7d} {i_bruta[k]:+10.3f} {i_registrada[k]:+8.3f} {m[k]:+7.3f} {errores[k]:4d} {int(valido[k]):6d}{marca}")
 
-import matplotlib
+try:
+    import matplotlib
+except ModuleNotFoundError:
+    print("Para generar la gráfica, instale matplotlib.")
+    sys.exit(0)
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 fig, ax = plt.subplots(2, 1, figsize=(7, 4.5), sharex=True)
 ax[0].plot(t * 1e3, i_bruta, color="#2a78d6", lw=1, label="ADC en bruto")
-ax[0].plot(t * 1e3, i_pr, color="#eb6834", lw=1, ls="--", label="Entrada del PR")
+ax[0].plot(t * 1e3, i_registrada, color="#eb6834", lw=1, ls="--", label="Corriente registrada")
 ax[0].axhline(I_MAX, color="#8a8984", ls=":"); ax[0].axhline(-I_MAX, color="#8a8984", ls=":")
 ax[0].set_ylabel("Corriente (A)"); ax[0].legend(fontsize=7, frameon=False)
 ax[1].plot(t * 1e3, m, color="#30302e", lw=1); ax[1].set_ylabel("m"); ax[1].set_xlabel("Tiempo (ms)")

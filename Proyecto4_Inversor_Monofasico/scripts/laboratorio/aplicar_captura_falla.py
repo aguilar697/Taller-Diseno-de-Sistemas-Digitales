@@ -1,7 +1,7 @@
 """control_inversor (rama) con registro de falla: guarda cada muestra (K_REG = 1, 51,2 ms),
 y tras una falla graba 20 muestras más y congela el registro hasta exportarlo.
 La columna i_ref lleva el ADC en bruto: valor*1000 = código + 4096*errores (bits 4-6 de STATUS),
-con signo negativo si la muestra no era válida. i_med es lo que recibió el PR.
+con signo negativo si la muestra no era válida. i_med conserva la corriente cruda.
 
 Uso: python aplicar_captura_falla.py <carpeta Proyecto4_Inversor_Monofasico>
 """
@@ -12,13 +12,13 @@ p = Path(sys.argv[1]) / "software/embedded/control/aplicacion.c"
 t = p.read_bytes().decode("utf-8")
 crlf = "\r\n" in t
 t = t.replace("\r\n", "\n")
+registro = "    registro_guardar(&app->registro, i_med, i_ref, q, n);"
 cambios = [
     ("    registro_iniciar(&app->registro, K_REG);",
      "    registro_iniciar(&app->registro, 1u);"),
     ("        info.k_reg = (uint16_t)K_REG;",
      "        info.k_reg = 1u;"),
-    ("""    /* Registrar (fuera de OPERACIÓN: i_ref = m = 0) */
-    registro_guardar(&app->registro, i_med, i_ref, q, n);""",
+    (registro,
      """    /* Registro de falla: ADC en bruto; tras una falla, 20 muestras más y se congela */
     {
         static uint32_t post_falla;

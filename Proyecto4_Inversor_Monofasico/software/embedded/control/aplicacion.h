@@ -45,6 +45,10 @@ typedef struct {
     registro_t     registro;
     int16_t        q_ultimo;            /* última REFERENCE */
     uint32_t       arranque;            /* períodos con m = 0 que faltan */
+    uint8_t        muestras_sin_actualizar;
+    uint8_t        historial_corriente;
+    float          corriente_anterior;
+    float          corriente_antepenultima;
 
     /* Lazo principal */
     antirrebote_t  entradas;

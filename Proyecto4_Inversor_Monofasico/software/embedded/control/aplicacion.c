@@ -27,6 +27,8 @@ void app_iniciar(aplicacion_t *app)
     app->t_isr_max = 0;
     app->q_ultimo = 0;
     app->arranque = 0;
+    app->muestras_sin_actualizar = 0;
+    app->historial_corriente = 0;
 
     pr_iniciar(&app->pr, &coef);
     referencia_iniciar(&app->referencia, F_REF_HZ, TS_S);
@@ -97,6 +99,7 @@ static void aplicar_solicitud(aplicacion_t *app)
         pr_reiniciar(&app->pr);
         app->q_ultimo = 0;
         app->arranque = N_ARRANQUE;
+        app->historial_corriente = 0;
         pwm_escribir_referencia(0);
         if (pwm_habilitar(FREQ_SEL)) {
             app->lectura.n_por_control = N_PWM_POR_CONTROL;
@@ -115,12 +118,38 @@ static void aplicar_solicitud(aplicacion_t *app)
     }
 }
 
+/* Mediana causal de tres muestras admitidas por el control. */
+static float corriente_para_pr(aplicacion_t *app, float corriente)
+{
+    float resultado = corriente;
+
+    if (app->historial_corriente == 0u) {
+        app->corriente_anterior = corriente;
+        app->corriente_antepenultima = corriente;
+        app->historial_corriente = 1u;
+    } else {
+        float a = app->corriente_anterior;
+        float b = app->corriente_antepenultima;
+        float menor = a < b ? a : b;
+        float mayor = a > b ? a : b;
+        if (corriente < menor) {
+            resultado = menor;
+        } else if (corriente > mayor) {
+            resultado = mayor;
+        }
+        app->corriente_antepenultima = a;
+        app->corriente_anterior = corriente;
+    }
+    return resultado;
+}
+
 void app_isr(aplicacion_t *app)
 {
     uint32_t t0, duracion, estado_adc;
     uint16_t codigo, n;
     lectura_clase_t clase;
-    float i_med, i_ref = 0.0f;
+    float i_med = 0.0f, i_ref = 0.0f;
+    int muestra_para_control = 0;
     int16_t q = 0;
 
     /* Salida de medición = 1 */
@@ -130,21 +159,29 @@ void app_isr(aplicacion_t *app)
     /* Leer ADC: código, n y estado */
     adc_leer(&codigo, &n, &estado_adc);
 
-    /* Convertir a A y supervisar (sin muestra válida solo cuenta Δn) */
+    /* Mantener la protección sobre muestras crudas y de ID distinto. */
     clase = lectura_clasificar(&app->lectura, n);
     if (estado_adc & ADC_ESTADO_VALIDO) {
-        static float i_valida;
         i_med = lectura_a_amperios(&app->lectura, codigo);
-        /* Código imposible (acople en la medición): el PR usa la última muestra válida */
-        if (codigo < CODIGO_MIN || codigo > CODIGO_MAX) {
-            i_med = i_valida;
-        } else {
-            i_valida = i_med;
+        if (clase != LECTURA_REPETIDA) {
+            int codigo_en_rango = codigo >= CODIGO_MIN && codigo <= CODIGO_MAX;
+            int corriente_en_rango = i_med >= -I_MAX_A && i_med <= I_MAX_A;
+
+            /* Una lectura saturada activa la supervisión del ADC por código. */
+            supervision_muestra(&app->supervision, codigo_en_rango ? i_med : 0.0f,
+                                codigo, 0);
+            muestra_para_control = clase == LECTURA_NUEVA &&
+                                   codigo_en_rango && corriente_en_rango;
         }
-        supervision_muestra(&app->supervision, i_med, codigo, lectura_falla(&app->lectura));
+    }
+    if (muestra_para_control) {
+        app->muestras_sin_actualizar = 0u;
     } else {
-        i_med = 0.0f;
-        if (lectura_falla(&app->lectura)) {
+        if (app->muestras_sin_actualizar < N_FALLA_MUESTRAS) {
+            app->muestras_sin_actualizar++;
+        }
+        if (app->muestras_sin_actualizar >= N_FALLA_MUESTRAS &&
+            !supervision_hay_falla(&app->supervision)) {
             supervision_marcar(&app->supervision, FALLA_MUESTRAS);
         }
     }
@@ -166,6 +203,9 @@ void app_isr(aplicacion_t *app)
 
     /* ¿Estado = OPERACIÓN? */
     if (app->estado == ESTADO_OPERACION && app->arranque > 0u) {
+        if (muestra_para_control) {
+            (void)corriente_para_pr(app, i_med);
+        }
         /* Arranque: m = 0 para cargar el bootstrap */
         app->arranque--;
         pwm_escribir_referencia(0);
@@ -178,15 +218,15 @@ void app_isr(aplicacion_t *app)
         /* Referencia: θ += Δθ en cada iteración */
         i_ref = referencia_paso(&app->referencia);
 
-        /* ¿Muestra nueva? */
-        if (clase == LECTURA_REPETIDA) {
-            /* No ejecutar el PR: mantener REFERENCE */
+        if (!muestra_para_control) {
+            /* Sin realimentación utilizable: mantener la orden y los estados. */
             q = app->q_ultimo;
         } else {
             int saturado;
 
             /* PR: r* y v_PR */
-            float v_pr = pr_calcular(&app->pr, i_ref - i_med);
+            float i_pr = corriente_para_pr(app, i_med);
+            float v_pr = pr_calcular(&app->pr, i_ref - i_pr);
 
             /* m = sat(v_PR / Vdc) en Q1.15 */
             q = modulacion_calcular(&app->modulacion, v_pr, &saturado);
@@ -204,7 +244,7 @@ void app_isr(aplicacion_t *app)
         pr_reiniciar(&app->pr);
     }
 
-    /* Registrar (fuera de OPERACIÓN: i_ref = m = 0) */
+    /* Registrar la corriente cruda para conservar los picos para el diagnóstico. */
     registro_guardar(&app->registro, i_med, i_ref, q, n);
     if (app->estado != ESTADO_OPERACION) {
         adc_iniciar_conversion();

@@ -313,6 +313,21 @@ int main(void)
     }
     correr(10u);
 
+    /* Un impulso dentro del rango del ADC debe quedar fuera del PR. */
+    {
+        float corriente_anterior = app.corriente_anterior;
+        float corriente_antepenultima = app.corriente_antepenultima;
+        float mediana_esperada = fmaxf(corriente_anterior, corriente_antepenultima);
+        referencia_t referencia_previa = app.referencia;
+        float referencia_esperada = referencia_paso(&referencia_previa);
+        i_carga = 1.2;
+        periodo();
+        comprobar(fabsf(app.pr.e_k - (referencia_esperada - mediana_esperada)) < 1e-5f,
+                  "impulso de 1,2 A: el PR usa la mediana");
+        i_carga = corriente_anterior;
+        periodo();
+    }
+
     /* ---------- Tres repetidas seguidas: FALLA ---------- */
     congelar_n = 1;
     correr(3u);
@@ -334,11 +349,30 @@ int main(void)
     elegir_amplitud(2u);
     presionar(BTN_HABILITAR);
     correr(5000u);
+    {
+        uint32_t escrituras_antes_recorte = escrituras_ref;
+        i_carga = -20.0;
+        periodo();
+        i_carga = -20.0;
+        periodo();
+        comprobar(app.estado == ESTADO_OPERACION && escrituras_ref == escrituras_antes_recorte,
+                  "dos muestras al riel: se conserva REFERENCE");
+        i_carga = -20.0;
+        periodo();
+        comprobar(app.estado == ESTADO_FALLA && !pwm_habilitado &&
+                  app.supervision.causa == FALLA_CODIGO, "tres muestras al riel: falla de código");
+        presionar(BTN_RECONOCER);
+        presionar(BTN_HABILITAR);
+        correr(5000u);
+    }
+    uint32_t escrituras_antes_pico = escrituras_ref;
     i_carga = 1.8;
     periodo();
     i_carga = 1.8;
     periodo();
     comprobar(app.estado == ESTADO_OPERACION, "1,8 A en dos muestras: sigue en OPERACIÓN");
+    comprobar(escrituras_ref == escrituras_antes_pico,
+              "sobre el límite: el PR conserva la orden mientras supervisa la corriente cruda");
     i_carga = 1.8;
     periodo();
     comprobar(app.estado == ESTADO_FALLA && !pwm_habilitado &&
