@@ -24,10 +24,8 @@
 #define PR_A1               (-1.996504651667f)
 #define PR_A2               0.997490292546f
 
-/* Base fija de normalización del modelo inicial. El bus físico puede variar
- * entre 12 y 24 V; variar la fuente no requiere recompilar esta constante.
- * Una futura compensación por Vdc medido requiere validación del lazo. */
-#define VDC_V               12.0f
+/* Tensión nominal fija del bus para convertir la salida del PR en modulación. */
+#define VDC_V               24.0f
 #define MOD_LIMIT_Q15       27853        /* m = 0,85; mismo límite que el PWM */
 
 /* Montaje del 20/11 (Potencia/04_registro_laboratorio.md): cero de las dos
