@@ -1,6 +1,6 @@
-Simulaci?n funcional RTL en XSim 2026.1
-Fuentes de hardware y testbench de la revisi?n 2b7a183.
-Extractos de los logs de simulaci?n.
+Simulación funcional RTL en XSim 2026.1
+Fuentes de hardware y testbench de la revisión 2b7a183.
+Extractos de los logs de simulación.
 
 [tb_pwm_deadtime]
 TEST PASSED tb_pwm_deadtime checks=20
@@ -34,4 +34,4 @@ PERMISO_BASYS3_PASS: bloqueo, sincronizacion, frontera y reset
 
 [tb_pwm_adc_axi +INJECT_ERROR]
 Fatal: FALLO: ERROR_INYECTADO_DETECTADO
-Diagn?stico esperado de la prueba negativa.
+Diagnóstico esperado de la prueba negativa.

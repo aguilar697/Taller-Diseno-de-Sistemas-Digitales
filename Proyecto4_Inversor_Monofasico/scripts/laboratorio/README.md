@@ -16,7 +16,7 @@ Análisis de las tramas que exporta `control_inversor` por UART y compilación d
 | `analizar_transitorio.py` | Detecta un cambio de amplitud de la referencia y reporta el pico y el establecimiento de la envolvente, si este se observa dentro de la captura |
 | `analizar_cambio_carga.py` | Estima el cambio por un cruce sostenido de la amplitud de m. Admite la marca `--evento-ms` cuando el instante se conoce por otro medio. Reporta la caída y los errores antes y después |
 | `analizar_osciloscopio.py` | Amplitud de 50 Hz de la resta CH1−CH2 del osciloscopio, descartando las muestras en 0 de los canales saturados |
-| `figuras_informe_potencia.py` | Figuras de los [informes de Potencia](../../docs/informe/potencia/README.md) a partir de las tramas, e impedancia de la carga a 50 Hz: fundamental de `m·Vdc`, menos la caída por tiempo muerto, dividida por la fundamental de la corriente |
+| `figuras_informe_potencia.py` | Figuras de los [informes de Potencia](../../docs/informe/potencia/README.md) a partir de las tramas y del [CSV de 0,20 A](../../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/regimen/0a2_scope_16.csv); estima además la impedancia de la carga a 50 Hz a partir de `m·Vdc`, la caída por tiempo muerto y la fundamental de la corriente |
 
 `graficar_ensayos.py` y `resumen_ensayos.py` usan el decodificador y el ajuste de fundamental de [`receptor.py`](../../software/pc/receptor.py). El resumen reserva las columnas de cumplimiento para las capturas de régimen y conserva la sección de notas.
 

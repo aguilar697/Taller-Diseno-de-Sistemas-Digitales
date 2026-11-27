@@ -1,0 +1,25 @@
+Pruebas del software del inversor en PC
+
+Fuentes conservadas en 82a8226 y fc92a6f, sin diferencias en software/.
+Árbol Git de software/: 7aacce8d95f6852bd0dc77efde9ac0abb2f5f821
+Entorno: Windows, Python 3.13.0 y GCC 13.2.0 (MinGW-w64).
+Comando desde el Proyecto 4: python -B software/tests/correr_pruebas.py
+Alcance: módulos en PC con periféricos modelados y decodificación UART.
+
+  lazo_laboratorio 7 pasan, 0 fallan
+  referencia      10 pasan, 0 fallan
+  control_pr      10 pasan, 0 fallan
+  modulacion      22 pasan, 0 fallan
+  registro        13 pasan, 0 fallan
+  lectura         17 pasan, 0 fallan
+  supervision     20 pasan, 0 fallan
+  antirrebote     9 pasan, 0 fallan
+  exportacion     23 pasan, 0 fallan
+  drv_adc         10 pasan, 0 fallan
+  drv_pwm         14 pasan, 0 fallan
+  drv_plataforma  13 pasan, 0 fallan
+  calibracion     1 pasan, 0 fallan
+  aplicacion      41 pasan, 0 fallan
+  receptor (PC)   ok
+
+RESULTADO: POSITIVO

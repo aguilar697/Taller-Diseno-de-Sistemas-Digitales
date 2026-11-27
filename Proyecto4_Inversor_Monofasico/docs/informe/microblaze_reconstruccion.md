@@ -1,6 +1,6 @@
 # Verificación de reconstrucción MicroBlaze V
 
-Este documento registra la plataforma digital independiente. El montaje del inversor utiliza la [integración de laboratorio con asignación JA](../diseno/integracion_basys3.md).
+Este documento registra la plataforma digital independiente y resume pruebas cuyos reportes completos quedaron en los directorios de construcción externos. El montaje del inversor utiliza la [integración de laboratorio con asignación JA](../diseno/integracion_basys3.md), con [reportes de ruteo y manifiesto versionados](README.md#verificación-digital-e-implementación).
 
 ## Alcance
 

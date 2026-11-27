@@ -1,0 +1,14 @@
+Pruebas en PC de las herramientas numéricas de Potencia
+
+Fuentes de fc92a6f. Árbol Git de modelos/analisis/: 673288edc2b04d27003850d25e9362ad5e39b715
+Entorno: Python 3.13.0.
+Comando desde la raíz del repositorio:
+python -B -m unittest discover -s Proyecto4_Inversor_Monofasico/modelos/analisis -p "test_*.py" -v
+Alcance: pruebas del cálculo en Python. Las corridas de PLECS tienen registros propios.
+
+test_ensayos_funcionales: 3 pruebas aprobadas (fundamental y detección de solapamiento/huecos).
+test_pr_discreto: 7 pruebas aprobadas (discretización, resonancia, estabilidad y modulación).
+test_rizado_pwm_rl: 8 pruebas aprobadas (cálculo RL, rizado, simetría y contraste con RK4).
+
+Ran 18 tests
+OK

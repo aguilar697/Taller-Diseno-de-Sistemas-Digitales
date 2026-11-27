@@ -40,4 +40,6 @@ La prueba temporizada se ejecuta aparte con una netlist ruteada y sus retardos S
 
 Los modelos de simulación identifican sus simplificaciones. Los comandos y dependencias de cada prueba se incorporan junto con su banco y los [scripts de verificación](../../scripts/README.md). Las evidencias seleccionadas se documentan en el [informe](../../docs/informe/README.md).
 
+Los extractos conservados reúnen la [prueba conjunta y su caso negativo](../../docs/informe/resultados/integracion_basys3/xsim_funcional.txt) y las [regresiones de PWM y ADC](../../docs/informe/resultados/integracion_basys3/xsim_perifericos.txt). Para la prueba con el modelo XADC de Vivado se conserva además la [consola de los ocho casos](../../docs/informe/resultados/adc/simulacion_pwm_xadc.png).
+
 [Descripción del proyecto](../../README.md)

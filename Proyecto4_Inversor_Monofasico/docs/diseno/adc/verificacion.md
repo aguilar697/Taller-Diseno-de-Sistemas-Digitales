@@ -13,7 +13,7 @@ El 11 de noviembre de 2026 se ejecutó `ejecutar_pruebas_adc.ps1 -RunName repo_f
 | `tb_adc_system_axi` | PASS | Tres conversiones por AXI y modelo XADC, ACK válido/atrasado/duplicado. |
 | `tb_adc_read_coherence` | PASS, 9/9 | Publicaciones entre lecturas y antes de ACK, sobrescrituras, R pendiente, lectores y reset. |
 
-Las seis pruebas terminaron con código de salida cero y `TEST PASSED`; se registraron cero advertencias y cero errores de compilación, elaboración y simulación. Los logs y productos compilados permanecen locales en `build/adc/repo_final_20261111/`. Cada top tiene `commands.txt`, `inputs.json` con SHA256 y los tres logs; `summary.json` resume los resultados. Los pasos para repetirlos están en el [índice](README.md). No se versionan logs temporales ni simulaciones compiladas.
+Las seis pruebas terminaron con código de salida cero y `TEST PASSED`; se registraron cero advertencias y cero errores de compilación, elaboración y simulación. Los logs y productos compilados permanecen locales en `build/adc/repo_final_20261111/`. Cada top tiene `commands.txt`, `inputs.json` con SHA256 y los tres logs; `summary.json` resume los resultados. Los [extractos versionados](../../informe/resultados/integracion_basys3/xsim_perifericos.txt) corresponden a la repetición con `2b7a183`, que también incluye el banco conjunto con PWM. Los pasos para repetirlos están en el [índice](README.md).
 
 ## Prueba dirigida de coherencia
 
