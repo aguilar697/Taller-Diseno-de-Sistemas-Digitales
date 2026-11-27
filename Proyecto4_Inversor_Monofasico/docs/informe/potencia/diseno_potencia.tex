@@ -1,5 +1,6 @@
 \documentclass[conference]{IEEEtran}
 \input{comun}
+\linespread{1.10}
 \hypersetup{pdftitle={Diseño del inversor monofásico con control PR de corriente}}
 \begin{document}
 \title{Diseño de un inversor monofásico con control proporcional resonante de corriente}
@@ -247,6 +248,7 @@ Todos los casos son estables, con margen de fase de al menos $71^\circ$ y de gan
 \subsection{Instrumentación}
 La corriente se registra de dos formas. El firmware guarda 512 muestras de $i$, $i_{\mathrm{ref}}$ y $m$, una cada 200 $\mu$s (102,4 ms), y las exporta por UART al pulsar BTNL; el receptor valida la trama y calcula la fundamental. Como contraste independiente se prevé la caída en una resistencia de 3,3 $\Omega$: dos canales en DC, ambos con masas en GND y resta matemática entre sus extremos. Cada canal debe admitir el modo común completo de 0 a $V_{dc}$ sin recorte. Para evaluar los flancos se requieren conexiones cortas y sondas de tensión adecuadas; para la compuerta superior se usa medición diferencial referida a su fuente. Nunca se conecta la masa de un osciloscopio convencional a A o B.
 
+\newpage
 \subsection{Método de medición del error}
 La fundamental se obtiene por proyección seno--coseno sobre los últimos cinco períodos completos de 50 Hz (500 muestras):
 \begin{equation}
@@ -273,8 +275,8 @@ Comparación & Cada punto frente a PLECS con los mismos $V_{dc}$ y referencia\\\
 \subsection{Puesta en marcha}
 Con el bus apagado se comprueban las alimentaciones auxiliares, el apagado con SD alto, la carga del bootstrap, las órdenes de compuerta y el tiempo muerto. Después se registra el reposo con el bus encendido y el PWM detenido para verificar el cero. El bus se energiza con límite de corriente de la fuente, de 1 A para 0,5 A pico y 1,5 A para 1 A pico, y se arranca con SW15 y BTNU. Ante una falla se apaga el bus, se baja SW15 y se abre SD antes de reconocerla con BTND.
 
+\newpage
 \section{Estado del diseño}
 El puente, el accionamiento, el sensado y el PR discreto sobre MicroBlaze V operaron juntos en el banco. La versión presentada se probó con 12 V fijos, 7,3 y 10,6 $\Omega$ DC entre A y B y una normalización del PR de 24 V en el código. Se eligió esta combinación porque dio el mejor comportamiento del lazo observado durante la puesta a punto en el banco. Con este ajuste, la ganancia ideal de actuación antes de saturación es la mitad de la del modelo de diseño a 12 V. En la carga de 7,3 $\Omega$ se midieron 176, 390 y 337 mA pico para consignas de 0,20, 0,50 y 1,00 A. La modulación saturó a 0,50 y 1,00 A. El informe técnico analiza ambos escalones de referencia, el cambio de carga, el rizado y los límites de la comparación con PLECS.
-\IEEEtriggeratref{8}
 \referencias{enunciado,zmood,teodorescu,pr,yepes,buso,holmes,mohan,ir,an978,irf,acs,xadc,plecs}
 \end{document}

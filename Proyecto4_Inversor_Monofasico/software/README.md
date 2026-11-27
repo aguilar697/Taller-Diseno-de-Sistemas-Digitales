@@ -18,11 +18,13 @@ El registro y la exportación de datos deben preservar la ejecución periódica 
 
 El hardware se exporta como XSA para generar el BSP y los ELF con Vitis 2026.1. Las aplicaciones disponibles y los comandos se describen en la [reconstrucción de Basys 3](../docs/diseno/integracion_basys3.md#reconstrucción-y-programas).
 
-Para las pruebas de PC, ejecutar desde la carpeta del Proyecto 4 con Python 3 y un compilador C disponible.
+Para las pruebas de PC, ejecutar desde la carpeta del Proyecto 4 con Python 3 y `gcc` en `PATH`.
 
 ```text
 python software/tests/correr_pruebas.py
 ```
+
+El [resultado de las pruebas en PC](../docs/informe/resultados/software/pruebas_pc.txt) registra 210 comprobaciones aprobadas en C y la prueba del receptor UART. La comunicación con la tarjeta durante el control se documenta con las [tramas de laboratorio](../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/README.md#uart-uart-régimen-permanente).
 
 ## Recepción del histórico por UART
 

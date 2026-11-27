@@ -2,7 +2,7 @@
 
 Se ejecutó nuevamente la síntesis desde el repositorio el 11 de noviembre de 2026 con Vivado 2026.1: `sintetizar_adc.tcl sintesis_repo_20261111`. Se regeneró XADC desde una copia importada del XCI y se sintetizó `adc_system_axi` fuera de contexto para `xc7a35tcpg236-1`, con reloj de 10 ns. No se abrió el proyecto original ni se generó bitstream.
 
-Resultado: **0 errores, 0 advertencias críticas y 16 advertencias de síntesis**; 130 LUT, 243 registros, 1 XADC y 0 latches. WNS estimado de 5,483 ns, TNS 0. Estos valores no demuestran cierre temporal integrado.
+Resultado: **0 errores, 0 advertencias críticas y 16 advertencias de síntesis**, con 130 LUT, 243 registros, 1 XADC y 0 latches. El WNS estimado fue de 5,483 ns y el TNS de 0 ns. El [extracto de la síntesis aislada](../../informe/resultados/adc/sintesis_aislada.txt) reúne la utilización, los avisos y las restricciones. Los [resultados de la implementación integrada](../../informe/README.md#verificación-digital-e-implementación) corresponden al top ruteado.
 
 | Mensaje | Cantidad | Clasificación | Acción |
 |---|---|---|---|

@@ -13,7 +13,7 @@ Los documentos distinguen parámetros nominales, mediciones y estimaciones. El i
 
 - [Campaña final del 26/11](../../../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/README.md). Mediciones a 12 V fijos con la versión presentada, capturas de ambos escalones, cambio de carga, rizado, tiempo muerto lógico y JB1.
 
-- [Video de la demostración funcional](https://youtu.be/cNjZ2tLcRmQ). El anexo incluye el enlace al video, la fotografía del montaje y la gráfica del osciloscopio de la campaña final a 12 V y 0,20 A pico.
+- Demostración funcional a 12 V y consigna de 0,20 A pico. El anexo reúne el [video](https://youtu.be/cNjZ2tLcRmQ), la [foto del montaje final](figuras/montaje_final.png) y la [gráfica del osciloscopio](figuras/regimen_final_0a2_osciloscopio.pdf).
 - [Diseño, circuito, componentes y criterios de validación](../../../Potencia/README.md).
 - [Esquemático completo](../../../Potencia/img/esquematico_inversor.svg), [estados de conmutación](../../../Potencia/01_diseno_y_componentes.md#topología-y-alimentaciones) y [asignación PWM de S1–S4](../../diseno/integracion_basys3.md#conexiones).
 - [Modelos PLECS y reproducción](../../../modelos/README.md).
@@ -22,9 +22,9 @@ Los documentos distinguen parámetros nominales, mediciones y estimaciones. El i
 - [Tramas del 21/11](../resultados/potencia/laboratorio/2026-11-21/resultados.md): seguimiento a 0,2 A pico con 12 y 24 V e intentos a 0,5 A.
 - [Tramas del 23/11](../resultados/potencia/laboratorio/2026-11-23/resultados.md): rango nominal con 6,6 y 9,9 Ω, escalones de referencia, cambio de carga y una falla capturada.
 - [Capturas del osciloscopio del 23/11](../../../Potencia/mediciones_lab_osciloscopio/README.md), con su limitación.
-- [Figuras de los informes](figuras/). Las gráficas de la campaña del 23/11 se regeneran con [`figuras_informe_potencia.py`](../../../scripts/laboratorio/figuras_informe_potencia.py), que también imprime la impedancia equivalente estimada de la carga. El informe incorpora directamente los PNG de la campaña final desde su carpeta de evidencias.
+- [Figuras de los informes](figuras/). El script [`figuras_informe_potencia.py`](../../../scripts/laboratorio/figuras_informe_potencia.py) regenera las gráficas del 23/11 y la del osciloscopio que aparece en el anexo. El informe incorpora los demás PNG de la campaña final directamente desde la carpeta de evidencias.
 
-La gráfica del anexo presenta las muestras de tensión registradas por el osciloscopio y un ajuste de la fundamental a 50 Hz sobre la adquisición completa de 100 ms. [CSV del osciloscopio](../../../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/regimen/0a2_scope_16.csv).
+La gráfica del anexo muestra las 3125 muestras de tensión diferencial de los 100 ms de adquisición. La fundamental del ajuste a 50 Hz es de 0,485 V pico, equivalente a 0,143 A pico sobre la resistencia de 3,4 Ω. [CSV del osciloscopio](../../../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/regimen/0a2_scope_16.csv).
 
 Con 12 V fijos y 7,3 Ω DC entre A y B, las referencias de 0,20, 0,50 y 1,00 A pico dieron fundamentales de 176, 390 y 337 mA pico por UART. Los cinco puntos evaluados quedaron fuera de ±10 % y se observó saturación a 0,50 y 1,00 A.
 

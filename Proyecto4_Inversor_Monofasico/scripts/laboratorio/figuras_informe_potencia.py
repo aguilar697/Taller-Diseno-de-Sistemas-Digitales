@@ -2,6 +2,7 @@
 
 Uso: python figuras_informe_potencia.py [carpeta de tramas] [carpeta de figuras]
 Por omisión lee laboratorio/2026-11-23 y escribe en docs/informe/potencia/figuras.
+La gráfica del anexo usa el CSV del osciloscopio de la campaña final del 26/11.
 La impedancia se obtiene de la fundamental de m*Vdc menos la caída por tiempo
 muerto, 4/pi*2*td*fsw*Vdc en fase con la corriente.
 """
@@ -15,11 +16,14 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.ticker import FuncFormatter
 import numpy as np
 
 PROYECTO = Path(__file__).resolve().parents[2]
 TRAMAS = PROYECTO / "docs/informe/resultados/potencia/laboratorio/2026-11-23"
 FIGURAS = PROYECTO / "docs/informe/potencia/figuras"
+CAPTURA_FINAL = (PROYECTO / "Potencia/mediciones_lab_osciloscopio/final_82a8226_12V"
+                 / "regimen/0a2_scope_16.csv")
 W0 = 2 * math.pi * 50.0
 TD, FSW, TS = 1e-6, 10e3, 100e-6
 AZUL, NARANJA, TINTA, GRIS = "#2a78d6", "#eb6834", "#30302e", "#8a8984"
@@ -102,6 +106,30 @@ def modulacion(ax, d, s=None, t=None):
     estilo(ax)
 
 
+def figura_anexo(destino):
+    """Muestra la caída de tensión adquirida y su fundamental a 50 Hz."""
+    tiempo, tension = np.loadtxt(CAPTURA_FINAL, delimiter=",", skiprows=2, unpack=True)
+    tiempo -= tiempo[0]
+    componente = fasor(tiempo, tension)
+    fundamental = componente.real * np.sin(W0 * tiempo) + componente.imag * np.cos(W0 * tiempo)
+
+    fig, ax = plt.subplots(figsize=(4.7, 2.65))
+    ax.plot(tiempo * 1e3, tension, color="#7c9db7", lw=0.6, label="Señal adquirida")
+    ax.plot(tiempo * 1e3, fundamental, color="#143b61", lw=1.25, label="Fundamental de 50 Hz")
+    estilo(ax)
+    ax.tick_params(labelsize=8.5)
+    ax.set(xlabel="Tiempo (ms)", ylabel="Tensión diferencial (V)",
+           xlim=(0, 100), xticks=np.arange(0, 101, 20),
+           ylim=(-0.8, 0.8), yticks=(-0.8, -0.4, 0, 0.4, 0.8))
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda valor, _: f"{valor:g}".replace(".", ",")))
+    ax.legend(frameon=False, loc="lower center", bbox_to_anchor=(0.5, 1), ncol=2, fontsize=8.5)
+    fig.tight_layout(pad=0.5)
+    with matplotlib.rc_context({"pdf.fonttype": 42}):
+        fig.savefig(destino, metadata={"CreationDate": None})
+    plt.close(fig)
+    print(f"Anexo 0,20 A: {abs(componente):.3f} V pico a 50 Hz ({len(tiempo)} muestras)")
+
+
 def main():
     tramas = Path(sys.argv[1]) if len(sys.argv) > 1 else TRAMAS
     figuras = Path(sys.argv[2]) if len(sys.argv) > 2 else FIGURAS
@@ -175,6 +203,7 @@ def main():
     fig.tight_layout(pad=0.4)
     fig.savefig(figuras / "cambio_carga.pdf")
     plt.close(fig)
+    figura_anexo(figuras / "regimen_final_0a2_osciloscopio.pdf")
     print("Figuras en", figuras)
 
 

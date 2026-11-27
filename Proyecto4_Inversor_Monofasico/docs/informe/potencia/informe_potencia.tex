@@ -11,7 +11,7 @@ Se evalúa un inversor monofásico con carga RL y control PR discreto ejecutado 
 \begin{IEEEkeywords}inversor monofásico, PWM unipolar, control PR, corriente.\end{IEEEkeywords}
 
 \section{Introducción}
-El objetivo es seguir referencias sinusoidales de 50 Hz con 0,2, 0,5 y 1 A pico en una carga RL alimentada desde un bus de 12 a 24 V, con error de amplitud de la fundamental no mayor del 10\,\% y rizado no mayor de 200 mA pico a pico, además de responder a cambios de referencia y a un aumento resistivo de al menos 25\,\% a 0,5 A pico \cite{enunciado}. El documento de diseño desarrolla la topología, el dimensionamiento y la sintonización del PR. Este informe reúne los parámetros medidos, la simulación en PLECS, los registros de puesta en marcha y la campaña final del 26 de noviembre, la comparación cuantitativa y la discusión de las diferencias.
+El objetivo es seguir referencias sinusoidales de 50 Hz con 0,2, 0,5 y 1 A pico en una carga RL, con un error de amplitud de la fundamental de hasta 10\,\% y un rizado de hasta 200 mA pico a pico. También se evalúan los cambios de referencia y un aumento resistivo de al menos 25\,\% a 0,5 A pico \cite{enunciado}. Dentro del intervalo de alimentación de 12 a 24 V, para la campaña final se eligió un bus fijo de 12 V. Las pruebas variaron la consigna de corriente o la carga. Este informe reúne los parámetros medidos, la simulación en PLECS, los registros de puesta en marcha y la campaña final del 26 de noviembre.
 
 \section{Montaje y parámetros}
 El puente usa cuatro IRF540N con dos IR2110 DIP-14, un ACS712 de 5 A con divisor de 4,7 k$\Omega$/1 k$\Omega$ hacia el canal VAUX6 del XADC, y una carga de dos resistencias de 3,3 $\Omega$ en serie con el secundario de un transformador con el primario abierto \cite{irf,ir,acs,xadc}. Las salidas JA1--JA4 ordenan $S_1$, $S_4$, $S_3$ y $S_2$, respectivamente. Con $v_{AB}=v_A-v_B$, los estados activos ideales son $S_1$--$S_2$ para $+V_{dc}$ y $S_3$--$S_4$ para $-V_{dc}$. Al cerrar $S_{R3}$ se puentea la tercera resistencia y quedan 6,6 $\Omega$ externos. Al abrirlo, se inserta $R_3$ y la resistencia externa sube a 9,9 $\Omega$. La Fig.~\ref{fig:puente} presenta el esquema del puente y de la carga utilizados, con la misma nomenclatura del documento de diseño. El ACS712 se conecta en serie para medir $i_L$; la carga permanece entre A y B, sin conectar ninguno de sus extremos a GND.
@@ -131,7 +131,7 @@ $R_{\mathrm{DC}}$ & $I_{\mathrm{ref},pk}$ & $I_{1,pk}$ & $E_A$ & $\phi$ & A lím
 \end{table}
 Las repeticiones a 7,3 $\Omega$ dieron de 175 a 176 mA para 0,20 A y de 388 a 390 mA para 0,50 A. Ningún punto alcanzó la banda de $\pm10$\,\%. El residuo RMS respecto a la fundamental fue de 22,8, 117 y 57,8 mA para las tres tramas principales de 7,3 $\Omega$. Incluye continua y distorsión de la señal registrada.
 
-La Fig.~\ref{fig:regimen_final} muestra la caída en la resistencia. A 0,20, 0,50 y 1,00 A pico de referencia, la fundamental de tensión fue de 0,49, 1,05 y 0,87 V pico y la distorsión de los armónicos 2 a 9 fue de 12, 37 y 30\,\%, respectivamente. Las corrientes equivalentes de esa medición son aproximadamente 144, 309 y 256 mA pico. Las dos cadenas de medición se mantienen por separado porque la diferencia de magnitud requiere contraste de ganancia y adquisición simultánea.
+La Fig.~\ref{fig:regimen_final} muestra la caída en la resistencia. A 0,20, 0,50 y 1,00 A pico de referencia, la fundamental de tensión fue de 0,485, 1,05 y 0,868 V pico y la distorsión de los armónicos 2 a 9 fue de aproximadamente 12, 37 y 30\,\%, respectivamente. Al dividir las amplitudes por 3,4 $\Omega$ se obtienen aproximadamente 143, 309 y 255 mA pico. La diferencia con las amplitudes de UART requiere contrastar la ganancia del ACS712 con una medición independiente y simultánea.
 
 \begin{figure}[H]\centering
 \includegraphics[width=\columnwidth]{final_12v/regimen/regimen_0a2_0a5_1a.png}
@@ -244,30 +244,28 @@ La versión presentada funcionó en lazo cerrado con bus de 12 V. Con 7,3 $\Omeg
 
 La saturación se observó en el banco. La comparación con PLECS debe interpretarse considerando el divisor elegido durante la puesta a punto, la impedancia del montaje y las diferencias de medición. La comprobación a 1 A también registró 251 mA pico a pico en el residuo bruto del osciloscopio, sujeto a la incertidumbre de la resta de canales. Las capturas de PWM y los registros UART sustentan la integración funcional del sistema durante las ventanas medidas.
 
-\clearpage
-\twocolumn[{
-\begin{minipage}{\textwidth}
 \section*{Anexo: montaje y demostración}
-La demostración funcional del sistema se registró en video. La Fig.~\ref{fig:montaje} muestra la Basys 3, la etapa de potencia y el osciloscopio. La Fig.~\ref{fig:captura_scope} presenta la tensión diferencial medida sobre la resistencia de 3,4 $\Omega$ en régimen permanente, con bus fijo de 12 V, referencia de 0,20 A pico y $R_3$ puenteada. Se muestran las muestras del osciloscopio y la componente de 50 Hz ajustada sobre cinco ciclos. El video puede consultarse en \url{https://youtu.be/cNjZ2tLcRmQ}.
-
-\medskip
 \noindent
-\begin{minipage}[t]{0.30\textwidth}
+\begin{minipage}[t]{0.38\columnwidth}
 \vspace{0pt}\centering
-\includegraphics[width=0.86\linewidth]{montaje_final.png}
-\captionof{figure}{Montaje de la demostración funcional.}
+\includegraphics[width=\linewidth]{montaje_final.png}
+\captionof{figure}{Montaje final.}
 \label{fig:montaje}
 \end{minipage}\hfill
-\begin{minipage}[t]{0.67\textwidth}
-\vspace{0pt}\centering
-\includegraphics[width=\linewidth]{regimen_final_0a2_osciloscopio.pdf}
-\captionof{figure}{Tensión sobre la resistencia de medida en el ensayo de 0,20 A pico. La fundamental de 50 Hz medida por el osciloscopio fue de 0,485 V pico.}
-\label{fig:captura_scope}
-\end{minipage}
-\end{minipage}
-\vspace{14pt}
-}]
+\begin{minipage}[t]{0.57\columnwidth}
+\vspace{0pt}\raggedright
+La Fig.~\ref{fig:montaje} muestra la Basys 3, la etapa de potencia y el osciloscopio. La captura de la Fig.~\ref{fig:captura_scope} se tomó con el bus fijo a 12 V y $R_3$ puenteada. El ajuste a 50 Hz usa 3125 muestras de cinco ciclos en régimen permanente.
 
-\newpage
+\smallskip
+\href{https://youtu.be/cNjZ2tLcRmQ}{Video de la demostración}.
+\end{minipage}
+\par
+
+\begin{figure}[H]\centering
+\includegraphics[width=\columnwidth]{regimen_final_0a2_osciloscopio.pdf}
+\caption{Tensión sobre 3,4 $\Omega$ con consigna de 0,20 A pico. La fundamental fue de 0,485 V pico, equivalente a 0,143 A pico.}
+\label{fig:captura_scope}
+\end{figure}
+
 \referencias{enunciado,irf,ir,acs,xadc,pr,yepes,mohan,plecs}
 \end{document}

@@ -28,6 +28,16 @@ Taller de Diseño Digital comprende a los cuatro integrantes. En Procesamiento E
 
 La Basys 3 ejecutó el PR en lazo cerrado y exportó muestras por UART. Con 12 V fijos y 7,3 Ω DC entre A y B, las referencias de 0,20, 0,50 y 1,00 A pico dieron fundamentales de 176, 390 y 337 mA pico por UART. Los cinco puntos evaluados quedaron fuera de ±10 % y se observó saturación a 0,50 y 1,00 A. [Resultados de laboratorio](docs/informe/README.md#validación-de-la-versión-presentada).
 
+## Evidencias de verificación
+
+| Subsistema | Dónde consultar la prueba y sus resultados |
+|---|---|
+| ADC/XADC | [Periférico con PWM, AXI y modelo XADC](docs/informe/adc_verificacion.md#resultados-medidos-en-simulación) y [regresión del ADC](docs/diseno/adc/verificacion.md). |
+| PWM | [Pruebas funcionales, detección de error y simulación después del ruteo con SDF](docs/informe/pwm_verificacion.md). |
+| MicroBlaze V y Basys 3 | [Reconstrucción de plataforma](docs/informe/microblaze_reconstruccion.md), [ondas de XSim y resultados del top de laboratorio](docs/informe/README.md#verificación-digital-e-implementación). |
+| Software | [Pruebas en PC del PR, los drivers y el receptor UART](software/README.md#compilación-y-pruebas). |
+| Potencia | [Resultados de PLECS](Potencia/02_simulacion_y_resultados.md#evaluación-funcional-de-accionamiento-y-medición) y [archivos del ensayo físico a 12 V](Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/README.md). |
+
 ## Estructura
 
 ```text

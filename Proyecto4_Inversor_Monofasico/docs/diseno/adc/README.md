@@ -25,7 +25,7 @@ $env:VIVADO_HOME = 'C:\AMDDesignTools\2026.1\Vivado'
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Proyecto4_Inversor_Monofasico\scripts\verificacion\adc\ejecutar_pruebas_adc.ps1 -RunName regresion_adc
 ```
 
-El nombre debe ser nuevo. `ExecutionPolicy Bypass` se limita a ese proceso. El script resuelve las fuentes respecto a su ubicación, admite `-VivadoHome`, regenera el IP en `Proyecto4_Inversor_Monofasico/build/adc/<nombre>/ip/` y compila cada test desde cero. No abre el proyecto local de desarrollo ni necesita sus productos generados. Conserva logs, comandos, hashes SHA256 y `summary.json` dentro de `build/`, excluido de Git. Para seleccionar pruebas, pasar `-Tops` como arreglo desde una sesión PowerShell:
+El nombre debe ser nuevo. `ExecutionPolicy Bypass` se limita a ese proceso. El script resuelve las fuentes respecto a su ubicación, admite `-VivadoHome`, regenera el IP en `Proyecto4_Inversor_Monofasico/build/adc/<nombre>/ip/` y compila cada test desde cero. Conserva logs, comandos, hashes SHA256 y `summary.json` dentro de `build/`, excluido de Git. Por defecto ejecuta los seis bancos de la regresión del ADC. La prueba conjunta con PWM se selecciona con `-Tops tb_adc_pwm_axi`. Los [extractos de XSim](../../informe/resultados/integracion_basys3/xsim_perifericos.txt) conservan resultados de los siete bancos. Para seleccionar pruebas, pasar `-Tops` como arreglo desde una sesión PowerShell:
 
 ```powershell
 & .\Proyecto4_Inversor_Monofasico\scripts\verificacion\adc\ejecutar_pruebas_adc.ps1 -Tops @('tb_adc_read_coherence') -RunName lectura_adc

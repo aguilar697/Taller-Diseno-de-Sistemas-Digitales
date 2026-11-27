@@ -26,6 +26,8 @@ python -B Proyecto4_Inversor_Monofasico/modelos/analisis/pr_discreto.py
 
 `rizado_pwm_rl.py` genera el barrido en `Proyecto4_Inversor_Monofasico/build/potencia/rizado/`, excluido de Git. Admite `--salida` para escoger otro directorio y `--graficas` para producir SVG. `pr_discreto.py` muestra sus resultados en la terminal.
 
+La [regresión numérica en PC](../../docs/informe/resultados/potencia/pruebas_analisis.txt) aprobó 18 pruebas de extracción de métricas, PR discreto y rizado RL.
+
 Para repetir los ensayos de PLECS, abrir PLECS Standalone y habilitar su interfaz RPC local en las preferencias, con puerto 1080. El script no modifica esas preferencias ni los modelos originales:
 
 ```powershell
@@ -33,6 +35,8 @@ python -B Proyecto4_Inversor_Monofasico/modelos/analisis/verificar_pr_plecs.py
 ```
 
 El resultado se genera en `build/potencia/pr_discreto_plecs.json`. Se puede escoger otro destino con `--salida` y otro puerto con `--puerto`. La copia temporal se cierra al terminar. El [registro conservado](../../docs/informe/resultados/potencia/pr_discreto_plecs.json) incluye los parámetros, la ventana, el método y la huella SHA-256 del modelo.
+
+El PR discreto actual difiere del que generó ese registro. La revisión `d0c4399` conserva los modelos con las huellas usadas por ambos informes. La [guía de regeneración](../../docs/informe/potencia/README.md#regeneración) muestra cómo extraerlos.
 
 La copia funcional ya está generada. Para reconstruirla y repetir sus ensayos:
 

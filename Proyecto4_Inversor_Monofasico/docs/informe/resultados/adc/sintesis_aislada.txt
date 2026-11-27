@@ -1,0 +1,22 @@
+Síntesis aislada de adc_system_axi
+
+Fuentes: módulos ADC y XADC regenerado desde el XCI del repositorio.
+Entorno: Vivado 2026.1, xc7a35tcpg236-1, reloj restringido a 10 ns.
+Ejecución: sintetizar_adc.tcl, salida sintesis_repo_20261111.
+Alcance: síntesis fuera de contexto; el ruteo del sistema integrado tiene sus propios reportes.
+
+synthesis.log
+  Synthesis finished with 0 errors, 0 critical warnings and 16 warnings.
+  synth_design completed successfully
+  Synth 8-7129: 4 puertos do_i sin carga y 12 entradas AWPROT/ARPROT sin carga.
+  Timing 38-242: HD.CLK_SRC sin fijar para s_axi_aclk, posterior a síntesis.
+
+utilization.rpt
+  Slice LUTs: 130
+  Slice Registers: 243
+  Register as Latch: 0
+  XADC: 1
+
+timing_post_synthesis.rpt
+  adc_clk: WNS 5.483 ns, TNS 0.000 ns.
+  check_timing: 55 entradas sin input delay y 39 salidas sin output delay.
