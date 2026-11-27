@@ -53,13 +53,14 @@ La Tabla~\ref{tab:parametros} compara los valores del modelo con los del montaje
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.27\columnwidth}@{\hspace{0.5em}}>{\raggedright\arraybackslash}p{0.22\columnwidth}@{\hspace{0.5em}}>{\raggedright\arraybackslash}p{0.43\columnwidth}@{}}\toprule
 Magnitud & Modelo & Montaje\\\midrule
 Bus & 12 y 24 V & 12 V fijos en la campaña final\\
+Divisor del PR & 12 V & 24 V en el firmware presentado\\
 R externa & 6,6 y 9,9 $\Omega$ & Resistencias de 3,3 $\Omega$, 5 W\\
 Carga a 50 Hz & 7,2 $\Omega$, 10 mH & 7,3 o 10,6 $\Omega$ en DC. Equivalentes históricos en Tabla~\ref{tab:impedancia}\\
 PWM y tiempo muerto & 10 kHz, 1 $\mu$s & 10 kHz, 1,00 $\mu$s entre órdenes lógicas\\
 Período de control & 100 $\mu$s & 100 $\mu$s nominales. ISR máxima de 8,94 $\mu$s\\
 Cero del ADC & 1776 códigos & 1785,8 con el bus apagado y 1787,7 con 24 V (23/11)\\
 Ganancia del ADC & 7,52 mA/código & 7,64 mA/código con $V_{CC}=4{,}92$ V\\
-Ruido en reposo & -- & 20--21 mA RMS (2,7 códigos)\\
+Ruido en reposo & -- & 20--21 mA RMS (2,7 códigos), 23/11\\
 Límite de modulación & $\pm0{,}85$ & $\pm0{,}85$\\\bottomrule
 \end{tabular}\label{tab:parametros}\end{table}
 
@@ -113,7 +114,7 @@ Con el bus a 3 V se verificaron 11,9 V entre LO y COM, unos 12,0 V de bootstrap 
 
 
 \subsection{Seguimiento de la versión presentada}
-La campaña del 26/11 se realizó con bus fijo de 12 V y un divisor de 24 V en el PR. Se eligió esta combinación porque dio el mejor comportamiento del lazo observado durante la puesta a punto en el banco. Se midieron 7,3 $\Omega$ DC entre A y B con $R_3$ puenteada y 10,6 $\Omega$ al insertarla. La resistencia de medida fue de 3,4 $\Omega$ y el devanado se mantuvo durante el cambio de carga. La Tabla~\ref{tab:final} usa el ajuste a 50 Hz de cinco ciclos completos de cada trama UART. El porcentaje a límite cuenta las muestras con $|m|$ igual al límite Q1.15 del firmware.
+La campaña del 26/11 se realizó con bus fijo de 12 V y un divisor de 24 V en el PR. Se eligió esta combinación porque dio el mejor comportamiento del lazo observado durante la puesta a punto en el banco. Se midieron 7,3 $\Omega$ DC entre A y B con $R_3$ puenteada y 10,6 $\Omega$ al insertarla. La resistencia de medida fue de 3,4 $\Omega$ y el devanado se mantuvo durante el cambio de carga. La Tabla~\ref{tab:final} usa el ajuste a 50 Hz de cinco ciclos completos de cada trama UART. El porcentaje a límite cuenta, en esas 500 muestras, las que alcanzan $|m|=27853$ en Q1.15.
 
 \begin{table}[H]\centering\small
 \caption{Régimen registrado por UART con bus fijo de 12 V}
@@ -122,10 +123,10 @@ La campaña del 26/11 se realizó con bus fijo de 12 V y un divisor de 24 V en e
 $R_{\mathrm{DC}}$ & $I_{\mathrm{ref},pk}$ & $I_{1,pk}$ & $E_A$ & $\phi$ & A límite\\
 ($\Omega$) & (A) & (mA) & (\%) & ($^\circ$) & (\%)\\\midrule
 7,3 & 0,20 & 176 & $-12{,}1$ & $-7{,}25$ & 0\\
-7,3 & 0,50 & 390 & $-22{,}0$ & $-57{,}8$ & 18\\
-7,3 & 1,00 & 337 & $-66{,}3$ & $-68{,}8$ & 34\\
+7,3 & 0,50 & 390 & $-22{,}0$ & $-57{,}8$ & 16,4\\
+7,3 & 1,00 & 337 & $-66{,}3$ & $-68{,}8$ & 33,0\\
 10,6 & 0,20 & 169 & $-15{,}4$ & $-7{,}40$ & 0\\
-10,6 & 0,50 & 342 & $-31{,}7$ & $-60{,}7$ & 17\\\bottomrule
+10,6 & 0,50 & 342 & $-31{,}7$ & $-60{,}7$ & 17,0\\\bottomrule
 \end{tabular}
 \end{table}
 Las repeticiones a 7,3 $\Omega$ dieron de 175 a 176 mA para 0,20 A y de 388 a 390 mA para 0,50 A. Ningún punto alcanzó la banda de $\pm10$\,\%. El residuo RMS respecto a la fundamental fue de 22,8, 117 y 57,8 mA para las tres tramas principales de 7,3 $\Omega$. Incluye continua y distorsión de la señal registrada.
@@ -239,7 +240,7 @@ La Basys 3 genera las cuatro órdenes PWM, dispara el XADC a mitad del período 
 Se validó el CRC de 12 tramas UART de la campaña final. Ninguna registró códigos de falla ni pérdidas de conversión. En las nueve de operación tampoco hubo saltos de secuencia. El temporizador interno registró un máximo de ISR de 7,82 $\mu$s en reposo y 8,94 $\mu$s en operación (8,94\,\% del período nominal de 100 $\mu$s). En JB1 se midió el ancho de un pulso de 7,55 $\mu$s, con el estado del sistema sin confirmar. Para cuantificar el período efectivo y el jitter hacen falta flancos sucesivos en JB1, tanto en operación normal como durante la exportación UART. El retardo entre adquisición y actuación tampoco se midió de forma simultánea.
 
 \section{Conclusiones}
-La versión presentada funcionó en lazo cerrado con bus de 12 V. Con 7,3 $\Omega$ DC entre A y B, las consignas de 0,20 y 0,50 A pico produjeron fundamentales de 176 y 390 mA, respectivamente. A 1,00 A de consigna la corriente bajó a 337 mA y la modulación saturó en el 34\,\% del registro. Las tres mediciones quedaron fuera de la tolerancia de amplitud. Al insertar $R_3$, se mantuvo la operación con una reducción de la fundamental de tensión sobre la resistencia de medida de aproximadamente 12\,\% respecto del régimen previo.
+La versión presentada funcionó en lazo cerrado con bus de 12 V. Con 7,3 $\Omega$ DC entre A y B, las consignas de 0,20 y 0,50 A pico produjeron fundamentales de 176 y 390 mA, respectivamente. A 1,00 A de consigna la corriente bajó a 337 mA y la modulación saturó en el 33,0\,\% de las muestras analizadas. Las tres mediciones quedaron fuera de la tolerancia de amplitud. Al insertar $R_3$, se mantuvo la operación con una reducción de la fundamental de tensión sobre la resistencia de medida de aproximadamente 12\,\% respecto del régimen previo.
 
 La saturación se observó en el banco. La comparación con PLECS debe interpretarse considerando el divisor elegido durante la puesta a punto, la impedancia del montaje y las diferencias de medición. La comprobación a 1 A también registró 251 mA pico a pico en el residuo bruto del osciloscopio, sujeto a la incertidumbre de la resta de canales. Las capturas de PWM y los registros UART sustentan la integración funcional del sistema durante las ventanas medidas.
 
@@ -247,23 +248,25 @@ La saturación se observó en el banco. La comparación con PLECS debe interpret
 \twocolumn[{
 \begin{minipage}{\textwidth}
 \section*{Anexo: montaje y demostración}
-La demostración funcional del sistema está disponible en el video \emph{Proyecto 4: control de corriente de un inversor monofásico con MicroBlaze V y PWM}: \url{https://youtu.be/cNjZ2tLcRmQ}. Se complementa con la fotografía de la Fig.~\ref{fig:montaje}, tomada durante el ensayo con bus de 24 V y referencia de 0,2 A pico. La imagen permite reconocer la Basys 3, el puente y sus drivers, el sensor, la carga y las fuentes auxiliares. Los valores de seguimiento se evalúan con los registros cuantitativos de las secciones anteriores.
+La demostración funcional del sistema se registró en video. La Fig.~\ref{fig:montaje} muestra la Basys 3, la etapa de potencia y el osciloscopio. La Fig.~\ref{fig:captura_scope} presenta la tensión diferencial medida sobre la resistencia de 3,4 $\Omega$ en régimen permanente, con bus fijo de 12 V, referencia de 0,20 A pico y $R_3$ puenteada. Se muestran las muestras del osciloscopio y la componente de 50 Hz ajustada sobre cinco ciclos. El video puede consultarse en \url{https://youtu.be/cNjZ2tLcRmQ}.
 
-\medskip\centering
-\includegraphics[width=0.64\textwidth]{circuito_completo.JPG}
-\captionof{figure}{Montaje experimental del inversor y la plataforma de control durante el ensayo de 24 V y 0,2 A pico. Se observan la fuente del bus, las alimentaciones auxiliares, la carga, la Basys 3 y la pantalla del osciloscopio.}
+\medskip
+\noindent
+\begin{minipage}[t]{0.30\textwidth}
+\vspace{0pt}\centering
+\includegraphics[width=0.86\linewidth]{montaje_final.png}
+\captionof{figure}{Montaje de la demostración funcional.}
 \label{fig:montaje}
-\end{minipage}
-\vspace{12pt}
-}]
-
-Como evidencia de la campaña previa, la Fig.~\ref{fig:captura_scope} conserva una captura directa del osciloscopio para la misma condición nominal de bus y referencia, con 6,6 $\Omega$ externos. La función matemática corresponde a la resta de los canales en los extremos de una resistencia de 3,3 $\Omega$. Se aprecian perturbaciones y la limitación de rango de esa campaña. La captura se utiliza como registro del comportamiento del montaje; el seguimiento de la fundamental se cuantifica con las tramas de adquisición analizadas anteriormente.
-
-\begin{figure}[H]\centering
-\includegraphics[width=0.92\columnwidth]{osciloscopio_24v_0a2.png}
-\caption{Captura original del osciloscopio a 24 V y 0,2 A pico, con 6,6 $\Omega$ externos y 10 ms/div. La resta sobre la resistencia está afectada por el recorte de los canales y los picos; la frecuencia automática mostrada no representa la fundamental de la corriente.}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.67\textwidth}
+\vspace{0pt}\centering
+\includegraphics[width=\linewidth]{regimen_final_0a2_osciloscopio.pdf}
+\captionof{figure}{Tensión sobre la resistencia de medida en el ensayo de 0,20 A pico. La fundamental de 50 Hz medida por el osciloscopio fue de 0,485 V pico.}
 \label{fig:captura_scope}
-\end{figure}
+\end{minipage}
+\end{minipage}
+\vspace{14pt}
+}]
 
 \newpage
 \referencias{enunciado,irf,ir,acs,xadc,pr,yepes,mohan,plecs}

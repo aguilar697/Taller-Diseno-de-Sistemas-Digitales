@@ -56,7 +56,7 @@ La comprobación de separación en puertos admite hasta un ciclo de diferencia e
 
 ## Consistencia con el control
 
-Se mantuvieron los offsets del driver C y se configuró `TRIGGER_PHASE=5000` en `parametros.h`. Se aclaró que `VDC_V=12` es la normalización fija del modelo inicial; el bus físico sigue siendo variable entre 12 y 24 V. No se sustituyó la calibración nominal por valores físicos incompletos.
+Se mantuvieron los offsets del driver C y se configuró `TRIGGER_PHASE=5000` en `parametros.h`. El contraste numérico de esta sección usa un divisor fijo de 12 V y simula ambos extremos del rango del bus. La campaña final del montaje usó 12 V fijos en el bus y un divisor de 24 V en el firmware.
 
 Los coeficientes resonantes del C coinciden con Tustin preajustado a 50 Hz, Kp=12, Kr=200 y ancho resonante de 2 Hz. El [contraste numérico](resultados/pwm/control_parametros.json) evalúa 24 combinaciones de R=7,2/10,5 Ω, L=6,984/9,291/10 mH, bus=12/24 V y retardos de uno/dos períodos. Los modelos lineales resultan estables y con error de amplitud menor de 10 %. Este análisis no demuestra el montaje real, la recuperación en saturación ni el retardo fraccionario integrado.
 

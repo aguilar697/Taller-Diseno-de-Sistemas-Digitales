@@ -82,7 +82,7 @@ Las simulaciones iniciales usaron `VDC_V=12`. El firmware de la demostración co
 
 En la prueba inicial se observó una pendiente negativa para la orientación usada entonces. En el montaje con control PR se confirmó el signo positivo y se empleó una escala nominal de 7,6383 mA por código. Queda por contrastar esa escala con una medición independiente. El umbral provisional I_MAX=1,5 A tampoco reemplaza la limitación de corriente de la fuente ni la protección eléctrica.
 
-El buffer de 1024 entradas de 8 bytes ocupa 8 KB y cubre 102,4 ms con K_REG=1. Si la compilación con BSP, pila y datos no cabe en 32 KB, 512 entradas requieren K_REG=2 para conservar esa ventana. La ocupación final se confirma con el mapa del ejecutable integrado.
+La configuración integrada registra 512 entradas de 8 bytes (4 KiB) con `K_REG=2`. A 10 kHz de control, una entrada cada 200 µs conserva una ventana nominal de 102,4 ms. La decimación actúa sobre el registro y el PR conserva su período nominal de 100 µs.
 
 ## Permiso de drivers y comprobaciones pendientes
 

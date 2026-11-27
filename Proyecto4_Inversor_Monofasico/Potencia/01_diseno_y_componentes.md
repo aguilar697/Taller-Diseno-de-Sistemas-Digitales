@@ -40,7 +40,7 @@ S1 y S4 corresponden a las órdenes AH y AL de la rama A. S3 y S2 corresponden a
 
 | Conexión | Elementos conectados |
 |---|---|
-| +Vbus, variable entre 12 y 24 V | Drenadores de S1 y S3 |
+| +Vbus, ajustable entre 12 y 24 V | Drenadores de S1 y S3 |
 | GND de potencia | Fuentes de S4 y S2 |
 | Nodo A | Fuente de S1, drenador de S4 y VS del driver A |
 | Nodo B | Fuente de S3, drenador de S2 y VS del driver B |
@@ -62,7 +62,7 @@ Los dos estados de tensión nula conectan ambos extremos de la carga al mismo ri
 | Alimentación | Valor | Destino y criterio |
 |---|---|---|
 | Bus de potencia | 12–24 V DC | Energía del puente; su variación es una perturbación para el lazo |
-| Auxiliar de accionamiento | 12 V DC regulados | VCC de ambos IR2110; se mantiene fija al variar el bus |
+| Auxiliar de accionamiento | 12 V DC regulados | VCC de ambos IR2110, independiente del ajuste del bus |
 | Lógica de drivers | 3,3 V regulados, fuente externa | VDD de ambos IR2110 y resistencia de polarización de SD |
 | Sensor | 5 V regulados | VCC del ACS712; su estabilidad afecta al cero y a la sensibilidad |
 
@@ -76,7 +76,7 @@ El IRF540N tiene una tensión nominal drenador–fuente de 100 V. Su resistencia
 
 Se selecciona el IR2110 por disponibilidad y por disponer de dos canales independientes, alimentación lógica separada y salida flotante para el MOSFET superior. Cada unidad acciona una rama, no los cuatro MOSFET. La referencia adquirida corresponde a [IR2110 DIP-14](https://componenteselectronicoscr.com/product/ir2110-circuito-integrado-high-and-low-side-driver-mosf); sus conexiones eléctricas se toman de la [hoja de datos del fabricante](https://www.infineon.com/assets/row/public/documents/24/49/infineon-ir2110-datasheet-en.pdf).
 
-La propuesta utiliza `VDD=3,3 V` para la lógica y `VCC=12 V` regulados para el accionamiento. Con VDD a 3,3 V, HIN y LIN reciben las señales de la Basys 3; alimentar VDD a 12 V cambiaría sus umbrales y no corresponde a esta interfaz. La fuente auxiliar de 12 V debe mantenerse estable mientras el bus varía entre 12 y 24 V; no se conecta VCC directamente al bus variable.
+La propuesta utiliza `VDD=3,3 V` para la lógica y `VCC=12 V` regulados para el accionamiento. Con VDD a 3,3 V, HIN y LIN reciben las señales de la Basys 3; alimentar VDD a 12 V cambiaría sus umbrales y no corresponde a esta interfaz. VCC se alimenta desde la fuente auxiliar regulada de 12 V, independiente de la fuente del puente.
 
 ![Conexiones de una rama con IR2110 DIP-14](img/accionamiento_ir2110.svg)
 
@@ -228,7 +228,7 @@ La caracterización del ACS712 puede comenzar antes de construir el puente: alim
 
 Con `m=0` y PWM habilitado puede haber conmutación aunque la tensión media diferencial sea cero. Esa condición es distinta del apagado. La alimentación bootstrap exige intervalos de conducción inferior; no permite mantener indefinidamente encendido el MOSFET superior sin recarga.
 
-El software convierte la salida del PR en modulación mediante una tensión de normalización. El modelo de evaluación utiliza 12 V fijos; variar el bus a 24 V cambia la ganancia de la planta y el lazo debe rechazar esa perturbación. Normalizar con Vbus medido constituye otra estrategia y requiere un canal de medición y validación propios; no se supone que el sistema disponga de esa lectura. Los coeficientes, latencias y escalas definitivos se contrastan con [las simulaciones](02_simulacion_y_resultados.md), el [contrato PWM](../docs/diseno/nivel_3_pwm.md) y la [integración del ADC](../docs/diseno/adc/integracion_pendiente.md).
+El software convierte la salida del PR en modulación mediante una tensión de normalización. El modelo de diseño utiliza un divisor fijo de 12 V y explora el efecto de cambiar el bus sobre la ganancia de actuación. En el banco, la campaña final se hizo con el bus fijo en 12 V y `VDC_V=24.0f` en el firmware. Los transitorios finales correspondieron a cambios de referencia y carga. Normalizar con el bus medido requeriría un canal adicional y una validación propia. Los coeficientes, latencias y escalas definitivos se contrastan con [las simulaciones](02_simulacion_y_resultados.md), el [contrato PWM](../docs/diseno/nivel_3_pwm.md) y la [integración del ADC](../docs/diseno/adc/integracion_pendiente.md).
 
 Los valores de cero y ganancia de ADC presentes en software son nominales hasta realizar la calibración. El divisor no implica que la entrada XADC admita 5 V: el nodo de entrada debe permanecer dentro de su rango de 0 a 1 V en operación normal, arranque y apagado.
 

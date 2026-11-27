@@ -219,7 +219,7 @@ Con $T_s=100\ \mu$s, la rama resonante es
 \begin{align}
 r[k]={}&b_0(e[k]-e[k-2])-a_1r[k-1]-a_2r[k-2],
 \end{align}
-con los coeficientes redondeados $b_0=0{,}25097075$, $a_1=-1{,}9965047$ y $a_2=0{,}99749029$. La salida es $v_{PR}[k]=12e[k]+r[k]$ y se aplica $m[k+1]=\mathrm{sat}_{0{,}85}(v_{PR}[k]/12)$. Como anti-windup se usa integración condicional: si la modulación satura y el error empuja en el mismo sentido que la salida, los estados no se actualizan.
+con los coeficientes redondeados $b_0=0{,}25097075$, $a_1=-1{,}9965047$ y $a_2=0{,}99749029$. La salida es $v_{PR}[k]=12e[k]+r[k]$. Para el modelo de diseño se aplica $m[k+1]=\mathrm{sat}_{0{,}85}(v_{PR}[k]/12)$. Como anti-windup se usa integración condicional: si la modulación satura y el error empuja en el mismo sentido que la salida, los estados no se actualizan.
 
 \subsection{Estabilidad}
 El polinomio característico en $q=z^{-1}$ es

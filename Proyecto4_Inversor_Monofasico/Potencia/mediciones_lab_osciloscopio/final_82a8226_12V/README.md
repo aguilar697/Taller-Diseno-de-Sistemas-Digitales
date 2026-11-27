@@ -1,6 +1,6 @@
 # Ensayos de la versión presentada (26/11)
 
-Software `82a8226`, bus de potencia 12 V fijos, carga 7,3 Ω (R3 puenteada) o 10,6 Ω.
+Software `82a8226`, bus de potencia de 12 V fijos, normalización del PR de 24 V en firmware y carga de 7,3 Ω (R3 puenteada) o 10,6 Ω.
 Osciloscopio: tensión en la resistencia de 3,4 Ω.
 
 ## UART (`uart/`, régimen permanente)
@@ -16,7 +16,7 @@ Osciloscopio: tensión en la resistencia de 3,4 Ω.
 
 `reposo_off` (potencia apagada) y `reposo_12v*`: referencia cero; media 6 a 10 mA, 15 mA rms.
 Sin fallas ni conversiones perdidas; ISR máx. 8,94 µs. Ningún punto cumple ±10 %.
-La modulación satura en cerca del 17 % de las muestras a 0,5 A y 34 % a 1 A.
+En las 500 muestras de los cinco ciclos más recientes de cada captura principal, el mando alcanzó el límite Q1.15 en el 16,4 % (`r73_0a5`), 33,0 % (`r73_1a`) y 17,0 % (`r106_0a5`). Los registros principales a 0,2 A no alcanzaron el límite.
 
 ## Régimen en osciloscopio (`regimen/`)
 
