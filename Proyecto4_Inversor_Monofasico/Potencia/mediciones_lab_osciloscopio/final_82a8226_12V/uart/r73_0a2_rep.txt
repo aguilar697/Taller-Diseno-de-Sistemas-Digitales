@@ -1,0 +1,7 @@
+Guardado en t08_181359.bin y t08_181359.csv
+Estado: OPERACIÓN   causa de falla: ninguna
+f_sw = 10000 Hz   Ts = 100000 ns   K_REG = 2   N = 512   amplitud = 200 mA
+t_isr_max = 894 ciclos (8.94 us)   conversiones perdidas = 0
+Fundamental sobre 5 períodos: medida 0.1749 A, referencia 0.2000 A
+Error de amplitud -12.55 %  (NO cumple <= 10 %)   desfase -7.23 grados
+Residuo de baja frecuencia: 20.9 mA rms   saltos en n: 0

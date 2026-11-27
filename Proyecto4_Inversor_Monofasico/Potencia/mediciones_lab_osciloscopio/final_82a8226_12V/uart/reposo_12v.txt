@@ -1,0 +1,5 @@
+Guardado en t01_180515.bin y t01_180515.csv
+Estado: DETENIDO   causa de falla: ninguna
+f_sw = 10000 Hz   Ts = 100000 ns   K_REG = 2   N = 512   amplitud = 0 mA
+t_isr_max = 782 ciclos (7.82 us)   conversiones perdidas = 0
+Sin análisis: la referencia es cero: no hay ensayo que analizar
