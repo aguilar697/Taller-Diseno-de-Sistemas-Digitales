@@ -2,7 +2,7 @@
 
 **EL3313 · Proyecto 4.** Daniel Puentes, Kevin Aguilar, Kenneth Campos y Kevin Cortés.
 
-La Basys 3 regula la corriente de un inversor monofásico en lazo cerrado y exporta por UART las muestras del control. El PWM personalizado y el XADC se verificaron mediante simulaciones autocomprobables. En el montaje, la corriente de 50 Hz siguió las consignas de 0,2 A pico con 12 y 24 V y de 0,5 A pico con 24 V dentro del error de amplitud del 10 %. Los resultados incluyen la puesta en marcha, las fallas observadas y los límites del montaje.
+La Basys 3 regula la corriente de un inversor monofásico en lazo cerrado y exporta por UART las muestras del control. El PWM personalizado y el XADC se verificaron mediante simulaciones autocomprobables. En la campaña final, con 12 V fijos, el PR operó en lazo cerrado y se registraron los cambios de referencia y carga. La amplitud quedó fuera de la tolerancia del 10 % en los puntos medidos. Los resultados incluyen la puesta en marcha, las fallas observadas en ensayos anteriores y los límites del montaje.
 
 ## Fundamentos y enfoque
 
@@ -105,37 +105,30 @@ La primera instrumentación mostró picos incluso al conectar punta y retorno al
 
 Tras corregir el retorno, sustituir el devanado y ajustar el cero y el signo del sensor, se obtuvo seguimiento a 3 V en una prueba limitada. Con referencia de 0,1 A pico, la fundamental fue 93,6 mA y el atraso fue de 5,7°. [Registro de puesta en marcha](../../Potencia/04_registro_laboratorio.md#primer-ensayo-completo-del-pr-a-3-v).
 
-### Operación a 12 y 24 V
+### Validación de la versión presentada
 
-La serie principal utilizó el bitstream de `da2b7c3` y el firmware `control_inversor` de `d2d60c6`. Se retiraron los capacitores conectados sobre la carga y se mantuvo el devanado de reemplazo en serie con la resistencia. La normalización interna del PR quedó fija en 12 V tanto con el bus de 12 V como con el de 24 V. La siguiente tabla resume la primera serie con 6,6 Ω externos, usando un ajuste sinusoidal de 50 Hz sobre al menos cinco períodos en régimen.
+El 26 de noviembre se ensayó la versión 82a8226 a 10 kHz, con bus fijo de 12 V. Se mantuvo el divisor del PR en 24 V. Se eligió esta combinación porque dio el mejor comportamiento del lazo observado durante la puesta a punto en el banco. La tabla usa muestras del ACS712 digitalizadas por el XADC y exportadas por UART. Un desfase negativo indica atraso respecto de la referencia.
 
-| Bus | Referencia pico | Fundamental pico | Error de amplitud | Desfase | Amplitud dentro de ±10 % |
-|---|---:|---:|---:|---:|---|
-| 12 V | 0,2 A | 190 mA | −5,05 % | −3,05° | Sí |
-| 24 V | 0,2 A | 193 mA | −3,62 % | −1,87° | Sí |
-| 12 V | 0,5 A | 318 mA | −36,4 % | −43,5° | No |
-| 24 V | 0,5 A | 471 mA | −5,91 % | −3,87° | Sí |
-| 12 V | 1,0 A | 329 mA | −67,1 % | −43,5° | No |
-| 24 V | 1,0 A | 736 mA | −26,4 % | −26,4° | No |
+| Resistencia DC entre A y B | Referencia pico | Fundamental pico | Error de amplitud | Desfase |
+|---|---:|---:|---:|---:|
+| 7,3 Ω | 0,20 A | 176 mA | −12,1 % | −7,25° |
+| 7,3 Ω | 0,50 A | 390 mA | −22,0 % | −57,8° |
+| 7,3 Ω | 1,00 A | 337 mA | −66,3 % | −68,8° |
+| 10,6 Ω | 0,20 A | 169 mA | −15,4 % | −7,40° |
+| 10,6 Ω | 0,50 A | 342 mA | −31,7 % | −60,7° |
 
-**UART y ejecución del control.** Se verificó el CRC de las 38 tramas conservadas. Las 36 tramas de ensayo del 23 de noviembre, excluyendo los dos registros de reposo, reportaron cero conversiones perdidas y se conservaron los identificadores sucesivos. En operación, el máximo instrumentado de la ISR fue 8,57 µs. Las capturas incluyen exportación manual por BTNL durante la operación y exportaciones activadas por las variantes de diagnóstico. [Tramas y condiciones](resultados/potencia/laboratorio/2026-11-23/resultados.md).
+Los cinco puntos excedieron el 10 % de error absoluto. La modulación alcanzó ±0,85 a 0,50 y 1,00 A. La estimación a partir de la caída sobre 3,4 Ω en el osciloscopio fue menor que la de UART y queda por verificar la ganancia del sensado.
 
-**Cambios de referencia y de carga.** Se repitió seis veces el escalón de 0,2 a 0,5 A a 24 V y 6,6 Ω. Durante el cambio de 6,6 a 9,9 Ω (+50 %) con la misma inductancia y referencia de 0,5 A, se obtuvo una fundamental de 472 mA antes del evento y 483 mA en la ventana posterior de la trama 37. Con 9,9 Ω en régimen, la trama 38 dio 473 mA (−5,49 %). El escalón de 0,5 a 1 A queda pendiente.
+El escalón de 0,20 a 0,50 A se estableció en ≈75 ms. El de 0,50 a 1,00 A presentó un pico transitorio y se estableció en ≈60 ms, con amplitud inferior a la inicial. Al insertar R3, la resistencia DC aumentó 45 % y la amplitud observada en el osciloscopio disminuyó aproximadamente 12 % respecto de la previa, con establecimiento en 20–40 ms. [Capturas y tramas](../../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/README.md).
 
-![Corriente y modulación durante el aumento de resistencia externa a 24 V](resultados/potencia/laboratorio/2026-11-23/37_cambio_carga_6v6_9v9_c410_cambio_carga.png)
+En ambas ramas se midió 1,00 µs de tiempo muerto en las señales lógicas JA, sin solapamiento en los flancos observados. A 1,00 A, el residuo bruto de conmutación llegó a 251 mA pico a pico frente al límite de 200 mA. El filtrado diagnóstico dio 49 mA pico a pico. [Resultados y método de cálculo](potencia/informe_potencia.pdf).
 
-*Figura 4. Trama 37. El instante se estima a partir del cambio de amplitud de la modulación.*
-
-**Contraste con PLECS y diagnóstico.** A 0,5 A pico, el PR simulado con la carga nominal de 7,2 Ω y 10 mH dio 484 mA a 12 V y 492 mA a 24 V. En el montaje, la modulación alcanza ±0,85 en los puntos con mayor error. La impedancia aparente inferida a partir de la corriente y de la modulación es consistente con falta de margen de tensión. La contribución del devanado requiere una medición independiente. En la trama 13 el firmware deshabilitó el PWM por sobrecorriente tras registrar una lectura aparente de −12,6 A. El valor es incompatible con la corriente esperada para ese ensayo y se conserva como anomalía de sensado. [Informe de Potencia](potencia/informe_potencia.pdf).
-
-**Alcance de la medición.** Las capturas de osciloscopio muestran la conmutación y la caída en la resistencia. El recorte de los canales y el intervalo de 50 µs en los CSV impiden usar esas trazas para verificar el límite de 200 mA pico a pico o validar la escala del ACS712. Para completar la evidencia se necesitan capturas asociadas a cada ensayo con corriente independiente, tensión de carga y PWM, además de una medición específica del rizado. [Capturas del osciloscopio](../../Potencia/mediciones_lab_osciloscopio/README.md) · [Estado de validación](../../Potencia/03_pendientes_y_validacion.md).
-
-Para medir la precisión temporal se registrarán flancos sucesivos de `isr_debug` en JB1. La diferencia entre flancos de subida da el período efectivo y el ancho del pulso da la duración de la rutina instrumentada. Se reportarán mínimo, máximo, promedio y jitter pico a pico como diferencia entre el máximo y el mínimo del período. La medición se repetirá durante la exportación UART para comprobar si afecta la periodicidad. La frecuencia PWM medida en JA sirve como referencia de hardware y la latencia del ADC permanece disponible por separado en simulación.
+**Precisión temporal.** El período configurado fue de 100 µs. El máximo de ISR en reposo fue 7,82 µs. La ISR duró hasta 8,94 µs en operación. Un pulso de JB1 midió 7,55 µs. El período efectivo y el jitter, también durante la exportación UART, quedaron sin medir. Se verificaron 12 tramas con CRC válido, sin fallas ni conversiones perdidas. Las capturas de operación conservaron la secuencia de muestras.
 
 ## Conclusiones
 
 1. El PWM cumple los criterios de simulación para las tres frecuencias, saturación, tiempo muerto y sincronización de adquisición. El autochequeo detectó el error forzado y la simulación con SDF respaldó el funcionamiento del periférico ruteado.
-2. La adquisición sincronizada, el cálculo PR y la exportación UART operaron juntos en el montaje. Se documentó seguimiento dentro de la tolerancia a 0,2 A pico con ambos buses y a 0,5 A pico con 24 V, así como la recuperación ante un aumento del 50 % en la resistencia externa.
-3. La consigna de 1 A supera el margen observado en el montaje. Para cerrar la verificación quedan el escalón hacia esa consigna, la comprobación independiente de la escala de corriente, el rizado y la precisión temporal del período de control durante operación extendida.
+2. La adquisición sincronizada, el cálculo PR y la exportación UART operaron juntos en el montaje. Se registraron los dos escalones y un aumento de resistencia. La corriente se estabilizó tras los cambios con amplitud fuera de tolerancia.
+3. La consigna de 1 A supera el margen observado en el montaje. El residuo bruto a esa consigna superó el límite de rizado. El contraste de la escala de corriente y la medición del período efectivo y el jitter siguen pendientes.
 
 [Documento de diseño](../diseno/README.md) · [Instructivo, secciones 6 y 7 y anexo A](../enunciado/Proyecto_4_EL3313__Taller_de_Diseño_Digital.pdf) · [Entregables de Potencia](potencia/README.md)

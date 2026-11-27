@@ -78,7 +78,7 @@ La fase central es la elección inicial de integración. Su conveniencia frente 
 
 `parametros.h` conserva Kp=12, Kr=200, ancho resonante de 2 Hz y los coeficientes de Tustin con pre-warping a 50 Hz para Ts=100 µs. Se contrastaron numéricamente los coeficientes y los modelos con uno y dos períodos de retardo. Los [ensayos existentes del PR discreto en PLECS](../informe/resultados/potencia/pr_discreto_plecs.json) utilizan un período de retardo y normalización fija de 12 V. Queda pendiente contrastar la temporización completa de la plataforma integrada, inicialmente cercana a 1,5 Ts; los modelos PLECS existentes no se modifican en esta revisión.
 
-Las simulaciones iniciales usaron `VDC_V=12`. El firmware de la demostración configura `VDC_V=24.0f` para un bus fijo de 24 V. El PR calcula una orden de tensión, que se divide entre 24 V antes de limitar la modulación a ±0,85. La FPGA no mide la tensión del bus.
+Las simulaciones iniciales usaron `VDC_V=12`. El firmware de la demostración configura `VDC_V=24.0f` y el bus se fijó en 12 V durante la campaña final. Se eligió esta combinación porque dio el mejor comportamiento del lazo observado durante la puesta a punto en el banco. El PR calcula una orden de tensión, que se divide entre 24 V antes de limitar la modulación a ±0,85. La FPGA no mide la tensión del bus.
 
 En la prueba inicial se observó una pendiente negativa para la orientación usada entonces. En el montaje con control PR se confirmó el signo positivo y se empleó una escala nominal de 7,6383 mA por código. Queda por contrastar esa escala con una medición independiente. El umbral provisional I_MAX=1,5 A tampoco reemplaza la limitación de corriente de la fuente ni la protección eléctrica.
 

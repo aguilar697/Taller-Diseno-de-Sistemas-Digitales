@@ -11,6 +11,8 @@ Los documentos distinguen parámetros nominales, mediciones y estimaciones. El i
 
 ## Evidencias
 
+- [Campaña final del 26/11](../../../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/README.md). Mediciones a 12 V fijos con la versión presentada, capturas de ambos escalones, cambio de carga, rizado, tiempo muerto lógico y JB1.
+
 - [Video de la demostración funcional](https://youtu.be/cNjZ2tLcRmQ). El informe incluye el enlace completo, la fotografía del montaje a 24 V y 0,2 A pico y una captura directa del osciloscopio, con las evidencias incorporadas en el PDF.
 - [Diseño, circuito, componentes y criterios de validación](../../../Potencia/README.md).
 - [Esquemático completo](../../../Potencia/img/esquematico_inversor.svg), [estados de conmutación](../../../Potencia/01_diseno_y_componentes.md#topología-y-alimentaciones) y [asignación PWM de S1–S4](../../diseno/integracion_basys3.md#conexiones).
@@ -24,15 +26,20 @@ Los documentos distinguen parámetros nominales, mediciones y estimaciones. El i
 
 La fotografía `figuras/circuito_completo.JPG` corresponde al montaje aportado por el equipo. La imagen `figuras/osciloscopio_24v_0a2.png` es una copia sin modificaciones de [`scope_08.png`](../../../Potencia/mediciones_lab_osciloscopio/6_6/0.2/24/scope_08.png). Su pie de figura conserva la limitación de rango de los canales; se incluye como registro del ensayo, no como validación del rizado.
 
-Los ensayos documentan el seguimiento a 0,2 A con 12 y 24 V, el seguimiento a 0,5 A con 24 V, los cambios de referencia entre 0,2 y 0,5 A y el aumento resistivo del 50 %. El análisis relaciona la saturación del mando a 1 A con la impedancia de la carga y distingue los resultados del modelo de las mediciones del montaje.
+Con 12 V fijos y 7,3 Ω DC entre A y B, las referencias de 0,20, 0,50 y 1,00 A pico dieron fundamentales de 176, 390 y 337 mA pico por UART. Los cinco puntos evaluados quedaron fuera de ±10 % y se observó saturación a 0,50 y 1,00 A.
 
 ## Regeneración
 
-Desde la carpeta del Proyecto 4, ejecutar:
+Desde la raíz del repositorio, en PowerShell, extraer los modelos históricos cuyas huellas coinciden con el JSON de simulación y compilar los informes.
 
-```text
-python scripts/laboratorio/figuras_informe_potencia.py
-python scripts/generar_informes_potencia.py
+```powershell
+$revisionModelos = 'd0c4399edde3763a6ada19d097d144957cf4ee24'
+$modelosInforme = Join-Path $env:TEMP ('p4-modelos-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $modelosInforme | Out-Null
+$archivoModelos = Join-Path $modelosInforme 'modelos.zip'
+git archive --format=zip -o $archivoModelos $revisionModelos Proyecto4_Inversor_Monofasico/modelos/plecs
+Expand-Archive -LiteralPath $archivoModelos -DestinationPath $modelosInforme
+python Proyecto4_Inversor_Monofasico/scripts/generar_informes_potencia.py --modelos-simulados (Join-Path $modelosInforme 'Proyecto4_Inversor_Monofasico/modelos/plecs')
 ```
 
-El primer comando requiere NumPy y Matplotlib. El segundo requiere una distribución LaTeX con pdflatex, IEEEtran, babel en español, circuitikz, amsmath, booktabs, float, cuted, capt-of e hyperref. Genera las tablas de simulación a partir del JSON, verifica las huellas de los modelos y compila ambos documentos. Los archivos auxiliares quedan en `build/informes_potencia/`.
+El generador requiere una distribución LaTeX con pdflatex, IEEEtran, babel en español, circuitikz, amsmath, booktabs, float, cuted, capt-of e hyperref. Genera las tablas de simulación a partir del JSON, verifica las huellas de los modelos y compila ambos documentos. Los archivos auxiliares quedan en `build/informes_potencia/`.

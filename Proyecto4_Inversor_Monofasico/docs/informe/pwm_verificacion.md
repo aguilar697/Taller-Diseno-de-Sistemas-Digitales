@@ -68,9 +68,9 @@ El [procedimiento de ejecución](../../src/testbench/pwm/README.md) utiliza fuen
 
 ## Integración y pruebas de laboratorio
 
-La plataforma integrada ejecutó el controlador PR con adquisición XADC y exportación UART en los ensayos a 12 y 24 V. Se ajustó el cero del sensor y se comprobó su sentido; la ganancia empleada sigue siendo nominal y requiere contraste independiente. El máximo de ejecución de ISR registrado por software fue de 8,57 µs. El permiso SD de los IR2110 se maneja mediante la conexión externa descrita en la [integración Basys 3](../diseno/integracion_basys3.md), además de la habilitación digital por SW15.
+La plataforma integrada ejecutó el PR, la adquisición y la exportación UART a 12 V fijos en la campaña final. Se midió 1,00 µs de tiempo muerto en las señales lógicas de ambas ramas. La ISR duró hasta 8,94 µs en operación. Un pulso de JB1 midió 7,55 µs. El período efectivo y el jitter, también durante la exportación UART, quedaron sin medir.
 
-Los resultados de seguimiento y perturbaciones se presentan en el [informe técnico](README.md) y en la [bitácora de laboratorio](../../Potencia/04_registro_laboratorio.md). La ejecución física confirma la integración de los subsistemas, pero el cumplimiento se evalúa para cada condición: con 6,6 Ω externos se cumplió el error de amplitud a 0,2 A en ambos buses y a 0,5 A con 24 V; las demás condiciones de esa serie excedieron el límite del 10 %.
+Los [resultados de seguimiento y perturbaciones](README.md#validación-de-la-versión-presentada) documentan la integración física y los límites observados. Con 12 V fijos y 7,3 Ω DC entre A y B, las referencias de 0,20, 0,50 y 1,00 A pico dieron fundamentales de 176, 390 y 337 mA pico por UART. Los cinco puntos evaluados quedaron fuera de ±10 % y se observó saturación a 0,50 y 1,00 A.
 
 Para completar la validación se requiere:
 

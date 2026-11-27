@@ -2,7 +2,7 @@
 
 `adc_system_axi` está conectado al Block Design de MicroBlaze V, con base `0x44A00000`, reloj de 100 MHz y reset AXI activo bajo. El PWM envía un pulso de un ciclo en fase 5000 a 10 kHz. La ISR del Timer consulta la muestra y reconoce su token por AXI. El periférico ADC opera sin IRQ dedicada.
 
-La operación con el ACS712 y el registro por UART se verificaron en el montaje. El cero y el signo se comprobaron en banco y se utilizó la ganancia nominal del acondicionamiento. [Resultados de integración física](../../informe/README.md#operación-a-12-y-24-v).
+La operación con el ACS712 y el registro por UART se verificaron en el montaje. El cero y el signo se comprobaron en banco y se utilizó la ganancia nominal del acondicionamiento. [Resultados de integración física](../../informe/README.md#validación-de-la-versión-presentada).
 
 | Área | Verificación pendiente |
 |---|---|

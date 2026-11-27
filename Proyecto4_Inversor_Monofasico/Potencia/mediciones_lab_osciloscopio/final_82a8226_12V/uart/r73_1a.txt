@@ -1,0 +1,7 @@
+Guardado en t05_181036.bin y t05_181036.csv
+Estado: OPERACIÓN   causa de falla: ninguna
+f_sw = 10000 Hz   Ts = 100000 ns   K_REG = 2   N = 512   amplitud = 1000 mA
+t_isr_max = 894 ciclos (8.94 us)   conversiones perdidas = 0
+Fundamental sobre 5 períodos: medida 0.3374 A, referencia 1.0000 A
+Error de amplitud -66.26 %  (NO cumple <= 10 %)   desfase -68.80 grados
+Residuo de baja frecuencia: 57.8 mA rms   saltos en n: 0

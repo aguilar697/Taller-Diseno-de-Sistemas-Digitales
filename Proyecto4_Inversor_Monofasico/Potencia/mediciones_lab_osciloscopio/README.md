@@ -1,5 +1,7 @@
 # Capturas del osciloscopio del 23/11
 
+La [campaña final del 26/11](final_82a8226_12V/README.md) corresponde a la versión presentada y al bus fijo de 12 V. Las capturas de esta página corresponden al 23/11.
+
 Resta CH1−CH2 (función F1) sobre una resistencia de 3,3 Ω de la carga, con el osciloscopio Agilent DSO-X 2002A a 10 ms/div. Cada carpeta corresponde a una condición: `carga/referencia en A pico/bus en V`. Cada una tiene una imagen de la pantalla y el CSV de la resta (2000 puntos en 100 ms, uno cada 50 µs).
 
 | Carpeta | Tramas del XADC de la misma condición |

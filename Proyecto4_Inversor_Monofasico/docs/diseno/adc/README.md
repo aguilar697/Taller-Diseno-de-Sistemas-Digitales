@@ -1,6 +1,6 @@
 # Subsistema ADC/XADC
 
-Periférico ADC/XADC para Basys 3 (`xc7a35tcpg236-1`). Las pruebas aisladas y la construcción digital integrada se hicieron en **Vivado 2026.1**. La compatibilidad con **2025.1**, versión solicitada, sigue pendiente. En laboratorio se comprobó la lectura en reposo y la adquisición durante el control PR y la exportación UART. El montaje usa el cero y el signo obtenidos en la puesta en marcha; la ganancia conserva el valor nominal del sensor y del divisor. Los [resultados integrados](../../informe/README.md#operación-a-12-y-24-v) distinguen el seguimiento registrado del contraste independiente de esa escala.
+Periférico ADC/XADC para Basys 3 (`xc7a35tcpg236-1`). Las pruebas aisladas y la construcción digital integrada se hicieron en **Vivado 2026.1**. La compatibilidad con **2025.1**, versión solicitada, sigue pendiente. En laboratorio se comprobó la lectura en reposo y la adquisición durante el control PR y la exportación UART. El montaje usa el cero y el signo obtenidos en la puesta en marcha; la ganancia conserva el valor nominal del sensor y del divisor. Los [resultados integrados](../../informe/README.md#validación-de-la-versión-presentada) distinguen el seguimiento registrado del contraste independiente de esa escala.
 
 ## Fuentes y contrato
 

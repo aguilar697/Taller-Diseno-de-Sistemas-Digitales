@@ -122,7 +122,7 @@ Pin & Señal & Conexión\\\midrule
 
 El bootstrap usa SB360, 2,2 $\Omega$ y 1 $\mu$F de película en paralelo con 100 nF. A 10 kHz con $|m|=0{,}85$, la orden superior dura hasta 92,5 $\mu$s. Con presupuestos de diseño de 100 nC de compuerta, 230 $\mu$A del driver, 0,5 mA de fuga y 1,2 mA de la resistencia compuerta--fuente, la carga consumida es de unos 279 nC. Se obtiene una caída de 0,28 V usando solo 1 $\mu$F, sin contar los 100 nF en paralelo \cite{an978}. Deben verificarse el valor efectivo del capacitor y las fugas. El software ordena cinco iteraciones de control con $m=0$ al arrancar para permitir la recarga de ambos capacitores.
 
-El tiempo muerto se fija en 1 $\mu$s (100 ciclos de 100 MHz) en el periférico PWM. Se eligió por encima de los tiempos típicos de propagación del driver y conmutación del MOSFET. La captura de las órdenes confirma la separación de 1 $\mu$s; comprobar el margen efectivo de no solapamiento requiere medir ambas $V_{GS}$ en sus referencias de fuente. Su costo es un error de tensión de $2t_df_{sw}V_{dc}$, el 2\,\% del bus a 10 kHz: 0,31 V de fundamental a 12 V y 0,61 V a 24 V. El lazo puede compensar parte de ese error mientras conserve margen de modulación.
+El tiempo muerto se fija en 1 $\mu$s (100 ciclos de 100 MHz) en el periférico PWM. Se eligió por encima de los tiempos típicos de propagación del driver y conmutación del MOSFET. Las capturas de JA1/JA2 y JA3/JA4 confirman 1,00 $\mu$s en las órdenes lógicas; comprobar el margen efectivo de no solapamiento requiere medir ambas $V_{GS}$ en sus referencias de fuente. Su costo es un error de tensión de $2t_df_{sw}V_{dc}$, el 2\,\% del bus a 10 kHz: 0,31 V de fundamental a 12 V y 0,61 V a 24 V. El lazo puede compensar parte de ese error mientras conserve margen de modulación.
 
 \subsection{Frecuencia de conmutación}
 \label{sec:fsw}
@@ -169,7 +169,7 @@ $I_{pk}$ & \multicolumn{2}{c}{Nominal} & \multicolumn{2}{c}{Estimada}\\
 1,0 & 0,68 & 0,35 & $>1$ & 1,10\\\bottomrule
 \end{tabular}\label{tab:modulacion}\end{table}
 
-Con el devanado de reemplazo, las pruebas alcanzaron el criterio a 0,5 A pico con 24 V. A 1 A pico la modulación saturó con ambos buses. Con $R=25\ \Omega$ a 0,5 A pico, el equivalente serie asigna aproximadamente $(R-6{,}6)I_{\mathrm{rms}}^2=2{,}3$ W al devanado. Es una estimación a partir de la impedancia ajustada y conviene contrastarla con la temperatura y la potencia durante los ensayos.
+En la campaña previa del 23 de noviembre, con el devanado de reemplazo, las pruebas alcanzaron el criterio a 0,5 A pico con 24 V. A 1 A pico la modulación saturó con ambos buses. Con $R=25\ \Omega$ a 0,5 A pico, el equivalente serie asigna aproximadamente $(R-6{,}6)I_{\mathrm{rms}}^2=2{,}3$ W al devanado. Es una estimación a partir de la impedancia ajustada y conviene contrastarla con la temperatura y la potencia durante los ensayos.
 
 \section{Medición}
 El ACS712 de 5 A se conecta en serie con la carga y se alimenta con 5 V regulados; su salida nominal es $v_s=V_{CC}/2+0{,}185\,(V_{CC}/5)\,i_L$ \cite{acs}. Un divisor de 4,7 k$\Omega$/1 k$\Omega$ lleva la señal al rango unipolar de 0 a 1 V del XADC (canal VAUX6, 12 bits) \cite{xadc}:
@@ -191,7 +191,7 @@ En valores medios por período de conmutación, con el puente ideal y $\bar v_{A
 \begin{equation}
 L\frac{di_L}{dt}+Ri_L=mV_{dc}-v_{td},\qquad G_{vi}(s)=\frac{1}{Ls+R},
 \end{equation}
-donde $v_{td}$ es la caída por tiempo muerto. El software calcula una tensión $v_{PR}$ y la convierte en modulación con una normalización fija, $m=\mathrm{sat}_{0{,}85}(v_{PR}/12)$. A 24 V la ganancia de la planta vista por el controlador se duplica; este caso forma parte del análisis. Con retención de orden cero, la planta discreta es
+donde $v_{td}$ es la caída por tiempo muerto. En el modelo de diseño, el software calcula una tensión $v_{PR}$ y la convierte en modulación con una normalización fija, $m=\mathrm{sat}_{0{,}85}(v_{PR}/12)$. A 24 V la ganancia de la planta vista por el controlador se duplica; este caso forma parte del análisis. Con retención de orden cero, la planta discreta es
 \begin{equation}
 G(z)=\frac{V_{dc}}{12}\frac{B\,z^{-1}}{1-Az^{-1}},\quad A=e^{-RT_s/L},\quad B=\frac{1-A}{R}.
 \end{equation}
@@ -263,7 +263,7 @@ La Tabla~\ref{tab:ensayos} organiza los puntos de operación y las perturbacione
 \begin{table}[H]\caption{Ensayos previstos}\centering\small
 \begin{tabular}{@{}p{0.42\columnwidth}p{0.5\columnwidth}@{}}\toprule
 Ensayo & Condición\\\midrule
-Seguimiento nominal & 0,2, 0,5 y 1 A pico; 24 V y, donde la modulación lo permita, 12 V\\
+Seguimiento nominal & 0,2, 0,5 y 1 A pico con bus fijo por campaña; 12 V en la versión presentada\\
 Cambio de consigna & 0,2$\to$0,5 y 0,5$\to$1 A pico con SW1--SW0; el firmware aplica el cambio en el cruce por cero\\
 Cambio de carga & 0,5 A pico; abrir $S_{R3}$: 6,6$\to$9,9 $\Omega$\\
 Rizado & Osciloscopio en la resistencia en cada punto nominal\\
@@ -274,7 +274,7 @@ Comparación & Cada punto frente a PLECS con los mismos $V_{dc}$ y referencia\\\
 Con el bus apagado se comprueban las alimentaciones auxiliares, el apagado con SD alto, la carga del bootstrap, las órdenes de compuerta y el tiempo muerto. Después se registra el reposo con el bus encendido y el PWM detenido para verificar el cero. El bus se energiza con límite de corriente de la fuente, de 1 A para 0,5 A pico y 1,5 A para 1 A pico, y se arranca con SW15 y BTNU. Ante una falla se apaga el bus, se baja SW15 y se abre SD antes de reconocerla con BTND.
 
 \section{Estado del diseño}
-El puente, el accionamiento, el sensado y el PR discreto sobre MicroBlaze V se probaron en el banco. El error fue de $-5{,}05$\,\% y $-3{,}62$\,\% a 0,2 A pico con 12 y 24 V, y de $-5{,}91$\,\% a 0,5 A pico con 24 V. El ajuste de la fundamental situó el establecimiento de los escalones de 0,2 a 0,5 A en 16,4--16,8 ms. El aumento resistivo del 50\,\% a 0,5 A mantuvo el error de amplitud dentro del criterio antes y después del cambio. El punto de 1 A quedó limitado por la saturación de la modulación. El informe técnico reúne los resultados, compara el montaje con la simulación y analiza las condiciones de instrumentación del rizado.
+El puente, el accionamiento, el sensado y el PR discreto sobre MicroBlaze V operaron juntos en el banco. La versión presentada se probó con 12 V fijos, 7,3 y 10,6 $\Omega$ DC entre A y B y una normalización del PR de 24 V en el código. Se eligió esta combinación porque dio el mejor comportamiento del lazo observado durante la puesta a punto en el banco. Con este ajuste, la ganancia ideal de actuación antes de saturación es la mitad de la del modelo de diseño a 12 V. En la carga de 7,3 $\Omega$ se midieron 176, 390 y 337 mA pico para consignas de 0,20, 0,50 y 1,00 A. La modulación saturó a 0,50 y 1,00 A. El informe técnico analiza ambos escalones de referencia, el cambio de carga, el rizado y los límites de la comparación con PLECS.
 \IEEEtriggeratref{8}
 \referencias{enunciado,zmood,teodorescu,pr,yepes,buso,holmes,mohan,ir,an978,irf,acs,xadc,plecs}
 \end{document}

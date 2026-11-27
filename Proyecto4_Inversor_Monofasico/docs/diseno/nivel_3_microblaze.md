@@ -78,7 +78,7 @@ AXI Timer dispone de dos contadores independientes de 32 bits. El contador 0 pro
 
 El Timer no ejecuta el PR ni garantiza que haya una conversión terminada al interrumpir. La configuración nominal usa PWM y control a 10 kHz, con disparo en fase 5000; la disponibilidad ADC se comprobó durante los ensayos registrados. La fase efectiva Timer–PWM y el jitter siguen pendientes de medición. Los 100 MHz del reloj, los 50 Hz de referencia y la frecuencia PWM son magnitudes distintas.
 
-La aplicación compilada inicializa memoria y drivers con el PWM deshabilitado. En cada atención lee y reconoce la muestra antes de procesar las solicitudes de arranque o parada; después ejecuta el control cuando corresponde, escribe la referencia pendiente y registra. El PWM la aplica al comienzo de período. El software organiza la exportación sin esperas bloqueantes; el lazo PR y la exportación se verificaron en el [montaje de laboratorio](../informe/README.md#operación-a-12-y-24-v).
+La aplicación compilada inicializa memoria y drivers con el PWM deshabilitado. En cada atención lee y reconoce la muestra antes de procesar las solicitudes de arranque o parada; después ejecuta el control cuando corresponde, escribe la referencia pendiente y registra. El PWM la aplica al comienzo de período. El software organiza la exportación sin esperas bloqueantes; el lazo PR y la exportación se verificaron en el [montaje de laboratorio](../informe/README.md#validación-de-la-versión-presentada).
 
 ## Justificación y relación con el cuarto nivel
 
