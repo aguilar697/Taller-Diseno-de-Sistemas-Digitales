@@ -2,7 +2,7 @@
 
 Este documento desarrolla los bloques de la [plataforma de tercer nivel](nivel_3_microblaze.md) mediante cuatro vistas: interconexión, memoria/procesamiento, reloj/reset y Timer/interrupciones. Se conservan los requisitos del [segundo nivel](nivel_2.md): 100 MHz, caché de instrucciones de 8 KB, memoria local de 32 KB y acceso AXI a periféricos.
 
-El Block Design ya fue construido y validado con Vivado/Vitis 2026.1. Las figuras conservan la propuesta inicial: sus rótulos pendientes y conexiones agrupadas no sustituyen el diseño implementado. La [guía de implementación](implementacion_microblaze.md#arquitectura-y-conexiones) describe la plataforma digital independiente y la [integración Basys 3](integracion_basys3.md) identifica la construcción de laboratorio. La compatibilidad con 2025.1 sigue pendiente. El lazo PR integrado operó en el [montaje de laboratorio](../informe/README.md#operación-a-12-y-24-v).
+El Block Design ya fue construido y validado con Vivado/Vitis 2026.1. Las figuras conservan la propuesta inicial: sus rótulos pendientes y conexiones agrupadas no sustituyen el diseño implementado. La [guía de implementación](implementacion_microblaze.md#arquitectura-y-conexiones) describe la plataforma digital independiente y la [integración Basys 3](integracion_basys3.md) identifica la construcción de laboratorio. La compatibilidad con 2025.1 sigue pendiente. El lazo PR integrado operó en el [montaje de laboratorio](../informe/README.md#validación-de-la-versión-presentada).
 
 ## 1. Interconexión AXI y mapa de memoria
 
@@ -165,7 +165,7 @@ AXI Timer establece el evento periódico nominal del control. Su IRQ pasa por In
 
 La IP contiene dos contadores independientes de 32 bits, no una cascada de 64 bits. El driver configura Timer 0 descendente, con recarga automática e interrupción, y Timer 1 ascendente para mediciones, sin habilitar su interrupción. La recarga evita reprogramar cada intervalo ([PG079: modo Generate](https://docs.amd.com/r/en-US/pg079-axi-timer/Generate-Mode)).
 
-El período nominal configurado es 100 µs: 10000 ciclos de 100 MHz. `drv_timer.c` carga `TLR0=9998`, pues el modo de generación descendente utiliza `(TLR0 + 2) · Tclk`. Timer 1 permite medir ciclos transcurridos. Estas configuraciones y el enlace del software están comprobados; la periodicidad efectiva, el jitter y el tiempo completo de atención aún deben medirse en FPGA.
+El período nominal configurado es 100 µs: 10000 ciclos de 100 MHz. `drv_timer.c` carga `TLR0=9998`, pues el modo de generación descendente utiliza `(TLR0 + 2) · Tclk`. Timer 1 permite medir ciclos transcurridos. Estas configuraciones y el enlace del software están comprobados; la periodicidad efectiva y el jitter siguen pendientes.
 
 Cuando vence el intervalo, el Timer registra la condición de interrupción y su ruta solicita atención. El software debe reconocer la fuente y limpiar el estado pendiente según el IP y el controlador utilizado; entrar o retornar de la rutina no sustituye ese reconocimiento. La ruta IRQ no debe suponerse un pulso de un ciclo idéntico a `pwm_trigger_o`.
 
@@ -183,6 +183,6 @@ La fecha del evento del Timer y el comienzo real de la rutina son instantes dist
 
 El presupuesto de una iteración debe incluir atención, lectura ADC, cálculo PR, escritura PWM y registro de muestra. Debe terminar antes del siguiente plazo acordado, con margen para las demás tareas. La exportación UART solicitada mediante GPIO se atiende sin esperas bloqueantes que impidan ese cumplimiento; el tamaño del buffer y su gestión pertenecen a la aplicación.
 
-Separar Timer, adquisición y PWM permite verificar cada función sin confundir sus frecuencias. El [informe conjunto](../informe/README.md) distingue pruebas digitales, implementación y observaciones de laboratorio. En los registros de laboratorio, la duración máxima instrumentada de la ISR fue de 8,57 µs y se recibieron exportaciones UART durante la operación. Ese máximo observado no constituye una cota de peor caso. La fase Timer–PWM, el jitter y la latencia muestra–actuación requieren mediciones específicas; también se conserva la revisión de avisos de BSP y metodología y de compatibilidad con 2025.1.
+Separar Timer, adquisición y PWM permite verificar cada función sin confundir sus frecuencias. El [informe conjunto](../informe/README.md) distingue pruebas digitales, implementación y observaciones de laboratorio. En los registros de laboratorio, la duración máxima instrumentada de la ISR fue de 8,94 µs y un pulso de JB1 midió 7,55 µs. Se recibieron exportaciones UART durante la operación. Ese máximo observado no constituye una cota de peor caso. La fase Timer–PWM, el jitter y la latencia muestra–actuación requieren mediciones específicas; también se conserva la revisión de avisos de BSP y metodología y de compatibilidad con 2025.1.
 
 [Tercer nivel: plataforma y funciones](nivel_3_microblaze.md) · [Segundo nivel del sistema](nivel_2.md) · [Índice del diseño](README.md)

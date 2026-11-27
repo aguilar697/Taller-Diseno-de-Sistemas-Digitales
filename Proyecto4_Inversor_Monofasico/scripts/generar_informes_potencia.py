@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -91,12 +92,16 @@ def tablas(datos: dict) -> str:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--modelos-simulados", type=Path, default=PROYECTO / "modelos/plecs",
+                        help="Directorio de los modelos con que se generó el JSON de resultados.")
+    args = parser.parse_args()
     compilador = shutil.which("pdflatex")
     if not compilador:
         raise SystemExit("Se requiere pdflatex con IEEEtran, babel-spanish y booktabs.")
     datos = json.loads(RESULTADOS.read_text(encoding="utf-8"))
     for nombre, esperado in datos["modelos_sha256"].items():
-        modelo = PROYECTO / f"modelos/plecs/{nombre}.plecs"
+        modelo = args.modelos_simulados / f"{nombre}.plecs"
         actual = hashlib.sha256(modelo.read_bytes()).hexdigest()
         if actual != esperado:
             raise SystemExit(
@@ -109,6 +114,12 @@ def main() -> None:
         shutil.copy2(fuente, BUILD / fuente.name)
     if (FUENTES / "figuras").is_dir():
         shutil.copytree(FUENTES / "figuras", BUILD / "figuras", dirs_exist_ok=True)
+    evidencia = PROYECTO / "Potencia/mediciones_lab_osciloscopio/final_82a8226_12V"
+    for ensayo in ("regimen", "escalones", "cambio_carga"):
+        destino_figuras = BUILD / "figuras/final_12v" / ensayo
+        destino_figuras.mkdir(parents=True, exist_ok=True)
+        for figura in (evidencia / ensayo).glob("*.png"):
+            shutil.copy2(figura, destino_figuras / figura.name)
     for nombre in ("diseno_potencia", "informe_potencia"):
         for _ in range(2):
             ejecucion = subprocess.run(

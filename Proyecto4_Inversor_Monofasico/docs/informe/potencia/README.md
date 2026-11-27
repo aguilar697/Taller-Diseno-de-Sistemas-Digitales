@@ -11,7 +11,9 @@ Los documentos distinguen parámetros nominales, mediciones y estimaciones. El i
 
 ## Evidencias
 
-- [Video de la demostración funcional](https://youtu.be/cNjZ2tLcRmQ). El informe incluye el enlace completo, la fotografía del montaje a 24 V y 0,2 A pico y una captura directa del osciloscopio, con las evidencias incorporadas en el PDF.
+- [Campaña final del 26/11](../../../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/README.md). Mediciones a 12 V fijos con la versión presentada, capturas de ambos escalones, cambio de carga, rizado, tiempo muerto lógico y JB1.
+
+- [Video de la demostración funcional](https://youtu.be/cNjZ2tLcRmQ). El anexo incluye el enlace al video, la fotografía del montaje y la gráfica del osciloscopio de la campaña final a 12 V y 0,20 A pico.
 - [Diseño, circuito, componentes y criterios de validación](../../../Potencia/README.md).
 - [Esquemático completo](../../../Potencia/img/esquematico_inversor.svg), [estados de conmutación](../../../Potencia/01_diseno_y_componentes.md#topología-y-alimentaciones) y [asignación PWM de S1–S4](../../diseno/integracion_basys3.md#conexiones).
 - [Modelos PLECS y reproducción](../../../modelos/README.md).
@@ -20,19 +22,24 @@ Los documentos distinguen parámetros nominales, mediciones y estimaciones. El i
 - [Tramas del 21/11](../resultados/potencia/laboratorio/2026-11-21/resultados.md): seguimiento a 0,2 A pico con 12 y 24 V e intentos a 0,5 A.
 - [Tramas del 23/11](../resultados/potencia/laboratorio/2026-11-23/resultados.md): rango nominal con 6,6 y 9,9 Ω, escalones de referencia, cambio de carga y una falla capturada.
 - [Capturas del osciloscopio del 23/11](../../../Potencia/mediciones_lab_osciloscopio/README.md), con su limitación.
-- [Figuras de los informes](figuras/). Las gráficas de seguimiento, saturación, escalón de referencia y cambio de carga se regeneran con [`figuras_informe_potencia.py`](../../../scripts/laboratorio/figuras_informe_potencia.py), que también imprime la impedancia equivalente estimada de la carga. Cada gráfica se presenta después del párrafo que explica el ensayo.
+- [Figuras de los informes](figuras/). Las gráficas de la campaña del 23/11 se regeneran con [`figuras_informe_potencia.py`](../../../scripts/laboratorio/figuras_informe_potencia.py), que también imprime la impedancia equivalente estimada de la carga. El informe incorpora directamente los PNG de la campaña final desde su carpeta de evidencias.
 
-La fotografía `figuras/circuito_completo.JPG` corresponde al montaje aportado por el equipo. La imagen `figuras/osciloscopio_24v_0a2.png` es una copia sin modificaciones de [`scope_08.png`](../../../Potencia/mediciones_lab_osciloscopio/6_6/0.2/24/scope_08.png). Su pie de figura conserva la limitación de rango de los canales; se incluye como registro del ensayo, no como validación del rizado.
+La gráfica del anexo presenta las muestras de tensión registradas por el osciloscopio y un ajuste de la fundamental a 50 Hz sobre la adquisición completa de 100 ms. [CSV del osciloscopio](../../../Potencia/mediciones_lab_osciloscopio/final_82a8226_12V/regimen/0a2_scope_16.csv).
 
-Los ensayos documentan el seguimiento a 0,2 A con 12 y 24 V, el seguimiento a 0,5 A con 24 V, los cambios de referencia entre 0,2 y 0,5 A y el aumento resistivo del 50 %. El análisis relaciona la saturación del mando a 1 A con la impedancia de la carga y distingue los resultados del modelo de las mediciones del montaje.
+Con 12 V fijos y 7,3 Ω DC entre A y B, las referencias de 0,20, 0,50 y 1,00 A pico dieron fundamentales de 176, 390 y 337 mA pico por UART. Los cinco puntos evaluados quedaron fuera de ±10 % y se observó saturación a 0,50 y 1,00 A.
 
 ## Regeneración
 
-Desde la carpeta del Proyecto 4, ejecutar:
+Desde la raíz del repositorio, en PowerShell, extraer los modelos históricos cuyas huellas coinciden con el JSON de simulación y compilar los informes.
 
-```text
-python scripts/laboratorio/figuras_informe_potencia.py
-python scripts/generar_informes_potencia.py
+```powershell
+$revisionModelos = 'd0c4399edde3763a6ada19d097d144957cf4ee24'
+$modelosInforme = Join-Path $env:TEMP ('p4-modelos-' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $modelosInforme | Out-Null
+$archivoModelos = Join-Path $modelosInforme 'modelos.zip'
+git archive --format=zip -o $archivoModelos $revisionModelos Proyecto4_Inversor_Monofasico/modelos/plecs
+Expand-Archive -LiteralPath $archivoModelos -DestinationPath $modelosInforme
+python Proyecto4_Inversor_Monofasico/scripts/generar_informes_potencia.py --modelos-simulados (Join-Path $modelosInforme 'Proyecto4_Inversor_Monofasico/modelos/plecs')
 ```
 
-El primer comando requiere NumPy y Matplotlib. El segundo requiere una distribución LaTeX con pdflatex, IEEEtran, babel en español, circuitikz, amsmath, booktabs, float, cuted, capt-of e hyperref. Genera las tablas de simulación a partir del JSON, verifica las huellas de los modelos y compila ambos documentos. Los archivos auxiliares quedan en `build/informes_potencia/`.
+El generador requiere una distribución LaTeX con pdflatex, IEEEtran, babel en español, circuitikz, amsmath, booktabs, float, cuted, capt-of e hyperref. Genera las tablas de simulación a partir del JSON, verifica las huellas de los modelos y compila ambos documentos. Los archivos auxiliares quedan en `build/informes_potencia/`.

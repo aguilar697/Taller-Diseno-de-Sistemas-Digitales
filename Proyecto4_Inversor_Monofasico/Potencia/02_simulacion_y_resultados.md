@@ -6,7 +6,7 @@ Las primeras simulaciones se realizaron con un puente H ideal, PWM unipolar y ca
 
 Los ensayos exploratorios incluyeron referencias de 0,2; 0,5 y 1 A pico a 50 Hz, alimentación de 12 y 24 V, cambios de bus y aumento de resistencia. Las gráficas revisadas mostraron recuperación del seguimiento después de las perturbaciones y reducción de la modulación al aumentar el bus. Se conservan como observaciones preliminares: las capturas y los datos originales de esos ensayos no están incorporados como evidencias en este directorio.
 
-La comparación cuantitativa final requiere repetir los casos con parámetros identificados, exportar datos y analizar las ventanas indicadas en el [plan de validación](03_pendientes_y_validacion.md). El máximo instantáneo y la corriente RMS de un scope no sustituyen la amplitud de la fundamental.
+El [informe experimental](../docs/informe/potencia/informe_potencia.pdf) compara PLECS con la campaña final a 12 V. La simulación funcional usa una normalización de 12 V y el firmware presentado conserva 24 V como divisor, valor elegido durante la puesta a punto con el bus a 12 V. La comparación usa la amplitud de la fundamental de corriente en régimen.
 
 ## Modelos conservados
 
@@ -166,7 +166,7 @@ Las copias con PR discreto y efectos funcionales permiten evaluar muestreo, reta
 2. Incorporar resistencia de conducción y caída de diodos justificadas, órdenes con tiempo muerto y apagado; los retardos de accionamiento se modelan como hipótesis identificadas, pendientes de contrastar con mediciones.
 3. Representar el sensor mediante offset, sensibilidad, divisor, filtro y muestreo/retención. Los valores nominales permiten evaluar escalas y retardo; la calibración y el ruido deben proceder de las pruebas del módulo.
 4. Acordar el período de control con software y adquisición, discretizar el PR y estudiar estabilidad, saturación y retardo de actualización antes de cerrar sus coeficientes.
-5. Ejecutar por separado los tres puntos nominales, los cambios de referencia y el cambio resistivo; conservar condiciones, datos y método de extracción de fundamental y rizado. La variación del bus es una comprobación adicional.
+5. Ejecutar por separado los tres puntos nominales, los cambios de referencia y el cambio resistivo; conservar condiciones, datos y método de extracción de fundamental y rizado. Para reproducir la campaña final, mantener fijo el bus en 12 V.
 
 El MOSFET habitual de PLECS se controla con una señal lógica y puede incorporar Ron; esa entrada no es una compuerta eléctrica cuya tensión se pueda medir. Los efectos del accionamiento se pueden representar funcionalmente sin disponer de un bloque IR2110. La comprobación del bootstrap, VGS, resistencia de compuerta y parásitos requiere un modelo eléctrico detallado o mediciones de banco. [Plexim, modelo MOSFET](https://docs.plexim.com/plecs/5.0/components-by-category/mosfet/).
 

@@ -262,7 +262,7 @@ Las pruebas de PC terminan con un código de error ante cualquier falla y guarda
 
 ## Validación en tarjeta
 
-El ensayo a 12 y 24 V verificó el seguimiento de corriente en parte del rango, el cambio de carga y la recepción de tramas UART durante operación. El firmware conserva los parámetros en `software/embedded/control/parametros.h`. [Resultados de integración física](../informe/README.md#operación-a-12-y-24-v).
+La campaña final a 12 V verificó el funcionamiento del PR y la recepción de tramas UART en operación. También registró los dos escalones de consigna y el cambio de carga. El firmware conserva los parámetros en `software/embedded/control/parametros.h`. [Resultados de integración física](../informe/README.md#validación-de-la-versión-presentada).
 
 | Pendiente | Qué falta | Afecta a |
 |---|---|---|

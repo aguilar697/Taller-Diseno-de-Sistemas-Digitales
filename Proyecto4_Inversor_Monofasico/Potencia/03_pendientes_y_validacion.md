@@ -4,24 +4,17 @@
 
 El alcance se toma de la sección 4.3 y del anexo B del [instructivo](../docs/enunciado/Proyecto_4_EL3313__Taller_de_Diseño_Digital.pdf). El [informe experimental](../docs/informe/potencia/informe_potencia.pdf) presenta las mediciones, su contraste con PLECS y las discrepancias.
 
-| Requisito | Disponible | Trabajo por completar |
+| Requisito | Evidencia de la campaña final | Trabajo por completar |
 |---|---|---|
-| Etapa de potencia y carga | Puente H con IRF540N e IR2110, carga con 6,6 y 9,9 Ω externos, dimensionamiento y cambio de carga en marcha | Caracterizar el devanado de reemplazo en la banda de operación |
-| Pérdidas y frecuencia | Estimaciones de conducción y conmutación, comparación de frecuencias y selección de 10 kHz | Confirmar el rizado experimental |
-| Planta RL y PR | Modelo nominal en PLECS, comparación experimental e impedancia aparente estimada | Comprobar la impedancia con tensión y corriente medidas de forma independiente |
-| Medición | Cero y signo comprobados, escala nominal aplicada y tramas del XADC | Contrastar la ganancia y el ruido con una referencia independiente |
-| Seguimiento de 50 Hz | Dentro de ±10 % a 0,2 A con ambos buses y a 0,5 A con 24 V. Fuera de tolerancia a 0,5 A con 12 V y a 1 A con ambos buses | Mejorar el margen del montaje para los puntos fuera de tolerancia |
-| Cambio de referencia | Seis ensayos de 0,2 a 0,5 A con 24 V y 6,6 Ω | Ensayar 0,5 a 1 A con la misma carga cuando el punto de 1 A sea viable |
-| Cambio de carga | +50 % con inductancia fija a 0,5 A pico y 24 V. Amplitud dentro de ±10 % antes y después | Completar las trazas de tensión, corriente independiente y PWM del transitorio |
-| Integración con Taller | Lazo físico con MicroBlaze V, PWM, XADC y exportación UART en operación | Medir período efectivo, jitter y relación entre disparo, ISR y actuación |
+| Etapa de potencia y carga | Puente H con IRF540N e IR2110. Tiempo muerto lógico de 1,00 µs en ambas ramas | Caracterizar el devanado y verificar las transiciones en compuerta |
+| Rizado | Residuo bruto de 166, 180 y 251 mA pp para 0,20, 0,50 y 1,00 A. Tras el filtrado diagnóstico, 47, 48 y 49 mA pp | Repetir la medición a 1,00 A con instrumentación diferencial |
+| Planta y sensado | Comparación con PLECS y contraste entre UART y caída en 3,4 Ω | Verificar la ganancia del ACS712 y medir la impedancia en operación |
+| Seguimiento de 50 Hz | Error a 7,3 Ω de −12,1 %, −22,0 % y −66,3 %. A 10,6 Ω, −15,4 % y −31,7 % | Cuantificar el margen de actuación y comparar el seguimiento con distintos divisores del PR bajo las mismas condiciones de carga |
+| Cambios de referencia | Establecimiento de ≈75 ms para 0,20 → 0,50 A y ≈60 ms para 0,50 → 1,00 A. En el segundo escalón la amplitud final disminuyó | Verificar la recuperación de la amplitud solicitada |
+| Cambio de carga | 7,3 → 10,6 Ω DC (+45 %) a 0,50 A pico y L fija. Establecimiento de 20–40 ms y caída de ≈12 % respecto a la amplitud previa | Verificar la recuperación de la amplitud solicitada |
+| Integración con Taller | PR, PWM, XADC y exportación UART. ISR de hasta 8,94 µs en operación | Medir período efectivo y jitter en JB1, también durante la exportación UART |
 
-El diseño de potencia y su informe corresponden a Kevin Aguilar, Kenneth Campos y Kevin Cortés. La plataforma de Daniel Puentes pertenece a Taller. La sección 8.2 separa los 80 puntos propios de PEDP de los 20 de integración; demostrar los primeros también requiere un controlador discreto funcionando físicamente. La organización de ambos informes se conserva en [docs/informe](../docs/informe/README.md).
-
-## Mediciones por completar
-
-1. Repetir una condición estable a 24 V y 0,5 A con corriente independiente, tensión aplicada y PWM registrados en la misma prueba. Para el rizado se requiere una ventana corta, con los canales dentro de escala y una tasa de muestreo que resuelva la conmutación.
-2. Caracterizar el devanado y contrastar el cero y la ganancia del ACS712 en ambos sentidos. Con esa evidencia, seleccionar la carga que ofrezca margen para llegar a 1 A y repetir el seguimiento y el escalón de 0,5 a 1 A.
-3. Medir el período y jitter en JB1 durante operación extendida, incluida la exportación UART. Documentar por separado el ancho del pulso de diagnóstico y el intervalo entre flancos sucesivos.
+[Capturas, tramas y condiciones de ensayo](mediciones_lab_osciloscopio/final_82a8226_12V/README.md).
 
 ## Condiciones de aceptación
 
@@ -36,13 +29,13 @@ El [instructivo del proyecto](../docs/enunciado/Proyecto_4_EL3313__Taller_de_Dis
 | Fase | Medir y reportar el desfase respecto a la referencia |
 | Rizado | Conmutación ≤0,20 A pico a pico, separada de la componente de baja frecuencia |
 | Cambio de referencia | Ensayar 0,2 → 0,5 A y 0,5 → 1 A pico sin cambiar la carga |
-| Cambio de carga | Variar la resistencia externa al menos 25 % con L fija y referencia de 0,5 A pico. El ensayo registrado empleó 6,6 → 9,9 Ω |
+| Cambio de carga | Variar la resistencia externa al menos 25 % con L fija y referencia de 0,5 A pico. El ensayo final empleó 7,3 → 10,6 Ω DC entre A y B |
 | Control | Justificar sintonización, discretización, estabilidad y retardo del PR implementado |
 | Carga inductiva | Documentar los valores utilizados, resistencia del devanado y condición del primario; verificar corriente y disipación. El instructivo no exige curvas de saturación ni caracterización magnética especializada |
 | PWM digital | Ofrecer al menos tres frecuencias seleccionables y justificar la frecuencia nominal, el tiempo muerto y la saturación |
 | Puesta en marcha | Verificar compuertas y tiempo muerto antes de energizar el puente; documentar limitación de corriente y desconexión ante fallos |
 
-Como condición adicional de diseño se ensayarán cambios de bus de 12 a 24 V y de 24 a 12 V, además de variaciones graduales. Se registrarán los picos y la recuperación del seguimiento. Esta prueba complementa los cambios de referencia y carga exigidos.
+En la campaña final el bus se mantuvo fijo a 12 V durante los cambios de referencia y de carga.
 
 La amplitud se evaluará mediante:
 

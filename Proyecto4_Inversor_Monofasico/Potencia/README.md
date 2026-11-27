@@ -2,7 +2,7 @@
 
 El inversor emplea un puente H con cuatro IRF540N, dos IR2110 y un ACS712 de 5 A. La carga nominal combina 6,6 Ω externos con el secundario de un transformador. El objetivo es regular corriente sinusoidal de 50 Hz con un bus de 12 a 24 V y consignas de 0,2, 0,5 y 1 A pico.
 
-En PLECS se ensayaron las tres consignas y los transitorios de referencia y carga con un PR discreto. El montaje físico operó en lazo cerrado con el devanado de reemplazo. Las mediciones del XADC cumplen el criterio de amplitud a 0,2 A pico con 12 y 24 V y a 0,5 A pico con 24 V. A 1 A pico la modulación alcanzó su límite y la corriente quedó por debajo de la consigna. La validación física permanece abierta para el escalón hacia 1 A, el rizado y el contraste independiente de la escala del sensor.
+En la campaña final se registraron los dos escalones de referencia y un cambio de carga. Con 12 V fijos y 7,3 Ω DC entre A y B, las referencias de 0,20, 0,50 y 1,00 A pico dieron fundamentales de 176, 390 y 337 mA pico por UART. Los cinco puntos evaluados quedaron fuera de ±10 % y se observó saturación a 0,50 y 1,00 A. [Mediciones de la campaña final](mediciones_lab_osciloscopio/final_82a8226_12V/README.md).
 
 El [esquemático completo](img/esquematico_inversor.svg) muestra los cuatro interruptores S1–S4, ambos IR2110, la carga y el sensado. Los [estados del puente](01_diseno_y_componentes.md#topología-y-alimentaciones) y la [asignación de pines](../docs/diseno/integracion_basys3.md#conexiones) detallan su funcionamiento y cableado.
 

@@ -26,7 +26,7 @@ Taller de Diseño Digital comprende a los cuatro integrantes. En Procesamiento E
 - [Reconstrucción en Basys 3](docs/diseno/integracion_basys3.md) y [conexiones de S1–S4 desde el PWM](docs/diseno/integracion_basys3.md#conexiones).
 - [Diseño, simulación e informe de Potencia](Potencia/README.md).
 
-La Basys 3 ejecutó el control PR del inversor en lazo cerrado y exportó por UART la referencia, la corriente medida y la modulación. Con la carga de laboratorio, la fundamental quedó dentro de ±10 % a 0,2 A pico con 12 y 24 V, y a 0,5 A pico con 24 V. También se registraron el escalón de 0,2 a 0,5 A y el aumento de resistencia externa de 6,6 a 9,9 Ω en marcha. Quedan por resolver el seguimiento a 0,5 A pico con 12 V y a 1 A pico con ambos buses, el escalón hacia esa consigna y la medición del rizado. [Resultados de laboratorio](docs/informe/README.md#laboratorio-y-análisis-de-discrepancias).
+La Basys 3 ejecutó el PR en lazo cerrado y exportó muestras por UART. Con 12 V fijos y 7,3 Ω DC entre A y B, las referencias de 0,20, 0,50 y 1,00 A pico dieron fundamentales de 176, 390 y 337 mA pico por UART. Los cinco puntos evaluados quedaron fuera de ±10 % y se observó saturación a 0,50 y 1,00 A. [Resultados de laboratorio](docs/informe/README.md#validación-de-la-versión-presentada).
 
 ## Estructura
 
