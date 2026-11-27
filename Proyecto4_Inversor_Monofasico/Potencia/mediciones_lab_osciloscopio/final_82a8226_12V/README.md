@@ -57,8 +57,13 @@ CH1 y CH2 en los extremos de la resistencia, F1 = CH1 − CH2, ventana de 200 µ
 - D (ambas sondas en el mismo punto) se tomó a 20 ms/div: desfase −59 mV y 75 mV pp.
   No es comparable con A–C.
 
+## Lazo de control en JB1 (`jb1/`)
+
+Una captura de un solo pulso: ancho 7,55 µs al 50 %, nivel alto 3,26 V. No se confirmó
+el estado del sistema y el disparo no estaba en ese flanco. No mide período ni jitter.
+
 ## Pendiente
 
-- Período y jitter del lazo en JB1, también durante la exportación UART.
+- Período y jitter del lazo en JB1, también durante la exportación UART (no medidos).
 - Componente de baja frecuencia en la ventana del rizado (se reporta aparte).
 - Opcional: tiempo muerto en V_GS, D repetida a 20 µs/div.
